@@ -21,6 +21,10 @@
       <form action="auth" method="post">
 	<table>
 	  <tr>
+	    <td>Server URL: </td>
+            <td><input type="text" name="server" width="20" value="cnx.org"/></td>
+	  </tr>
+	  <tr>
             <td>Username: </td>
             <td><input type="text" name="username" width="20"/></td>
 	  </tr>

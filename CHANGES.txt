@@ -1,3 +1,9 @@
+0.1.1
+-----
+
+- Made it possible to select the server used on the login page.
+  Available under "Advanced" options.
+
 0.1
 ---
 
