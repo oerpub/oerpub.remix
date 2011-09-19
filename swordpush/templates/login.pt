@@ -21,8 +21,8 @@
       <form action="auth" method="post">
 	<table>
 	  <tr>
-	    <td>Server URL: </td>
-            <td><input type="text" name="server" width="20" value="cnx.org"/></td>
+	    <td>Service document URL: </td>
+            <td><input type="text" name="serviceDocument" width="20" value="http://cnx.org/sword"/></td>
 	  </tr>
 	  <tr>
             <td>Username: </td>
