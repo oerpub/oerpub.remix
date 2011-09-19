@@ -16,7 +16,7 @@ def UploadView(request):
     password = authString[pos+1:]
     assert base64.b64encode(username + ':' + password) == inputs['credentials']
 
-    conn = swordcnx.Connection("http://cnx.org/sword",
+    conn = swordcnx.Connection(inputs['swordServer'] + "/sword",
                                user_name=username,
                                user_pass=password,
                                download_service_document=True)
@@ -40,6 +40,7 @@ def UploadView(request):
         inputs['keywords'].split("\n"), filesToUpload)
 
     return {
+        'swordServer': inputs['swordServer'],
         'credentials': inputs['credentials'],
         'swordCollections': swordCollections,
         'url': inputs['url'],
