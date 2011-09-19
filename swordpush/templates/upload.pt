@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+  <title>SwordPush: Upload to Connexions</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="keywords" content="sword upload client connexions" />
+  <meta name="description" content="SWORD version 1 upload client for Connexions" />
+  <link rel="stylesheet" href="${request.static_url('swordpush:static/swordpush.css')}" type="text/css" media="screen" charset="utf-8" />
+</head>
+<body>
+  <div id="header">
+    <div class="header">
+      <h1>Connexions content uploader</h1>
+    </div>
+  </div>
+  <div id="body">
+    <p class="body">
+      Please enter the title, etc. below and select the file or files to upload.
+    </p>
+    <div class="body">
+      <form action="upload" method="post" enctype="multipart/form-data">
+	<input type="hidden" name="credentials" value="${credentials}"/>
+	<input type="hidden" name="MAX_FILE_SIZE" value="2000000"/>
+	<table>
+	  <tr>
+            <td></td>
+            <td></td>
+            <td align="center">Remember?</td>
+	  </tr>
+
+	  <tr>
+            <td>Deposit location:</td>
+            <td><select name="url" tabindex="1">
+	      <option
+		 tal:repeat="entry swordCollections"
+		 tal:content="python:entry['title']"
+		 tal:attributes="value python:entry['url'];
+				 selected python:entry['url']==url">title</option>
+            </select></td>
+	    <td align="center"><input type="checkbox" disabled="disabled" checked="checked"/></td>
+	  </tr>
+
+	  <tr>
+            <td>Title:</td>
+            <td><input type="text" name="title" size="50" value="${title}" tabindex="2"/></td>
+	    <td align="center"><input type="checkbox" name="keepTitle" checked="${keepTitle}"/></td>
+	  </tr>
+
+	  <tr>
+            <td>Summary:</td>
+            <td><textarea name="summary" rows="10" cols="50" tabindex="3">${summary}</textarea></td>
+	    <td align="center"><input type="checkbox" name="keepSummary" checked="${keepSummary}"/></td>
+	  </tr>
+
+	  <tr>
+            <td>Keywords:<br/>(one per line)</td>
+            <td><textarea name="keywords" rows="5" cols="50" tabindex="4">${keywords}</textarea></td>
+	    <td align="center"><input type="checkbox" name="keepKeywords" checked="${keepKeywords}"/></td>
+	  </tr>
+
+	  <tr>
+            <td>Language:</td>
+            <td><select name="language" tabindex="5">
+	      <option
+		 tal:repeat="entry languages"
+		 tal:content="python:entry[1]"
+		 tal:attributes="value python:entry[0];
+				 selected python:entry[0]==language">English</option>
+            </select></td>
+	    <td align="center"><input type="checkbox" disabled="disabled" checked="checked"/></td>
+	  </tr>
+
+	  <tr>
+            <td>Files:</td>
+            <td><input type="file" name="file1" size="50" tabindex="6"/></td>
+            <td></td>
+	  </tr>
+	  <tr>
+            <td></td>
+            <td><input type="file" name="file2" size="50" tabindex="7"/></td>
+            <td></td>
+	  </tr>
+	  <tr>
+            <td></td>
+            <td><input type="file" name="file3" size="50" tabindex="8"/></td>
+            <td></td>
+	  </tr>
+
+	  <tr>
+            <td colspan="3" align="right"><input type="submit" value="Upload" tabindex="9"/></td>
+	  </tr>
+
+	</table>
+	<p class="body">
+	  All uploaded files will be placed in the same module.
+	</p>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

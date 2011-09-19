@@ -1,0 +1,10 @@
+0.1
+---
+
+- Implemented basic uploader, as used to be implemented in the old PHP
+  code.
+
+0.0
+---
+
+-  Initial version
