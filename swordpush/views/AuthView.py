@@ -8,11 +8,7 @@ def AuthView(request):
     # TODO: check credentials against Connexions and ask for login
     # again if failed.
 
-    swordServer = request.params['server']
-    if swordServer.find("://") == -1:
-        swordServer = "http://" + swordServer
-    if swordServer[-1] == "/":
-        swordServer = swordServer[:-1]
+    serviceDocument = request.params['serviceDocument']
 
     # Encode authentication information
     import base64
@@ -21,7 +17,7 @@ def AuthView(request):
     digest = base64.b64encode(username + ':' + password)
 
     # Authenticate to Connexions
-    conn = swordcnx.Connection(swordServer + "/sword",
+    conn = swordcnx.Connection(serviceDocument,
                                user_name=username,
                                user_pass=password,
                                download_service_document=True)
@@ -30,7 +26,7 @@ def AuthView(request):
     swordCollections = swordcnx.parse_service_document(conn.sd)
 
     return {
-        'swordServer': swordServer,
+        'serviceDocument': serviceDocument,
         'credentials': digest,
         'swordCollections': swordCollections,
         'url': '',

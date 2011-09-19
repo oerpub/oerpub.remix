@@ -19,7 +19,7 @@
     </p>
     <div class="body">
       <form action="upload" method="post" enctype="multipart/form-data">
-	<input type="hidden" name="swordServer" value="${swordServer}"/>
+	<input type="hidden" name="serviceDocument" value="${serviceDocument}"/>
 	<input type="hidden" name="credentials" value="${credentials}"/>
 	<input type="hidden" name="MAX_FILE_SIZE" value="2000000"/>
 	<table>
