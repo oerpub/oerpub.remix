@@ -1,4 +1,4 @@
-import sword1cnx as swordcnx
+import swordcnx
 from languages import languages
 from decorators import main_template
 
