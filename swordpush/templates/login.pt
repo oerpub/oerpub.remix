@@ -1,19 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
-<head>
-  <title>SwordPush: Connexions login required</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="keywords" content="sword upload client connexions" />
-  <meta name="description" content="SWORD version 1 upload client for Connexions" />
-  <link rel="stylesheet" href="${request.static_url('swordpush:static/swordpush.css')}" type="text/css" media="screen" charset="utf-8" />
-</head>
-<body>
-  <div id="header">
-    <div class="header">
-      <h1>Connexions content uploader</h1>
-    </div>
-  </div>
-  <div id="body">
+<metal:use use-macro="main.macros['main']">
+<metal:body metal:fill-slot="body">
     <p class="body">
       Please provide the credentials that you will be using for this session.
     </p>
@@ -38,6 +24,5 @@
 	</table>
       </form>
     </div>
-  </div>
-</body>
-</html>
+</metal:body>
+</metal:use>

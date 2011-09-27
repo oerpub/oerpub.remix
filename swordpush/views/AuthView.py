@@ -1,6 +1,8 @@
-import swordcnx
+import sword1cnx as swordcnx
 from languages import languages
+from decorators import main_template
 
+@main_template
 def AuthView(request):
     """
     Handle authentication (login) requests.
@@ -24,6 +26,7 @@ def AuthView(request):
 
     # Get available collections from SWORD service document
     swordCollections = swordcnx.parse_service_document(conn.sd)
+
 
     return {
         'serviceDocument': serviceDocument,
