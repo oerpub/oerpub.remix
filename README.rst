@@ -13,4 +13,5 @@ This will probably end up being buildout-enabled. Until that happens, the follow
     virtualenv --no-site-packages .
     ./bin/easy_install pyramid
     ./bin/python setup.py develop
+    ./setup_libraries.sh
     ./bin/paster serve development.ini 
