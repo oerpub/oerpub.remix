@@ -15,3 +15,5 @@ This will probably end up being buildout-enabled. Until that happens, the follow
     ./bin/python setup.py develop
     ./setup_libraries.sh
     ./bin/paster serve development.ini 
+
+The setup_libraries script is designed to pull in all the needed libraries, without using git submodules, which I don't like. It is relatively idempotent, in that it will either checkout or pull the relevant development libraries.
