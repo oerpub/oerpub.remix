@@ -7,3 +7,4 @@ include/
 lib/
 tags
 swordpush/views/swordcnx
+external/cnxmlutils

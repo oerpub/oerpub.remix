@@ -13,8 +13,13 @@ getgit() {
 }
 
 pushd external
+
 # Sword library
 getgit git://github.com/cscheffler/swordpush.git swordcnx
+
+# rhaptos.cnxmlutils for doc conversion
+getgit git://github.com/rochecompaan/rhaptos.cnxmlutils.git cnxmlutils
+
 popd
 
 pushd swordpush/views/
