@@ -10,7 +10,7 @@ class ViewTests(unittest.TestCase):
         testing.tearDown()
 
     def test_my_view(self):
-        from swordpush.views import my_view
+        from swordpushweb.views import my_view
         request = testing.DummyRequest()
         info = my_view(request)
         self.assertEqual(info['project'], 'SwordPush')

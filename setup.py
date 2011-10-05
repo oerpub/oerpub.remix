@@ -30,7 +30,7 @@ setup(name='oerpub.rhaptoslabs.swordpushweb',
       test_suite="swordpush",
       entry_points = """\
       [paste.app_factory]
-      main = swordpush:main
+      main = oerpub.rhaptoslabs.swordpushweb:main
       """,
       paster_plugins=['pyramid'],
       )
