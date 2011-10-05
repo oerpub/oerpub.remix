@@ -8,7 +8,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = ['pyramid', 'pyramid_debugtoolbar']
 
-setup(name='SwordPush',
+setup(name='oerpub.rhaptoslabs.swordpushweb',
       version='0.1.2',
       description='SwordPush',
       long_description=README + '\n\n' +  CHANGES,
