@@ -1,4 +1,4 @@
-<metal:use use-macro="main.macros['main']">
+<metal:use use-macro="base">
 <metal:body metal:fill-slot="body">
     <p class="body">
       Please provide the credentials that you will be using for this session.

@@ -1,4 +1,4 @@
-<metal:use use-macro="main.macros['main']">
+<metal:use use-macro="base">
 <metal:body metal:fill-slot="body">
     <p class="body">
       Please enter the title, etc. below and select the file or files to upload.

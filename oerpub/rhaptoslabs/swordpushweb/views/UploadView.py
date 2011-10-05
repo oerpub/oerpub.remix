@@ -1,8 +1,6 @@
 import oerpub.rhaptoslabs.sword1cnx as swordcnx
 from languages import languages
-from decorators import main_template
 
-@main_template
 def UploadView(request):
     """
     Handle SWORD uploads POSTed from a form.

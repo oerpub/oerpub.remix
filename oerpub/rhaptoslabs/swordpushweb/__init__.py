@@ -17,4 +17,7 @@ def main(global_config, **settings):
 
     config.add_static_view('static', 'oerpub.rhaptoslabs.swordpushweb:static', cache_max_age=3600)
 
+    config.add_subscriber('oerpub.rhaptoslabs.swordpushweb.subscribers.add_base_template',
+                          'pyramid.events.BeforeRender')
+
     return config.make_wsgi_app()
