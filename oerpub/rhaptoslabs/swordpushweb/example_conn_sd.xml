@@ -1,0 +1,54 @@
+<!-- Example of a successful authentication against connexions -->
+<?xml version="1.0" encoding=\'utf-8\'?>
+<service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sword="http://purl.org/net/sword/" xmlns:dcterms="http://purl.org/dc/terms/">
+
+ <sword:version>1.3</sword:version>
+ <sword:verbose>false</sword:verbose>
+ <sword:noop>true</sword:noop>
+ <sword:maxuploadsize>60000</sword:maxuploadsize>
+ <workspace>
+   <atom:title>Connexions</atom:title>
+   
+   
+     <collection href="http://cnx.org/Members/johan/sword">
+       <atom:title>Johan Beyers\'s workspace</atom:title>
+       <accept>application/zip</accept>
+       <sword:mediation>false</sword:mediation>
+       <sword:treatment>Upload a MS Word document to a Connexions module.</sword:treatment>
+       <dcterms:abstract>Connexions is a web-based collaborative publishing system for educational material.</dcterms:abstract>
+     </collection>
+     
+       <collection href="http://cnx.org/GroupWorkspaces/wg1979/sword">
+         <atom:title>Umonya</atom:title>
+         <accept>application/zip</accept>
+         <sword:mediation>false</sword:mediation>
+         <sword:treatment>Upload a MS Word document to a Connexions module.</sword:treatment>
+         <dcterms:abstract>Connexions is a web-based collaborative publishing system for educational material.</dcterms:abstract>
+       </collection>
+     
+   
+ </workspace>
+</service>
+
+<!-- Example of an unsuccessful authentication against connexions -->
+<?xml version="1.0" encoding=\'utf-8\'?>
+<service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sword="http://purl.org/net/sword/" xmlns:dcterms="http://purl.org/dc/terms/">
+
+ <sword:version>1.3</sword:version>
+ <sword:verbose>false</sword:verbose>
+ <sword:noop>true</sword:noop>
+ <sword:maxuploadsize>60000</sword:maxuploadsize>
+ <workspace>
+   <atom:title>Connexions</atom:title>
+   
+     <collection href="http://cnx.org/sword">
+       <atom:title>Connexions Module Generation</atom:title>
+       <accept>application/zip</accept>
+       <sword:mediation>false</sword:mediation>
+       <sword:treatment>Upload a MS Word document to a Connexions module.</sword:treatment>
+       <dcterms:abstract>Connexions is a web-based collaborative publishing system for educational material.</dcterms:abstract>
+     </collection>
+   
+   
+ </workspace>
+</service>
