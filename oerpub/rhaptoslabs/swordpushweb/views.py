@@ -1,8 +1,8 @@
 import oerpub.rhaptoslabs.sword1cnx as swordcnx
 from languages import languages
 
-def my_view(request):
-    return { 'project':'SwordPush' }
+def login_view(request):
+    return {}
 
 
 def auth_view(request):

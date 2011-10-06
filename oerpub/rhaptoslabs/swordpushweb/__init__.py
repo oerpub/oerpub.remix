@@ -11,7 +11,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           session_factory = my_session_factory)
 
-    config.add_view('oerpub.rhaptoslabs.swordpushweb.views.my_view',
+    config.add_view('oerpub.rhaptoslabs.swordpushweb.views.login_view',
                     renderer='oerpub.rhaptoslabs.swordpushweb:templates/login.pt')
     config.add_view('oerpub.rhaptoslabs.swordpushweb.views.auth_view',
                     name='auth',
