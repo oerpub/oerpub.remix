@@ -1,10 +1,15 @@
 from pyramid.config import Configurator
+from pyramid.session import UnencryptedCookieSessionFactoryConfig
 
 def main(global_config, **settings):
     """
     This function returns a Pyramid WSGI application.
     """
-    config = Configurator(settings=settings)
+    my_session_factory = UnencryptedCookieSessionFactoryConfig(
+        'iephohv3meiy3uen')
+
+    config = Configurator(settings=settings,
+                          session_factory = my_session_factory)
 
     config.add_view('oerpub.rhaptoslabs.swordpushweb.views.my_view',
                     renderer='oerpub.rhaptoslabs.swordpushweb:templates/login.pt')
