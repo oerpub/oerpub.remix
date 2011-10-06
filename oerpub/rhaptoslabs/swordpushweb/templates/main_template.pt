@@ -13,13 +13,14 @@
     </head>
     <body>
         <div class="container">
-            <div class="header span-12">
+            <div class="span-13" id="header">
                 <h1>Connexions content uploader</h1>
             </div>
-            <div class="span-12 last" id="profile">
-                Profile info goes here
-
+            <div class="span-11 last large" id="profile">
+                Repository: Connexions | User: hstephenson <a>sign out</a><br/>
+                Workspace: 
             </div>
+            <hr class="space"/>
             <div id="recent-files">
                 <p>Most recent files:</p>
                 <ul>
@@ -27,8 +28,10 @@
                     <li>Introductory Statistics</li>
                 </ul>
             </div>
-            <div id="message">
+            <div class="info" id="message">
                 <metal:message define-slot="message" />
+                Woot
+
             </div>
             <div id="filepicker">
                 <metal:filepicker define-slot="filepicker" />

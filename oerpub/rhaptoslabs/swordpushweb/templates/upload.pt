@@ -1,5 +1,5 @@
 <metal:use use-macro="base">
-<metal:body metal:fill-slot="body">
+<metal:body metal:fill-slot="content">
     <p class="body">
       Please enter the title, etc. below and select the file or files to upload.
     </p>

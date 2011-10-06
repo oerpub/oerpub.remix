@@ -1,5 +1,8 @@
 #header {
-    color: #ffffff;
     background-color: #99bbdd;
-    padding: 8px;
+}
+
+#header h1 {
+    padding:9px;
+    color: #ffffff;
 }

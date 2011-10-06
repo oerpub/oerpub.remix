@@ -1,5 +1,5 @@
 <metal:use use-macro="base">
-<metal:body metal:fill-slot="body">
+<metal:body metal:fill-slot="content">
     <p class="body">
       Please provide the credentials that you will be using for this session.
     </p>
