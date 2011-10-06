@@ -1,24 +1,45 @@
 <metal:main define-macro="main">
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
-<head>
-  <title>
-      <metal:page_title define-slot="page_title">title</metal:page_title>
-  </title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="keywords" content="sword upload client connexions" />
-  <meta name="description" content="SWORD version 1 upload client for Connexions" />
-  <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.css')}" type="text/css" media="screen" charset="utf-8" />
-</head>
-<body>
-  <div id="header">
-    <div class="header">
-      <h1>Connexions content uploader</h1>
-    </div>
-  </div>
-  <div id="body">
-      <metal:body define-slot="body" />
-  </div>
-</body>
+    <head>
+        <title>
+            <metal:page_title define-slot="page_title">title</metal:page_title>
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="keywords" content="sword upload client connexions" />
+        <meta name="description" content="SWORD version 1 upload client for Connexions" />
+        <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/screen.css')}" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.css')}" type="text/css" media="screen" charset="utf-8" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="header span-12">
+                <h1>Connexions content uploader</h1>
+            </div>
+            <div class="span-12 last" id="profile">
+                Profile info goes here
+
+            </div>
+            <div id="recent-files">
+                <p>Most recent files:</p>
+                <ul>
+                    <li>Psychology 101</li>
+                    <li>Introductory Statistics</li>
+                </ul>
+            </div>
+            <div id="message">
+                <metal:message define-slot="message" />
+            </div>
+            <div id="filepicker">
+                <metal:filepicker define-slot="filepicker" />
+            </div>
+            <div class="span-24 last" id="content">
+                <metal:content define-slot="content" />
+            </div>
+            <div id="footer">
+                Footer goes here.
+            </div>
+        </div>
+    </body>
 </html>
 </metal:main>
