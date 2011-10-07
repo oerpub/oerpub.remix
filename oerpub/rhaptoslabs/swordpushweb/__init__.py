@@ -11,7 +11,10 @@ def main(global_config, **settings):
                           session_factory = my_session_factory)
 
     config.add_route('upload', '/upload')
-    config.add_route('auth', '/auth')
+    config.add_route('preview', '/preview')
+    config.add_route('metadata', '/metadata')
+    config.add_route('summary', '/summary')
+    config.add_route('roles', '/roles')
     config.add_route('logout', '/logout')
     config.add_route('main', '/')
 
