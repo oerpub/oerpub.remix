@@ -19,7 +19,11 @@ class LoginSchema(formencode.Schema):
 
 @view_config(route_name='main', renderer='templates/login.pt')
 def login_view(request):
-    form = Form(request, schema=LoginSchema)
+    defaults = {'service_document_url': 'http://cnx.org/sword'}
+    form = Form(request,
+                schema=LoginSchema,
+                defaults=defaults
+                )
     field_tuples = [('service_document_url', 'Service Document URL'),
                     ('username', 'User Name'),
                     ('password', 'Password'),
