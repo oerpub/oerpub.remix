@@ -1,7 +1,4 @@
 <metal:use use-macro="base">
-<metal:message metal:fill-slot="message">
-Session sdoc: <span tal:replace="request.session['sdoc']" />
-</metal:message>
 <metal:body metal:fill-slot="content">
     <p class="body">
       Please enter the title, etc. below and select the file or files to upload.
