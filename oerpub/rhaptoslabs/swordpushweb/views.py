@@ -66,6 +66,26 @@ def logout_view(request):
     session.invalidate()
     raise HTTPFound(location='/')
 
+@view_config(route_name='upload', renderer='templates/upload.pt')
+def upload_view(request):
+    return {}
+
+@view_config(route_name='preview', renderer='templates/preview.pt')
+def preview_view(request):
+    return {}
+
+@view_config(route_name='metadata', renderer='templates/metadata.pt')
+def metadata_view(request):
+    return {}
+
+@view_config(route_name='summary', renderer='templates/summary.pt')
+def summary_view(request):
+    return {}
+
+@view_config(route_name='roles', renderer='templates/roles.pt')
+def roles_view(request):
+    return {}
+
 class MetadataSchema(formencode.Schema):
     allow_extra_fields = True
     service_document_url = formencode.validators.String(not_empty=True)
