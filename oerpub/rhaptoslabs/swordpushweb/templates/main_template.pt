@@ -20,6 +20,15 @@
                 <tal:profile tal:condition="'username' in request.session">
                 Repository: Connexions | User: <span tal:replace="request.session['username']"/> <a href="/logout">sign out</a><br/>
                 Workspace: 
+                <form>
+                    <select name="url" tabindex="1">
+                        <option
+                        tal:repeat="entry request.session['collections']"
+                        tal:content="python:entry['title']"
+                        tal:attributes="value python:entry['url'];
+                        selected python:entry['url']==request.session['current_collection']">title</option>
+                    </select>
+                </form>
                 </tal:profile>
                 <tal:profile tal:condition="'username' not in request.session">
                 Not logged in<br/>Please log in
@@ -35,8 +44,6 @@
             </div>
             <div class="info" id="message">
                 <metal:message define-slot="message" />
-                Woot
-
             </div>
             <div id="filepicker">
                 <metal:filepicker define-slot="filepicker" />
