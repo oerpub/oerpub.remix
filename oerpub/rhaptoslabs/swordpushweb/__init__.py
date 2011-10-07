@@ -21,7 +21,7 @@ def main(global_config, **settings):
         cache_max_age=3600)
 
     config.add_subscriber(
-        'oerpub.rhaptoslabs.swordpushweb.subscribers.add_base_template',
+        '.subscribers.add_base_template',
         'pyramid.events.BeforeRender')
 
     config.scan()
