@@ -74,10 +74,6 @@ def upload_view(request):
 def preview_view(request):
     return {}
 
-@view_config(route_name='metadata', renderer='templates/metadata.pt')
-def metadata_view(request):
-    return {}
-
 @view_config(route_name='summary', renderer='templates/summary.pt')
 def summary_view(request):
     return {}
