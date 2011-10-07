@@ -2,11 +2,14 @@ import os
 import base64
 import oerpub.rhaptoslabs.sword1cnx as swordcnx
 from languages import languages
+from pyramid.view import view_config
 
+@view_config(route_name='main', renderer='templates/login.pt')
 def login_view(request):
     return {}
 
 
+@view_config(route_name='auth', renderer='templates/upload.pt')
 def auth_view(request):
     """
     Handle authentication (login) requests.
@@ -46,6 +49,7 @@ def auth_view(request):
         'language': 'en',
     }
 
+@view_config(route_name='upload', renderer='templates/upload.pt')
 def upload_view(request):
     """
     Handle SWORD uploads POSTed from a form.
