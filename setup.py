@@ -6,7 +6,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'pyramid_debugtoolbar']
+requires = [
+    'pyramid',
+    'pyramid_debugtoolbar',
+    'pyramid_simpleform',
+    ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',
       version='0.1.2',
