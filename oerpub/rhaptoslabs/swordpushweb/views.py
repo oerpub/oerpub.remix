@@ -1,5 +1,4 @@
 import os
-import base64
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
@@ -19,6 +18,12 @@ class LoginSchema(formencode.Schema):
 
 @view_config(route_name='main', renderer='templates/login.pt')
 def login_view(request):
+    """
+    Perform a 'login' by getting the service document from a sword repository.
+    """
+    # TODO: check credentials against Connexions and ask for login
+    # again if failed.
+
     defaults = {'service_document_url': 'http://cnx.org/sword'}
     form = Form(request,
                 schema=LoginSchema,
@@ -28,11 +33,28 @@ def login_view(request):
                     ('username', 'User Name'),
                     ('password', 'Password'),
                     ]
+
+    # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
+
+        # The login details are persisted on the session
         session = request.session
         for field_name in [i[0] for i in field_tuples]:
             session[field_name] = form.data[field_name]
-        return HTTPFound(location="/auth")
+
+        # Get the service document and persist what's needed.
+        conn = swordcnx.Connection(session['service_document_url'],
+                                   user_name=session['username'],
+                                   user_pass=session['password'],
+                                   download_service_document=True)
+
+        # Get available collections from SWORD service document
+        # TODO: This is fragile and needs more checking
+        session['collections'] = swordcnx.parse_service_document(conn.sd)
+        session['current_collection'] = session['collections'][0]['url']
+
+        # Go to the upload page
+        return HTTPFound(location="/upload")
     return {
         'form': FormRenderer(form),
         'field_list': field_tuples,
@@ -44,44 +66,18 @@ def logout_view(request):
     session.invalidate()
     raise HTTPFound(location='/')
 
-@view_config(route_name='auth', renderer='templates/upload.pt')
-def auth_view(request):
-    """
-    Handle authentication (login) requests.
-    """
-    # TODO: check credentials against Connexions and ask for login
-    # again if failed.
-
-    session = request.session
-    serviceDocument = session['service_document_url']
-
-    # Encode authentication information
-    username = session['username']
-    password = session['password']
-
-    # Authenticate to Connexions
-    conn = swordcnx.Connection(serviceDocument,
-                               user_name=username,
-                               user_pass=password,
-                               download_service_document=True)
-
-    # Get available collections from SWORD service document
-    swordCollections = swordcnx.parse_service_document(conn.sd)
-
-
-    return {
-        'serviceDocument': serviceDocument,
-        'swordCollections': swordCollections,
-        'url': '',
-        'title': '',
-        'keepTitle': False,
-        'summary': '',
-        'keepSummary': False,
-        'keywords': '',
-        'keepKeywords': True,
-        'languages': languages,
-        'language': 'en',
-    }
+class MetadataSchema(formencode.Schema):
+    allow_extra_fields = True
+    service_document_url = formencode.validators.String(not_empty=True)
+    username = formencode.validators.PlainText(not_empty=True)
+    password = formencode.validators.PlainText(not_empty=True)
+    title = formencode.validators.PlainText(not_empty=True)
+    keep_title = formencode.validators.Bool()
+    summary = formencode.validators.PlainText(not_empty=True)
+    keep_summary = formencode.validators.Bool()
+    keywords = formencode.validators.PlainText(not_empty=True)
+    keep_keywords = formencode.validators.Bool()
+    language = formencode.validators.PlainText(not_empty=True)
 
 @view_config(route_name='upload', renderer='templates/upload.pt')
 def upload_view(request):
@@ -89,54 +85,41 @@ def upload_view(request):
     Handle SWORD uploads POSTed from a form.
     """
 
-    inputs = request.params
+    defaults = {'service_document_url': 'http://cnx.org/sword'}
+    form = Form(request,
+                schema=MetadataSchema,
+                defaults=defaults
+                )
 
-    # Decode authentication information
-    authString = base64.b64decode(inputs['credentials'])
-    pos = authString.find(':')
-    username = authString[:pos]
-    password = authString[pos+1:]
-    assert base64.b64encode(username + ':' + password) == inputs['credentials']
 
-    conn = swordcnx.Connection(inputs['serviceDocument'],
-                               user_name=username,
-                               user_pass=password,
-                               download_service_document=True)
+    # Check for successful form completion
+    if 'form.submitted' in request.POST and form.validate():
 
-    # Get available collections from SWORD service document
-    swordCollections = swordcnx.parse_service_document(conn.sd)
+        # Parse form elements
+        filesToUpload = {}
+        for key in ['file1','file2','file3']:
+            if hasattr(form.data[key], 'file'):
+                filesToUpload[os.path.basename(form.data[key].filename)] = \
+                    form.data[key].file
 
-    # Parse form elements
-    filesToUpload = {}
-    for key in ['file1','file2','file3']:
-        if hasattr(inputs[key], 'file'):
-            filesToUpload[os.path.basename(inputs[key].filename)] = \
-                inputs[key].file
+        session = request.session
+        # Send zip file to Connexions through SWORD interface
+        conn = swordcnx.Connection(form.data['url'],
+                                   user_name=session['username'],
+                                   user_pass=session['password'],
+                                   download_service_document=False)
 
-    # Send zip file to Connexions through SWORD interface
-    conn = swordcnx.Connection(inputs['url'],
-                               user_name=username,
-                               user_pass=password,
-                               download_service_document=False)
+        response = swordcnx.upload_multipart(conn,
+                                             form.data['title'],
+                                             form.data['summary'],
+                                             form.data['language'],
+                                             form.data['keywords'].split("\n"),
+                                             filesToUpload)
 
-    response = swordcnx.upload_multipart(conn,
-                                         inputs['title'],
-                                         inputs['summary'],
-                                         inputs['language'],
-                                         inputs['keywords'].split("\n"),
-                                         filesToUpload)
 
+        # Go to the upload page
+        return HTTPFound(location="/summary")
     return {
-        'serviceDocument': inputs['serviceDocument'],
-        'credentials': inputs['credentials'],
-        'swordCollections': swordCollections,
-        'url': inputs['url'],
-        'title': inputs['title'] if inputs.get('keepTitle') else '',
-        'keepTitle': inputs.get('keepTitle', False),
-        'summary': inputs['summary'] if inputs.get('keepSummary') else '',
-        'keepSummary': inputs.get('keepSummary', False),
-        'keywords': inputs['keywords'] if inputs.get('keepKeywords') else '',
-        'keepKeywords': inputs.get('keepKeywords', False),
-        'languages': languages,
-        'language': inputs['language'],
-    }
+        'form': FormRenderer(form),
+        }
+
