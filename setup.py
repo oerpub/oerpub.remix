@@ -10,7 +10,9 @@ requires = [
     'pyramid',
     'pyramid_debugtoolbar',
     'pyramid_simpleform',
+    'cryptacular',
     'pyramid_beaker',
+    'pycrypto',
     ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',

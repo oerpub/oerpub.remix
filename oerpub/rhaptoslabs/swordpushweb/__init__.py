@@ -1,12 +1,11 @@
 from pyramid.config import Configurator
-from pyramid.session import UnencryptedCookieSessionFactoryConfig
+from pyramid_beaker import session_factory_from_settings
 
 def main(global_config, **settings):
     """
     This function returns a Pyramid WSGI application.
     """
-    my_session_factory = UnencryptedCookieSessionFactoryConfig(
-        'iephohv3meiy3uen')
+    my_session_factory = session_factory_from_settings(settings)
 
     config = Configurator(settings=settings,
                           session_factory = my_session_factory)
