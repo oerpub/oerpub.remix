@@ -79,10 +79,10 @@ class MetadataSchema(formencode.Schema):
     keep_keywords = formencode.validators.Bool()
     language = formencode.validators.PlainText(not_empty=True)
 
-@view_config(route_name='upload', renderer='templates/upload.pt')
-def upload_view(request):
+@view_config(route_name='metadata', renderer='templates/metadata.pt')
+def metadata_view(request):
     """
-    Handle SWORD uploads POSTed from a form.
+    Handle metadata adding and uploads
     """
 
     defaults = {'service_document_url': 'http://cnx.org/sword'}
