@@ -1,28 +1,19 @@
 <metal:use use-macro="base">
-<metal:body metal:fill-slot="content">
+<tal:body metal:fill-slot="content">
     <p class="body">
       Please provide the credentials that you will be using for this session.
     </p>
-    <div class="body">
-      <form action="auth" method="post">
-    <table>
-      <tr>
-        <td>Service document URL: </td>
-            <td><input type="text" name="serviceDocument" width="20" value="http://cnx.org/sword"/></td>
-      </tr>
-      <tr>
-            <td>Username: </td>
-            <td><input type="text" name="username" width="20"/></td>
-      </tr>
-      <tr>
-            <td>Password: </td>
-            <td><input type="password" name="password" width="20"/></td>
-      </tr>
-      <tr>
-            <td colspan="2"><input type="submit" value="Login"/></td>
-      </tr>
-    </table>
-      </form>
-    </div>
-</metal:body>
+    ${form.begin(request.route_url('main'))}
+        <fieldset>
+            ${form.csrf_token()}
+            <tal:field tal:repeat="field field_list">
+            ${form.errorlist(field[0])}
+            ${form.label(field[0], field[1] + ':')}
+            ${form.text(field[0])}
+            <br />
+            </tal:field>
+            ${form.submit('form.submitted', 'Register', class_='submit')}
+        </fieldset>
+    ${form.end()}
+</tal:body>
 </metal:use>

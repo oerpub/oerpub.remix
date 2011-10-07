@@ -17,8 +17,13 @@
                 <h1>Connexions content uploader</h1>
             </div>
             <div class="span-11 last large" id="profile">
-                Repository: Connexions | User: hstephenson <a>sign out</a><br/>
+                <tal:profile tal:condition="'username' in request.session">
+                Repository: Connexions | User: <span tal:replace="request.session['username']"/> <a href="/logout">sign out</a><br/>
                 Workspace: 
+                </tal:profile>
+                <tal:profile tal:condition="'username' not in request.session">
+                Not logged in<br/>Please log in
+                </tal:profile>
             </div>
             <hr class="space"/>
             <div id="recent-files">

@@ -1,12 +1,13 @@
 <metal:use use-macro="base">
+<metal:message metal:fill-slot="message">
+Session sdoc: <span tal:replace="request.session['sdoc']" />
+</metal:message>
 <metal:body metal:fill-slot="content">
     <p class="body">
       Please enter the title, etc. below and select the file or files to upload.
     </p>
     <div class="body">
       <form action="upload" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="serviceDocument" value="${serviceDocument}"/>
-    <input type="hidden" name="credentials" value="${credentials}"/>
     <input type="hidden" name="MAX_FILE_SIZE" value="2000000"/>
     <table>
       <tr>

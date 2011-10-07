@@ -1,13 +1,44 @@
 import os
 import base64
-import oerpub.rhaptoslabs.sword1cnx as swordcnx
-from languages import languages
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPFound
+
+import formencode
+
+from pyramid_simpleform import Form
+from pyramid_simpleform.renderers import FormRenderer
+
+from languages import languages
+import oerpub.rhaptoslabs.sword1cnx as swordcnx
+
+class LoginSchema(formencode.Schema):
+    allow_extra_fields = True
+    service_document_url = formencode.validators.String(not_empty=True)
+    username = formencode.validators.PlainText(not_empty=True)
+    password = formencode.validators.PlainText(not_empty=True)
 
 @view_config(route_name='main', renderer='templates/login.pt')
 def login_view(request):
-    return {}
+    form = Form(request, schema=LoginSchema)
+    field_tuples = [('service_document_url', 'Service Document URL'),
+                    ('username', 'User Name'),
+                    ('password', 'Password'),
+                    ]
+    if 'form.submitted' in request.POST and form.validate():
+        session = request.session
+        for field_name in [i[0] for i in field_tuples]:
+            session[field_name] = form.data[field_name]
+        return HTTPFound(location="/auth")
+    return {
+        'form': FormRenderer(form),
+        'field_list': field_tuples,
+        }
 
+@view_config(route_name='logout', renderer='templates/login.pt')
+def logout_view(request):
+    session = request.session
+    session.invalidate()
+    raise HTTPFound(location='/')
 
 @view_config(route_name='auth', renderer='templates/upload.pt')
 def auth_view(request):
@@ -17,12 +48,12 @@ def auth_view(request):
     # TODO: check credentials against Connexions and ask for login
     # again if failed.
 
-    serviceDocument = request.params['serviceDocument']
+    session = request.session
+    serviceDocument = session['service_document_url']
 
     # Encode authentication information
-    username = request.params['username']
-    password = request.params['password']
-    digest = base64.b64encode(username + ':' + password)
+    username = session['username']
+    password = session['password']
 
     # Authenticate to Connexions
     conn = swordcnx.Connection(serviceDocument,
@@ -36,7 +67,6 @@ def auth_view(request):
 
     return {
         'serviceDocument': serviceDocument,
-        'credentials': digest,
         'swordCollections': swordCollections,
         'url': '',
         'title': '',

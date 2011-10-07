@@ -13,6 +13,7 @@ def main(global_config, **settings):
 
     config.add_route('upload', '/upload')
     config.add_route('auth', '/auth')
+    config.add_route('logout', '/logout')
     config.add_route('main', '/')
 
     config.add_static_view(
