@@ -42,9 +42,18 @@
                     <li>Introductory Statistics</li>
                 </ul>
             </div>
-            <div class="info" id="message">
-                <metal:message define-slot="message" />
-            </div>
+            <tal:errors tal:define="messages request.session.pop_flash('errors')"
+                      tal:condition="messages">
+                <div class="error" tal:repeat="message messages">
+                    <span tal:replace="message" />
+                </div>
+            </tal:errors>
+            <tal:info tal:define="messages request.session.pop_flash()"
+                      tal:condition="messages">
+                <div class="info" tal:repeat="message messages">
+                    <span tal:replace="message" />
+                </div>
+            </tal:info>
             <div id="filepicker">
                 <metal:filepicker define-slot="filepicker" />
             </div>

@@ -52,6 +52,8 @@ def login_view(request):
         # TODO: This is fragile and needs more checking
         session['collections'] = swordcnx.parse_service_document(conn.sd)
         session['current_collection'] = session['collections'][0]['url']
+        if len(session['collections']) > 1:
+            session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')
 
         # Go to the upload page
         return HTTPFound(location="/upload")
