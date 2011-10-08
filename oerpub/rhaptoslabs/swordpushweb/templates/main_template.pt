@@ -18,7 +18,7 @@
             </div>
             <div class="span-11 last large" id="profile">
                 <tal:profile tal:condition="'username' in request.session">
-                Repository: Connexions | User: <span tal:replace="request.session['username']"/> <a href="/logout">sign out</a><br/>
+                Repository: <span tal:replace="request.session['workspace_title']" tal:condition="'workspace_title' in request.session"/> | User: <span tal:replace="request.session['username']"/> <a href="/logout">sign out</a><br/>
                 Workspace: 
                 <form>
                     <select name="url" tabindex="1">

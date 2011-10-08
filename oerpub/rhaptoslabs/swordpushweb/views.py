@@ -1,4 +1,5 @@
 import os
+from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
@@ -8,7 +9,8 @@ from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
 
 from languages import languages
-import oerpub.rhaptoslabs.sword1cnx as swordcnx
+import oerpub.rhaptoslabs.sword1cnx as sword1cnx
+import oerpub.rhaptoslabs.sword2cnx as sword2cnx
 
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
@@ -43,17 +45,38 @@ def login_view(request):
             session[field_name] = form.data[field_name]
 
         # Get the service document and persist what's needed.
-        conn = swordcnx.Connection(session['service_document_url'],
+        conn = sword1cnx.Connection(session['service_document_url'],
                                    user_name=session['username'],
                                    user_pass=session['password'],
                                    download_service_document=True)
 
+        import pdb;pdb.set_trace()
         # Get available collections from SWORD service document
         # TODO: This is fragile and needs more checking
-        session['collections'] = swordcnx.parse_service_document(conn.sd)
+        session['collections'] = sword1cnx.parse_service_document(conn.sd)
         session['current_collection'] = session['collections'][0]['url']
         if len(session['collections']) > 1:
             session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')
+
+
+        # Get needed info from the service document
+        doc = etree.fromstring(conn.sd)
+
+        # Prep the namespaces. xpath does not like a None namespace.
+        namespaces = doc.nsmap
+        del namespaces[None]
+
+        # We need some details from the service document.
+        # TODO: This is fragile, since it assumes a certain structure.
+        session['workspace_title'] = doc.xpath('//atom:title',
+                                               namespaces=namespaces
+                                               )[0].text
+        session['sword_version'] = doc.xpath('//sword:version',
+                                             namespaces=namespaces
+                                             )[0].text
+        session['maxuploadsize'] = doc.xpath('//sword:maxuploadsize',
+                                             namespaces=namespaces
+                                             )[0].text
 
         # Go to the upload page
         return HTTPFound(location="/upload")
@@ -68,9 +91,21 @@ def logout_view(request):
     session.invalidate()
     raise HTTPFound(location='/')
 
+class UploadSchema(formencode.Schema):
+    allow_extra_fields = True
+    upload = formencode.validators.FieldStorageUploadConverter()
+
 @view_config(route_name='upload', renderer='templates/upload.pt')
 def upload_view(request):
-    return {}
+    form = Form(request, schema=UploadSchema)
+    # Check for successful form completion
+    if 'form.submitted' in request.POST and form.validate():
+        return HTTPFound(location="/preview")
+
+    # First view or errors
+    return {
+        'form': FormRenderer(form),
+        }
 
 @view_config(route_name='preview', renderer='templates/preview.pt')
 def preview_view(request):
@@ -122,12 +157,12 @@ def metadata_view(request):
 
         session = request.session
         # Send zip file to Connexions through SWORD interface
-        conn = swordcnx.Connection(form.data['url'],
+        conn = sword1cnx.Connection(form.data['url'],
                                    user_name=session['username'],
                                    user_pass=session['password'],
                                    download_service_document=False)
 
-        response = swordcnx.upload_multipart(conn,
+        response = sword1cnx.upload_multipart(conn,
                                              form.data['title'],
                                              form.data['summary'],
                                              form.data['language'],
