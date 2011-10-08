@@ -53,7 +53,13 @@ def login_view(request):
         # Get available collections from SWORD service document
         # TODO: This is fragile and needs more checking
         session['collections'] = sword1cnx.parse_service_document(conn.sd)
-        session['current_collection'] = session['collections'][0]['url']
+
+        # Set the default collection to the first one.
+        if session['collections']:
+            session['current_collection'] = session['collections'][0]['url']
+        else:
+            session['current_collection'] = ''
+
         if len(session['collections']) > 1:
             session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')
 
