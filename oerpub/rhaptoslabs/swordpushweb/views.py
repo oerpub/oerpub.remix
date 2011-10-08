@@ -50,6 +50,12 @@ def login_view(request):
                                    user_pass=session['password'],
                                    download_service_document=True)
 
+
+        # If the service document is invalid, just return with a message.
+        if not conn.sd:
+            session.flash('The service document is empty', 'errors')
+            return {'form': FormRenderer(form), 'field_list': field_tuples}
+
         # Get available collections from SWORD service document
         # TODO: This is fragile and needs more checking
         session['collections'] = sword1cnx.parse_service_document(conn.sd)
