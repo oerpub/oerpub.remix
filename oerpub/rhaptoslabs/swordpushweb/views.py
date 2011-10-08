@@ -50,7 +50,6 @@ def login_view(request):
                                    user_pass=session['password'],
                                    download_service_document=True)
 
-        import pdb;pdb.set_trace()
         # Get available collections from SWORD service document
         # TODO: This is fragile and needs more checking
         session['collections'] = sword1cnx.parse_service_document(conn.sd)
