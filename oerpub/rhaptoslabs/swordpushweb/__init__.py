@@ -23,6 +23,11 @@ def main(global_config, **settings):
         'oerpub.rhaptoslabs.swordpushweb:static',
         cache_max_age=3600)
 
+    config.add_static_view(
+        'transforms',
+        'oerpub.rhaptoslabs.swordpushweb:transforms',
+        cache_max_age=3600)
+
     config.add_subscriber(
         '.subscribers.add_base_template',
         'pyramid.events.BeforeRender')
