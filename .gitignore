@@ -8,3 +8,4 @@ lib/
 tags
 oerpub/rhaptoslabs/swordpushweb/transforms/*
 !oerpub/rhaptoslabs/swordpushweb/transforms/README
+oerpub/rhaptoslabs/data/
