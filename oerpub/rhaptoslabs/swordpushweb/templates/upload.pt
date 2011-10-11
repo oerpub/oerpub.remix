@@ -4,6 +4,17 @@
       metal:use-macro="base">
 
 <tal:block metal:fill-slot="content">
-    This is the upload template.
+    ${form.begin(request.route_url('upload'), multipart='multipart')}
+        <fieldset>
+            ${form.csrf_token()}
+            <tal:field tal:repeat="field field_list">
+            ${form.errorlist(field[0])}
+            ${form.label(field[0], field[1] + ':')}
+            ${form.file(field[0])}
+            <br />
+            </tal:field>
+            ${form.submit('form.submitted', 'Upload', class_='submit')}
+        </fieldset>
+    ${form.end()}
 </tal:block>
 </html>

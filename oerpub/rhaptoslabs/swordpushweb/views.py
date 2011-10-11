@@ -1,4 +1,6 @@
 import os
+import shutil
+import datetime
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -11,6 +13,7 @@ from pyramid_simpleform.renderers import FormRenderer
 from languages import languages
 import oerpub.rhaptoslabs.sword1cnx as sword1cnx
 import oerpub.rhaptoslabs.sword2cnx as sword2cnx
+from rhaptos.cnxmlutils.odt2cnxml import transform
 
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
@@ -109,13 +112,55 @@ class UploadSchema(formencode.Schema):
 @view_config(route_name='upload', renderer='templates/upload.pt')
 def upload_view(request):
     form = Form(request, schema=UploadSchema)
+    field_tuples = [('upload', 'File')]
+
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
+        
+        # Create a directory to do the conversions
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        # TODO: This has a good chance of being unique, but even so...
+        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        save_dir = os.path.join(
+            request.registry.settings['transform_dir'],
+            temp_dir_name
+            )
+        os.mkdir(save_dir)
+
+        # Save the original file so that we can convert, plus keep it.
+        original_filename = os.path.join(
+            save_dir,
+            form.data['upload'].filename.replace(os.sep, '_'))
+        saved_odt = open(original_filename, 'wb')
+        input_file = form.data['upload'].file
+        shutil.copyfileobj(input_file, saved_odt)
+        saved_odt.close()
+        input_file.close()
+
+        # Convert and save all the resulting files.
+        cnxml_data = transform(original_filename)
+        cnxml_file = open(os.path.join(save_dir, 'cnxml.xml'), 'w')
+        cnxml_file.write(etree.tostring(cnxml_data[0], pretty_print=True))
+        cnxml_file.close()
+        for filename, content in cnxml_data[1].items():
+            img_file = open(os.path.join(save_dir, filename), 'wb')
+            img_file.write(content)
+            img_file.close()
+
+        # Keep the info we need for next uploads.  Note that this might kill
+        # the ability to do multiple tabs in parallel, unless it gets offloaded
+        # onto the form again.
+        request.session['upload_dir'] = temp_dir_name
+        request.session['filename'] = form.data['upload'].filename
+        request.session['cnxml_filenames'] = ['cnxml.xml'] + \
+                                             cnxml_data[1].keys()
+
         return HTTPFound(location="/preview")
 
     # First view or errors
     return {
         'form': FormRenderer(form),
+        'field_list': field_tuples,
         }
 
 @view_config(route_name='preview', renderer='templates/preview.pt')
