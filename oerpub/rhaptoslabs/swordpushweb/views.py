@@ -58,7 +58,10 @@ def login_view(request):
 
         try:
             # Get available collections from SWORD service document
-            session['collections'] = sword2cnx.get_workspaces(conn)
+            # We create a list of dictionaries, otherwise we'll have problems
+            # pickling them.
+            session['collections'] = [{'title': i.title, 'href': i.href} for i
+                                      in sword2cnx.get_workspaces(conn)]
         except:
             session.flash('Could not log in', 'errors')
             return {'form': FormRenderer(form), 'field_list': field_tuples}
@@ -66,7 +69,7 @@ def login_view(request):
 
         # Set the default collection to the first one.
         if session['collections']:
-            session['current_collection'] = session['collections'][0].href
+            session['current_collection'] = session['collections'][0]['href']
 
         if len(session['collections']) > 1:
             session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')

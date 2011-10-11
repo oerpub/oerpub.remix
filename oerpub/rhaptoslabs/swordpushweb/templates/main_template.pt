@@ -25,9 +25,9 @@
                         <option
                         tal:repeat="entry request.session['collections']"
                         tal:condition="'collections' in request.session"
-                        tal:content="entry.title"
-                        tal:attributes="value entry.href;
-                        selected 'selected' if entry.href == request.session['current_collection'] else ''">title</option>
+                        tal:content="entry['title']"
+                        tal:attributes="value entry['href'];
+                        selected 'selected' if entry['href'] == request.session['current_collection'] else ''">title</option>
                     </select>
                 </form>
                 </tal:profile>
