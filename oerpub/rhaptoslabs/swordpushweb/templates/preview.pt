@@ -4,6 +4,12 @@
       metal:use-macro="base">
 
 <tal:block metal:fill-slot="content">
-    This is the preview template.
+<div class="span-18">
+    <iframe src="" tal:attributes="src '%s%s/' % (request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])" frameborder="1" width="99%" height="800"></iframe>
+</div>
+<div class="span-6 last">
+    <p>The file was successfully converted. Check the preview </p>
+    <a href="/metadata">Next</a>
+</div>
 </tal:block>
 </html>
