@@ -14,6 +14,7 @@ from languages import languages
 import oerpub.rhaptoslabs.sword1cnx as sword1cnx
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
+from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
 
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
@@ -144,6 +145,12 @@ def upload_view(request):
             img_file = open(os.path.join(save_dir, filename), 'wb')
             img_file.write(content)
             img_file.close()
+
+        # Convert the cnxml for preview.
+        html = cnxml_to_htmlpreview(etree.tostring(cnxml_data[0]))
+        index = open(os.path.join(save_dir, 'index.html'), 'w')
+        index.write(html)
+        index.close()
 
         # Keep the info we need for next uploads.  Note that this might kill
         # the ability to do multiple tabs in parallel, unless it gets offloaded
