@@ -24,6 +24,7 @@
                     <select name="url" tabindex="1">
                         <option
                         tal:repeat="entry request.session['collections']"
+                        tal:condition="'collections' in request.session"
                         tal:content="python:entry['title']"
                         tal:attributes="value python:entry['url'];
                         selected python:entry['url']==request.session['current_collection']">title</option>

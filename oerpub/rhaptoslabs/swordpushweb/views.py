@@ -12,7 +12,7 @@ from pyramid_simpleform.renderers import FormRenderer
 
 from languages import languages
 import oerpub.rhaptoslabs.sword1cnx as sword1cnx
-import oerpub.rhaptoslabs.sword2cnx as sword2cnx
+from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 
 class LoginSchema(formencode.Schema):
@@ -48,24 +48,23 @@ def login_view(request):
             session[field_name] = form.data[field_name]
 
         # Get the service document and persist what's needed.
-        conn = sword1cnx.Connection(session['service_document_url'],
-                                   user_name=session['username'],
-                                   user_pass=session['password'],
+        conn = sword2cnx.Connection(form.data['service_document_url'],
+                                   user_name=form.data['username'],
+                                   user_pass=form.data['password'],
                                    download_service_document=True)
 
 
-        # If the service document is invalid, just return with a message.
-        if not conn.sd:
-            session.flash('The service document is empty', 'errors')
+        try:
+            # Get available collections from SWORD service document
+            session['collections'] = sword2cnx.get_workspaces(conn)
+        except:
+            session.flash('Could not log in', 'errors')
             return {'form': FormRenderer(form), 'field_list': field_tuples}
 
-        # Get available collections from SWORD service document
-        # TODO: This is fragile and needs more checking
-        session['collections'] = sword1cnx.parse_service_document(conn.sd)
 
         # Set the default collection to the first one.
         if session['collections']:
-            session['current_collection'] = session['collections'][0]['url']
+            session['current_collection'] = session['collections'][0].href
         else:
             session['current_collection'] = ''
 
@@ -74,7 +73,7 @@ def login_view(request):
 
 
         # Get needed info from the service document
-        doc = etree.fromstring(conn.sd)
+        doc = etree.fromstring(conn.sd.raw_response)
 
         # Prep the namespaces. xpath does not like a None namespace.
         namespaces = doc.nsmap
