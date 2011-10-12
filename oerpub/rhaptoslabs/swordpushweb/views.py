@@ -146,17 +146,17 @@ def upload_view(request):
         input_file.close()
 
         # Convert and save all the resulting files.
-        cnxml_data = transform(original_filename)
+        xml, files, errors = transform(original_filename)
         cnxml_file = open(os.path.join(save_dir, 'cnxml.xml'), 'w')
-        cnxml_file.write(etree.tostring(cnxml_data[0], pretty_print=True))
+        cnxml_file.write(etree.tostring(xml, pretty_print=True))
         cnxml_file.close()
-        for filename, content in cnxml_data[1].items():
+        for filename, content in files.items():
             img_file = open(os.path.join(save_dir, filename), 'wb')
             img_file.write(content)
             img_file.close()
 
         # Convert the cnxml for preview.
-        html = cnxml_to_htmlpreview(etree.tostring(cnxml_data[0]))
+        html = cnxml_to_htmlpreview(etree.tostring(xml))
         index = open(os.path.join(save_dir, 'index.html'), 'w')
         index.write(html)
         index.close()
@@ -166,8 +166,9 @@ def upload_view(request):
         # onto the form again.
         request.session['upload_dir'] = temp_dir_name
         request.session['filename'] = form.data['upload'].filename
-        request.session['cnxml_filenames'] = ['cnxml.xml'] + \
-                                             cnxml_data[1].keys()
+        request.session['cnxml_filenames'] = ['cnxml.xml'] + files.keys()
+
+        # TODO: Errors should be shown to the user
 
         return HTTPFound(location="/preview")
 
