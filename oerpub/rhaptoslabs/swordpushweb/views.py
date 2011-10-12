@@ -185,24 +185,40 @@ def roles_view(request):
 
 class MetadataSchema(formencode.Schema):
     allow_extra_fields = True
-    service_document_url = formencode.validators.String(not_empty=True)
-    username = formencode.validators.PlainText(not_empty=True)
-    password = formencode.validators.PlainText(not_empty=True)
     title = formencode.validators.PlainText(not_empty=True)
     keep_title = formencode.validators.Bool()
     summary = formencode.validators.PlainText(not_empty=True)
     keep_summary = formencode.validators.Bool()
     keywords = formencode.validators.PlainText(not_empty=True)
     keep_keywords = formencode.validators.Bool()
+    subject = formencode.validators.PlainText()
+    keep_subject = formencode.validators.Bool()
     language = formencode.validators.PlainText(not_empty=True)
+    keep_language = formencode.validators.Bool()
+    google_code = formencode.validators.PlainText(not_empty=True)
+    keep_google_code = formencode.validators.Bool()
 
 @view_config(route_name='metadata', renderer='templates/metadata.pt')
 def metadata_view(request):
     """
     Handle metadata adding and uploads
     """
+    session = request.session
+    remember_fields = ['title',
+                       'summary',
+                       'keywords',
+                       'subject',
+                       'language',
+                       'google_code',
+                       ]
 
-    defaults = {'service_document_url': 'http://cnx.org/sword'}
+    # Get remembered fields from the session
+    defaults = {}
+    for field_name in remember_fields:
+        if field_name in session:
+            defaults[field_name] = session[field_name]
+            defaults['keep_%s' % field_name] = True
+
     form = Form(request,
                 schema=MetadataSchema,
                 defaults=defaults
@@ -212,6 +228,16 @@ def metadata_view(request):
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
 
+        # Persist the values that should be persisted in the session, and
+        # delete the others.
+        for field_name in remember_fields:
+            if form.data['keep_%s' % field_name]:
+                session[field_name] = form.data[field_name]
+            else:
+                if field_name in session:
+                    del(session[field_name])
+
+        return {'form': FormRenderer(form)}
         # Parse form elements
         filesToUpload = {}
         for key in ['file1','file2','file3']:
@@ -219,7 +245,6 @@ def metadata_view(request):
                 filesToUpload[os.path.basename(form.data[key].filename)] = \
                     form.data[key].file
 
-        session = request.session
         # Send zip file to Connexions through SWORD interface
         conn = sword1cnx.Connection(form.data['url'],
                                    user_name=session['username'],
