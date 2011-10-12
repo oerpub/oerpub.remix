@@ -6,3 +6,8 @@
     padding:9px;
     color: #ffffff;
 }
+
+/* Override default Blueprint table body colouring */
+tbody tr:nth-child(2n) td, tbody tr.even td {
+    background: none repeat scroll 0 0 #FFFFFF;
+}
