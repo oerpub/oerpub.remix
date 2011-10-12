@@ -179,6 +179,8 @@ def upload_view(request):
 
 @view_config(route_name='preview', renderer='templates/preview.pt')
 def preview_view(request):
+    session = request.session
+    session.flash('Previewing file: %s' % session['filename'])
     return {}
 
 @view_config(route_name='summary', renderer='templates/summary.pt')
@@ -210,6 +212,7 @@ def metadata_view(request):
     Handle metadata adding and uploads
     """
     session = request.session
+    session.flash('Uploading: %s' % session['filename'])
     field_list = [['title', 'Title'],
                   ['summary', 'Summary'],
                   ['keywords', 'Keywords (One per line)'],
