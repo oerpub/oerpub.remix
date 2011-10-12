@@ -17,6 +17,7 @@ def main(global_config, **settings):
     config.add_route('roles', '/roles')
     config.add_route('logout', '/logout')
     config.add_route('main', '/')
+    config.add_route('change_workspace', '/change_workspace')
 
     config.add_static_view(
         'static',

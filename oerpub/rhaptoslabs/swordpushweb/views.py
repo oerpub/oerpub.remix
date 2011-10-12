@@ -107,6 +107,12 @@ def logout_view(request):
     session.invalidate()
     raise HTTPFound(location='/')
 
+@view_config(route_name='change_workspace', renderer='json')
+def change_workspace_view(request):
+    session = request.session
+    session['current_collection'] = request.POST['url']
+    return {'current_collection': session['current_collection']}
+
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
