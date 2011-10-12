@@ -29,6 +29,15 @@
             <tal:textarea tal:condition="field_dict['type'] == 'textarea'">
             ${form.textarea(field[0])}
             </tal:textarea>
+            <tal:checkbox tal:condition="field_dict['type'] == 'checkbox'">
+            <tal:checkboxen repeat="value field_dict['values']">
+            ${form.checkbox(field[0], value=value, label=value)}
+            <br/>
+            </tal:checkboxen>
+            </tal:checkbox>
+            <tal:select tal:condition="field_dict['type'] == 'select'">
+            ${form.select(field[0], field_dict['values'])}
+            </tal:select>
             </tal:field_dict>
             </td>
             <td align="center">

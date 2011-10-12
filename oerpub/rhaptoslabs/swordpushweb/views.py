@@ -219,17 +219,17 @@ def roles_view(request):
 
 class MetadataSchema(formencode.Schema):
     allow_extra_fields = True
-    title = formencode.validators.PlainText(not_empty=True)
+    title = formencode.validators.String(not_empty=True)
     keep_title = formencode.validators.Bool()
-    summary = formencode.validators.PlainText(not_empty=True)
+    summary = formencode.validators.String(not_empty=True)
     keep_summary = formencode.validators.Bool()
-    keywords = formencode.validators.PlainText(not_empty=True)
+    keywords = formencode.validators.String(not_empty=True)
     keep_keywords = formencode.validators.Bool()
-    subject = formencode.validators.PlainText()
+    subject = formencode.validators.Set()
     keep_subject = formencode.validators.Bool()
-    language = formencode.validators.PlainText(not_empty=True)
+    language = formencode.validators.String(not_empty=True)
     keep_language = formencode.validators.Bool()
-    google_code = formencode.validators.PlainText(not_empty=True)
+    google_code = formencode.validators.String()
     keep_google_code = formencode.validators.Bool()
 
 @view_config(route_name='metadata', renderer='templates/metadata.pt')
@@ -239,11 +239,21 @@ def metadata_view(request):
     """
     session = request.session
     session.flash('Uploading: %s' % session['filename'])
+
+    subjects = ["Arts",
+                "Business",
+                "Humanities",
+                "Mathematics and Statistics",
+                "Science and Technology",
+                "Social Sciences",
+                ]
     field_list = [['title', 'Title'],
                   ['summary', 'Summary', {'type': 'textarea'}],
                   ['keywords', 'Keywords (One per line)', {'type': 'textarea'}],
-                  ['subject', 'Subject'],
-                  ['language', 'Language'],
+                  ['subject', 'Subject', {'type': 'checkbox',
+                                          'values': subjects}],
+                  ['language', 'Language', {'type': 'select',
+                                            'values': languages}],
                   ['google_code', 'Google Analytics Code'],
                   ]
     remember_fields = [field[0] for field in field_list]
@@ -272,41 +282,79 @@ def metadata_view(request):
                 if field_name in session:
                     del(session[field_name])
 
-        return {'form': FormRenderer(form),
-                'field_list': field_list,
-                }
-
+        # Reconstruct the path to the saved files
+        save_dir = os.path.join(
+            request.registry.settings['transform_dir'],
+            session['upload_dir']
+            )
 
         # Create the metadata entry
+        metadata = {}
+
+        # Title
+        metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
+                                    else session['filename']
+
+        # Summary
+        metadata['dcterms:abstract'] = form.data['summary'].strip()
+
+        # Language
+        metadata['dcterms:language'] = form.data['language']
+
+        # Subjects
+        metadata['oerdc:oer-subject'] = form.data['subject']
+
+        # Keywords
+        metadata['dcterms:subject'] = [i.strip() for i in 
+                                       form.data['keywords'].splitlines()
+                                       if i.strip()]
+
+        # Google Analytics code
+        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
+
+        # Standard change description
+        metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
+
+        # Build metadata entry object
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        metadata_entry = sword2cnx.MetaData(metadata)
+
+        # Add role tags
+        role_metadata = {'dcterms:creator': [session['username']],
+                        'dcterms:rightsHolder': [session['username']],
+                        'oerdc:maintainer': [session['username']],
+                        }
+        for key, value in role_metadata.iteritems():
+            for v in value:
+                v = v.strip()
+                if v:
+                    metadata_entry.add_field(key, '', {'oerdc:id': v})
 
         # Create a connection to the sword service
-
-        # Parse form elements
-        filesToUpload = {}
-        for key in ['file1','file2','file3']:
-            if hasattr(form.data[key], 'file'):
-                filesToUpload[os.path.basename(form.data[key].filename)] = \
-                    form.data[key].file
-
-        # Send zip file to Connexions through SWORD interface
-        conn = sword1cnx.Connection(session['current_collection'],
+        conn = sword2cnx.Connection(session['service_document_url'],
                                    user_name=session['username'],
                                    user_pass=session['password'],
                                    always_authenticate=True,
-                                   download_service_document=False)
+                                   download_service_document=True)
 
-        response = sword1cnx.upload_multipart(conn,
-                                             form.data['title'],
-                                             form.data['summary'],
-                                             form.data['language'],
-                                             form.data['keywords'].split("\n"),
-                                             filesToUpload)
+        import pdb;pdb.set_trace()
+        # Send zip file to Connexions through SWORD interface
+        with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
+            deposit_receipt = conn.create(
+                col_iri = session['current_collection'],
+                metadata_entry = metadata_entry,
+                payload = zip_file,
+                filename = 'upload.zip',
+                mimetype = 'application/zip',
+                packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                in_progress = True)
 
-
+        session['deposit_receipt'] = deposit_receipt
         # Go to the upload page
         return HTTPFound(location="/summary")
     return {
         'form': FormRenderer(form),
         'field_list': field_list,
         }
-
