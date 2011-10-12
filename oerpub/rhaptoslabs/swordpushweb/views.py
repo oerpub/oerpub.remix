@@ -58,6 +58,7 @@ def login_view(request):
         conn = sword2cnx.Connection(form.data['service_document_url'],
                                    user_name=form.data['username'],
                                    user_pass=form.data['password'],
+                                   always_authenticate=True,
                                    download_service_document=True)
 
 
@@ -276,6 +277,7 @@ def metadata_view(request):
         conn = sword1cnx.Connection(form.data['url'],
                                    user_name=session['username'],
                                    user_pass=session['password'],
+                                   always_authenticate=True,
                                    download_service_document=False)
 
         response = sword1cnx.upload_multipart(conn,
