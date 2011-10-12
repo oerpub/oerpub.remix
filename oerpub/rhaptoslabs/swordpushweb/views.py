@@ -16,6 +16,11 @@ from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
 
+# TODO: If we have enough helper functions, they should go into utils
+
+def escape_system(input_string):
+    return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
+
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     service_document_url = formencode.validators.String(not_empty=True)
@@ -145,8 +150,17 @@ def upload_view(request):
         saved_odt.close()
         input_file.close()
 
+        # Convert from other office format to odt if needed
+        odt_filename = original_filename
+        filename, extension = os.path.splitext(original_filename)
+        if extension != '.odt':
+            odt_filename = '%s.odt' % filename
+            command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+            os.system(command)
+
+
         # Convert and save all the resulting files.
-        xml, files, errors = transform(original_filename)
+        xml, files, errors = transform(odt_filename)
         cnxml_file = open(os.path.join(save_dir, 'cnxml.xml'), 'w')
         cnxml_file.write(etree.tostring(xml, pretty_print=True))
         cnxml_file.close()
