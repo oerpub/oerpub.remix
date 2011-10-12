@@ -1,6 +1,7 @@
 import os
 import shutil
 import datetime
+import zipfile
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -159,29 +160,38 @@ def upload_view(request):
             command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
             os.system(command)
 
-
         # Convert and save all the resulting files.
-        xml, files, errors = transform(odt_filename)
-        cnxml_file = open(os.path.join(save_dir, 'cnxml.xml'), 'w')
-        cnxml_file.write(etree.tostring(xml, pretty_print=True))
-        cnxml_file.close()
+        tree, files, errors = transform(odt_filename)
+        xml = etree.tostring(tree)
+        with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
+            cnxml_file.write(xml)
         for filename, content in files.items():
-            img_file = open(os.path.join(save_dir, filename), 'wb')
-            img_file.write(content)
-            img_file.close()
+            with open(os.path.join(save_dir, filename), 'wb') as img_file:
+                img_file.write(content)
 
         # Convert the cnxml for preview.
-        html = cnxml_to_htmlpreview(etree.tostring(xml))
-        index = open(os.path.join(save_dir, 'index.html'), 'w')
-        index.write(html)
-        index.close()
+        html = cnxml_to_htmlpreview(xml)
+        with open(os.path.join(save_dir, 'index.html'), 'w') as index:
+            index.write(html)
+
+        # Zip up all the files. This is done now, since we have all the files
+        # available, and it also allows us to post a simple download link.
+        # Note that we cannot use zipfile as context manager, as that is only
+        # available from python 2.7
+        # TODO: Do a filesize check xxxx
+        zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+        try:
+            zip_archive.writestr('index.cnxml', xml.encode('utf8'))
+            for filename, content in files.items():
+                zip_archive.writestr(filename, content)
+        finally:
+            zip_archive.close()
 
         # Keep the info we need for next uploads.  Note that this might kill
         # the ability to do multiple tabs in parallel, unless it gets offloaded
         # onto the form again.
         request.session['upload_dir'] = temp_dir_name
         request.session['filename'] = form.data['upload'].filename
-        request.session['cnxml_filenames'] = ['cnxml.xml'] + files.keys()
 
         # TODO: Errors should be shown to the user
 
@@ -266,6 +276,11 @@ def metadata_view(request):
                 'field_list': field_list,
                 }
 
+
+        # Create the metadata entry
+
+        # Create a connection to the sword service
+
         # Parse form elements
         filesToUpload = {}
         for key in ['file1','file2','file3']:
@@ -274,7 +289,7 @@ def metadata_view(request):
                     form.data[key].file
 
         # Send zip file to Connexions through SWORD interface
-        conn = sword1cnx.Connection(form.data['url'],
+        conn = sword1cnx.Connection(session['current_collection'],
                                    user_name=session['username'],
                                    user_pass=session['password'],
                                    always_authenticate=True,
