@@ -204,13 +204,14 @@ def metadata_view(request):
     Handle metadata adding and uploads
     """
     session = request.session
-    remember_fields = ['title',
-                       'summary',
-                       'keywords',
-                       'subject',
-                       'language',
-                       'google_code',
-                       ]
+    field_list = [['title', 'Title'],
+                  ['summary', 'Summary'],
+                  ['keywords', 'Keywords (One per line)'],
+                  ['subject', 'Subject'],
+                  ['language', 'Language'],
+                  ['google_code', 'Google Analytics Code'],
+                  ]
+    remember_fields = [field[0] for field in field_list]
 
     # Get remembered fields from the session
     defaults = {}
@@ -224,7 +225,6 @@ def metadata_view(request):
                 defaults=defaults
                 )
 
-
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
 
@@ -237,7 +237,9 @@ def metadata_view(request):
                 if field_name in session:
                     del(session[field_name])
 
-        return {'form': FormRenderer(form)}
+        return {'form': FormRenderer(form),
+                'field_list': field_list,
+                }
         # Parse form elements
         filesToUpload = {}
         for key in ['file1','file2','file3']:
@@ -263,5 +265,6 @@ def metadata_view(request):
         return HTTPFound(location="/summary")
     return {
         'form': FormRenderer(form),
+        'field_list': field_list,
         }
 
