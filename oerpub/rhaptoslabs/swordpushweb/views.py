@@ -229,8 +229,8 @@ def metadata_view(request):
     session = request.session
     session.flash('Uploading: %s' % session['filename'])
     field_list = [['title', 'Title'],
-                  ['summary', 'Summary'],
-                  ['keywords', 'Keywords (One per line)'],
+                  ['summary', 'Summary', {'type': 'textarea'}],
+                  ['keywords', 'Keywords (One per line)', {'type': 'textarea'}],
                   ['subject', 'Subject'],
                   ['language', 'Language'],
                   ['google_code', 'Google Analytics Code'],
@@ -264,6 +264,7 @@ def metadata_view(request):
         return {'form': FormRenderer(form),
                 'field_list': field_list,
                 }
+
         # Parse form elements
         filesToUpload = {}
         for key in ['file1','file2','file3']:

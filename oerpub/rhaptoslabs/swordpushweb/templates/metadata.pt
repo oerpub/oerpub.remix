@@ -20,7 +20,16 @@
                 ${form.label(field[0], field[1] + ':')}
             </td>
             <td>
-                ${form.text(field[0])}
+            <tal:textfield tal:condition="len(field) < 3">
+            ${form.text(field[0])}
+            </tal:textfield>
+            <tal:field_dict
+                tal:define="field_dict field[2] if len(field) > 2 else {}"
+                tal:condition="field_dict">
+            <tal:textarea tal:condition="field_dict['type'] == 'textarea'">
+            ${form.textarea(field[0])}
+            </tal:textarea>
+            </tal:field_dict>
             </td>
             <td align="center">
                 ${form.checkbox('keep_%s' % field[0])}
@@ -30,7 +39,7 @@
         </tr>
         </tal:field>
     </table>
-    ${form.submit('form.submitted', 'Register', class_='submit')}
+    ${form.submit('form.submitted', 'Upload', class_='submit')}
     ${form.end()}
 </metal:body>
 </metal:use>
