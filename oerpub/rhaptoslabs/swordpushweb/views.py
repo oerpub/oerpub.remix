@@ -35,10 +35,10 @@ def login_view(request):
                 schema=LoginSchema,
                 defaults=defaults
                 )
-    field_tuples = [('service_document_url', 'Service Document URL'),
-                    ('username', 'User Name'),
-                    ('password', 'Password'),
-                    ]
+    field_list = [('service_document_url', 'Service Document URL'),
+                  ('username', 'User Name'),
+                  ('password', 'Password'),
+                  ]
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
@@ -46,7 +46,7 @@ def login_view(request):
         # The login details are persisted on the session
         session = request.session
         session['current_collection'] = ''
-        for field_name in [i[0] for i in field_tuples]:
+        for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
 
         # Get the service document and persist what's needed.
@@ -64,7 +64,7 @@ def login_view(request):
                                       in sword2cnx.get_workspaces(conn)]
         except:
             session.flash('Could not log in', 'errors')
-            return {'form': FormRenderer(form), 'field_list': field_tuples}
+            return {'form': FormRenderer(form), 'field_list': field_list}
 
 
         # Set the default collection to the first one.
@@ -98,7 +98,7 @@ def login_view(request):
         return HTTPFound(location="/upload")
     return {
         'form': FormRenderer(form),
-        'field_list': field_tuples,
+        'field_list': field_list,
         }
 
 @view_config(route_name='logout', renderer='templates/login.pt')
@@ -114,7 +114,7 @@ class UploadSchema(formencode.Schema):
 @view_config(route_name='upload', renderer='templates/upload.pt')
 def upload_view(request):
     form = Form(request, schema=UploadSchema)
-    field_tuples = [('upload', 'File')]
+    field_list = [('upload', 'File')]
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
@@ -168,7 +168,7 @@ def upload_view(request):
     # First view or errors
     return {
         'form': FormRenderer(form),
-        'field_list': field_tuples,
+        'field_list': field_list,
         }
 
 @view_config(route_name='preview', renderer='templates/preview.pt')
