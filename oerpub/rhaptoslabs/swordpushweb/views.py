@@ -13,6 +13,7 @@ from pyramid_simpleform.renderers import FormRenderer
 
 from languages import languages
 import oerpub.rhaptoslabs.sword1cnx as sword1cnx
+from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
@@ -211,7 +212,9 @@ def preview_view(request):
 
 @view_config(route_name='summary', renderer='templates/summary.pt')
 def summary_view(request):
-    return {}
+    session = request.session
+    dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
+    return {'treatment': dr.treatment}
 
 @view_config(route_name='roles', renderer='templates/roles.pt')
 def roles_view(request):
@@ -339,7 +342,6 @@ def metadata_view(request):
                                    always_authenticate=True,
                                    download_service_document=True)
 
-        import pdb;pdb.set_trace()
         # Send zip file to Connexions through SWORD interface
         with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
             deposit_receipt = conn.create(
@@ -351,7 +353,8 @@ def metadata_view(request):
                 packaging = 'http://purl.org/net/sword/package/SimpleZip',
                 in_progress = True)
 
-        session['deposit_receipt'] = deposit_receipt
+        # The deposit receipt cannot be pickled, so we pickle the xml
+        session['deposit_receipt'] = deposit_receipt.to_xml()
         # Go to the upload page
         return HTTPFound(location="/summary")
     return {
