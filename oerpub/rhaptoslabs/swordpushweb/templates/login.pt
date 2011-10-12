@@ -9,7 +9,16 @@
             <tal:field tal:repeat="field field_list">
             ${form.errorlist(field[0])}
             ${form.label(field[0], field[1] + ':')}
+            <tal:textfield tal:condition="len(field) < 3">
             ${form.text(field[0])}
+            </tal:textfield>
+            <tal:textfield tal:condition="len(field) > 2">
+            <tal:field_dict tal:define="field_dict field[2]">
+            <tal:passwordfield tal:condition="field_dict['type'] == 'password'">
+            ${form.password(field[0])}
+            </tal:passwordfield>
+            </tal:field_dict>
+            </tal:textfield>
             <br />
             </tal:field>
             ${form.submit('form.submitted', 'Register', class_='submit')}

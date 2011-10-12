@@ -37,7 +37,7 @@ def login_view(request):
                 )
     field_list = [('service_document_url', 'Service Document URL'),
                   ('username', 'User Name'),
-                  ('password', 'Password'),
+                  ('password', 'Password', {'type': 'password'}),
                   ]
 
     # Check for successful form completion
