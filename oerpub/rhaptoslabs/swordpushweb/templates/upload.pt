@@ -13,8 +13,9 @@
             ${form.file(field[0])}
             <br />
             </tal:field>
-            ${form.submit('form.submitted', 'Upload', class_='submit')}
+            ${form.submit('form.submitted', 'Upload', class_='submit', id='upload-submit')}
         </fieldset>
     ${form.end()}
+    <div class="notice large" id="upload-wait" style="display:none;"><p>Your document is being converted to cnxml. This may take a few moments.</p></div>
 </tal:block>
 </html>
