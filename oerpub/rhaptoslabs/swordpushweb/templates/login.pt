@@ -9,7 +9,7 @@
             <div id="sd-picker" style="display:none;">
             <label for="service_document_url">Service Document URL:</label>
             <br/>
-            <input id="service_document_url" name="service_document_url" type="text" default_val="http://cnx.org/sword" value="http://cnx.org/sword" size="38"/>
+            <input id="service_document_url" name="service_document_url" type="text" default_val="http://cnx.org/sword/servicedocument" value="http://cnx.org/sword/servicedocument" size="38"/>
             <a href="#" id="sd-cancel">Cancel</a>
             </div>
             <table cellspacing="0">
