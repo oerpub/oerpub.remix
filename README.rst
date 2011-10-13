@@ -1,19 +1,13 @@
 What this is
 ============
 
-The sword push web client is a Pyramid webapp designed to let a user upload a MS Word or OpenOffice document, do a conversion to CNXML, and push it to the cnx.org site as a module, using the sword v1 or v2 interface. It will be generalised to enable pushing to any sword-compliant service.
+The sword push web client is a Pyramid webapp designed to let a user upload a MS Word or OpenOffice document, do a conversion to CNXML, and push it to the cnx.org site as a module, using the sword v2 interface. It will be generalised to enable pushing to any sword-compliant service.
 
 Quick Start
 ===========
 
-This will probably end up being buildout-enabled. Until that happens, the following should get you going on an Ubuntu based system::
+Since this is still in development, and depends on lots of in-development packages, I recommend that you install it via the following buildout:
 
-    git clone git@github.com:jbeyers/oerpub.rhaptoslabs.swordpushweb.git swordpushweb
-    cd swordpushweb/
-    virtualenv --no-site-packages .
-    ./bin/easy_install pyramid
-    ./bin/python setup.py develop
-    ./setup_libraries.sh
-    ./bin/paster serve development.ini 
+https://github.com/jbeyers/oerpub.rhaptoslabs.swordpushweb-buildout
 
-The setup_libraries script is designed to pull in all the needed libraries, without using git submodules, which I don't like. It is relatively idempotent, in that it will either checkout or pull the relevant development libraries.
+Instructions are in that readme.
