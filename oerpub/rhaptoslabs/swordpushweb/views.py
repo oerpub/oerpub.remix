@@ -55,6 +55,7 @@ def login_view(request):
         session['current_collection'] = ''
         for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
+        session['service_document_url'] = form.data['service_document_url']
 
         # Get the service document and persist what's needed.
         conn = sword2cnx.Connection(form.data['service_document_url'],
