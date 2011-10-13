@@ -11,3 +11,7 @@
 tbody tr:nth-child(2n) td, tbody tr.even td {
     background: none repeat scroll 0 0 #FFFFFF;
 }
+
+ul.error {
+    padding-left: 1.8em;
+}

@@ -1,28 +1,51 @@
 <metal:use use-macro="base">
 <tal:body metal:fill-slot="content">
-    <p class="body">
-      Please provide the credentials that you will be using for this session.
-    </p>
+<div class="span-11 large">
+    <p id="login-line">Login to Connexions <a href="#" id="pick-sd">change</a></p>
     ${form.begin(request.route_url('main'))}
-        <fieldset>
+            
+
             ${form.csrf_token()}
+            <div id="sd-picker" style="display:none;">
+            <label for="service_document_url">Service Document URL:</label>
+            <br/>
+            <input id="service_document_url" name="service_document_url" type="text" default_val="http://cnx.org/sword" value="http://cnx.org/sword" size="38"/>
+            <a href="#" id="sd-cancel">Cancel</a>
+            </div>
+            <table cellspacing="0">
             <tal:field tal:repeat="field field_list">
-            ${form.errorlist(field[0])}
-            ${form.label(field[0], field[1] + ':')}
-            <tal:textfield tal:condition="len(field) < 3">
-            ${form.text(field[0])}
-            </tal:textfield>
-            <tal:textfield tal:condition="len(field) > 2">
-            <tal:field_dict tal:define="field_dict field[2]">
-            <tal:passwordfield tal:condition="field_dict['type'] == 'password'">
-            ${form.password(field[0])}
-            </tal:passwordfield>
-            </tal:field_dict>
-            </tal:textfield>
-            <br />
+                <tr>
+                    <td colspan="2">
+                        ${form.errorlist(field[0])}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        ${form.label(field[0], field[1] + ':')}
+                    </td>
+                    <td>
+                        <tal:textfield tal:condition="len(field) < 3">
+                        ${form.text(field[0])}
+                        </tal:textfield>
+                        <tal:textfield tal:condition="len(field) > 2">
+                        <tal:field_dict tal:define="field_dict field[2]">
+                        <tal:passwordfield tal:condition="field_dict['type'] == 'password'">
+                        ${form.password(field[0])}
+                        </tal:passwordfield>
+                        </tal:field_dict>
+                        </tal:textfield>
+                    </td>
+                </tr>
             </tal:field>
-            ${form.submit('form.submitted', 'Register', class_='submit')}
-        </fieldset>
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                        ${form.submit('form.submitted', 'Log In', class_='submit')}
+                    </td>
+                </tr>
+            </table>
     ${form.end()}
+</div>
 </tal:body>
 </metal:use>

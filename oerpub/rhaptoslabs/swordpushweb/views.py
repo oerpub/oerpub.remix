@@ -42,7 +42,7 @@ def login_view(request):
                 schema=LoginSchema,
                 defaults=defaults
                 )
-    field_list = [('service_document_url', 'Service Document URL'),
+    field_list = [
                   ('username', 'User Name'),
                   ('password', 'Password', {'type': 'password'}),
                   ]
