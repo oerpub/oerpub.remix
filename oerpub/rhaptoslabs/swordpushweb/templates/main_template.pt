@@ -16,7 +16,7 @@
     <body>
         <div class="container">
             <div class="span-13" id="header">
-                <h1>Connexions content uploader</h1>
+                <h1>Word Converter</h1>
             </div>
             <div class="span-11 last large" id="profile">
                 <tal:profile tal:condition="'username' in request.session">
