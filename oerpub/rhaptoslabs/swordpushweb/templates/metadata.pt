@@ -7,7 +7,7 @@
             <td colspan="2">
                 Use the fields below to describe the file that you are uploading:
             </td>
-            <td>Remember?</td>
+            <td><!--Remember?--></td>
         </tr>
         <tal:field tal:repeat="field field_list">
         <tr>
@@ -40,11 +40,9 @@
             </tal:select>
             </tal:field_dict>
             </td>
-            <td align="center">
+            <td align="center"><!--
                 ${form.checkbox('keep_%s' % field[0])}
-            <td>
-
-            </td>
+            --></td>
         </tr>
         </tal:field>
     </table>
