@@ -257,7 +257,8 @@ def metadata_view(request):
                   ['subject', 'Subject', {'type': 'checkbox',
                                           'values': subjects}],
                   ['language', 'Language', {'type': 'select',
-                                            'values': languages}],
+                                            'values': languages,
+                                            'selected_value': 'en'}],
                   ['google_code', 'Google Analytics Code'],
                   ]
     remember_fields = [field[0] for field in field_list]

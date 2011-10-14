@@ -36,7 +36,7 @@
             </tal:checkboxen>
             </tal:checkbox>
             <tal:select tal:condition="field_dict['type'] == 'select'">
-            ${form.select(field[0], field_dict['values'])}
+            ${form.select(field[0], field_dict['values'], selected_value=field_dict.get('selected_value'))}
             </tal:select>
             </tal:field_dict>
             </td>
