@@ -46,11 +46,13 @@
                 </tal:profile>
             </div>
             <div id="recent-files" tal:condition="'username' in request.session">
+	    <!--
                 <p>Most recent files:</p>
                 <ul>
                     <li>Psychology 101</li>
                     <li>Introductory Statistics</li>
                 </ul>
+	    -->
             </div>
             <tal:errors tal:define="messages request.session.pop_flash('errors')"
                       tal:condition="messages">
