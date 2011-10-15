@@ -4,7 +4,9 @@
       metal:use-macro="base">
 
 <tal:block metal:fill-slot="content">
-    <a href="/metadata" class="large">Next</a>
+    <div class="box large">
+        <a href="/metadata" class="large">Next</a>
+    </div>
     <iframe src="" tal:attributes="src '%s%s/' % (request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])" frameborder="1" width="99%" height="800"></iframe>
 </tal:block>
 </html>
