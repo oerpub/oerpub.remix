@@ -252,6 +252,8 @@ class MetadataSchema(formencode.Schema):
     keep_language = formencode.validators.Bool()
     google_code = formencode.validators.String()
     keep_google_code = formencode.validators.Bool()
+    workspace = formencode.validators.String(not_empty=True)
+    keep_workspace = formencode.validators.Bool()
 
 @view_config(route_name='metadata', renderer='templates/metadata.pt')
 def metadata_view(request):
@@ -261,6 +263,7 @@ def metadata_view(request):
     session = request.session
     session.flash('Uploading: %s' % session['filename'])
 
+    workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
                 "Business",
                 "Humanities",
@@ -277,6 +280,8 @@ def metadata_view(request):
                                             'values': languages,
                                             'selected_value': 'en'}],
                   ['google_code', 'Google Analytics Code'],
+                  ['workspace', 'Workspace', {'type': 'select',
+                                            'values': workspaces}],
                   ]
     remember_fields = [field[0] for field in field_list]
 
@@ -364,7 +369,7 @@ def metadata_view(request):
         # Send zip file to Connexions through SWORD interface
         with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
             deposit_receipt = conn.create(
-                col_iri = session['current_collection'],
+                col_iri = form.data['workspace'],
                 metadata_entry = metadata_entry,
                 payload = zip_file,
                 filename = 'upload.zip',
