@@ -46,6 +46,7 @@
                 </tal:profile>
             </div>
             <div id="recent-files" tal:condition="'username' in request.session">
+                    &nbsp;
 	    <!--
                 <p>Most recent files:</p>
                 <ul>
