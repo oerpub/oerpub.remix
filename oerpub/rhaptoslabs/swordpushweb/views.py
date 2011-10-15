@@ -212,11 +212,16 @@ def preview_view(request):
     session.flash('Previewing file: %s' % session['filename'])
     return {}
 
-@view_config(route_name='summary', renderer='templates/summary.pt')
-def summary_view(request):
+@view_config(route_name='sword_treatment',
+             renderer='templates/sword_treatment.pt')
+def sword_treatment_view(request):
     session = request.session
     dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
     return {'treatment': dr.treatment}
+
+@view_config(route_name='summary', renderer='templates/summary.pt')
+def summary_view(request):
+    return {}
 
 @view_config(route_name='roles', renderer='templates/roles.pt')
 def roles_view(request):
