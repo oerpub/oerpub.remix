@@ -345,7 +345,7 @@ def metadata_view(request):
         # Add role tags
         role_metadata = {'dcterms:creator': [session['username']],
                         'dcterms:rightsHolder': [session['username']],
-                        'oerdc:maintainer': [session['username']],
+                        'oerdc:maintainer': [session['username'], 'siyavula'],
                         }
         for key, value in role_metadata.iteritems():
             for v in value:
