@@ -187,6 +187,7 @@ def upload_view(request):
             zip_archive.writestr('index.cnxml', xml.encode('utf8'))
             for filename, content in files.items():
                 zip_archive.writestr(filename, content)
+            zip_archive.write(original_filename, form.data['upload'].filename)
         finally:
             zip_archive.close()
 
