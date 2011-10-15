@@ -2,6 +2,7 @@ import os
 import shutil
 import datetime
 import zipfile
+import markdown
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -217,7 +218,16 @@ def preview_view(request):
 def sword_treatment_view(request):
     session = request.session
     dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
-    return {'treatment': dr.treatment}
+
+    # TODO: Here be dragons. The following bit of code is designed to
+    # specifically convert the Connexions treatment reply to something that we
+    # can push through a markdown filter to get reasonable-looking html. By
+    # default, the first couple of paragraphs are indented, which gets you
+    # <pre> tags, which strips out links. Ugh.
+
+    treatment = [i.lstrip() for i in dr.treatment.split('\n')]
+    treatment = markdown.markdown('\n'.join(treatment))
+    return {'treatment': treatment}
 
 @view_config(route_name='summary', renderer='templates/summary.pt')
 def summary_view(request):
