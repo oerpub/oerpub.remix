@@ -196,6 +196,7 @@ def upload_view(request):
         request.session['filename'] = form.data['upload'].filename
 
         # TODO: Errors should be shown to the user
+        session.flash('The file was successfully converted.')
 
         return HTTPFound(location="/preview")
 
