@@ -19,6 +19,10 @@ def main(global_config, **settings):
     config.add_route('main', '/')
     config.add_route('change_workspace', '/change_workspace')
     config.add_route('sword_treatment', '/sword_treatment')
+    
+    # every other add_route declaration should come
+    # before this one, as it will, by default, catch all requests
+    config.add_route('catchall_static', '/preview_css/*subpath', 'oerpub.rhaptoslabs.swordpushweb.static.static_view')
 
     config.add_static_view(
         'static',
