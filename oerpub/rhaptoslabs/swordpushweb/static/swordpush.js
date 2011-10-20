@@ -1,10 +1,6 @@
 $(document).ready(function()
 {
 
-    $('#workspace-changer').change(function() {
-        $.post('/change_workspace', $('#workspace-form').serialize());
-    });
-
     $('#pick-sd').click(function(e) {
         e.preventDefault();
         $('#login-line').slideUp('slow');

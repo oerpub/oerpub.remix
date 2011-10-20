@@ -53,7 +53,6 @@ def login_view(request):
 
         # The login details are persisted on the session
         session = request.session
-        session['current_collection'] = ''
         for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
         session['service_document_url'] = form.data['service_document_url']
@@ -75,11 +74,6 @@ def login_view(request):
         except:
             session.flash('Could not log in', 'errors')
             return {'form': FormRenderer(form), 'field_list': field_list}
-
-
-        # Set the default collection to the first one.
-        if session['collections']:
-            session['current_collection'] = session['collections'][0]['href']
 
         if len(session['collections']) > 1:
             session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')
@@ -116,12 +110,6 @@ def logout_view(request):
     session = request.session
     session.invalidate()
     raise HTTPFound(location='/')
-
-@view_config(route_name='change_workspace', renderer='json')
-def change_workspace_view(request):
-    session = request.session
-    session['current_collection'] = request.POST['url']
-    return {'current_collection': session['current_collection']}
 
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
