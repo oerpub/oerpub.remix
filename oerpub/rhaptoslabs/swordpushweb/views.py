@@ -99,7 +99,7 @@ def login_view(request):
                                              )[0].text
 
         # Go to the upload page
-        return HTTPFound(location="/upload")
+        return HTTPFound(location="/choose")
     return {
         'form': FormRenderer(form),
         'field_list': field_list,
@@ -115,7 +115,7 @@ class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
 
-@view_config(route_name='upload', renderer='templates/upload.pt')
+@view_config(route_name='choose', renderer='templates/choose.pt')
 def upload_view(request):
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]
