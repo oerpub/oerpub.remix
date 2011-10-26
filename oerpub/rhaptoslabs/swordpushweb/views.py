@@ -18,6 +18,7 @@ from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
+import gdata.gauth
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
 
@@ -160,7 +161,7 @@ def upload_view(request):
             gd_client = getAuthorizedGoogleDocsClient()
             
             # Create a AuthSub Token based on gdocs_access_token String
-            auth_sub_token = gd_client.gauth.AuthSubToken(gdocs_access_token)
+            auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token)
             
             # get the Google Docs Entry
             gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
