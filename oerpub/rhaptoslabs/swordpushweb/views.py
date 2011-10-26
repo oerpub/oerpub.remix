@@ -18,7 +18,8 @@ from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
-from oerpub.rhaptoslabs.html_gdocs2cnxml.test123 import testgdocs
+from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
+from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
 
 # TODO: If we have enough helper functions, they should go into utils
 
@@ -148,6 +149,32 @@ def upload_view(request):
             temp_dir_name
             )
         os.mkdir(save_dir)
+
+        # Do we have Google Docs ID and Access token?
+        if form.data['gdocs_resource_id']:
+            gdocs_resource_id = form.data['gdocs_resource_id']
+            gdocs_access_token = form.data['gdocs_access_token']
+            print gdocs_resource_id
+            print gdocs_access_token
+            
+            # TODO: Do the Google Docs transformation here
+            
+            # login to gdocs and get a client object
+            gd_client = getAuthorizedGoogleDocsClient()
+            
+            # Create a AuthSub Token based on gdocs_access_token String
+            auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token)
+            
+            # get the Google Docs Entry
+            gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
+            
+            # Get the contents of the document
+            gd_entry_url = gd_entry.content.src
+            html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
+            
+            print html
+            
+            import pdb;pdb.set_trace()
 
         # Save the original file so that we can convert, plus keep it.
         original_filename = os.path.join(
