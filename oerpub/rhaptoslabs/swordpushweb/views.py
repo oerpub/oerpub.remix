@@ -18,6 +18,7 @@ from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
+from oerpub.rhaptoslabs.html_gdocs2cnxml.test123 import testgdocs
 
 # TODO: If we have enough helper functions, they should go into utils
 
@@ -134,6 +135,9 @@ def upload_view(request):
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
+    
+        print testgdocs()
+        import pdb;pdb.set_trace()
         
         # Create a directory to do the conversions
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
