@@ -160,7 +160,7 @@ def upload_view(request):
             gd_client = getAuthorizedGoogleDocsClient()
             
             # Create a AuthSub Token based on gdocs_access_token String
-            auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token)
+            auth_sub_token = gd_client.gauth.AuthSubToken(gdocs_access_token)
             
             # get the Google Docs Entry
             gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
