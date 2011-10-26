@@ -19,6 +19,7 @@ from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
 import gdata.gauth
+import gdata.docs.client
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
 
