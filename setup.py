@@ -13,6 +13,7 @@ requires = [
     'cryptacular',
     'pyramid_beaker',
     'pycrypto',
+    'Markdown',
     ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',

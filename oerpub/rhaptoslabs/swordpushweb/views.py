@@ -2,6 +2,7 @@ import os
 import shutil
 import datetime
 import zipfile
+import markdown
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -196,6 +197,7 @@ def upload_view(request):
         request.session['filename'] = form.data['upload'].filename
 
         # TODO: Errors should be shown to the user
+        request.session.flash('The file was successfully converted.')
 
         return HTTPFound(location="/preview")
 
@@ -211,11 +213,25 @@ def preview_view(request):
     session.flash('Previewing file: %s' % session['filename'])
     return {}
 
-@view_config(route_name='summary', renderer='templates/summary.pt')
-def summary_view(request):
+@view_config(route_name='sword_treatment',
+             renderer='templates/sword_treatment.pt')
+def sword_treatment_view(request):
     session = request.session
     dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
-    return {'treatment': dr.treatment}
+
+    # TODO: Here be dragons. The following bit of code is designed to
+    # specifically convert the Connexions treatment reply to something that we
+    # can push through a markdown filter to get reasonable-looking html. By
+    # default, the first couple of paragraphs are indented, which gets you
+    # <pre> tags, which strips out links. Ugh.
+
+    treatment = [i.lstrip() for i in dr.treatment.split('\n')]
+    treatment = markdown.markdown('\n'.join(treatment))
+    return {'treatment': treatment}
+
+@view_config(route_name='summary', renderer='templates/summary.pt')
+def summary_view(request):
+    return {}
 
 @view_config(route_name='roles', renderer='templates/roles.pt')
 def roles_view(request):
@@ -235,6 +251,8 @@ class MetadataSchema(formencode.Schema):
     keep_language = formencode.validators.Bool()
     google_code = formencode.validators.String()
     keep_google_code = formencode.validators.Bool()
+    workspace = formencode.validators.String(not_empty=True)
+    keep_workspace = formencode.validators.Bool()
 
 @view_config(route_name='metadata', renderer='templates/metadata.pt')
 def metadata_view(request):
@@ -244,6 +262,7 @@ def metadata_view(request):
     session = request.session
     session.flash('Uploading: %s' % session['filename'])
 
+    workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
                 "Business",
                 "Humanities",
@@ -260,6 +279,8 @@ def metadata_view(request):
                                             'values': languages,
                                             'selected_value': 'en'}],
                   ['google_code', 'Google Analytics Code'],
+                  ['workspace', 'Workspace', {'type': 'select',
+                                            'values': workspaces}],
                   ]
     remember_fields = [field[0] for field in field_list]
 
@@ -329,7 +350,7 @@ def metadata_view(request):
         # Add role tags
         role_metadata = {'dcterms:creator': [session['username']],
                         'dcterms:rightsHolder': [session['username']],
-                        'oerdc:maintainer': [session['username']],
+                        'oerdc:maintainer': [session['username'], 'siyavula'],
                         }
         for key, value in role_metadata.iteritems():
             for v in value:
@@ -347,7 +368,7 @@ def metadata_view(request):
         # Send zip file to Connexions through SWORD interface
         with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
             deposit_receipt = conn.create(
-                col_iri = session['current_collection'],
+                col_iri = form.data['workspace'],
                 metadata_entry = metadata_entry,
                 payload = zip_file,
                 filename = 'upload.zip',

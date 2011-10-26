@@ -13,46 +13,28 @@
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/screen.css')}" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.css')}" type="text/css" media="screen" charset="utf-8" />
     </head>
-    <body>
+    <body metal:define-slot="body">
         <div class="container">
             <div class="span-10" id="header">
                 <h1>Document Importer (with Google Docs importer)</h1>
             </div>
             <div class="span-14 last large" id="profile">
                 <tal:profile tal:condition="'username' in request.session">
-                Repository: <span tal:replace="request.session['workspace_title']" tal:condition="'workspace_title' in request.session"/> | User: <span tal:replace="request.session['username']"/> <a href="/logout">sign out</a><br/>
-                <table cellspacing="0">
-                    <tr>
-                        <td>
-                Workspace: 
-                        </td>
-                        <td>
-                <form id="workspace-form" method="post" action="/change_workspace">
-                    <select id="workspace-changer" name="url" tabindex="1">
-                        <option
-                        tal:repeat="entry request.session['collections']"
-                        tal:condition="'collections' in request.session"
-                        tal:content="entry['title']"
-                        tal:attributes="value entry['href'];
-                        selected 'selected' if entry['href'] == request.session['current_collection'] else None">title</option>
-                    </select>
-                </form>
-                        </td>
-                    </tr>
-                </table>
+                Repository: <span tal:replace="request.session['workspace_title']" tal:condition="'workspace_title' in request.session"/><br/>User: <span tal:replace="request.session['username']"/> <a href="/logout">sign out</a><br/>
                 </tal:profile>
                 <tal:profile tal:condition="'username' not in request.session">
                     &nbsp;
                 </tal:profile>
             </div>
             <div id="recent-files" tal:condition="'username' in request.session">
-	    <!--
+                    &nbsp;
+        <!--
                 <p>Most recent files:</p>
                 <ul>
                     <li>Psychology 101</li>
                     <li>Introductory Statistics</li>
                 </ul>
-	    -->
+        -->
             </div>
             <tal:errors tal:define="messages request.session.pop_flash('errors')"
                       tal:condition="messages">
