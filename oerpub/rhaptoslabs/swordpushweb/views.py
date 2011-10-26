@@ -136,10 +136,7 @@ def upload_view(request):
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
-    
-        print testgdocs()
-        import pdb;pdb.set_trace()
-        
+          
         # Create a directory to do the conversions
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
         # TODO: This has a good chance of being unique, but even so...
