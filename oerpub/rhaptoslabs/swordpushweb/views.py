@@ -149,7 +149,8 @@ def upload_view(request):
             )
         os.mkdir(save_dir)
 
-        # Do we have Google Docs ID and Access token?
+        # Google Docs Conversion
+        # if we have a Google Docs ID and Access token.
         if form.data['gdocs_resource_id']:
             gdocs_resource_id = form.data['gdocs_resource_id']
             gdocs_access_token = form.data['gdocs_access_token']
@@ -199,8 +200,9 @@ def upload_view(request):
             # the ability to do multiple tabs in parallel, unless it gets offloaded
             # onto the form again.
             request.session['upload_dir'] = temp_dir_name
-            request.session['filename'] = gdocs_resource_id
+            request.session['filename'] = gd_entry_url
 
+        # OOo / MS Word Conversion
         else:
             # Save the original file so that we can convert, plus keep it.
             original_filename = os.path.join(
