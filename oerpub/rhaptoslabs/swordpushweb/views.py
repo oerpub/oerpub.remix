@@ -190,7 +190,7 @@ def upload_view(request):
             # TODO: Do a filesize check xxxx
             zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
             try:
-                zip_archive.writestr('index.cnxml', cnxml.encode('utf8'))
+                zip_archive.writestr('index.cnxml', cnxml)
                 for image_filename, image in objects.iteritems():
                     zip_archive.writestr(image_filename, image)
             finally:
