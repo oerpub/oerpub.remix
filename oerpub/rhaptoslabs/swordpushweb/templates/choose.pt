@@ -4,7 +4,7 @@
       metal:use-macro="base">
 
 <tal:block metal:fill-slot="content">
-    ${form.begin(request.route_url('upload'), multipart='multipart')}
+    ${form.begin(request.route_url('choose'), multipart='multipart')}
         <fieldset>
             ${form.csrf_token()}
             <tal:field tal:repeat="field field_list">
@@ -13,6 +13,14 @@
             ${form.file(field[0])}
             <br />
             </tal:field>
+            <br />
+            ${form.label('- or -')}
+            <br />
+            <br />
+            ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')}
+            ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
+            <a href="javascript:newPicker()" style="font-weight: bold"><img src="https://docs.google.com/images/doclist/logo_docs.gif"/></a>
+            <br />
             ${form.submit('form.submitted', 'Preview', class_='submit', id='upload-submit')}
         </fieldset>
     ${form.end()}
