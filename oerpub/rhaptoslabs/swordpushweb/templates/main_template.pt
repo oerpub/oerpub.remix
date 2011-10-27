@@ -17,7 +17,7 @@
     <body metal:define-slot="body">
         <div class="container">
             <div class="span-10" id="header">
-                <h1>Document Importer (with Google Docs importer)</h1>
+                <h1>Document Importer (test version with Google Docs)</h1>
             </div>
             <div class="span-14 last large" id="profile">
                 <tal:profile tal:condition="'username' in request.session">
