@@ -195,7 +195,7 @@ def upload_view(request):
             with open(os.path.join(save_dir, 'index.html'), 'w') as index:
                 index.write(htmlpreview)
 
-       else:
+        else:
             # Save the original file so that we can convert, plus keep it.
             original_filename = os.path.join(
                 save_dir,
