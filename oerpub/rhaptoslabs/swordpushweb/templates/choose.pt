@@ -13,6 +13,14 @@
             ${form.file(field[0])}
             <br />
             </tal:field>
+            <br />
+            ${form.label('- or -')}
+            <br />
+            <br />
+            ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')}
+            ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
+            <a href="javascript:newPicker()" style="font-weight: bold"><img src="https://docs.google.com/images/doclist/logo_docs.gif"/></a>
+            <br />
             ${form.submit('form.submitted', 'Preview', class_='submit', id='upload-submit')}
         </fieldset>
     ${form.end()}
