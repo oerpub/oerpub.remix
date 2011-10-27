@@ -312,6 +312,11 @@ class MetadataSchema(formencode.Schema):
     keep_google_code = formencode.validators.Bool()
     workspace = formencode.validators.String(not_empty=True)
     keep_workspace = formencode.validators.Bool()
+    authors = formencode.validators.String(not_empty=True)
+    maintainers = formencode.validators.String(not_empty=True)
+    copyright = formencode.validators.String(not_empty=True)
+    editors = formencode.validators.String()
+    translators = formencode.validators.String()
 
 @view_config(route_name='metadata', renderer='templates/metadata.pt')
 def metadata_view(request):
@@ -329,7 +334,16 @@ def metadata_view(request):
                 "Science and Technology",
                 "Social Sciences",
                 ]
-    field_list = [['title', 'Title'],
+    # The roles fields are comma-separated strings. This makes the javascript
+    # easier on the client side, and is easy to parse. The fields are hidden,
+    # and the values will be user ids, which should not have commas in them.
+    field_list = [
+                  ['authors', 'authors', {'type': 'hidden'}],
+                  ['maintainers', 'maintainers', {'type': 'hidden'}],
+                  ['copyright', 'copyright', {'type': 'hidden'}],
+                  ['editors', 'editors', {'type': 'hidden'}],
+                  ['translators', 'translators', {'type': 'hidden'}],
+                  ['title', 'Title', {'type': 'text'}],
                   ['summary', 'Summary', {'type': 'textarea'}],
                   ['keywords', 'Keywords (One per line)', {'type': 'textarea'}],
                   ['subject', 'Subject', {'type': 'checkbox',
@@ -337,14 +351,18 @@ def metadata_view(request):
                   ['language', 'Language', {'type': 'select',
                                             'values': languages,
                                             'selected_value': 'en'}],
-                  ['google_code', 'Google Analytics Code'],
+                  ['google_code', 'Google Analytics Code', {'type': 'text'}],
                   ['workspace', 'Workspace', {'type': 'select',
                                             'values': workspaces}],
                   ]
-    remember_fields = [field[0] for field in field_list]
+    remember_fields = [field[0] for field in field_list[5:]]
 
     # Get remembered fields from the session
     defaults = {}
+    for role in ['authors', 'maintainers', 'copyright']:
+        defaults[role] = session['username']
+    defaults['editors'] = ''
+    defaults['translators'] = ''
     for field_name in remember_fields:
         if field_name in session:
             defaults[field_name] = session[field_name]
@@ -407,10 +425,14 @@ def metadata_view(request):
         metadata_entry = sword2cnx.MetaData(metadata)
 
         # Add role tags
-        role_metadata = {'dcterms:creator': [session['username']],
-                        'dcterms:rightsHolder': [session['username']],
-                        'oerdc:maintainer': [session['username'], 'siyavula'],
-                        }
+        role_metadata = {}
+        role_mappings = {'authors': 'dcterms:creator',
+                         'maintainers': 'oerdc:maintainer',
+                         'copyright': 'dcterms:rightsHolder',
+                         'editors': 'oerdc:editor',
+                         'translators': 'oerdc:translator'}
+        for k, v in role_mappings.items():
+            role_metadata[v] = form.data[k].split(',')
         for key, value in role_metadata.iteritems():
             for v in value:
                 v = v.strip()

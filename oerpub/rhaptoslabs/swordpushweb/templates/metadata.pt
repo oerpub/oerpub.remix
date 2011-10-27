@@ -1,5 +1,29 @@
 <metal:use use-macro="base">
 <metal:body metal:fill-slot="content">
+<div class="span-18">
+    <div id="roles-picker" style="display:none;">
+        <table cellspacing="0" id="roles-table">
+            <tr>
+                <th rowspan="2" width="200">ID</th>
+                <th colspan="3">Required Roles</th>
+                <th colspan="2">Optional Roles</th>
+                <th></th>
+            </tr>
+            <tr>
+                <th width="1">Author</th>
+                <th width="1">Maintainer</th>
+                <th width="1">Copyright</th>
+                <th width="1">Editor</th>
+                <th width="1">Translator</th>
+                <th width="1">Remove</th>
+            </tr>
+        </table>
+        <a href="#" id="add-role">Add Role</a><br/>
+        <form id="roles-picker-buttons" method="link" action="#">
+            <input type="submit" id="cancel-roles" value="Cancel roles" />
+            <input type="submit" id="submit-roles" value="Submit roles" />
+        </form>
+    </div>
     ${form.begin(request.route_url('metadata'))}
     ${form.csrf_token()}
     <table>
@@ -10,22 +34,25 @@
             <td><!--Remember?--></td>
         </tr>
         <tal:field tal:repeat="field field_list">
-        <tr>
+        <tal:field_dict
+            tal:define="field_dict field[2] if len(field) > 2 else {};
+                        field_type field_dict['type']">
+        <tal:hidden tal:condition="field_type == 'hidden'">
+            ${form.hidden(field[0])}
+        </tal:hidden>
+        <tr tal:condition="field_type != 'hidden'">
             <td colspan="3">
                 ${form.errorlist(field[0])}
             </td>
         </tr>
-        <tr>
+        <tr tal:condition="field_type != 'hidden'">
             <td>
                 ${form.label(field[0], field[1] + ':')}
             </td>
             <td>
-            <tal:textfield tal:condition="len(field) < 3">
+            <tal:textfield tal:condition="field_type == 'text'">
             ${form.text(field[0])}
             </tal:textfield>
-            <tal:field_dict
-                tal:define="field_dict field[2] if len(field) > 2 else {}"
-                tal:condition="field_dict">
             <tal:textarea tal:condition="field_dict['type'] == 'textarea'">
             ${form.textarea(field[0])}
             </tal:textarea>
@@ -38,15 +65,27 @@
             <tal:select tal:condition="field_dict['type'] == 'select'">
             ${form.select(field[0], field_dict['values'], selected_value=field_dict.get('selected_value'))}
             </tal:select>
-            </tal:field_dict>
             </td>
             <td align="center"><!--
                 ${form.checkbox('keep_%s' % field[0])}
             --></td>
         </tr>
+        </tal:field_dict>
         </tal:field>
     </table>
     ${form.submit('form.submitted', 'Upload', class_='submit')}
     ${form.end()}
+</div>
+<div class="span-6 last">
+    <h3>Roles
+    <ul>
+        <li id="list-authors"><b>Author(s):</b><span>${form.data['authors']}</span></li>
+        <li id="list-maintainers"><b>Maintainer(s):</b><span>${form.data['maintainers']}</span></li>
+        <li id="list-copyright"><b>Copyright Holder(s):</b><span>${form.data['copyright']}</span></li>
+        <li id="list-editors"><b>Editor(s):</b><span>${form.data['editors']}</span></li>
+        <li id="list-translators"><b>Translator(s):</b><span>${form.data['translators']}</span></li>
+    </ul>
+    <a href="#" id="edit-roles">Edit roles</a>
+</div>
 </metal:body>
 </metal:use>

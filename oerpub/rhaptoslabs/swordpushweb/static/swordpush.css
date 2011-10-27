@@ -15,3 +15,32 @@ tbody tr:nth-child(2n) td, tbody tr.even td {
 ul.error {
     padding-left: 1.8em;
 }
+
+/* override default textarea height */
+textarea#summary, textarea#keywords {
+    height: 61px;
+}
+
+/* Simple modal form styling */
+#simplemodal-overlay {
+    background-color:#000;
+}
+#simplemodal-container {
+    background-color:#ffffff;
+    border:8px solid #444;
+    padding:12px;
+}
+
+#simplemodal-container th {
+    background: #ccc;
+    border: 1px solid #888;
+    text-align: center;
+}
+
+#simplemodal-container td {
+    border: 1px solid #888;
+}
+
+#roles-picker-buttons {
+    text-align:right;
+}
