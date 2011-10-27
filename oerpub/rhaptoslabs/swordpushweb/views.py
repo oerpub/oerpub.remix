@@ -13,7 +13,6 @@ from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
 
 from languages import languages
-import oerpub.rhaptoslabs.sword1cnx as sword1cnx
 from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
@@ -57,7 +56,6 @@ def login_view(request):
 
         # The login details are persisted on the session
         session = request.session
-        session['current_collection'] = ''
         for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
         session['service_document_url'] = form.data['service_document_url']
@@ -79,11 +77,6 @@ def login_view(request):
         except:
             session.flash('Could not log in', 'errors')
             return {'form': FormRenderer(form), 'field_list': field_list}
-
-
-        # Set the default collection to the first one.
-        if session['collections']:
-            session['current_collection'] = session['collections'][0]['href']
 
         if len(session['collections']) > 1:
             session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')
@@ -109,7 +102,7 @@ def login_view(request):
                                              )[0].text
 
         # Go to the upload page
-        return HTTPFound(location="/upload")
+        return HTTPFound(location="/choose")
     return {
         'form': FormRenderer(form),
         'field_list': field_list,
@@ -121,17 +114,11 @@ def logout_view(request):
     session.invalidate()
     raise HTTPFound(location='/')
 
-@view_config(route_name='change_workspace', renderer='json')
-def change_workspace_view(request):
-    session = request.session
-    session['current_collection'] = request.POST['url']
-    return {'current_collection': session['current_collection']}
-
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
 
-@view_config(route_name='upload', renderer='templates/upload.pt')
+@view_config(route_name='choose', renderer='templates/choose.pt')
 def upload_view(request):
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]

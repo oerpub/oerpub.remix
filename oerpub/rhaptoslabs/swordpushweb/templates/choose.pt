@@ -4,7 +4,7 @@
       metal:use-macro="base">
 
 <tal:block metal:fill-slot="content">
-    ${form.begin(request.route_url('upload'), multipart='multipart')}
+    ${form.begin(request.route_url('choose'), multipart='multipart')}
         <fieldset>
             ${form.csrf_token()}
             <tal:field tal:repeat="field field_list">
