@@ -195,6 +195,12 @@ def upload_view(request):
             with open(os.path.join(save_dir, 'index.html'), 'w') as index:
                 index.write(htmlpreview)
 
+            # Keep the info we need for next uploads.  Note that this might kill
+            # the ability to do multiple tabs in parallel, unless it gets offloaded
+            # onto the form again.
+            request.session['upload_dir'] = temp_dir_name
+            request.session['filename'] = gdocs_resource_id
+
         else:
             # Save the original file so that we can convert, plus keep it.
             original_filename = os.path.join(
