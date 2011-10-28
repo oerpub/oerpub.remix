@@ -11,6 +11,6 @@
         <a tal:attributes="href '%s%s/upload.zip' % (request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])">Save a local copy</a>
         <a href="/metadata" class="large" style="float:right;">Next</a>
     </div>
-    <iframe src="" tal:attributes="src '%s%s/' % (request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])" frameborder="1" width="99%" height="800"></iframe>
+    <iframe src="" tal:attributes="src '%s%s/index.xhtml' % (request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])" frameborder="1" width="99%" height="800"></iframe>
 </tal:block>
 </html>

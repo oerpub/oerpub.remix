@@ -180,7 +180,7 @@ def upload_view(request):
                     image_file.close()
                     
             htmlpreview = cnxml_to_htmlpreview(cnxml)
-            with open(os.path.join(save_dir, 'index.html'), 'w') as index:
+            with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
                 index.write(htmlpreview)
 
             # Zip up all the files. This is done now, since we have all the files
@@ -233,7 +233,7 @@ def upload_view(request):
 
             # Convert the cnxml for preview.
             html = cnxml_to_htmlpreview(xml)
-            with open(os.path.join(save_dir, 'index.html'), 'w') as index:
+            with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
                 index.write(html)
 
             # Zip up all the files. This is done now, since we have all the files
