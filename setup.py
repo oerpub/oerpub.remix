@@ -12,7 +12,7 @@ requires = [
     'pyramid_simpleform',
     'cryptacular',
     'pyramid_beaker',
-    'pycrypto',
+    'pycrypto==2.3',
     'Markdown',
     ]
 
