@@ -24,6 +24,8 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 
 # TODO: If we have enough helper functions, they should go into utils
 
+TESTING = True
+
 def escape_system(input_string):
     return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
@@ -33,7 +35,7 @@ class LoginSchema(formencode.Schema):
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.PlainText(not_empty=True)
 
-@view_config(route_name='main', renderer='templates/login.pt')
+@view_config(route_name='main', renderer='templates/novice/login.pt')
 def login_view(request):
     """
     Perform a 'login' by getting the service document from a sword repository.
@@ -60,53 +62,55 @@ def login_view(request):
             session[field_name] = form.data[field_name]
         session['service_document_url'] = form.data['service_document_url']
 
-        # Get the service document and persist what's needed.
-        conn = sword2cnx.Connection(form.data['service_document_url'],
-                                   user_name=form.data['username'],
-                                   user_pass=form.data['password'],
-                                   always_authenticate=True,
-                                   download_service_document=True)
+        if not TESTING:
+            # Get the service document and persist what's needed.
+            conn = sword2cnx.Connection(form.data['service_document_url'],
+                                        user_name=form.data['username'],
+                                        user_pass=form.data['password'],
+                                        always_authenticate=True,
+                                        download_service_document=True)
+            try:
+                # Get available collections from SWORD service document
+                # We create a list of dictionaries, otherwise we'll have problems
+                # pickling them.
+                session['collections'] = [{'title': i.title, 'href': i.href} for i
+                                          in sword2cnx.get_workspaces(conn)]
+            except:
+                session.flash('Could not log in', 'errors')
+                return {'form': FormRenderer(form), 'field_list': field_list}
 
+            # Get needed info from the service document
+            doc = etree.fromstring(conn.sd.raw_response)
 
-        try:
-            # Get available collections from SWORD service document
-            # We create a list of dictionaries, otherwise we'll have problems
-            # pickling them.
-            session['collections'] = [{'title': i.title, 'href': i.href} for i
-                                      in sword2cnx.get_workspaces(conn)]
-        except:
-            session.flash('Could not log in', 'errors')
-            return {'form': FormRenderer(form), 'field_list': field_list}
+            # Prep the namespaces. xpath does not like a None namespace.
+            namespaces = doc.nsmap
+            del namespaces[None]
 
-        if len(session['collections']) > 1:
-            session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')
+            # We need some details from the service document.
+            # TODO: This is fragile, since it assumes a certain structure.
+            session['workspace_title'] = doc.xpath('//atom:title',
+                                                   namespaces=namespaces
+                                                   )[0].text
+            session['sword_version'] = doc.xpath('//sword:version',
+                                                 namespaces=namespaces
+                                                 )[0].text
+            session['maxuploadsize'] = doc.xpath('//sword:maxuploadsize',
+                                                 namespaces=namespaces
+                                                 )[0].text
+        else:
+            session['workspace_title'] = "Connexions"
+            session['sword_version'] = "2.0"
+            session['maxuploadsize'] = "60000"
+            session['collections'] = [{'title': 'Personal Workspace', 'href': 'http://'}]
 
-
-        # Get needed info from the service document
-        doc = etree.fromstring(conn.sd.raw_response)
-
-        # Prep the namespaces. xpath does not like a None namespace.
-        namespaces = doc.nsmap
-        del namespaces[None]
-
-        # We need some details from the service document.
-        # TODO: This is fragile, since it assumes a certain structure.
-        session['workspace_title'] = doc.xpath('//atom:title',
-                                               namespaces=namespaces
-                                               )[0].text
-        session['sword_version'] = doc.xpath('//sword:version',
-                                             namespaces=namespaces
-                                             )[0].text
-        session['maxuploadsize'] = doc.xpath('//sword:maxuploadsize',
-                                             namespaces=namespaces
-                                             )[0].text
 
         # Go to the upload page
         return HTTPFound(location="/choose")
+
     return {
         'form': FormRenderer(form),
         'field_list': field_list,
-        }
+    }
 
 @view_config(route_name='logout', renderer='templates/login.pt')
 def logout_view(request):

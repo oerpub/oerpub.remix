@@ -8,3 +8,5 @@ def add_base_template(event):
     """
     base = get_renderer('templates/main_template.pt').implementation()
     event.update({'base': base})
+    base = get_renderer('templates/base.pt').implementation()
+    event.update({'newbase': base})

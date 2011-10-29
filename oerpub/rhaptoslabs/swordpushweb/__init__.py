@@ -10,13 +10,14 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           session_factory = my_session_factory)
 
+    config.add_route('switch_expert_mode', '/switchmode')
+    config.add_route('main', '/')
     config.add_route('choose', '/choose')
     config.add_route('preview', '/preview')
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
     config.add_route('roles', '/roles')
     config.add_route('logout', '/logout')
-    config.add_route('main', '/')
     config.add_route('change_workspace', '/change_workspace')
     config.add_route('sword_treatment', '/sword_treatment')
     
