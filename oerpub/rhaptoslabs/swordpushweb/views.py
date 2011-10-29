@@ -35,7 +35,7 @@ class LoginSchema(formencode.Schema):
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.PlainText(not_empty=True)
 
-@view_config(route_name='main', renderer='templates/novice/login.pt')
+@view_config(route_name='login', renderer='templates/novice/login.pt')
 def login_view(request):
     """
     Perform a 'login' by getting the service document from a sword repository.
@@ -49,7 +49,7 @@ def login_view(request):
                 defaults=defaults
                 )
     field_list = [
-                  ('username', 'User Name'),
+                  ('username', 'Username'),
                   ('password', 'Password', {'type': 'password'}),
                   ]
 

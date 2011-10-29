@@ -11,7 +11,7 @@ def main(global_config, **settings):
                           session_factory = my_session_factory)
 
     config.add_route('switch_expert_mode', '/switchmode')
-    config.add_route('main', '/')
+    config.add_route('login', '/')
     config.add_route('choose', '/choose')
     config.add_route('preview', '/preview')
     config.add_route('metadata', '/metadata')

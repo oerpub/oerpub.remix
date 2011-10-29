@@ -9,7 +9,7 @@
     Connexions Document Importer
   </div>
   <p>You need to sign in to Connexions to use this tool.</p>
-  ${form.begin(request.route_url('main'))}
+  ${form.begin(request.route_url('login'))}
   ${form.csrf_token()}
   <input type="hidden" name="service_document_url" value="http://cnx.org/sword/servicedocument"/>
   <center>

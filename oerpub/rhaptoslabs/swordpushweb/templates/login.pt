@@ -2,7 +2,7 @@
 <tal:body metal:fill-slot="content">
 <div class="span-11 large">
     <p id="login-line">Login to Connexions <a href="#" id="pick-sd">change</a></p>
-    ${form.begin(request.route_url('main'))}
+    ${form.begin(request.route_url('login'))}
             
 
             ${form.csrf_token()}
