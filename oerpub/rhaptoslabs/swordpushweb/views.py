@@ -40,77 +40,84 @@ def login_view(request):
     """
     Perform a 'login' by getting the service document from a sword repository.
     """
-    # TODO: check credentials against Connexions and ask for login
-    # again if failed.
 
     defaults = {'service_document_url': 'http://cnx.org/sword'}
-    form = Form(request,
-                schema=LoginSchema,
-                defaults=defaults
-                )
+    form = Form(request, schema=LoginSchema, defaults=defaults)
     field_list = [
-                  ('username', 'Username'),
-                  ('password', 'Password', {'type': 'password'}),
-                  ]
+        ('username', 'Username'),
+        ('password', 'Password', {'type': 'password'}),
+    ]
+    
+    session = request.session
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
-
         # The login details are persisted on the session
-        session = request.session
         for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
         session['service_document_url'] = form.data['service_document_url']
+        loggedIn = True
+    # Check if user is already authenticated
+    else:
+        loggedIn = True
+        for key in ['username', 'password', 'service_document_url']:
+            if not request.session.has_key(key):
+                loggedIn = False
 
-        if not TESTING:
-            # Get the service document and persist what's needed.
-            conn = sword2cnx.Connection(form.data['service_document_url'],
-                                        user_name=form.data['username'],
-                                        user_pass=form.data['password'],
-                                        always_authenticate=True,
-                                        download_service_document=True)
-            try:
-                # Get available collections from SWORD service document
-                # We create a list of dictionaries, otherwise we'll have problems
-                # pickling them.
-                session['collections'] = [{'title': i.title, 'href': i.href} for i
-                                          in sword2cnx.get_workspaces(conn)]
-            except:
-                session.flash('Could not log in', 'errors')
-                return {'form': FormRenderer(form), 'field_list': field_list}
+    # TODO: check credentials against Connexions and ask for login
+    # again if failed.
 
-            # Get needed info from the service document
-            doc = etree.fromstring(conn.sd.raw_response)
+    # If not signed in, go to login page
+    if not loggedIn:
+        return {
+            'form': FormRenderer(form),
+            'field_list': field_list,
+        }
 
-            # Prep the namespaces. xpath does not like a None namespace.
-            namespaces = doc.nsmap
-            del namespaces[None]
+    if TESTING:
+        session['workspace_title'] = "Connexions"
+        session['sword_version'] = "2.0"
+        session['maxuploadsize'] = "60000"
+        session['collections'] = [{'title': 'Personal Workspace', 'href': 'http://'}]
+    else:
+        # Get the service document and persist what's needed.
+        conn = sword2cnx.Connection(form.data['service_document_url'],
+                                    user_name=form.data['username'],
+                                    user_pass=form.data['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)
+        try:
+            # Get available collections from SWORD service document
+            # We create a list of dictionaries, otherwise we'll have problems
+            # pickling them.
+            session['collections'] = [{'title': i.title, 'href': i.href} for i
+                                      in sword2cnx.get_workspaces(conn)]
+        except:
+            session.flash('Could not log in', 'errors')
+            return {'form': FormRenderer(form), 'field_list': field_list}
 
-            # We need some details from the service document.
-            # TODO: This is fragile, since it assumes a certain structure.
-            session['workspace_title'] = doc.xpath('//atom:title',
-                                                   namespaces=namespaces
-                                                   )[0].text
-            session['sword_version'] = doc.xpath('//sword:version',
-                                                 namespaces=namespaces
-                                                 )[0].text
-            session['maxuploadsize'] = doc.xpath('//sword:maxuploadsize',
-                                                 namespaces=namespaces
-                                                 )[0].text
-        else:
-            session['workspace_title'] = "Connexions"
-            session['sword_version'] = "2.0"
-            session['maxuploadsize'] = "60000"
-            session['collections'] = [{'title': 'Personal Workspace', 'href': 'http://'}]
+        # Get needed info from the service document
+        doc = etree.fromstring(conn.sd.raw_response)
 
+        # Prep the namespaces. xpath does not like a None namespace.
+        namespaces = doc.nsmap
+        del namespaces[None]
 
-        # Go to the upload page
-        return HTTPFound(location="/choose")
+        # We need some details from the service document.
+        # TODO: This is fragile, since it assumes a certain structure.
+        session['workspace_title'] = doc.xpath('//atom:title',
+                                               namespaces=namespaces
+                                               )[0].text
+        session['sword_version'] = doc.xpath('//sword:version',
+                                             namespaces=namespaces
+                                             )[0].text
+        session['maxuploadsize'] = doc.xpath('//sword:maxuploadsize',
+                                             namespaces=namespaces
+                                             )[0].text
 
-    return {
-        'form': FormRenderer(form),
-        'field_list': field_list,
-    }
+    # Go to the upload page
+    return HTTPFound(location="/choose")
+
 
 @view_config(route_name='logout', renderer='templates/login.pt')
 def logout_view(request):
