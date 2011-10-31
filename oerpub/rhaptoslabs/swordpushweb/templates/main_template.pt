@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
     <head>
         <title>
-            <metal:page_title define-slot="page_title">title</metal:page_title>
+            <metal:page_title define-slot="page_title">Document Uploader</metal:page_title>
         </title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="keywords" content="sword upload client connexions" />
