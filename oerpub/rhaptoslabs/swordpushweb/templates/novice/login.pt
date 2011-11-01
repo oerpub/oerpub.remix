@@ -32,7 +32,7 @@
     <a href="http://cnx.org/join_form">the Connexions site</a>
     to create one.</p>
   <div align="right">
-    <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}" width="200"/>
+    <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}" width="200"/></a>
   </div>
 </div>
 </tal:body>
