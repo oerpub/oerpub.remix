@@ -19,24 +19,37 @@
     <div id="container">
       <div id="content">
 	<h1>Upload your document</h1>
+        ${form.begin(request.route_url('choose'), multipart='multipart')}
+        ${form.csrf_token()}
 	<p>You can upload any type of office document here. A preview
 	  will appear in this area so that you can review it before
 	  publishing the final version.</p>
 	<center>
 	  <br/>
-	  ${form.begin(request.route_url('choose'), multipart='multipart')}
-          ${form.csrf_token()}
           <label for="upload">File:</label>
           <input id="upload" name="upload" type="file"/>
           <br/>
           <br/>
           ${form.submit('form.submitted', 'Preview', class_='submit', id='upload-submit')}
-	  ${form.end()}
+          <br/>
+          <br/>
 	</center>
-	<div class="pleasewait" id="upload-wait" style="display:none;">
-	  Your document is being processed. This may take a few
-	  moments.
-	</div>
+	<p>Alternatively, you can select a Google Document by clicking on the image below.</p>
+	<center>
+          <br/>
+	  ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')}
+          ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
+          <a href="javascript:newPicker()" style="font-weight: bold"><img src="https://docs.google.com/images/doclist/logo_docs.gif"/></a>
+          <br/>
+          ${form.submit('form.submitted', 'Preview', class_='submit', id='upload-submit')}
+          <br/>
+          <br/>
+	  <div class="pleasewait" id="upload-wait" style="display:none;">
+	    Your document is being processed. This may take a few
+	    moments.
+	  </div>
+        </center>
+        ${form.end()}
       </div>
     </div>
   </div>
