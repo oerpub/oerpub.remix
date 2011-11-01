@@ -301,7 +301,7 @@ def upload_view(request):
         # TODO: Errors should be shown to the user
         request.session.flash('The file was successfully converted.')
 
-        return HTTPFound(location=request.route_url('preview'))
+        return HTTPFound(location=request.route_url('preview_frames'))
 
     # First view or errors
     response = {
@@ -311,11 +311,20 @@ def upload_view(request):
     return render_to_response(templatePath, response, request=request)
 
 
-@view_config(route_name='preview', renderer='templates/preview.pt')
-def preview_view(request):
-    session = request.session
-    session.flash('Previewing file: %s' % session['filename'])
-    return {}
+@view_config(route_name='preview_frames', renderer='templates/preview_frames.pt')
+def preview_frames_view(request):
+    check_login(request)
+    return {
+        'header_url': request.route_url('preview_header'),
+        'body_url': '%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
+    }
+
+
+@view_config(route_name='preview_header')
+def preview_header_view(request):
+    check_login(request)
+    templatePath = 'templates/%s/preview_header.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    return render_to_response(templatePath, {}, request=request)
 
 
 @view_config(route_name='sword_treatment',
