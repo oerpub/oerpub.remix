@@ -1,0 +1,47 @@
+<metal:use use-macro="newbase">
+
+<tal:body metal:fill-slot="header">
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header">
+	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
+	<h1>Connexions Importer</h1>
+	<p class="status">You are logged in as ${request.session['username']}
+	  <br/><a href="${request.route_url('logout')}">Click here to sign out</a></p>
+	<img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}"/>
+      </div>
+    </div>
+  </div>
+</tal:body>
+
+<tal:body metal:fill-slot="content">
+  <div id="ie6-container-wrap">
+    <div id="container" style="padding-top: 50px;">
+      <div id="content">
+	<h1>Success</h1>
+
+	<p>Your document,
+	  <span class="highlight">${request.session['filename']}</span>,
+	  was imported successfully to the workspace called
+	  <span class="highlight">${request.session['deposit_workspace']}</span>
+	  on Connexions.</p>
+	<p><span class="highlight">To publish</span> this module
+	  <!--if username is you-->you<!--else Author Name-->
+	  will have to
+	</p>
+
+	<ol>
+	  <li><a href="">sign the Connexions license</a>.</li>
+	  <li>Wait for Account Name to agree to the role request. If
+	    you would like to send a reminder to Account Name to do
+	    this, <a href="">click here</a>.</li>
+	</ol>
+	<p><span class="highlight">To upload another document</span>,
+	  <a href="${request.route_url('choose')}">click here</a> to return to the beginning of the process.</p>
+
+      </div>
+    </div>
+  </div>
+</tal:body>
+
+</metal:use>

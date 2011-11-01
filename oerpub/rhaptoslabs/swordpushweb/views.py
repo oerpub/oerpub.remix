@@ -344,9 +344,18 @@ def sword_treatment_view(request):
     return {'treatment': treatment}
 
 
-@view_config(route_name='summary', renderer='templates/summary.pt')
+@view_config(route_name='summary')
 def summary_view(request):
-    return {}
+    check_login(request)
+    templatePath = 'templates/%s/summary.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+
+    session = request.session
+    dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
+    treatment = [i.lstrip() for i in dr.treatment.split('\n')]
+    treatment = markdown.markdown('\n'.join(treatment))
+    response = {'treatment': treatment}
+
+    return render_to_response(templatePath, response, request=request)
 
 
 class MetadataSchema(formencode.Schema):
@@ -494,26 +503,160 @@ def metadata_view(request):
                 if v:
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
 
-        # Create a connection to the sword service
-        conn = sword2cnx.Connection(session['service_document_url'],
-                                   user_name=session['username'],
-                                   user_pass=session['password'],
-                                   always_authenticate=True,
-                                   download_service_document=True)
+        if not TESTING:
+            # Create a connection to the sword service
+            conn = sword2cnx.Connection(session['service_document_url'],
+                                       user_name=session['username'],
+                                       user_pass=session['password'],
+                                       always_authenticate=True,
+                                       download_service_document=True)
 
-        # Send zip file to Connexions through SWORD interface
-        with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-            deposit_receipt = conn.create(
-                col_iri = form.data['workspace'],
-                metadata_entry = metadata_entry,
-                payload = zip_file,
-                filename = 'upload.zip',
-                mimetype = 'application/zip',
-                packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                in_progress = True)
+            # Send zip file to Connexions through SWORD interface
+            with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
+                deposit_receipt = conn.create(
+                    col_iri = form.data['workspace'],
+                    metadata_entry = metadata_entry,
+                    payload = zip_file,
+                    filename = 'upload.zip',
+                    mimetype = 'application/zip',
+                    packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                    in_progress = True)
 
-        # The deposit receipt cannot be pickled, so we pickle the xml
-        session['deposit_receipt'] = deposit_receipt.to_xml()
+        # Remember to which workspace we submitted
+        session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
+
+        if not TESTING:
+            # The deposit receipt cannot be pickled, so we pickle the xml
+            session['deposit_receipt'] = deposit_receipt.to_xml()
+        else:
+            session['deposit_receipt'] = """<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:sword="http://purl.org/net/sword/"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:md="http://cnx.rice.edu/mdml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <!-- SWORD deposit receipt -->
+    <title>Word created with multipart</title>
+    <id>module.2011-10-06.9527952926</id>
+    <updated>2011/10/06 15:29:15.879 Universal</updated>
+    <summary type="text">A bit of summary.</summary>
+    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+
+    <!-- The metadata begins -->
+    <dcterms:identifier xsi:type="dcterms:URI">http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">module.2011-10-06.9527952926</dcterms:identifier> 
+    <dcterms:title>Word created with multipart</dcterms:title>
+    <dcterms:created>2011/10/06 15:29:12.821 Universal</dcterms:created> 
+    <dcterms:modified>2011/10/06 15:29:15.879 Universal</dcterms:modified> 
+    <dcterms:creator oerdc:id="user1"
+                     oerdc:email="useremail1@localhost.net"
+                     oerdc:pending="False">firstname1 lastname1</dcterms:creator>
+    <dcterms:creator oerdc:id="roche"
+                     oerdc:email="roche@upfrontsystems.co.za"
+                     oerdc:pending="True">Roche Compaan</dcterms:creator>
+    <dcterms:creator oerdc:id="user2"
+                     oerdc:email="useremail2@localhost.net"
+                     oerdc:pending="True">firstname2 lastname2</dcterms:creator>
+    <oerdc:maintainer oerdc:id="user1"
+                      oerdc:email="useremail1@localhost.net"
+                      oerdc:pending="False">firstname1 lastname1</oerdc:maintainer>
+    <oerdc:maintainer oerdc:id="roche"
+                      oerdc:email="roche@upfrontsystems.co.za"
+                      oerdc:pending="True">Roche Compaan</oerdc:maintainer>
+    <dcterms:rightsHolder oerdc:id="roche"
+                          oerdc:email="roche@upfrontsystems.co.za"
+                          oerdc:pending="True">Roche Compaan</dcterms:rightsHolder>
+    <dcterms:rightsHolder oerdc:id="user2"
+                          oerdc:email="useremail2@localhost.net"
+                          oerdc:pending="True">firstname2 lastname2</dcterms:rightsHolder>
+    <oerdc:translator oerdc:id="user85"
+                      oerdc:email="dcwill@rice.edu"
+                      oerdc:pending="True">Daniel Williamson</oerdc:translator>
+    <oerdc:editor oerdc:id="user3"
+                  oerdc:email="useremail3@localhost.net"
+                  oerdc:pending="True">firstname3 lastname3</oerdc:editor>
+    <!-- CNX-Supported but not in MDML -->
+    <oerdc:descriptionOfChanges>
+        This is brand new.
+    </oerdc:descriptionOfChanges> 
+    <oerdc:oer-subject>Arts</oerdc:oer-subject>
+    <dcterms:subject xsi:type="oerdc:Subject">Arts</dcterms:subject>
+    <dcterms:subject>music</dcterms:subject>
+    <dcterms:subject>passion</dcterms:subject>
+    <dcterms:abstract>A bit of summary.</dcterms:abstract>
+    <dcterms:language xsi:type="ISO639-1">es</dcterms:language> 
+    <dcterms:license xsi:type="dcterms:URI"></dcterms:license>
+    <sword:treatment>
+        Module 'Word created with multipart' was imported via the SWORD API.
+        You can <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view">preview your module here</a> to see what it will look like once it is published.
+        
+        The current description of the changes you have made for this version of the module: This is brand new.
+        
+
+        
+        Publication requirements:
+        
+            1. Author (firstname1 lastname1, account:user1), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
+        
+        
+            2. Author (Roche Compaan, account:roche), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
+        
+        
+            3. Author (firstname2 lastname2, account:user2), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
+        
+        
+            4. You cannot publish with pending role requests. Contributor, Roche Compaan (account:roche),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=roche">agree to thw pending requests</a>.
+        
+        
+            5. You cannot publish with pending role requests. Contributor, Daniel Williamson (account:user85),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user85">agree to thw pending requests</a>.
+        
+        
+            6. You cannot publish with pending role requests. Contributor, firstname2 lastname2 (account:user2),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user2">agree to thw pending requests</a>.
+        
+        
+            7. You cannot publish with pending role requests. Contributor, firstname3 lastname3 (account:user3),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user3">agree to thw pending requests</a>.
+        
+        
+    </sword:treatment>
+    <!-- For all UNPUBLISHED modules -->
+    <link rel="alternate"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=html"/>
+    <content type="application/zip"
+             src="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/editmedia"/>
+    <link rel="edit-media"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/editmedia"/>
+    <link rel="edit"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword"/>
+    <link rel="http://purl.org/net/sword/terms/add"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword"/>
+    <link rel="http://purl.org/net/sword/terms/statement"
+          type="application/atom+xml;type=feed"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/statement.atom"/>
+    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=html"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/pdf"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=pdf"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/zip"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_export?format=zip"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/xml"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_export?format=plain"/>
+    <!-- END for all UNPUBLISHED modules -->
+</entry>
+"""
+
         # Go to the upload page
         return HTTPFound(location=request.route_url('summary'))
 
