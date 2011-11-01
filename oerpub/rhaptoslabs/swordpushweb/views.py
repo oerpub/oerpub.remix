@@ -149,17 +149,6 @@ def logout_view(request):
 def switch_expert_mode_view(request):
     referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
     request.session['expert_mode'] = not request.session.get('expert_mode', False)
-    keys = request.keys()
-    keys = list(set(keys).intersection(['path', 'path_info', 'path_info_peek', 'path_info_pop', 'path_qs', 'path_url', 'pop', 'popitem', 'pragma', 'query_string', 'range', 'referer', 'referrer', 'registry', 'relative_url', 'remote_addr', 'remote_user', 'remove_conditional_headers', 'request_body_tempfile_limit', 'request_iface', 'resource_url', 'response', 'response_cache_for', 'response_callbacks', 'response_charset', 'response_content_type', 'response_headerlist', 'response_status', 'root', 'route_path', 'route_url', 'rr_dep', 'scheme', 'script_name', 'server_name', 'server_port', 'session', 'setdefault', 'static_path', 'static_url', 'str_GET', 'str_POST', 'str_cookies', 'str_params', 'subpath', 'tmpl_context', 'traversed', 'upath_info', 'update', 'url', 'urlargs', 'urlvars', 'uscript_name', 'user_agent', 'values', 'view_name', 'virtual_root', 'virtual_root_path']))
-    keys.sort()
-    print '==========='
-    for key in keys:
-        print key, '=>', eval('request.' + key)
-    print '==========='
-
-    for key in ['application_url', 'environ', 'host_url']:
-        print key, '=>', eval('request.' + key)
-    print 'environ["HTTP_REFERER"] =>', request.environ.get("HTTP_REFERER")
     raise HTTPFound(location=referer)
 
 
