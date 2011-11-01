@@ -1,0 +1,156 @@
+<metal:use use-macro="newbase">
+
+<tal:body metal:fill-slot="content">
+  <!-- OLD ROLES CODE -->
+  <div id="roles-picker" style="display:none;">
+    <table cellspacing="0" id="roles-table">
+      <tr>
+        <th rowspan="2" width="200">ID</th>
+        <th colspan="3">Required Roles</th>
+        <th colspan="2">Optional Roles</th>
+        <th></th>
+      </tr>
+      <tr>
+        <th width="1">Author</th>
+        <th width="1">Maintainer</th>
+        <th width="1">Copyright</th>
+        <th width="1">Editor</th>
+        <th width="1">Translator</th>
+        <th width="1">Remove</th>
+      </tr>
+    </table>
+    <a href="#" id="add-role">Add Role</a><br/>
+    <form id="roles-picker-buttons" method="link" action="#">
+      <input type="submit" id="cancel-roles" value="Cancel roles" />
+      <input type="submit" id="submit-roles" value="Submit roles" />
+    </form>
+  </div>
+  <!-- /OLD ROLES CODE -->
+  ${form.begin(request.route_url('metadata'))}
+  ${form.csrf_token()}
+  <!-- OLD ROLES CODE -->
+  <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
+    <tal:hidden>${form.hidden(field)}</tal:hidden>
+  </tal:field>
+  <!-- /OLD ROLES CODE -->
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header">
+	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
+	<h1>Connexions Importer</h1>
+	<p class="status">You are logged in as ${request.session['username']}
+	  <br/><a href="${request.route_url('logout')}">Click here to sign out</a></p>
+	<img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}"/>
+      </div>
+    </div>
+    <div id="header2-container">
+      <div id="header2">
+	Describe your module below. Form fields marked in red have to
+	be filled out. Once you are ready you can, if necessary,
+	change the workspace in which the module will be placed below
+	and click Upload.
+	<div style="text-align: right; margin-top: 5px;">
+	  <span class="formfield">${form.select("workspace", workspaces, selected_value=None)}</span>
+	  <span class="formfield">${form.submit('form.submitted', 'Upload', class_='submit')}</span>
+	</div>
+      </div>
+    </div>
+  </div>
+  <div id="ie6-container-wrap">
+    <div id="container" style="padding-top: 160px;">
+      <div id="content">
+	<table width="100%" border="0" cellspacing="0" cellpadding="2">
+	  <tr>
+	    <td width="50%" valign="top">
+	      <div class="formentry">
+		<div class="formlabel">Title <span class="formrequired">*</span></div>
+		<div class="forminfo">Enter the title of this module.</div>
+		<div class="formfield"><input type="text" name="title" size="40" value=""/></div>
+	      </div>
+
+	      <div class="formentry">
+		<div class="formlabel">Subject</div>
+		<div class="forminfo">Select the subject categories that apply to this module.</div>
+		<table>
+		  <tr>
+		    <td>
+		      <input type="checkbox" name="subject" value="Arts"/>
+		      <span class="formlabel">Arts</span>
+		    </td>
+		    <td>
+		      <input type="checkbox" name="subject" value="Mathematics and Statistics"/>
+		      <span class="formlabel">Mathematics and Statistics</span>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td>
+		      <input type="checkbox" name="subject" value="Business"/>
+		      <span class="formlabel">Business</span>
+		    </td>
+		    <td>
+		      <input type="checkbox" name="subject" value="Science and Technology"/>
+		      <span class="formlabel">Science and Technology</span>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td>
+		      <input type="checkbox" name="subject" value="Humanities"/>
+		      <span class="formlabel">Humanities</span>
+		    </td>
+		    <td>
+		      <input type="checkbox" name="subject" value="Social Sciences"/>
+		      <span class="formlabel">Social Sciences</span>
+		    </td>
+		  </tr>
+		</table>
+	      </div>
+	      <div class="formentry">
+		<div class="formlabel">Summary</div>
+		<div class="forminfo">Enter a summary of the module.</div>
+		<div class="formfield"><textarea name="summary" rows="6" cols="40"></textarea></div>
+	      </div>
+	    </td>
+	    <td width="50%" valign="top">
+	      <div class="formentry">
+		<div class="formlabel">Language <span class="formrequired">*</span></div>
+		<div class="forminfo">Select the primary language for this module.</div>
+		<div class="formfield">${form.select("language", languages, selected_value="en")}</div>
+	      </div>
+	      <div class="formentry">
+		<div class="formlabel">Keywords (one per line)</div>
+		<div class="forminfo">Enter each keyword on its own
+		  line. Keywords are not displayed on the content, but
+		  are used behind the scenes to help people find it in
+		  searches.</div>
+		<div class="formfield"><textarea name="keywords" rows="4" cols="40"></textarea></div>
+	      </div>
+	      <div class="formentry">
+		<div class="formlabel">Google Analytics Tracking Code</div>
+		<div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
+		<div class="formfield"><input type="text" name="google_code" size="40" value=""/></div>
+	      </div>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan="2">
+	      <div class="formentry">
+		<div class="formlabel">Roles</div>
+		<ul>
+		  <li id="list-authors"><b>Author(s):</b><span>${form.data['authors']}</span></li>
+		  <li id="list-maintainers"><b>Maintainer(s):</b><span>${form.data['maintainers']}</span></li>
+		  <li id="list-copyright"><b>Copyright Holder(s):</b><span>${form.data['copyright']}</span></li>
+		  <li id="list-editors"><b>Editor(s):</b><span>${form.data['editors']}</span></li>
+		  <li id="list-translators"><b>Translator(s):</b><span>${form.data['translators']}</span></li>
+		</ul>
+		<a href="#" id="edit-roles">Edit roles</a>
+	      </div>
+	    </td>
+	  </tr>
+	</table>
+      </div>
+    </div>
+  </div>
+  ${form.end()}
+</tal:body>
+
+</metal:use>

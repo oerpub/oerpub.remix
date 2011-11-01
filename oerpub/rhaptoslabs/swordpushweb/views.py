@@ -373,13 +373,14 @@ class MetadataSchema(formencode.Schema):
     editors = formencode.validators.String()
     translators = formencode.validators.String()
 
-@view_config(route_name='metadata', renderer='templates/metadata.pt')
+@view_config(route_name='metadata')
 def metadata_view(request):
     """
     Handle metadata adding and uploads
     """
+    check_login(request)
+    templatePath = 'templates/%s/metadata.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
     session = request.session
-    session.flash('Uploading: %s' % session['filename'])
 
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
@@ -516,7 +517,11 @@ def metadata_view(request):
         session['deposit_receipt'] = deposit_receipt.to_xml()
         # Go to the upload page
         return HTTPFound(location=request.route_url('summary'))
-    return {
+
+    response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
-        }
+        'workspaces': workspaces,
+        'languages': languages,
+    }
+    return render_to_response(templatePath, response, request=request)
