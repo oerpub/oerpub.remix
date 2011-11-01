@@ -343,13 +343,11 @@ def sword_treatment_view(request):
     treatment = markdown.markdown('\n'.join(treatment))
     return {'treatment': treatment}
 
+
 @view_config(route_name='summary', renderer='templates/summary.pt')
 def summary_view(request):
     return {}
 
-@view_config(route_name='roles', renderer='templates/roles.pt')
-def roles_view(request):
-    return {}
 
 class MetadataSchema(formencode.Schema):
     allow_extra_fields = True
@@ -372,6 +370,7 @@ class MetadataSchema(formencode.Schema):
     copyright = formencode.validators.String(not_empty=True)
     editors = formencode.validators.String()
     translators = formencode.validators.String()
+
 
 @view_config(route_name='metadata')
 def metadata_view(request):

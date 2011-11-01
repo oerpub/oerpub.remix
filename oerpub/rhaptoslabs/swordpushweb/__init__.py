@@ -17,7 +17,6 @@ def main(global_config, **settings):
     config.add_route('preview_header', '/preview_header')
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
-    config.add_route('roles', '/roles')
     config.add_route('logout', '/logout')
     config.add_route('change_workspace', '/change_workspace')
     config.add_route('sword_treatment', '/sword_treatment')
