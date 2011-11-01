@@ -6,6 +6,7 @@ import markdown
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
+from pyramid.renderers import render_to_response
 
 import formencode
 
@@ -26,8 +27,21 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 
 TESTING = True
 
+
 def escape_system(input_string):
     return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
+
+
+def check_login(request, raise_exception=True):
+    # Check if logged in
+    for key in ['username', 'password', 'service_document_url']:
+        if not request.session.has_key(key):
+            if raise_exception:
+                raise HTTPFound(location=request.route_url('login'))
+            else:
+                return False
+    return True
+
 
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
@@ -35,17 +49,20 @@ class LoginSchema(formencode.Schema):
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.PlainText(not_empty=True)
 
-@view_config(route_name='login', renderer='templates/novice/login.pt')
+
+@view_config(route_name='login')
 def login_view(request):
     """
     Perform a 'login' by getting the service document from a sword repository.
     """
 
+    templatePath = 'templates/%s/login.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+
     defaults = {'service_document_url': 'http://cnx.org/sword'}
     form = Form(request, schema=LoginSchema, defaults=defaults)
     field_list = [
-        ('username', 'Username'),
-        ('password', 'Password', {'type': 'password'}),
+        ('username',),
+        ('password',),
     ]
     
     session = request.session
@@ -69,10 +86,11 @@ def login_view(request):
 
     # If not signed in, go to login page
     if not loggedIn:
-        return {
+        response = {
             'form': FormRenderer(form),
             'field_list': field_list,
         }
+        return render_to_response(templatePath, response, request=request)
 
     if TESTING:
         session['workspace_title'] = "Connexions"
@@ -94,7 +112,8 @@ def login_view(request):
                                       in sword2cnx.get_workspaces(conn)]
         except:
             session.flash('Could not log in', 'errors')
-            return {'form': FormRenderer(form), 'field_list': field_list}
+            response = {'form': FormRenderer(form), 'field_list': field_list}
+            return render_to_response(templatePath, response, request=request)
 
         # Get needed info from the service document
         doc = etree.fromstring(conn.sd.raw_response)
@@ -116,21 +135,43 @@ def login_view(request):
                                              )[0].text
 
     # Go to the upload page
-    return HTTPFound(location="/choose")
+    return HTTPFound(location=request.route_url('choose'))
 
 
 @view_config(route_name='logout', renderer='templates/login.pt')
 def logout_view(request):
     session = request.session
     session.invalidate()
-    raise HTTPFound(location='/')
+    raise HTTPFound(location=request.route_url('login'))
+
+
+@view_config(route_name='switch_expert_mode')
+def switch_expert_mode_view(request):
+    referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
+    request.session['expert_mode'] = not request.session.get('expert_mode', False)
+    keys = request.keys()
+    keys = list(set(keys).intersection(['path', 'path_info', 'path_info_peek', 'path_info_pop', 'path_qs', 'path_url', 'pop', 'popitem', 'pragma', 'query_string', 'range', 'referer', 'referrer', 'registry', 'relative_url', 'remote_addr', 'remote_user', 'remove_conditional_headers', 'request_body_tempfile_limit', 'request_iface', 'resource_url', 'response', 'response_cache_for', 'response_callbacks', 'response_charset', 'response_content_type', 'response_headerlist', 'response_status', 'root', 'route_path', 'route_url', 'rr_dep', 'scheme', 'script_name', 'server_name', 'server_port', 'session', 'setdefault', 'static_path', 'static_url', 'str_GET', 'str_POST', 'str_cookies', 'str_params', 'subpath', 'tmpl_context', 'traversed', 'upath_info', 'update', 'url', 'urlargs', 'urlvars', 'uscript_name', 'user_agent', 'values', 'view_name', 'virtual_root', 'virtual_root_path']))
+    keys.sort()
+    print '==========='
+    for key in keys:
+        print key, '=>', eval('request.' + key)
+    print '==========='
+
+    for key in ['application_url', 'environ', 'host_url']:
+        print key, '=>', eval('request.' + key)
+    print 'environ["HTTP_REFERER"] =>', request.environ.get("HTTP_REFERER")
+    raise HTTPFound(location=referer)
+
 
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
 
+
 @view_config(route_name='choose', renderer='templates/choose.pt')
 def upload_view(request):
+    check_login(request)
+
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]
 
@@ -269,7 +310,7 @@ def upload_view(request):
         # TODO: Errors should be shown to the user
         request.session.flash('The file was successfully converted.')
 
-        return HTTPFound(location="/preview")
+        return HTTPFound(location=request.route_url('preview'))
 
     # First view or errors
     return {
@@ -471,7 +512,7 @@ def metadata_view(request):
         # The deposit receipt cannot be pickled, so we pickle the xml
         session['deposit_receipt'] = deposit_receipt.to_xml()
         # Go to the upload page
-        return HTTPFound(location="/summary")
+        return HTTPFound(location=request.route_url('summary'))
     return {
         'form': FormRenderer(form),
         'field_list': field_list,

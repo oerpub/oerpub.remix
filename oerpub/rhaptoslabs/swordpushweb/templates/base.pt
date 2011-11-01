@@ -18,7 +18,7 @@
   <body metal:define-slot="body">
     <metal:content define-slot="header"/>
     <metal:content define-slot="content"/>
-    <div class="expertmode"><a href="${request.route_url('switch_expert_mode')}"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gears_small.png')}" width="24" height="24"/></a></div>
+    <div class="expertmode"><a href="${request.route_url('switch_expert_mode')}"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gears_' + ['small','expert'][request.session.get('expert_mode',False)] + '.png')}" width="24" height="24"/></a></div>
   </body>
 </html>
 </metal:main>

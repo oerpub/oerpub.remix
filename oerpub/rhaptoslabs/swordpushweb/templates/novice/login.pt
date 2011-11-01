@@ -15,12 +15,12 @@
   <center>
     <table>
       <tr>
-        <td><label for="${field_list[0][0]}">${field_list[0][1]}:</label></td>
-        <td><input name="${field_list[0][0]}" type="text"/></td>
+        <td><label for="username">Username:</label></td>
+        <td><input type="text" name="username"/></td>
       </tr>
       <tr>
-        <td><label for="${field_list[1][0]}">${field_list[1][1]}:</label></td>
-        <td><input name="${field_list[1][0]}" type="password"/></td>
+        <td><label for="password">Password:</label></td>
+        <td><input type="password" name="password"/></td>
       </tr>
       <tr>
         <td colspan="2" align="right">${form.submit('form.submitted', 'Log in', class_='submit')}</td>
