@@ -6,7 +6,7 @@
 <div class="splashbox">
   <div class="splashheading">
     <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}" width="51" height="59" align="left"/>
-    Connexions Document Importer <span style="font-size:12pt;color:#808080;margin-left:1em;">Expert Interface</span>
+    Connexions Document Importer <span style="font-size:12pt;color:#ed891b;margin-left:1em;">Expert Interface</span>
   </div>
   ${form.begin(request.route_url('login'))}
   ${form.csrf_token()}

@@ -1,0 +1,45 @@
+<metal:use use-macro="newbase">
+
+<tal:body metal:fill-slot="header">
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header">
+	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
+	<h1>Connexions Importer</h1>
+	<p class="status">You are logged in as ${request.session['username']}
+	  <br/><a href="${request.route_url('logout')}">Click here to sign out</a></p>
+	<img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}"/>
+      </div>
+    </div>
+  </div>
+</tal:body>
+
+<tal:body metal:fill-slot="content">
+  <div id="ie6-container-wrap">
+    <div id="container">
+      <div id="content">
+	<h1>Upload your document</h1>
+	<p>You can upload any type of office document here. A preview
+	  will appear in this area so that you can review it before
+	  publishing the final version.</p>
+	<center>
+	  <br/>
+	  ${form.begin(request.route_url('choose'), multipart='multipart')}
+          ${form.csrf_token()}
+          <label for="upload">File:</label>
+          <input id="upload" name="upload" type="file"/>
+          <br/>
+          <br/>
+          ${form.submit('form.submitted', 'Preview', class_='submit', id='upload-submit')}
+	  ${form.end()}
+	</center>
+	<div class="pleasewait" id="upload-wait" style="display:none;">
+	  Your document is being processed. This may take a few
+	  moments.
+	</div>
+      </div>
+    </div>
+  </div>
+</tal:body>
+
+</metal:use>

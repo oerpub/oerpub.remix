@@ -168,9 +168,11 @@ class UploadSchema(formencode.Schema):
     upload = formencode.validators.FieldStorageUploadConverter()
 
 
-@view_config(route_name='choose', renderer='templates/choose.pt')
+@view_config(route_name='choose')
 def upload_view(request):
     check_login(request)
+
+    templatePath = 'templates/%s/choose.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
 
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]
@@ -313,16 +315,19 @@ def upload_view(request):
         return HTTPFound(location=request.route_url('preview'))
 
     # First view or errors
-    return {
+    response = {
         'form': FormRenderer(form),
         'field_list': field_list,
-        }
+    }
+    return render_to_response(templatePath, response, request=request)
+
 
 @view_config(route_name='preview', renderer='templates/preview.pt')
 def preview_view(request):
     session = request.session
     session.flash('Previewing file: %s' % session['filename'])
     return {}
+
 
 @view_config(route_name='sword_treatment',
              renderer='templates/sword_treatment.pt')
