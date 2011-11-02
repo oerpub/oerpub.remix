@@ -25,7 +25,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 
 # TODO: If we have enough helper functions, they should go into utils
 
-TESTING = True
+TESTING = False
 
 
 def escape_system(input_string):
@@ -372,9 +372,9 @@ class MetadataSchema(formencode.Schema):
     allow_extra_fields = True
     title = formencode.validators.String(not_empty=True)
     keep_title = formencode.validators.Bool()
-    summary = formencode.validators.String(not_empty=True)
+    summary = formencode.validators.String()
     keep_summary = formencode.validators.Bool()
-    keywords = formencode.validators.String(not_empty=True)
+    keywords = formencode.validators.String()
     keep_keywords = formencode.validators.Bool()
     subject = formencode.validators.Set()
     keep_subject = formencode.validators.Bool()
