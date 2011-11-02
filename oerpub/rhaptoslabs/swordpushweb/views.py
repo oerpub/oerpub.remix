@@ -77,7 +77,7 @@ def login_view(request):
     else:
         loggedIn = True
         for key in ['username', 'password', 'service_document_url']:
-            if not request.session.has_key(key):
+            if not session.has_key(key):
                 loggedIn = False
 
     # TODO: check credentials against Connexions and ask for login
@@ -98,9 +98,9 @@ def login_view(request):
         session['collections'] = [{'title': 'Personal Workspace', 'href': 'http://'}]
     else:
         # Get the service document and persist what's needed.
-        conn = sword2cnx.Connection(form.data['service_document_url'],
-                                    user_name=form.data['username'],
-                                    user_pass=form.data['password'],
+        conn = sword2cnx.Connection(session['service_document_url'],
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
                                     always_authenticate=True,
                                     download_service_document=True)
         try:
