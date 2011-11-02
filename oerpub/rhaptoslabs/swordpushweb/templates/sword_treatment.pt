@@ -1,9 +1,0 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="base">
-
-<body metal:fill-slot="body">
-<span tal:replace="structure treatment" />
-</body>
-</html>

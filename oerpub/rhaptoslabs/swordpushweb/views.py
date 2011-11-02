@@ -2,10 +2,10 @@ import os
 import shutil
 import datetime
 import zipfile
-import markdown
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
+from pyramid.renderers import render_to_response
 
 import formencode
 
@@ -24,8 +24,23 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 
 # TODO: If we have enough helper functions, they should go into utils
 
+TESTING = False
+
+
 def escape_system(input_string):
     return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
+
+
+def check_login(request, raise_exception=True):
+    # Check if logged in
+    for key in ['username', 'password', 'service_document_url']:
+        if not request.session.has_key(key):
+            if raise_exception:
+                raise HTTPFound(location=request.route_url('login'))
+            else:
+                return False
+    return True
+
 
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
@@ -33,41 +48,61 @@ class LoginSchema(formencode.Schema):
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.PlainText(not_empty=True)
 
-@view_config(route_name='main', renderer='templates/login.pt')
+
+@view_config(route_name='login')
 def login_view(request):
     """
     Perform a 'login' by getting the service document from a sword repository.
     """
-    # TODO: check credentials against Connexions and ask for login
-    # again if failed.
+
+    templatePath = 'templates/%s/login.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
 
     defaults = {'service_document_url': 'http://cnx.org/sword'}
-    form = Form(request,
-                schema=LoginSchema,
-                defaults=defaults
-                )
+    form = Form(request, schema=LoginSchema, defaults=defaults)
     field_list = [
-                  ('username', 'User Name'),
-                  ('password', 'Password', {'type': 'password'}),
-                  ]
+        ('username',),
+        ('password',),
+    ]
+    
+    session = request.session
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
-
         # The login details are persisted on the session
-        session = request.session
         for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
         session['service_document_url'] = form.data['service_document_url']
+        loggedIn = True
+    # Check if user is already authenticated
+    else:
+        loggedIn = True
+        for key in ['username', 'password', 'service_document_url']:
+            if not request.session.has_key(key):
+                loggedIn = False
 
+    # TODO: check credentials against Connexions and ask for login
+    # again if failed.
+
+    # If not signed in, go to login page
+    if not loggedIn:
+        response = {
+            'form': FormRenderer(form),
+            'field_list': field_list,
+        }
+        return render_to_response(templatePath, response, request=request)
+
+    if TESTING:
+        session['workspace_title'] = "Connexions"
+        session['sword_version'] = "2.0"
+        session['maxuploadsize'] = "60000"
+        session['collections'] = [{'title': 'Personal Workspace', 'href': 'http://'}]
+    else:
         # Get the service document and persist what's needed.
         conn = sword2cnx.Connection(form.data['service_document_url'],
-                                   user_name=form.data['username'],
-                                   user_pass=form.data['password'],
-                                   always_authenticate=True,
-                                   download_service_document=True)
-
-
+                                    user_name=form.data['username'],
+                                    user_pass=form.data['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)
         try:
             # Get available collections from SWORD service document
             # We create a list of dictionaries, otherwise we'll have problems
@@ -76,11 +111,8 @@ def login_view(request):
                                       in sword2cnx.get_workspaces(conn)]
         except:
             session.flash('Could not log in', 'errors')
-            return {'form': FormRenderer(form), 'field_list': field_list}
-
-        if len(session['collections']) > 1:
-            session.flash('You have more than one workspace. Please check that you have selected the correct one before uploading anything.')
-
+            response = {'form': FormRenderer(form), 'field_list': field_list}
+            return render_to_response(templatePath, response, request=request)
 
         # Get needed info from the service document
         doc = etree.fromstring(conn.sd.raw_response)
@@ -101,25 +133,40 @@ def login_view(request):
                                              namespaces=namespaces
                                              )[0].text
 
-        # Go to the upload page
-        return HTTPFound(location="/choose")
-    return {
-        'form': FormRenderer(form),
-        'field_list': field_list,
-        }
+    # Go to the upload page
+    return HTTPFound(location=request.route_url('choose'))
+
 
 @view_config(route_name='logout', renderer='templates/login.pt')
 def logout_view(request):
     session = request.session
     session.invalidate()
-    raise HTTPFound(location='/')
+    raise HTTPFound(location=request.route_url('login'))
+
+
+@view_config(route_name='switch_expert_mode')
+def switch_expert_mode_view(request):
+    referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
+    # HACK: to make frames view of preview page work out
+    substr = '/preview_side'
+    if referer[-len(substr):] == substr:
+        referer = referer[:-len(substr)] + '/preview'
+    # /HACK
+    request.session['expert_mode'] = not request.session.get('expert_mode', False)
+    raise HTTPFound(location=referer)
+
 
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
 
-@view_config(route_name='choose', renderer='templates/choose.pt')
-def upload_view(request):
+
+@view_config(route_name='choose')
+def choose_view(request):
+    check_login(request)
+
+    templatePath = 'templates/%s/choose.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]
 
@@ -200,7 +247,8 @@ def upload_view(request):
             # the ability to do multiple tabs in parallel, unless it gets offloaded
             # onto the form again.
             request.session['upload_dir'] = temp_dir_name
-            request.session['filename'] = gd_entry_url
+            request.session['filename'] = "Google Document"
+            print request.session['filename']
 
         # OOo / MS Word Conversion
         else:
@@ -258,51 +306,68 @@ def upload_view(request):
         # TODO: Errors should be shown to the user
         request.session.flash('The file was successfully converted.')
 
-        return HTTPFound(location="/preview")
+        return HTTPFound(location=request.route_url('preview_frames'))
 
     # First view or errors
-    return {
+    response = {
         'form': FormRenderer(form),
         'field_list': field_list,
-        }
+    }
+    return render_to_response(templatePath, response, request=request)
 
-@view_config(route_name='preview', renderer='templates/preview.pt')
-def preview_view(request):
-    session = request.session
-    session.flash('Previewing file: %s' % session['filename'])
-    return {}
 
-@view_config(route_name='sword_treatment',
-             renderer='templates/sword_treatment.pt')
-def sword_treatment_view(request):
-    session = request.session
-    dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
+@view_config(route_name='preview_frames', renderer='templates/preview_frames.pt')
+def preview_frames_view(request):
+    check_login(request)
+    return {
+        'header_url': request.route_url('preview_header'),
+        'body_url': '%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
+    }
 
-    # TODO: Here be dragons. The following bit of code is designed to
-    # specifically convert the Connexions treatment reply to something that we
-    # can push through a markdown filter to get reasonable-looking html. By
-    # default, the first couple of paragraphs are indented, which gets you
-    # <pre> tags, which strips out links. Ugh.
 
-    treatment = [i.lstrip() for i in dr.treatment.split('\n')]
-    treatment = markdown.markdown('\n'.join(treatment))
-    return {'treatment': treatment}
+@view_config(route_name='preview_header')
+def preview_header_view(request):
+    check_login(request)
+    templatePath = 'templates/%s/preview_header.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    return render_to_response(templatePath, {}, request=request)
 
-@view_config(route_name='summary', renderer='templates/summary.pt')
+
+@view_config(route_name='preview_side', renderer='templates/preview_side.pt')
+def preview_side_view(request):
+    return {'expert_mode_switch_target': '_parent'}
+
+
+@view_config(route_name='summary')
 def summary_view(request):
-    return {}
+    check_login(request)
+    templatePath = 'templates/%s/summary.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
 
-@view_config(route_name='roles', renderer='templates/roles.pt')
-def roles_view(request):
-    return {}
+    # Note: need to extract the version string before passing dom to
+    # Deposit_Receipt, which mangles dom.
+    dom = etree.fromstring(request.session['deposit_receipt'])
+    version_string = dom.find('{http://www.w3.org/2005/Atom}generator').text.strip()
+    dr = Deposit_Receipt(dom=dom)
+    treatment = dr.treatment
+
+    import parse_sword_treatment
+    response = parse_sword_treatment.markdown(treatment)
+    if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Publication requirements:') != -1):
+        response.update(parse_sword_treatment.cnx_1_0(treatment))
+    elif (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Before publishing:') != -1):
+        response.update(parse_sword_treatment.test_server_1_0(treatment))
+    else:
+        print 'WARNING: No valid version number found in SWORD deposit receipt. Defaulting to showing the SWORD treatment as is.'
+
+    return render_to_response(templatePath, response, request=request)
+
 
 class MetadataSchema(formencode.Schema):
     allow_extra_fields = True
     title = formencode.validators.String(not_empty=True)
     keep_title = formencode.validators.Bool()
-    summary = formencode.validators.String(not_empty=True)
+    summary = formencode.validators.String()
     keep_summary = formencode.validators.Bool()
-    keywords = formencode.validators.String(not_empty=True)
+    keywords = formencode.validators.String()
     keep_keywords = formencode.validators.Bool()
     subject = formencode.validators.Set()
     keep_subject = formencode.validators.Bool()
@@ -318,13 +383,15 @@ class MetadataSchema(formencode.Schema):
     editors = formencode.validators.String()
     translators = formencode.validators.String()
 
-@view_config(route_name='metadata', renderer='templates/metadata.pt')
+
+@view_config(route_name='metadata')
 def metadata_view(request):
     """
     Handle metadata adding and uploads
     """
+    check_login(request)
+    templatePath = 'templates/%s/metadata.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
     session = request.session
-    session.flash('Uploading: %s' % session['filename'])
 
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
@@ -439,29 +506,167 @@ def metadata_view(request):
                 if v:
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
 
-        # Create a connection to the sword service
-        conn = sword2cnx.Connection(session['service_document_url'],
-                                   user_name=session['username'],
-                                   user_pass=session['password'],
-                                   always_authenticate=True,
-                                   download_service_document=True)
+        if not TESTING:
+            # Create a connection to the sword service
+            conn = sword2cnx.Connection(session['service_document_url'],
+                                       user_name=session['username'],
+                                       user_pass=session['password'],
+                                       always_authenticate=True,
+                                       download_service_document=True)
 
-        # Send zip file to Connexions through SWORD interface
-        with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-            deposit_receipt = conn.create(
-                col_iri = form.data['workspace'],
-                metadata_entry = metadata_entry,
-                payload = zip_file,
-                filename = 'upload.zip',
-                mimetype = 'application/zip',
-                packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                in_progress = True)
+            # Send zip file to Connexions through SWORD interface
+            with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
+                deposit_receipt = conn.create(
+                    col_iri = form.data['workspace'],
+                    metadata_entry = metadata_entry,
+                    payload = zip_file,
+                    filename = 'upload.zip',
+                    mimetype = 'application/zip',
+                    packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                    in_progress = True)
 
-        # The deposit receipt cannot be pickled, so we pickle the xml
-        session['deposit_receipt'] = deposit_receipt.to_xml()
+        # Remember to which workspace we submitted
+        session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
+
+        if not TESTING:
+            # The deposit receipt cannot be pickled, so we pickle the xml
+            session['deposit_receipt'] = deposit_receipt.to_xml()
+        else:
+            session['deposit_receipt'] = """<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:sword="http://purl.org/net/sword/"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:md="http://cnx.rice.edu/mdml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <!-- SWORD deposit receipt -->
+    <title>Word created with multipart</title>
+    <id>module.2011-10-06.9527952926</id>
+    <updated>2011/10/06 15:29:15.879 Universal</updated>
+    <summary type="text">A bit of summary.</summary>
+    <generator uri="rhaptos.swordservice.plone" version="1.0"> uri:"rhaptos.swordservice.plone" version:"1.0"</generator>
+
+    <!-- The metadata begins -->
+    <dcterms:identifier xsi:type="dcterms:URI">http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">module.2011-10-06.9527952926</dcterms:identifier> 
+    <dcterms:title>Word created with multipart</dcterms:title>
+    <dcterms:created>2011/10/06 15:29:12.821 Universal</dcterms:created> 
+    <dcterms:modified>2011/10/06 15:29:15.879 Universal</dcterms:modified> 
+    <dcterms:creator oerdc:id="user1"
+                     oerdc:email="useremail1@localhost.net"
+                     oerdc:pending="False">firstname1 lastname1</dcterms:creator>
+    <dcterms:creator oerdc:id="roche"
+                     oerdc:email="roche@upfrontsystems.co.za"
+                     oerdc:pending="True">Roche Compaan</dcterms:creator>
+    <dcterms:creator oerdc:id="user2"
+                     oerdc:email="useremail2@localhost.net"
+                     oerdc:pending="True">firstname2 lastname2</dcterms:creator>
+    <oerdc:maintainer oerdc:id="user1"
+                      oerdc:email="useremail1@localhost.net"
+                      oerdc:pending="False">firstname1 lastname1</oerdc:maintainer>
+    <oerdc:maintainer oerdc:id="roche"
+                      oerdc:email="roche@upfrontsystems.co.za"
+                      oerdc:pending="True">Roche Compaan</oerdc:maintainer>
+    <dcterms:rightsHolder oerdc:id="roche"
+                          oerdc:email="roche@upfrontsystems.co.za"
+                          oerdc:pending="True">Roche Compaan</dcterms:rightsHolder>
+    <dcterms:rightsHolder oerdc:id="user2"
+                          oerdc:email="useremail2@localhost.net"
+                          oerdc:pending="True">firstname2 lastname2</dcterms:rightsHolder>
+    <oerdc:translator oerdc:id="user85"
+                      oerdc:email="dcwill@rice.edu"
+                      oerdc:pending="True">Daniel Williamson</oerdc:translator>
+    <oerdc:editor oerdc:id="user3"
+                  oerdc:email="useremail3@localhost.net"
+                  oerdc:pending="True">firstname3 lastname3</oerdc:editor>
+    <!-- CNX-Supported but not in MDML -->
+    <oerdc:descriptionOfChanges>
+        This is brand new.
+    </oerdc:descriptionOfChanges> 
+    <oerdc:oer-subject>Arts</oerdc:oer-subject>
+    <dcterms:subject xsi:type="oerdc:Subject">Arts</dcterms:subject>
+    <dcterms:subject>music</dcterms:subject>
+    <dcterms:subject>passion</dcterms:subject>
+    <dcterms:abstract>A bit of summary.</dcterms:abstract>
+    <dcterms:language xsi:type="ISO639-1">es</dcterms:language> 
+    <dcterms:license xsi:type="dcterms:URI"></dcterms:license>
+    <sword:treatment>
+        Module 'Word created with multipart' was imported via the SWORD API.
+        You can <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view">preview your module here</a> to see what it will look like once it is published.
+        
+        The current description of the changes you have made for this version of the module: This is brand new.
+        
+
+        
+        Publication requirements:
+        
+            1. Author (firstname1 lastname1, account:user1), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
+        
+        
+            2. Author (Roche Compaan, account:roche), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
+        
+        
+            3. Author (firstname2 lastname2, account:user2), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
+        
+        
+            4. You cannot publish with pending role requests. Contributor, Roche Compaan (account:roche),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=roche">agree to thw pending requests</a>.
+        
+        
+            5. You cannot publish with pending role requests. Contributor, Daniel Williamson (account:user85),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user85">agree to thw pending requests</a>.
+        
+        
+            6. You cannot publish with pending role requests. Contributor, firstname2 lastname2 (account:user2),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user2">agree to thw pending requests</a>.
+        
+        
+            7. You cannot publish with pending role requests. Contributor, firstname3 lastname3 (account:user3),
+must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user3">agree to thw pending requests</a>.
+        
+        
+    </sword:treatment>
+    <!-- For all UNPUBLISHED modules -->
+    <link rel="alternate"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=html"/>
+    <content type="application/zip"
+             src="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/editmedia"/>
+    <link rel="edit-media"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/editmedia"/>
+    <link rel="edit"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword"/>
+    <link rel="http://purl.org/net/sword/terms/add"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword"/>
+    <link rel="http://purl.org/net/sword/terms/statement"
+          type="application/atom+xml;type=feed"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/statement.atom"/>
+    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=html"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/pdf"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=pdf"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/zip"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_export?format=zip"/>
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/xml"
+          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_export?format=plain"/>
+    <!-- END for all UNPUBLISHED modules -->
+</entry>
+"""
+
         # Go to the upload page
-        return HTTPFound(location="/summary")
-    return {
+        return HTTPFound(location=request.route_url('summary'))
+
+    response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
-        }
+        'workspaces': workspaces,
+        'languages': languages,
+    }
+    return render_to_response(templatePath, response, request=request)
