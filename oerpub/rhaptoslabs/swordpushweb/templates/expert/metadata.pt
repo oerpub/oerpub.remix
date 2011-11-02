@@ -5,25 +5,24 @@
   <div id="roles-picker" style="display:none;">
     <table cellspacing="0" id="roles-table">
       <tr>
-        <th rowspan="2" width="200">ID</th>
-        <th colspan="3">Required Roles</th>
-        <th colspan="2">Optional Roles</th>
-        <th></th>
+        <td class="table-row-top"></td>
+        <td class="table-row-top" colspan="3">Required Roles</td>
+        <td class="table-row-top" colspan="2">Optional Roles</td>
+        <td></td>
       </tr>
       <tr>
-        <th width="1">Author</th>
-        <th width="1">Maintainer</th>
-        <th width="1">Copyright</th>
-        <th width="1">Editor</th>
-        <th width="1">Translator</th>
-        <th width="1">Remove</th>
+        <td width="200" id="roles-last-row-user" class="table-row-mid" style="text-align:left;">Username</td>
+        <td width="110" id="roles-last-row-authors" class="table-row-mid">Author</td>
+        <td width="110" id="roles-last-row-maintainers" class="table-row-mid">Maintainer</td>
+        <td width="110" id="roles-last-row-copyright" class="table-row-mid">Copyright</td>
+        <td width="110" id="roles-last-row-editors" class="table-row-mid">Editor</td>
+        <td width="110" id="roles-last-row-translators" class="table-row-mid">Translator</td>
+        <td width="24" id="roles-last-row-remove"></td>
       </tr>
     </table>
-    <a href="#" id="add-role">Add Role</a><br/>
-    <form id="roles-picker-buttons" method="link" action="#">
-      <input type="submit" id="cancel-roles" value="Cancel roles" />
-      <input type="submit" id="submit-roles" value="Submit roles" />
-    </form>
+    <div class="headeraction" style="float:left;margin-top:5px;margin-left:0;"><a href="#" id="add-role">Add user</a></div>
+    <div class="headeraction" style="float:right;margin-top:5px;margin-right:26px;"><a href="#" id="cancel-roles">Cancel</a></div>
+    <div class="headeraction" style="float:right;margin-top:5px;"><a href="#" id="submit-roles">Done</a></div>
   </div>
   <!-- /OLD ROLES CODE -->
   ${form.begin(request.route_url('metadata'))}
@@ -64,13 +63,11 @@
 	    <td width="50%" valign="top">
 	      <div class="formentry">
 		<div class="formlabel">Title <span class="formrequired">*</span></div>
-		<div class="forminfo">Enter the title of this module.</div>
 		<div class="formfield"><input type="text" name="title" size="40" value=""/></div>
 	      </div>
 
 	      <div class="formentry">
 		<div class="formlabel">Subject</div>
-		<div class="forminfo">Select the subject categories that apply to this module.</div>
 		<table>
 		  <tr>
 		    <td>
@@ -106,43 +103,32 @@
 	      </div>
 	      <div class="formentry">
 		<div class="formlabel">Summary</div>
-		<div class="forminfo">Enter a summary of the module.</div>
 		<div class="formfield"><textarea name="summary" rows="6" cols="40"></textarea></div>
 	      </div>
 	    </td>
 	    <td width="50%" valign="top">
 	      <div class="formentry">
 		<div class="formlabel">Language <span class="formrequired">*</span></div>
-		<div class="forminfo">Select the primary language for this module.</div>
 		<div class="formfield">${form.select("language", languages, selected_value="en")}</div>
 	      </div>
 	      <div class="formentry">
 		<div class="formlabel">Keywords (one per line)</div>
-		<div class="forminfo">Enter each keyword on its own
-		  line. Keywords are not displayed on the content, but
-		  are used behind the scenes to help people find it in
-		  searches.</div>
 		<div class="formfield"><textarea name="keywords" rows="4" cols="40"></textarea></div>
 	      </div>
 	      <div class="formentry">
 		<div class="formlabel">Google Analytics Tracking Code</div>
-		<div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
 		<div class="formfield"><input type="text" name="google_code" size="40" value=""/></div>
 	      </div>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td colspan="2">
 	      <div class="formentry">
 		<div class="formlabel">Roles</div>
-		<ul>
-		  <li id="list-authors"><b>Author(s):</b><span>${form.data['authors']}</span></li>
-		  <li id="list-maintainers"><b>Maintainer(s):</b><span>${form.data['maintainers']}</span></li>
-		  <li id="list-copyright"><b>Copyright Holder(s):</b><span>${form.data['copyright']}</span></li>
-		  <li id="list-editors"><b>Editor(s):</b><span>${form.data['editors']}</span></li>
-		  <li id="list-translators"><b>Translator(s):</b><span>${form.data['translators']}</span></li>
+		<ul style="margin-top: 5px; margin-bottom: 5px;">
+		  <li id="list-authors">Authors: <span>${form.data['authors']}</span></li>
+		  <li id="list-maintainers">Maintainers: <span>${form.data['maintainers']}</span></li>
+		  <li id="list-copyright">Copyright Holders: <span>${form.data['copyright']}</span></li>
+		  <li id="list-editors">Editors: <span>${form.data['editors']}</span></li>
+		  <li id="list-translators">Translators: <span>${form.data['translators']}</span></li>
 		</ul>
-		<a href="#" id="edit-roles">Edit roles</a>
+                <div class="headeraction" style="float:left; margin-left: 0;"><a href="#" id="edit-roles">Edit</a></div>
 	      </div>
 	    </td>
 	  </tr>

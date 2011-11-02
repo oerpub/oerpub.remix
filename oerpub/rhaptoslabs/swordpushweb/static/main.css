@@ -188,7 +188,6 @@ div.loginblock {
 div.headeraction {
     font-size: 90%;
     float: right;
-    background: 
     color: #0000ff;
     background: #f0f0ff;
     border-style: solid;
@@ -231,26 +230,38 @@ div.splashbox p {
 }
 
 /* OLD ROLES CODE */
-#roles-picker-buttons {
-    text-align:right;
-}
-
 #simplemodal-overlay {
     background-color:#000;
 }
+
 #simplemodal-container {
     background-color:#ffffff;
     border:8px solid #444;
     padding:12px;
 }
 
-#simplemodal-container th {
-    background: #ccc;
-    border: 1px solid #888;
+#simplemodal-container td.table-row-top {
+    border: none;
+    border-top: 2px solid black;
     text-align: center;
 }
 
+#simplemodal-container td.table-row-mid {
+    border: none;
+    border-bottom: 1px solid black;
+    text-align: center;
+}
+
+#simplemodal-container td.table-row-bottom {
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+#simplemodal-container td.table-row-general {
+    border: none;
+}
+
 #simplemodal-container td {
-    border: 1px solid #888;
+    border: none
 }
 /* /OLD ROLES CODE */

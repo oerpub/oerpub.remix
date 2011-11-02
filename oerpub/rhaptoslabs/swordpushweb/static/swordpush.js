@@ -5,6 +5,8 @@
 var roles = new Array('authors', 'maintainers', 'copyright', 'editors', 'translators');
 var required_roles = new Array('authors', 'maintainers', 'copyright');
 
+/* TODO: Check that required roles are specified */
+
 function get_user_list() {
     var userlist = new Array();
     for (var i in roles) {
@@ -20,24 +22,31 @@ function get_user_list() {
 
 /* Create rows for the roles form.*/
 function create_row(user_id) {
+    id_list = roles.concat(["user", "remove"]);
+    for (i in id_list) {
+	var last_row_td = $('#roles-last-row-' + id_list[i]);
+	if(last_row_td.attr("class") == "table-row-bottom")
+	    last_row_td.attr("class", "table-row-general");
+	last_row_td.attr("id", "");
+    }
     var row = $('<tr class="roles-row" user_id="'+user_id+'">');
     if ( user_id ) {
-        $('<td>').html(user_id).appendTo(row);
+        $('<td id="roles-last-row-user" class="table-row-bottom">').html(user_id).appendTo(row);
     } else {
         // Get a text input field to add a new role.
-        $('<td>')
-        .append($('<input type="text">').blur(fix_role_checkboxes))
-        .appendTo(row);
+        $('<td id="roles-last-row-user" class="table-row-bottom">')
+	    .append($('<input id="edit-new-username" type="text">').blur(fix_role_checkboxes))
+	    .appendTo(row);
     };
     for (i in roles) {
-        $('<td>')
+        $('<td id="roles-last-row-' + roles[i] + '" class="table-row-bottom" style="text-align:center;">')
         .append($('<input type="checkbox" id="checkbox-'
                   +roles[i]+'-'+user_id+'">'))
         .appendTo(row);
     };
-    $('<td>')
-    .append($('<input type="checkbox">'))
-    .appendTo(row);
+    $('<td id="roles-last-row-remove" style="text-align:center;">')
+	.append($('<img src="/static/images/delete_icon.png" alt="Delete" id="remove-'+user_id+'">').click(clear_role_checkboxes))
+	.appendTo(row);
     return row;
 };
 
@@ -88,6 +97,16 @@ function fix_role_checkboxes(e) {
     for (var i in roles) {
        $('#checkbox-'+roles[i]+'-')
        .attr('id', 'checkbox-'+roles[i]+'-'+user_id);
+    }
+    $('#remove-')
+	.attr('id', 'remove-'+user_id);
+};
+
+// Clear all role checkboxes in a row
+function clear_role_checkboxes(e) {
+    var user_id = $(this).attr('id').substr(7);
+    for (var i in roles) {
+       $('#checkbox-'+roles[i]+'-'+user_id).attr('checked', false);
     }
 };
 
@@ -147,6 +166,7 @@ $(document).ready(function()
         $('#roles-table tbody').append(create_row(''));
         $('#simplemodal-container').css('height', 'auto');
         $(window).trigger('resize.simplemodal');
+	$('#edit-new-username').focus();
     });
 
 });
