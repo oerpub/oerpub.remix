@@ -15,6 +15,7 @@ def main(global_config, **settings):
     config.add_route('choose', '/choose')
     config.add_route('preview_frames', '/preview')
     config.add_route('preview_header', '/preview_header')
+    config.add_route('preview_side', '/preview_side')
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
     config.add_route('logout', '/logout')

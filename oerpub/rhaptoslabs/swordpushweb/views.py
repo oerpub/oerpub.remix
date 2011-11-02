@@ -148,6 +148,11 @@ def logout_view(request):
 @view_config(route_name='switch_expert_mode')
 def switch_expert_mode_view(request):
     referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
+    # HACK: to make frames view of preview page work out
+    substr = '/preview_side'
+    if referer[-len(substr):] == substr:
+        referer = referer[:-len(substr)] + '/preview'
+    # /HACK
     request.session['expert_mode'] = not request.session.get('expert_mode', False)
     raise HTTPFound(location=referer)
 
@@ -325,6 +330,11 @@ def preview_header_view(request):
     check_login(request)
     templatePath = 'templates/%s/preview_header.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
     return render_to_response(templatePath, {}, request=request)
+
+
+@view_config(route_name='preview_side', renderer='templates/preview_side.pt')
+def preview_side_view(request):
+    return {'expert_mode_switch_target': '_parent'}
 
 
 @view_config(route_name='sword_treatment',
