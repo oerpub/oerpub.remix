@@ -2,7 +2,6 @@ import os
 import shutil
 import datetime
 import zipfile
-import markdown
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -337,33 +336,26 @@ def preview_side_view(request):
     return {'expert_mode_switch_target': '_parent'}
 
 
-@view_config(route_name='sword_treatment',
-             renderer='templates/sword_treatment.pt')
-def sword_treatment_view(request):
-    session = request.session
-    dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
-
-    # TODO: Here be dragons. The following bit of code is designed to
-    # specifically convert the Connexions treatment reply to something that we
-    # can push through a markdown filter to get reasonable-looking html. By
-    # default, the first couple of paragraphs are indented, which gets you
-    # <pre> tags, which strips out links. Ugh.
-
-    treatment = [i.lstrip() for i in dr.treatment.split('\n')]
-    treatment = markdown.markdown('\n'.join(treatment))
-    return {'treatment': treatment}
-
-
 @view_config(route_name='summary')
 def summary_view(request):
     check_login(request)
     templatePath = 'templates/%s/summary.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
 
-    session = request.session
-    dr = Deposit_Receipt(xml_deposit_receipt=session['deposit_receipt'])
-    treatment = [i.lstrip() for i in dr.treatment.split('\n')]
-    treatment = markdown.markdown('\n'.join(treatment))
-    response = {'treatment': treatment}
+    # Note: need to extract the version string before passing dom to
+    # Deposit_Receipt, which mangles dom.
+    dom = etree.fromstring(request.session['deposit_receipt'])
+    version_string = dom.find('{http://www.w3.org/2005/Atom}generator').text.strip()
+    dr = Deposit_Receipt(dom=dom)
+    treatment = dr.treatment
+
+    import parse_sword_treatment
+    response = parse_sword_treatment.markdown(treatment)
+    if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Publication requirements:') != -1):
+        response.update(parse_sword_treatment.cnx_1_0(treatment))
+    elif (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Before publishing:') != -1):
+        response.update(parse_sword_treatment.test_server_1_0(treatment))
+    else:
+        print 'WARNING: No valid version number found in SWORD deposit receipt. Defaulting to showing the SWORD treatment as is.'
 
     return render_to_response(templatePath, response, request=request)
 
@@ -552,7 +544,7 @@ def metadata_view(request):
     <id>module.2011-10-06.9527952926</id>
     <updated>2011/10/06 15:29:15.879 Universal</updated>
     <summary type="text">A bit of summary.</summary>
-    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+    <generator uri="rhaptos.swordservice.plone" version="1.0"> uri:"rhaptos.swordservice.plone" version:"1.0"</generator>
 
     <!-- The metadata begins -->
     <dcterms:identifier xsi:type="dcterms:URI">http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926</dcterms:identifier> 

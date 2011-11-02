@@ -47,6 +47,12 @@
 	<p><span class="highlight">To upload another document</span>,
 	  <a href="${request.route_url('choose')}">click here</a> to return to the beginning of the process.</p>
 
+	<br/>
+	<div id="show_sword_treatment" class="headeraction" style="float:left;margin-left:0;"><a href="#" onclick="document.getElementById('sword_treatment').style.display = 'block';document.getElementById('show_sword_treatment').style.display = 'none';">Show SWORD treatment</a></div>
+
+	<div id="sword_treatment" class="sword_treatment" style="display:none;">
+	  <p tal:replace="structure treatment">Markdown version of SWORD treatment</p>
+	</div>
       </div>
     </div>
   </div>
