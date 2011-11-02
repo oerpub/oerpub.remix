@@ -1,2 +1,2 @@
-<metal:use use-macro="newbase">
+<metal:use use-macro="base">
 </metal:use>

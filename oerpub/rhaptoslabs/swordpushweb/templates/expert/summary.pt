@@ -1,4 +1,4 @@
-<metal:use use-macro="newbase">
+<metal:use use-macro="base">
 
 <tal:body metal:fill-slot="header">
   <div id="header-wrap">

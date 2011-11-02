@@ -162,7 +162,7 @@ class UploadSchema(formencode.Schema):
 
 
 @view_config(route_name='choose')
-def upload_view(request):
+def choose_view(request):
     check_login(request)
 
     templatePath = 'templates/%s/choose.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
@@ -247,7 +247,8 @@ def upload_view(request):
             # the ability to do multiple tabs in parallel, unless it gets offloaded
             # onto the form again.
             request.session['upload_dir'] = temp_dir_name
-            request.session['filename'] = gd_entry_url
+            request.session['filename'] = "Google Document"
+            print request.session['filename']
 
         # OOo / MS Word Conversion
         else:
