@@ -27,10 +27,10 @@
 	<center>
 	  <br/>
           <label for="upload">File:</label>
-          <input id="upload" name="upload" type="file"/>
+          <input id="upload" name="upload" type="file" onchange="document.getElementById('file-submit').disabled=false;"/>
           <br/>
           <br/>
-          ${form.submit('form.submitted', 'Preview', class_='submit', id='upload-submit')}
+          ${form.submit('form.submitted', 'Preview', class_='submit', id='file-submit', disabled='disabled')}
           <br/>
           <br/>
 	</center>
@@ -41,7 +41,7 @@
           ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
           <a href="javascript:newPicker()" style="font-weight: bold"><img src="https://docs.google.com/images/doclist/logo_docs.gif"/></a>
           <br/>
-          ${form.submit('form.submitted', 'Preview', class_='submit', id='upload-submit')}
+          ${form.submit('form.submitted', 'Preview', class_='submit', id='google-submit')}
           <br/>
           <br/>
 	  <div class="pleasewait" id="upload-wait" style="display:none;">
