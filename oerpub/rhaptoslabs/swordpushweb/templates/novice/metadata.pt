@@ -26,7 +26,7 @@
     </form>
   </div>
   <!-- /OLD ROLES CODE -->
-  ${form.begin(request.route_url('metadata'))}
+  ${form.begin(request.route_url('metadata'), onsubmit="var temp=document.getElementById('form.submitted'); temp.disabled='disabled'; temp.value='Uploading...';")}
   ${form.csrf_token()}
   <!-- OLD ROLES CODE -->
   <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">

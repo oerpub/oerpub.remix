@@ -440,7 +440,7 @@ def metadata_view(request):
                 )
 
     # Check for successful form completion
-    if 'form.submitted' in request.POST and form.validate():
+    if form.validate():
 
         # Persist the values that should be persisted in the session, and
         # delete the others.
