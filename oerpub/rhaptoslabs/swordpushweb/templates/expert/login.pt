@@ -1,0 +1,30 @@
+<metal:use use-macro="base">
+<tal:body metal:fill-slot="content">
+
+<!-- TODO: add javascript to check that username and password are not empty -->
+
+<div class="splashbox">
+  <div class="splashheading">
+    <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}" width="51" height="59" align="left"/>
+    Connexions Document Importer <span style="font-size:12pt;color:#ed891b;margin-left:1em;">Expert Interface</span>
+  </div>
+  ${form.begin(request.route_url('login'))}
+  ${form.csrf_token()}
+  <center>
+    <table>
+      <tr><td><div class="formlabel">Service document URL</div></td></tr>
+      <tr><td><input type="text" name="service_document_url" value="http://cnx.org/sword/servicedocument" size="40"/></td></tr>
+      <tr><td><div class="formlabel">Username</div></td></tr>
+      <tr><td><input type="text" name="username" size="40"/></td></tr>
+      <tr><td><div class="formlabel">Password</div></td></tr>
+      <tr><td><input type="password" name="password" size="40"/></td></tr>
+      <tr><td align="right">${form.submit('form.submitted', 'Log in', class_='submit')}</td></tr>
+    </table>
+  </center>
+  ${form.end()}
+  <div align="right">
+    <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}" width="200"/></a>
+  </div>
+</div>
+</tal:body>
+</metal:use>

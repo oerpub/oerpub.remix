@@ -1,0 +1,23 @@
+<metal:use use-macro="basebare">
+
+<tal:body metal:fill-slot="header">
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header">
+	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
+	<h1>Connexions Importer</h1>
+	<p class="status">You are logged in as ${request.session['username']}
+	  <br/><a href="${request.route_url('logout')}" target="_parent">Click here to sign out</a></p>
+	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}"/></a>
+      </div>
+    </div>
+    <div id="header2-container">
+      <div id="header2">
+	You can preview <span class="highlight">${request.session['filename'][:32] + ['', '...'][len(request.session['filename']) > 32]}</span> below. Click next once you are ready
+	to proceed. <div class="headeraction"><a href="${request.route_url('metadata')}" target="_parent">Next</a></div>
+      </div>
+    </div>
+  </div>
+</tal:body>
+
+</metal:use>

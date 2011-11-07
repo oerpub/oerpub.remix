@@ -1,0 +1,50 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" 
+  "http://www.w3.org/Graphics/SVG/1.0/DTD/svg10.dtd">
+<svg 
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.0"
+   width="250"
+   height="250"
+   id="svg9961">
+  <defs
+     id="defs9963">
+    <linearGradient
+       id="linearGradient8409">
+      <stop
+         style="stop-color:white;stop-opacity:0.65934068"
+         offset="0"
+         id="stop8411" />
+      <stop
+         style="stop-color:white;stop-opacity:0"
+         offset="1"
+         id="stop8413" />
+    </linearGradient>
+    <linearGradient
+       x1="200.5"
+       y1="437.36218"
+       x2="346.5"
+       y2="583.36218"
+       id="linearGradient22177"
+       xlink:href="#linearGradient8409"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="layer1">
+    <path
+       d="M 356 511.86218 A 82 80 0 1 1  192,511.86218 A 82 80 0 1 1  356 511.86218 z"
+       transform="matrix(1.368836,0,0,1.403058,-249.9065,-592.9597)"
+       style="opacity:1;fill:#d3d7cf;fill-opacity:1;fill-rule:evenodd;stroke:#a40000;stroke-width:17.48716927;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path20271" />
+    <path
+       d="M 346.5 510.36218 A 73 73 0 1 1  200.5,510.36218 A 73 73 0 1 1  346.5 510.36218 z"
+       transform="matrix(1.712702,0,0,1.712702,-343.781,-749.0982)"
+       style="opacity:1;fill:url(#linearGradient22177);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path20273" />
+    <path
+       d="M 183.38032,190.37202 L 140.28081,125.88963 L 181.64941,62.506366 L 151.70477,62.506366 L 125.91431,103.72381 L 98.219842,62.323177 L 68.79448,62.506366 L 110.50927,126.80557 L 65.332673,190.37202 L 95.104218,190.37202 L 125.74121,147.1395 L 153.08949,190.37202 L 183.38032,190.37202"
+       style="font-size:178.06791687px;font-style:normal;font-weight:normal;fill:#a40000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Baekmuk Headline"
+       id="text20299" />
+  </g>
+</svg>
