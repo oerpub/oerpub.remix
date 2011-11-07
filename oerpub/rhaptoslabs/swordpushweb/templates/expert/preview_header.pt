@@ -13,7 +13,7 @@
     </div>
     <div id="header2-container">
       <div id="header2">
-	Preview of <span class="highlight">${request.session['filename']}</span>.
+	Preview of <span class="highlight">${request.session['filename'][:45] + ['', '...'][len(request.session['filename']) > 45]}</span>
 	<div class="headeraction"><a tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])">Save local copy</a></div>
 	<div class="headeraction"><a href="#">Edit CNXML</a></div>
 	<div class="headeraction"><a href="${request.route_url('metadata')}" target="_parent">Go to metadata</a></div>

@@ -13,7 +13,7 @@
     </div>
     <div id="header2-container">
       <div id="header2">
-	You can preview <span class="highlight">${request.session['filename']}</span> below. Click next once you are ready
+	You can preview <span class="highlight">${request.session['filename'][:32] + ['', '...'][len(request.session['filename']) > 32]}</span> below. Click next once you are ready
 	to proceed. <div class="headeraction"><a href="${request.route_url('metadata')}" target="_parent">Next</a></div>
       </div>
     </div>
