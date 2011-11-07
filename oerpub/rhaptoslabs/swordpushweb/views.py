@@ -248,7 +248,6 @@ def choose_view(request):
             # onto the form again.
             request.session['upload_dir'] = temp_dir_name
             request.session['filename'] = "Google Document"
-            print request.session['filename']
 
         # OOo / MS Word Conversion
         else:
@@ -512,7 +511,7 @@ def metadata_view(request):
                                        user_name=session['username'],
                                        user_pass=session['password'],
                                        always_authenticate=True,
-                                       download_service_document=True)
+                                       download_service_document=False)
 
             # Send zip file to Connexions through SWORD interface
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
