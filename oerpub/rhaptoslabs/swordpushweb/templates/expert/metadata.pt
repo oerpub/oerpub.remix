@@ -108,7 +108,7 @@
 	    </td>
 	    <td width="50%" valign="top">
 	      <div class="formentry">
-		<div class="formlabel">Language <span class="formrequired">*</span></div>
+		<div class="formlabel">Language</div>
 		<div class="formfield">${form.select("language", languages, selected_value="en")}</div>
 	      </div>
 	      <div class="formentry">
