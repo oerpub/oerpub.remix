@@ -249,52 +249,78 @@ def choose_view(request):
             request.session['upload_dir'] = temp_dir_name
             request.session['filename'] = "Google Document"
 
-        # OOo / MS Word Conversion
+        # Office or ZIP file
         else:
             # Save the original file so that we can convert, plus keep it.
             original_filename = os.path.join(
                 save_dir,
                 form.data['upload'].filename.replace(os.sep, '_'))
-            saved_odt = open(original_filename, 'wb')
+            saved_file = open(original_filename, 'wb')
             input_file = form.data['upload'].file
-            shutil.copyfileobj(input_file, saved_odt)
-            saved_odt.close()
+            shutil.copyfileobj(input_file, saved_file)
+            saved_file.close()
             input_file.close()
 
-            # Convert from other office format to odt if needed
-            odt_filename = original_filename
-            filename, extension = os.path.splitext(original_filename)
-            if extension != '.odt':
-                odt_filename = '%s.odt' % filename
-                command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
-                os.system(command)
-
-            # Convert and save all the resulting files.
-            tree, files, errors = transform(odt_filename)
-            xml = etree.tostring(tree)
-            with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
-                cnxml_file.write(xml)
-            for filename, content in files.items():
-                with open(os.path.join(save_dir, filename), 'wb') as img_file:
-                    img_file.write(content)
-
-            # Convert the cnxml for preview.
-            html = cnxml_to_htmlpreview(xml)
-            with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                index.write(html)
-
-            # Zip up all the files. This is done now, since we have all the files
-            # available, and it also allows us to post a simple download link.
-            # Note that we cannot use zipfile as context manager, as that is only
-            # available from python 2.7
-            # TODO: Do a filesize check xxxx
-            zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+            # Check if it is a ZIP file with at least index.cnxml in it
             try:
-                zip_archive.writestr('index.cnxml', xml.encode('utf8'))
+                zip_archive = zipfile.ZipFile(original_filename, 'r')
+                is_zip_archive = ('index.cnxml' in zip_archive.namelist())
+            except zipfile.BadZipfile:
+                is_zip_archive = False
+
+            # ZIP package from previous conversion
+            if is_zip_archive:
+                # Unzip into transform directory
+                zip_archive.extractall(path=save_dir)
+
+                # Rename ZIP file so that the user can download it again
+                os.rename(original_filename, os.path.join(save_dir, 'upload.zip'))
+
+                # Read CNXML
+                with open(os.path.join(save_dir, 'index.cnxml'), 'rt') as fp:
+                    xml = fp.read()
+
+                # Convert the CNXML to XHTML for preview
+                html = cnxml_to_htmlpreview(xml)
+                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                    index.write(html)
+
+            # OOo / MS Word Conversion
+            else:
+                # Convert from other office format to odt if needed
+                odt_filename = original_filename
+                filename, extension = os.path.splitext(original_filename)
+                if extension != '.odt':
+                    odt_filename = '%s.odt' % filename
+                    command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+                    os.system(command)
+
+                # Convert and save all the resulting files.
+                tree, files, errors = transform(odt_filename)
+                xml = etree.tostring(tree)
+                with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
+                    cnxml_file.write(xml)
                 for filename, content in files.items():
-                    zip_archive.writestr(filename, content)
-            finally:
-                zip_archive.close()
+                    with open(os.path.join(save_dir, filename), 'wb') as img_file:
+                        img_file.write(content)
+
+                # Convert the cnxml for preview.
+                html = cnxml_to_htmlpreview(xml)
+                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                    index.write(html)
+
+                # Zip up all the files. This is done now, since we have all the files
+                # available, and it also allows us to post a simple download link.
+                # Note that we cannot use zipfile as context manager, as that is only
+                # available from python 2.7
+                # TODO: Do a filesize check xxxx
+                zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                try:
+                    zip_archive.writestr('index.cnxml', xml.encode('utf8'))
+                    for filename, content in files.items():
+                        zip_archive.writestr(filename, content)
+                finally:
+                    zip_archive.close()
 
             # Keep the info we need for next uploads.  Note that this might kill
             # the ability to do multiple tabs in parallel, unless it gets offloaded
