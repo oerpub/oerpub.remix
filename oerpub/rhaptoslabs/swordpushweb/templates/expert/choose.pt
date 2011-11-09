@@ -19,7 +19,7 @@
     <div id="container">
       <div id="content">
 	<h1>Upload your document</h1>
-        ${form.begin(request.route_url('choose'), multipart='multipart')}
+        ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
         ${form.csrf_token()}
 	<p>You can upload any type of office document or a previously
 	  saved zip package here. A preview will appear in this area so
@@ -41,8 +41,7 @@
 	  ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')}
           ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
           <a href="javascript:newPicker()" style="font-weight: bold"><img src="https://docs.google.com/images/doclist/logo_docs.gif"/></a>
-          <br/>
-          ${form.submit('form.submitted', 'Preview', class_='submit', id='google-submit')}
+          <br/>          
           <br/>
           <br/>
 	  <div class="pleasewait" id="upload-wait" style="display:none;">
