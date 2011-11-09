@@ -16,6 +16,8 @@ def main(global_config, **settings):
     config.add_route('preview_frames', '/preview')
     config.add_route('preview_header', '/preview_header')
     config.add_route('preview_side', '/preview_side')
+    config.add_route('preview_body', '/preview_body')
+    config.add_route('cnxml', '/cnxml')
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
     config.add_route('logout', '/logout')
@@ -28,6 +30,11 @@ def main(global_config, **settings):
     config.add_static_view(
         'static',
         'oerpub.rhaptoslabs.swordpushweb:static',
+        cache_max_age=3600)
+
+    config.add_static_view(
+        'static/external/codemirror2',
+        'oerpub.rhaptoslabs.swordpushweb:codemirror',
         cache_max_age=3600)
 
     config.add_static_view(

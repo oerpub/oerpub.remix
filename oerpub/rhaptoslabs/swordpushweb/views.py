@@ -6,6 +6,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
+from pyramid.response import Response
 
 import formencode
 
@@ -23,12 +24,9 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthoriz
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 
 # TODO: If we have enough helper functions, they should go into utils
+from utils import escape_system, clean_cnxml
 
 TESTING = False
-
-
-def escape_system(input_string):
-    return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
 
 def check_login(request, raise_exception=True):
@@ -344,9 +342,17 @@ def choose_view(request):
 @view_config(route_name='preview_frames', renderer='templates/preview_frames.pt')
 def preview_frames_view(request):
     check_login(request)
+
+    body_filename = request.session.get('preview-no-cache')
+    if body_filename is None:
+        body_filename = 'index.xhtml'
+    else:
+        del request.session['preview-no-cache']
+
     return {
         'header_url': request.route_url('preview_header'),
-        'body_url': '%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
+        #'body_url': '%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
+        'body_url': request.route_url('preview_body'),
     }
 
 
@@ -360,6 +366,77 @@ def preview_header_view(request):
 @view_config(route_name='preview_side', renderer='templates/preview_side.pt')
 def preview_side_view(request):
     return {'expert_mode_switch_target': '_parent'}
+
+
+@view_config(route_name='preview_body')
+def preview_body_view(request):
+    return HTTPFound('%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
+                     headers={'Cache-Control': 'no-cache'})
+
+
+class CnxmlSchema(formencode.Schema):
+    allow_extra_fields = True
+    cnxml = formencode.validators.String(not_empty=True)
+
+
+@view_config(route_name='cnxml', renderer='templates/expert/cnxml_editor.pt')
+def cnxml_view(request):
+    check_login(request)
+
+    form = Form(request, schema=CnxmlSchema)
+
+    save_dir = os.path.join(request.registry.settings['transform_dir'], request.session['upload_dir'])
+    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+
+    # Check for successful form completion
+    if 'cnxml' in request.POST and form.validate():
+        import time
+        html_filename = os.path.join(save_dir, 'index.xhtml')
+        zip_filename = os.path.join(save_dir, 'upload.zip')
+
+        # Make backup of CNXML and HTML preview
+        os.rename(cnxml_filename, cnxml_filename + '~')
+        os.rename(html_filename, html_filename + '~')
+        os.rename(zip_filename, zip_filename + '~')
+
+        # Save new CNXML
+        with open(cnxml_filename, 'wt') as fp:
+            fp.write(form.data['cnxml'])
+
+        # Convert the CNXML for preview
+        html = cnxml_to_htmlpreview(form.data['cnxml'])
+        with open(html_filename, 'w') as index:
+            index.write(html)
+
+        # Update ZIP package
+        old_zip_archive = zipfile.ZipFile(zip_filename + '~', 'r')
+        zip_archive = zipfile.ZipFile(zip_filename, 'w')
+        try:
+            zip_archive.writestr('index.cnxml', form.data['cnxml'].encode('utf8'))
+            for filename in old_zip_archive.namelist():
+                if filename == 'index.cnxml':
+                    continue
+                fp = old_zip_archive.open(filename, 'r')
+                zip_archive.writestr(filename, fp.read())
+                fp.close()
+        finally:
+            zip_archive.close()
+
+        # Return to preview
+        return HTTPFound(location=request.route_url('preview_frames'), request=request)
+
+    # Read CNXML
+    with open(cnxml_filename, 'rt') as fp:
+        cnxml = fp.read()
+
+    # Clean CNXML
+    cnxml = clean_cnxml(cnxml)
+
+    return {
+        'codemirror': True,
+        'form': FormRenderer(form),
+        'cnxml': cnxml,
+    }
 
 
 @view_config(route_name='summary')
