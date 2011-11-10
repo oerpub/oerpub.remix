@@ -10,6 +10,7 @@ CodeMirror.defineMode("xmlpure", function(config, parserConfig) {
     // constants
     var STYLE_ERROR = "error";
     var STYLE_INSTRUCTION = "comment";
+    var STYLE_INSTRUCTION_WARNING = "error";
     var STYLE_COMMENT = "comment";
     var STYLE_ELEMENT_NAME = "tag";
     var STYLE_ATTRIBUTE = "attribute";
@@ -344,7 +345,7 @@ CodeMirror.defineMode("xmlpure", function(config, parserConfig) {
         }
 
         state.tokenize = parseProcessingInstructionBody;
-        return STYLE_INSTRUCTION;
+        return STYLE_INSTRUCTION_WARNING;
     }
 
     function parseProcessingInstructionBody(stream, state) {
@@ -355,7 +356,7 @@ CodeMirror.defineMode("xmlpure", function(config, parserConfig) {
                 state.tokenize = state.context == null ? parseDocument : parseElementBlock;
             }
         }
-        return STYLE_INSTRUCTION;
+        return STYLE_INSTRUCTION_WARNING;
     }
 
     
