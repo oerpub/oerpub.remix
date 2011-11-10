@@ -1,6 +1,30 @@
 <metal:use use-macro="base">
 
 <tal:body metal:fill-slot="content">
+  <script>
+function check_submit() {
+  passed = true;
+  names = ["title"];
+  for(i in names) {
+    name = names[i];
+    x = document.forms["metadata_form"][name];
+    if((x.value == null) || (x.value == "")) {
+      x.style.background = '#ffce99';
+      passed = false;
+    } else {
+      x.style.background = '#ffffff';
+    }
+  }
+
+  if(passed) {
+    x = document.getElementById('form.submitted');
+    x.disabled = 'disabled';
+    x.value = 'Uploading...';
+  }
+
+  return passed;
+}
+  </script>
   <!-- OLD ROLES CODE -->
   <div id="roles-picker" style="display:none;">
     <table cellspacing="0" id="roles-table">
@@ -26,7 +50,7 @@
     </form>
   </div>
   <!-- /OLD ROLES CODE -->
-  ${form.begin(request.route_url('metadata'), onsubmit="var temp=document.getElementById('form.submitted'); temp.disabled='disabled'; temp.value='Uploading...';")}
+  ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
   ${form.csrf_token()}
   <!-- OLD ROLES CODE -->
   <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">

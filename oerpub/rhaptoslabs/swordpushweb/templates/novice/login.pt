@@ -1,26 +1,41 @@
 <metal:use use-macro="base">
 <tal:body metal:fill-slot="content">
 
-<!-- TODO: add javascript to check that username and password are not empty -->
-
+<script>
+function check_submit() {
+  passed = true;
+  names = ["username", "password"];
+  for(i in names) {
+    name = names[i];
+    x = document.forms["login_form"][name];
+    if((x.value == null) || (x.value == "")) {
+      x.style.background = '#ffce99';
+      passed = false;
+    } else {
+      x.style.background = '#ffffff';
+    }
+  }
+  return passed;
+}
+</script>
 <div class="splashbox">
   <div class="splashheading">
     <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}" width="51" height="59" align="left"/>
     Connexions Document Importer
   </div>
   <p>You need to sign in to Connexions to use this tool.</p>
-  ${form.begin(request.route_url('login'))}
+  ${form.begin(request.route_url('login'), name='login_form', onsubmit='return check_submit()')}
   ${form.csrf_token()}
   <input type="hidden" name="service_document_url" value="http://cnx.org/sword/servicedocument"/>
   <center>
     <table>
       <tr>
-        <td><label for="username">Username:</label></td>
-        <td><input type="text" name="username"/></td>
+        <td><div class="formlabel"><label for="username">Username&nbsp;&nbsp;</label></div></td>
+        <td><div class="formfield"><input type="text" name="username"/></div></td>
       </tr>
       <tr>
-        <td><label for="password">Password:</label></td>
-        <td><input type="password" name="password"/></td>
+        <td><div class="formlabel"><label for="password">Password&nbsp;&nbsp;</label></div></td>
+        <td><div class="formfield"><input type="password" name="password"/></div></td>
       </tr>
       <tr>
         <td colspan="2" align="right">${form.submit('form.submitted', 'Log in', class_='submit')}</td>
