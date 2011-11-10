@@ -371,7 +371,8 @@ def preview_side_view(request):
 @view_config(route_name='preview_body')
 def preview_body_view(request):
     return HTTPFound('%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
-                     headers={'Cache-Control': 'no-cache'})
+                     headers={'Cache-Control': 'max-age=0, must-revalidate', 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
+                     request=request)
 
 
 class CnxmlSchema(formencode.Schema):
