@@ -7,12 +7,17 @@
       <metal:page_title define-slot="page_title">Connexions Document Importer</metal:page_title>
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script type="text/javascript">
+        function ForcePreviewReload () {
+            document.getElementById('preview_frame').contentDocument.location.reload(true);
+        }
+    </script>
   </head>
-  <frameset rows="90,*">
+  <frameset rows="90,*" onload="ForcePreviewReload()">
     <frame src="${header_url}" frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="no"/>
     <frameset cols="50%,940,50%">
       <frame frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="no"/>
-      <frame src="${body_url}" frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto"/>
+      <frame src="${body_url}" id="preview_frame" frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto"/>
       <frame src="${request.route_url('preview_side')}" frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="no"/>
     </frameset>
   </frameset>
