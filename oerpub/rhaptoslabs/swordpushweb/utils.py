@@ -95,13 +95,20 @@ def clean_cnxml(iCnxml, iMaxColumns=80):
         tagStop = cnxml.find(">", tagStart)
         preTag = cnxml[cnxmlPos:tagStart] # Everything before the next tag
         tag = cnxml[tagStart:tagStop+1]
-        if tag[1] == '/':
-            tagName = "/"
-        else:
-            tagName = ""
-        while 'a' <= tag[len(tagName)+1].lower() <= 'z':
-            tagName += tag[len(tagName)+1]
         cnxmlPos = tagStop + 1
+
+        # Extract tag name
+        if tag[1] == '/':
+            tagName = tag[1:3] # / plus first character
+        else:
+            tagName = tag[1] # first character
+        i = len(tagName)+1
+        while True:
+            character = tag[i]
+            if not ((character in "_.-:") or ('a' <= character.lower() <= 'z') or ('0' <= character <= '9')):
+                break
+            tagName += character
+            i += 1
 
         if tagName == '/code':
             newText += preTag # Do not reformat code lines
