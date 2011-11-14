@@ -47,7 +47,7 @@
 
 	<div class="formentry">
 	  <div class="formlabel">Title</div>
-	  <div class="forminfo">The default title of a module.</div>
+	  <div class="forminfo">The default title of a new module.</div>
 	  <div class="formfield"><input type="text" name="title" size="60" value="${config['metadata']['title']}"/></div>
 	</div>
 
@@ -78,6 +78,7 @@
 
         <div class="formentry">
 	  <div class="formlabel">Keywords (one per line)</div>
+	  <div class="forminfo">The default keywords of a new module.</div>
 	  <div class="formfield"><textarea name="keywords" rows="4" cols="58">${config['metadata']['keywords']}</textarea></div>
         </div>
 
