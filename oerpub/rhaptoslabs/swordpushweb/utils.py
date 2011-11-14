@@ -93,20 +93,32 @@ def clean_cnxml(iCnxml, iMaxColumns=80):
         if tagStart == -1:
             break
         tagStop = cnxml.find(">", tagStart)
-        preTag = cnxml[cnxmlPos:tagStart].strip() # Everything before the next tag
+        preTag = cnxml[cnxmlPos:tagStart] # Everything before the next tag
         tag = cnxml[tagStart:tagStop+1]
+        if tag[1] == '/':
+            tagName = "/"
+        else:
+            tagName = ""
+        while 'a' <= tag[len(tagName)+1].lower() <= 'z':
+            tagName += tag[len(tagName)+1]
         cnxmlPos = tagStop + 1
 
-        if len(preTag) > 0:
-            newText += wrap_text(preTag, indent, iMaxColumns) + "\n"
+        if tagName == '/code':
+            newText += preTag # Do not reformat code lines
+        else:
+            preTag = preTag.strip()
+            if len(preTag) > 0:
+                newText += wrap_text(preTag, indent, iMaxColumns) + "\n"
 
-        if tag[1] == "/":
+        if (len(tagName) > 0) and (tagName[0] == "/"):
             # Closing tag
             indent -= 1
             newText += " " * indent + tag + "\n"
         else:
             # Opening or self-closing tag or comment
-            newText += " " * indent + tag + "\n"
+            newText += " " * indent + tag
+            if tagName != "code":
+                newText += "\n"
             if (tag[-2] != '/') and (tag[:4] != "<!--"):
                 indent += 1
 
