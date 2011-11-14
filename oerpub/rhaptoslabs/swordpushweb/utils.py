@@ -1,3 +1,40 @@
+def pretty_print_dict(x, indent=0):
+    output = '{'
+    indentString = '    ' * (indent+1)
+    for key in x.keys():
+        output += '\n' + indentString + '"' + key + '": '
+        value = x[key]
+        if type(value) is dict:
+            output += pretty_print_dict(value, indent+1)
+        else:
+            output += repr(value)
+        output += ','
+    output += '\n' + '    ' * indent + '}'
+    return output
+
+
+def save_config(config, request):
+    import os, time
+
+    config_filename = request.registry.settings['config_file']
+    backup_filename = request.registry.settings['config_file'] + '~'
+
+    # Update edit history
+    config['edit_history'].append((request.session.get("username"), time.asctime(time.gmtime()) + " GMT"))
+
+    save_string = pretty_print_dict(config)
+    os.rename(config_filename, backup_filename)
+    with open(config_filename, "wt") as fp:
+        fp.write(save_string)
+
+
+def load_config(request):
+    config_filename = request.registry.settings['config_file']
+    with open(config_filename, "rb") as fp:
+        config = eval(fp.read())
+    return config
+
+
 def escape_system(input_string):
     return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
 

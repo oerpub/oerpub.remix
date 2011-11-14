@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <head>
+    <title>
+      <metal:page_title define-slot="page_title">Connexions Document Importer Configuration</metal:page_title>
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.6.4.min.js')}"></script>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery.simplemodal.1.4.1.min.js')}"></script>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
+    <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
+    <!--[if IE 6]>
+    <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
+    <![endif]-->
+  </head>
+  <body metal:define-slot="body">
+
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header">
+	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
+	<h1>Connexions Importer</h1>
+	<p class="status">You are logged into the administration panel.
+	  <br/><a href="${request.route_url('choose')}">Click here to return to the uploader</a></p>
+	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}"/></a>
+      </div>
+    </div>
+  </div>
+
+  ${form.begin(request.route_url('admin_config'), name="config_form")}
+  ${form.csrf_token()}
+  <div id="ie6-container-wrap">
+    <div id="container" style="padding-top: 100px;">
+      <div id="content">
+      <div style="float:none;width:580px;margin-left:auto;margin-right:auto;">
+
+	<div class="formentry">
+	  <div class="formlabel">Service document URL</div>
+	  <div class="forminfo">The default URL for retrieving a user's SWORD service document.</div>
+	  <div class="formfield"><input type="text" name="service_document_url" size="60" value="${config['service_document_url']}"/></div>
+	</div>
+
+	<div class="formentry">
+	  <div class="formlabel">Workspace URL</div>
+	  <div class="forminfo">The default workspace to which a module will be uploaded.</div>
+	  <div class="formfield"><input type="text" name="workspace_url" size="60" value="${config['workspace_url']}"/></div>
+	</div>
+
+	<div class="formentry">
+	  <div class="formlabel">Title</div>
+	  <div class="forminfo">The default title of a module.</div>
+	  <div class="formfield"><input type="text" name="title" size="60" value="${config['metadata']['title']}"/></div>
+	</div>
+
+	<div class="formentry">
+	  <div class="formlabel">Subject</div>
+	  <div class="forminfo">The default subject categories that apply to a new module.</div>
+	  <table>
+	    <tr tal:repeat="row python:range(3)">
+	      <td tal:repeat="column python:range(2)">
+	        <input type="checkbox" name="subject" tal:attributes="value subjects[row+column*3]; checked (subjects[row+column*3] in config['metadata']['subject'])"/>
+	        <span class="formlabel" tal:content="subjects[row+column*3]">Subject</span>
+	      </td>
+	    </tr>
+	  </table>
+        </div>
+
+        <div class="formentry">
+	  <div class="formlabel">Summary</div>
+	  <div class="forminfo">The summary of a new module.</div>
+	  <div class="formfield"><textarea name="summary" rows="6" cols="58">${config['metadata']['summary']}</textarea></div>
+        </div>
+
+        <div class="formentry">
+	  <div class="formlabel">Language</div>
+	  <div class="forminfo">The default language for a new module.</div>
+	  <div class="formfield">${form.select("language", languages, selected_value=config['metadata']['language'])}</div>
+        </div>
+
+        <div class="formentry">
+	  <div class="formlabel">Keywords (one per line)</div>
+	  <div class="formfield"><textarea name="keywords" rows="4" cols="58">${config['metadata']['keywords']}</textarea></div>
+        </div>
+
+        <div class="formentry">
+	  <div class="formlabel">Google Analytics Tracking Code</div>
+	  <div class="forminfo">Default Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for tracking a new module.</div>
+	  <div class="formfield"><input type="text" name="google_code" size="60" value="${config['metadata']['google_code']}"/></div>
+        </div>
+
+        <div class="formentry">
+	  <div class="formlabel">Roles</div>
+	  <div class="forminfo">The default roles associated with a module. Lists must contain Connexions usernames, separated by commas. Use the string &quot;_USER_&quot; to refer to the logged in user.</div>
+        </div>
+
+        <div class="formentry" tal:repeat="entry roles">
+	  <div class="formlabel">${entry[1]}</div>
+	  <div class="formfield"><input type="text" name="${entry[0]}" size="60" value="${', '.join(config['metadata'][entry[0]])}"/></div>
+        </div>
+
+        <div class="formentry">
+	  <span class="formfield">${form.submit('form.submitted', 'Save', class_='submit')}</span>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  ${form.end()}
+
+  </body>
+</html>

@@ -24,7 +24,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthoriz
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 
 # TODO: If we have enough helper functions, they should go into utils
-from utils import escape_system, clean_cnxml
+from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config
 
 TESTING = False
 
@@ -55,8 +55,9 @@ def login_view(request):
 
     templatePath = 'templates/%s/login.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
 
-    defaults = {'service_document_url': 'http://cnx.org/sword'}
-    form = Form(request, schema=LoginSchema, defaults=defaults)
+    config = load_config(request)
+
+    form = Form(request, schema=LoginSchema)
     field_list = [
         ('username',),
         ('password',),
@@ -86,6 +87,7 @@ def login_view(request):
         response = {
             'form': FormRenderer(form),
             'field_list': field_list,
+            'config': config,
         }
         return render_to_response(templatePath, response, request=request)
 
@@ -495,6 +497,7 @@ def metadata_view(request):
     check_login(request)
     templatePath = 'templates/%s/metadata.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
     session = request.session
+    config = load_config(request)
 
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
@@ -529,14 +532,16 @@ def metadata_view(request):
 
     # Get remembered fields from the session
     defaults = {}
-    for role in ['authors', 'maintainers', 'copyright']:
-        defaults[role] = session['username']
-    defaults['editors'] = ''
-    defaults['translators'] = ''
+    for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
+        defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
+        config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
+
+    """
     for field_name in remember_fields:
         if field_name in session:
             defaults[field_name] = session[field_name]
             defaults['keep_%s' % field_name] = True
+    """
 
     form = Form(request,
                 schema=MetadataSchema,
@@ -771,5 +776,59 @@ must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.952795292
         'field_list': field_list,
         'workspaces': workspaces,
         'languages': languages,
+        'subjects': subjects,
+        'config': config,
     }
     return render_to_response(templatePath, response, request=request)
+
+
+class ConfigSchema(formencode.Schema):
+    allow_extra_fields = True
+    service_document_url = formencode.validators.URL(add_http=True)
+    workspace_url = formencode.validators.URL(add_http=True)
+    title = formencode.validators.String()
+    summary = formencode.validators.String()
+    subject = formencode.validators.Set()
+    keywords = formencode.validators.String()
+    language = formencode.validators.String(not_empty=True)
+    google_code = formencode.validators.String()
+    authors = formencode.validators.String()
+    maintainers = formencode.validators.String()
+    copyright = formencode.validators.String()
+    editors = formencode.validators.String()
+    translators = formencode.validators.String()
+
+
+@view_config(route_name='admin_config', renderer='templates/admin_config.pt')
+def admin_config_view(request):
+    """
+    Configure default UI parameter settings
+    """
+
+    check_login(request)
+    session = request.session
+    subjects = ["Arts", "Business", "Humanities", "Mathematics and Statistics",
+                "Science and Technology", "Social Sciences"]
+    form = Form(request, schema=ConfigSchema)
+    config = load_config(request)
+
+    # Check for successful form completion
+    if 'form.submitted' in request.POST:
+        form.validate()
+        for key in ['service_document_url', 'workspace_url']:
+            config[key] = form.data[key]
+        for key in ['title', 'summary', 'subject', 'keywords', 'language', 'google_code']:
+            config['metadata'][key] = form.data[key]
+        for key in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
+            config['metadata'][key] = [x.strip() for x in form.data[key].split(',')]
+        save_config(config, request)
+
+    response =  {
+        'form': FormRenderer(form),
+        'subjects': subjects,
+        'languages': languages,
+        'roles': [('authors', 'Authors'), ('maintainers', 'Maintainers'), ('copyright', 'Copyright holders'), ('editors', 'Editors'), ('translators', 'Translators')],
+        'request': request,
+        'config': config,
+    }
+    return response
