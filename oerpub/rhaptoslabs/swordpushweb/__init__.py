@@ -10,6 +10,8 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           session_factory = my_session_factory)
 
+    config.add_route('admin_config', '/config')
+    #config.add_route('admin_config_login', '/config_login')
     config.add_route('switch_expert_mode', '/switchmode')
     config.add_route('login', '/')
     config.add_route('choose', '/choose')

@@ -26,7 +26,7 @@ function check_submit() {
   <p>You need to sign in to Connexions to use this tool.</p>
   ${form.begin(request.route_url('login'), name='login_form', onsubmit='return check_submit()')}
   ${form.csrf_token()}
-  <input type="hidden" name="service_document_url" value="http://cnx.org/sword/servicedocument"/>
+  <input type="hidden" name="service_document_url" value="${config['service_document_url']}"/>
   <center>
     <table>
       <tr>

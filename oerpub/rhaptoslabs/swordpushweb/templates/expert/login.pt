@@ -28,7 +28,7 @@ function check_submit() {
   <center>
     <table>
       <tr><td><div class="formlabel">Service document URL</div></td></tr>
-      <tr><td><div class="formfield"><input type="text" name="service_document_url" value="http://cnx.org/sword/servicedocument" size="40"/></div></td></tr>
+      <tr><td><div class="formfield"><input type="text" name="service_document_url" value="${config['service_document_url']}" size="40"/></div></td></tr>
       <tr><td><div class="formlabel">Username</div></td></tr>
       <tr><td><div class="formfield"><input type="text" name="username" size="40"/></div></td></tr>
       <tr><td><div class="formlabel">Password</div></td></tr>
