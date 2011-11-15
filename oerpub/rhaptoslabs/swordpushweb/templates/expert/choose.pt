@@ -43,12 +43,19 @@
           <a href="javascript:newPicker()" style="font-weight: bold"><img src="https://docs.google.com/images/doclist/logo_docs.gif"/></a>
           <br/>          
           <br/>
+    </center>
+	<p>Or you can enter an URL for converting an internet page.</p>
+    <center>
+          <br/>
+          <label>URL:</label>
+          <input id="url_text" name="url_text" type="text" size="80" onkeydown="if(event.keyCode == 13){$('#file-submit').removeAttr('disabled');$('#file-submit').click();}">
+          <br/>
           <br/>
 	  <div class="pleasewait" id="upload-wait" style="display:none;">
 	    Your document is being processed. This may take a few
 	    moments.
 	  </div>
-        </center>
+    </center>
         ${form.end()}
       </div>
     </div>

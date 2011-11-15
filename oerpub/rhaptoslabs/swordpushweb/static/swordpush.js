@@ -133,6 +133,17 @@ $(document).ready(function()
         $('#upload-wait').slideDown('slow');
     });
 
+    // URL import upload field, enter pressed
+    //$("#url_text").keyup(function(event){
+    //  if(event.keyCode == 13){
+    //    $('#file-submit').removeAttr('disabled');
+    //    $('#file-submit').click();
+    //  }
+    //});
+
+    // add a watermark to url text field    
+    $('#url_text').watermark('http://www.example.com');
+
     // Show the edit roles form.
     $('#edit-roles').click(function(e) {
         // Populate the fields from the data.
@@ -185,7 +196,7 @@ var picker = new google.picker.PickerBuilder().
 picker.setVisible(true);
 }
 
-// A simple callback implementation.
+// A simple callback implementation for Picker.
 function pickerCallback(data) {
 if(data.action == google.picker.Action.PICKED){
     document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
@@ -194,3 +205,4 @@ if(data.action == google.picker.Action.PICKED){
     $('#file-submit').click();
 }
 }
+

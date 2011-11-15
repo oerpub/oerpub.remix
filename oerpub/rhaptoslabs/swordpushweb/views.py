@@ -22,6 +22,8 @@ import gdata.gauth
 import gdata.docs.client
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
+import urllib2
+from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 
 # TODO: If we have enough helper functions, they should go into utils
 from utils import escape_system, clean_cnxml
@@ -246,6 +248,50 @@ def choose_view(request):
             # onto the form again.
             request.session['upload_dir'] = temp_dir_name
             request.session['filename'] = "Google Document"
+
+        # HTML URL Import:
+        if form.data['url_text']:
+            url = form.data['url_text']
+
+            # download html:
+            html = urllib2.urlopen(url).read()
+
+            # transformation            
+            cnxml = htmlsoup_to_cnxml(html)
+
+            # write CNXML output
+            cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+            cnxml_file = open(cnxml_filename, 'w')
+            try:
+                cnxml_file.write(cnxml)
+                cnxml_file.flush()
+            finally:
+                cnxml_file.close()
+                
+            # write images, not stable yet -> look at Gdocs code. TODO!
+                   
+            htmlpreview = cnxml_to_htmlpreview(cnxml)
+            with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                index.write(htmlpreview)
+
+            # Zip up all the files. This is done now, since we have all the files
+            # available, and it also allows us to post a simple download link.
+            # Note that we cannot use zipfile as context manager, as that is only
+            # available from python 2.7
+            # TODO: Do a filesize check xxxx
+            zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+            try:
+                zip_archive.writestr('index.cnxml', cnxml)
+                #for image_filename, image in objects.iteritems():
+                #    zip_archive.writestr(image_filename, image)
+            finally:
+                zip_archive.close()
+
+            # Keep the info we need for next uploads.  Note that this might kill
+            # the ability to do multiple tabs in parallel, unless it gets offloaded
+            # onto the form again.
+            request.session['upload_dir'] = temp_dir_name
+            request.session['filename'] = "HTML Document"
 
         # Office or ZIP file
         else:
