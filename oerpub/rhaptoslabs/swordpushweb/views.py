@@ -252,7 +252,7 @@ def choose_view(request):
             request.session['filename'] = "Google Document"
 
         # HTML URL Import:
-        elif form.data['url_text']:
+        elif form.data.get('url_text'):
             url = form.data['url_text']
 
             # download html:
