@@ -113,7 +113,8 @@ def login_view(request):
             session['collections'] = [{'title': i.title, 'href': i.href}
                                       for i in sword2cnx.get_workspaces(conn)]
         except:
-            session.invalidate()
+            del session['username']
+            del session['password']
             response = {
                 'form': FormRenderer(form),
                 'field_list': field_list,
