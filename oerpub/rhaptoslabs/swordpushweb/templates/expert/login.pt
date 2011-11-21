@@ -18,6 +18,7 @@ function check_submit() {
   return passed;
 }
 </script>
+<div tal:condition="econtext.has_key('login_error')" class="splashboxerror">${econtext.get('login_error', '')}</div>
 <div class="splashbox">
   <div class="splashheading">
     <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}" width="51" height="59" align="left"/>

@@ -108,11 +108,18 @@ def login_view(request):
             # Get available collections from SWORD service document
             # We create a list of dictionaries, otherwise we'll have problems
             # pickling them.
-            session['collections'] = [{'title': i.title, 'href': i.href} for i
-                                      in sword2cnx.get_workspaces(conn)]
+            if not conn.sd.valid:
+                raise Exception
+            session['collections'] = [{'title': i.title, 'href': i.href}
+                                      for i in sword2cnx.get_workspaces(conn)]
         except:
-            session.flash('Could not log in', 'errors')
-            response = {'form': FormRenderer(form), 'field_list': field_list}
+            session.invalidate()
+            response = {
+                'form': FormRenderer(form),
+                'field_list': field_list,
+                'config': config,
+                'login_error': "Invalid username or password. Please try again.",
+            }
             return render_to_response(templatePath, response, request=request)
 
         # Get needed info from the service document
