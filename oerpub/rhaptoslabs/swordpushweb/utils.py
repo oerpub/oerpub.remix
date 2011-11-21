@@ -130,3 +130,34 @@ def clean_cnxml(iCnxml, iMaxColumns=80):
                 indent += 1
 
     return newText
+
+
+def add_directory_to_zip(directory, zipFile, basePath=None):
+    """
+    Add all files and sub-directories from a directory to an open zip
+    archive.
+
+    Arguments:
+
+      directory - The directory to add to the zip archive.
+
+      zipFile - The zipfile.ZipFile archive to which to add the
+        directory.
+
+      basePath - If not None, this is the path to the directory to
+        add. Files from basePath/directory on the file system will be
+        added to the zip archive under the path directory.
+    """
+    import glob, os
+
+    if basePath is None:
+        basePath = ''
+    if (basePath != '') and (basePath[-1] != '/'):
+        basePath += '/'
+    basePathLength = len(basePath)
+
+    for pathToFile in glob.glob(os.path.join(basePath + directory, '*')):
+        if os.path.isfile(pathToFile):
+            zipFile.write(pathToFile, arcname=pathToFile[basePathLength:])
+        elif os.path.isdir(pathToFile):
+            add_directory_to_zip(pathToFile[basePathLength:], zipFile, basePath=basePath)

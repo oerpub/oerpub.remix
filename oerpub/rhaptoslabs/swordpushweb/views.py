@@ -25,8 +25,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 
-# TODO: If we have enough helper functions, they should go into utils
-from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config
+from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
 
 TESTING = False
 
@@ -174,186 +173,63 @@ def choose_view(request):
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and form.validate():
-          
-        # Create a directory to do the conversions
-        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        # TODO: This has a good chance of being unique, but even so...
-        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
-        save_dir = os.path.join(
-            request.registry.settings['transform_dir'],
-            temp_dir_name
-            )
-        os.mkdir(save_dir)
+        try: # Catch-all exception block
+            # Create a directory to do the conversions
+            now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+            # TODO: This has a good chance of being unique, but even so...
+            temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+            save_dir = os.path.join(
+                request.registry.settings['transform_dir'],
+                temp_dir_name
+                )
+            os.mkdir(save_dir)
 
-        # Google Docs Conversion
-        # if we have a Google Docs ID and Access token.
-        if form.data['gdocs_resource_id']:
-            gdocs_resource_id = form.data['gdocs_resource_id']
-            gdocs_access_token = form.data['gdocs_access_token']
-            
-            # TODO: Do the Google Docs transformation here
-            
-            # login to gdocs and get a client object
-            gd_client = getAuthorizedGoogleDocsClient()
-            
-            # Create a AuthSub Token based on gdocs_access_token String
-            auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token)
-            
-            # get the Google Docs Entry
-            gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
-            
-            # Get the contents of the document
-            gd_entry_url = gd_entry.content.src
-            html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
-            
-            # transformation and get images
-            cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
-            
-            # write CNXML output
-            cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-            cnxml_file = open(cnxml_filename, 'w')
-            try:
-                cnxml_file.write(cnxml)
-                cnxml_file.flush()
-            finally:
-                cnxml_file.close()
-                
-            # write images
-            for image_filename, image in objects.iteritems():
-                image_filename = os.path.join(save_dir, image_filename)
-                image_file = open(image_filename, 'wb') # write binary, important!
+            # Google Docs Conversion
+            # if we have a Google Docs ID and Access token.
+            if form.data['gdocs_resource_id']:
+                gdocs_resource_id = form.data['gdocs_resource_id']
+                gdocs_access_token = form.data['gdocs_access_token']
+
+                # TODO: Do the Google Docs transformation here
+
+                # login to gdocs and get a client object
+                gd_client = getAuthorizedGoogleDocsClient()
+
+                # Create a AuthSub Token based on gdocs_access_token String
+                auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token)
+
+                # get the Google Docs Entry
+                gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
+
+                # Get the contents of the document
+                gd_entry_url = gd_entry.content.src
+                html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
+
+                # Transformation and get images
+                cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
+
+                # write CNXML output
+                cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+                cnxml_file = open(cnxml_filename, 'w')
                 try:
-                    image_file.write(image)
-                    image_file.flush()
+                    cnxml_file.write(cnxml)
+                    cnxml_file.flush()
                 finally:
-                    image_file.close()
-                    
-            htmlpreview = cnxml_to_htmlpreview(cnxml)
-            with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                index.write(htmlpreview)
+                    cnxml_file.close()
 
-            # Zip up all the files. This is done now, since we have all the files
-            # available, and it also allows us to post a simple download link.
-            # Note that we cannot use zipfile as context manager, as that is only
-            # available from python 2.7
-            # TODO: Do a filesize check xxxx
-            zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-            try:
-                zip_archive.writestr('index.cnxml', cnxml)
+                # write images
                 for image_filename, image in objects.iteritems():
-                    zip_archive.writestr(image_filename, image)
-            finally:
-                zip_archive.close()
+                    image_filename = os.path.join(save_dir, image_filename)
+                    image_file = open(image_filename, 'wb') # write binary, important!
+                    try:
+                        image_file.write(image)
+                        image_file.flush()
+                    finally:
+                        image_file.close()
 
-            # Keep the info we need for next uploads.  Note that this might kill
-            # the ability to do multiple tabs in parallel, unless it gets offloaded
-            # onto the form again.
-            request.session['upload_dir'] = temp_dir_name
-            request.session['filename'] = "Google Document"
-
-        # HTML URL Import:
-        elif form.data.get('url_text'):
-            url = form.data['url_text']
-
-            # download html:
-            html = urllib2.urlopen(url).read()
-
-            # transformation            
-            cnxml = htmlsoup_to_cnxml(html)
-
-            # write CNXML output
-            cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-            cnxml_file = open(cnxml_filename, 'w')
-            try:
-                cnxml_file.write(cnxml)
-                cnxml_file.flush()
-            finally:
-                cnxml_file.close()
-                
-            # write images, not stable yet -> look at Gdocs code. TODO!
-                   
-            htmlpreview = cnxml_to_htmlpreview(cnxml)
-            with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                index.write(htmlpreview)
-
-            # Zip up all the files. This is done now, since we have all the files
-            # available, and it also allows us to post a simple download link.
-            # Note that we cannot use zipfile as context manager, as that is only
-            # available from python 2.7
-            # TODO: Do a filesize check xxxx
-            zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-            try:
-                zip_archive.writestr('index.cnxml', cnxml)
-                #for image_filename, image in objects.iteritems():
-                #    zip_archive.writestr(image_filename, image)
-            finally:
-                zip_archive.close()
-
-            # Keep the info we need for next uploads.  Note that this might kill
-            # the ability to do multiple tabs in parallel, unless it gets offloaded
-            # onto the form again.
-            request.session['upload_dir'] = temp_dir_name
-            request.session['filename'] = "HTML Document"
-
-        # Office or ZIP file
-        else:
-            # Save the original file so that we can convert, plus keep it.
-            original_filename = os.path.join(
-                save_dir,
-                form.data['upload'].filename.replace(os.sep, '_'))
-            saved_file = open(original_filename, 'wb')
-            input_file = form.data['upload'].file
-            shutil.copyfileobj(input_file, saved_file)
-            saved_file.close()
-            input_file.close()
-
-            # Check if it is a ZIP file with at least index.cnxml in it
-            try:
-                zip_archive = zipfile.ZipFile(original_filename, 'r')
-                is_zip_archive = ('index.cnxml' in zip_archive.namelist())
-            except zipfile.BadZipfile:
-                is_zip_archive = False
-
-            # ZIP package from previous conversion
-            if is_zip_archive:
-                # Unzip into transform directory
-                zip_archive.extractall(path=save_dir)
-
-                # Rename ZIP file so that the user can download it again
-                os.rename(original_filename, os.path.join(save_dir, 'upload.zip'))
-
-                # Read CNXML
-                with open(os.path.join(save_dir, 'index.cnxml'), 'rt') as fp:
-                    xml = fp.read()
-
-                # Convert the CNXML to XHTML for preview
-                html = cnxml_to_htmlpreview(xml)
+                htmlpreview = cnxml_to_htmlpreview(cnxml)
                 with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                    index.write(html)
-
-            # OOo / MS Word Conversion
-            else:
-                # Convert from other office format to odt if needed
-                odt_filename = original_filename
-                filename, extension = os.path.splitext(original_filename)
-                if extension != '.odt':
-                    odt_filename = '%s.odt' % filename
-                    command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
-                    os.system(command)
-
-                # Convert and save all the resulting files.
-                tree, files, errors = transform(odt_filename)
-                xml = etree.tostring(tree)
-                with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
-                    cnxml_file.write(xml)
-                for filename, content in files.items():
-                    with open(os.path.join(save_dir, filename), 'wb') as img_file:
-                        img_file.write(content)
-
-                # Convert the cnxml for preview.
-                html = cnxml_to_htmlpreview(xml)
-                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                    index.write(html)
+                    index.write(htmlpreview)
 
                 # Zip up all the files. This is done now, since we have all the files
                 # available, and it also allows us to post a simple download link.
@@ -362,21 +238,182 @@ def choose_view(request):
                 # TODO: Do a filesize check xxxx
                 zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
                 try:
-                    zip_archive.writestr('index.cnxml', xml.encode('utf8'))
-                    for filename, content in files.items():
-                        zip_archive.writestr(filename, content)
+                    zip_archive.writestr('index.cnxml', cnxml)
+                    for image_filename, image in objects.iteritems():
+                        zip_archive.writestr(image_filename, image)
                 finally:
                     zip_archive.close()
 
-            # Keep the info we need for next uploads.  Note that this might kill
-            # the ability to do multiple tabs in parallel, unless it gets offloaded
-            # onto the form again.
-            request.session['upload_dir'] = temp_dir_name
-            request.session['filename'] = form.data['upload'].filename
+                # Keep the info we need for next uploads.  Note that this might kill
+                # the ability to do multiple tabs in parallel, unless it gets offloaded
+                # onto the form again.
+                request.session['upload_dir'] = temp_dir_name
+                request.session['filename'] = "Google Document"
 
-        # TODO: Errors should be shown to the user
+            # HTML URL Import:
+            elif form.data.get('url_text'):
+                url = form.data['url_text']
+
+                # download html:
+                html = urllib2.urlopen(url).read()
+
+                # transformation            
+                cnxml = htmlsoup_to_cnxml(html)
+
+                # write CNXML output
+                cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+                cnxml_file = open(cnxml_filename, 'w')
+                try:
+                    cnxml_file.write(cnxml)
+                    cnxml_file.flush()
+                finally:
+                    cnxml_file.close()
+
+                # write images, not stable yet -> look at Gdocs code. TODO!
+
+                htmlpreview = cnxml_to_htmlpreview(cnxml)
+                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                    index.write(htmlpreview)
+
+                # Zip up all the files. This is done now, since we have all the files
+                # available, and it also allows us to post a simple download link.
+                # Note that we cannot use zipfile as context manager, as that is only
+                # available from python 2.7
+                # TODO: Do a filesize check xxxx
+                zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                try:
+                    zip_archive.writestr('index.cnxml', cnxml)
+                    #for image_filename, image in objects.iteritems():
+                    #    zip_archive.writestr(image_filename, image)
+                finally:
+                    zip_archive.close()
+
+                # Keep the info we need for next uploads.  Note that this might kill
+                # the ability to do multiple tabs in parallel, unless it gets offloaded
+                # onto the form again.
+                request.session['upload_dir'] = temp_dir_name
+                request.session['filename'] = "HTML Document"
+
+            # Office or ZIP file
+            else:
+                # Save the original file so that we can convert, plus keep it.
+                original_filename = os.path.join(
+                    save_dir,
+                    form.data['upload'].filename.replace(os.sep, '_'))
+                saved_file = open(original_filename, 'wb')
+                input_file = form.data['upload'].file
+                shutil.copyfileobj(input_file, saved_file)
+                saved_file.close()
+                input_file.close()
+
+                # Check if it is a ZIP file with at least index.cnxml in it
+                try:
+                    zip_archive = zipfile.ZipFile(original_filename, 'r')
+                    is_zip_archive = ('index.cnxml' in zip_archive.namelist())
+                except zipfile.BadZipfile:
+                    is_zip_archive = False
+
+                # ZIP package from previous conversion
+                if is_zip_archive:
+                    # Unzip into transform directory
+                    zip_archive.extractall(path=save_dir)
+
+                    # Rename ZIP file so that the user can download it again
+                    os.rename(original_filename, os.path.join(save_dir, 'upload.zip'))
+
+                    # Read CNXML
+                    with open(os.path.join(save_dir, 'index.cnxml'), 'rt') as fp:
+                        xml = fp.read()
+
+                    # Convert the CNXML to XHTML for preview
+                    html = cnxml_to_htmlpreview(xml)
+                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                        index.write(html)
+
+                # OOo / MS Word Conversion
+                else:
+                    # Convert from other office format to odt if needed
+                    odt_filename = original_filename
+                    filename, extension = os.path.splitext(original_filename)
+                    if extension != '.odt':
+                        odt_filename = '%s.odt' % filename
+                        command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+                        os.system(command)
+
+                    # Convert and save all the resulting files.
+                    tree, files, errors = transform(odt_filename)
+                    xml = etree.tostring(tree)
+                    with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
+                        cnxml_file.write(xml)
+                    for filename, content in files.items():
+                        with open(os.path.join(save_dir, filename), 'wb') as img_file:
+                            img_file.write(content)
+
+                    # Convert the cnxml for preview.
+                    html = cnxml_to_htmlpreview(xml)
+                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                        index.write(html)
+
+                    # Zip up all the files. This is done now, since we have all the files
+                    # available, and it also allows us to post a simple download link.
+                    # Note that we cannot use zipfile as context manager, as that is only
+                    # available from python 2.7
+                    # TODO: Do a filesize check xxxx
+                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                    try:
+                        zip_archive.writestr('index.cnxml', xml.encode('utf8'))
+                        for filename, content in files.items():
+                            zip_archive.writestr(filename, content)
+                    finally:
+                        zip_archive.close()
+
+                # Keep the info we need for next uploads.  Note that this might kill
+                # the ability to do multiple tabs in parallel, unless it gets offloaded
+                # onto the form again.
+                request.session['upload_dir'] = temp_dir_name
+                request.session['filename'] = form.data['upload'].filename
+        except Exception:
+            # Record traceback
+            import traceback
+            tb = traceback.format_exc()
+            # Get software version from git
+            try:
+                import subprocess
+                p = subprocess.Popen(["git","log","-1"], stdout=subprocess.PIPE)
+                out, err = p.communicate()
+                commit_hash = out[:out.find('\n')]
+            except OSError:
+                commit_hash = 'None'
+            # Get timestamp
+            timestamp = datetime.datetime.now()
+            # Zip up error report, form data, uploaded file (if any)  and temporary transform directory
+            zip_filename = os.path.join(request.registry.settings['errors_dir'], temp_dir_name + '.zip')
+            zip_archive = zipfile.ZipFile(zip_filename, 'w')
+            zip_archive.writestr("info.txt", """TRACEBACK
+""" + tb + """
+GIT VERSION
+""" + commit_hash + """
+
+USER
+""" + request.session['username'] + """
+
+SERVICE DOCUMENT URL
+""" + request.session['service_document_url'] + """
+
+TIMESTAMP
+""" + str(timestamp) + """
+
+FORM DATA
+""" + '\n'.join([key + ': ' + str(form.data.get(key)) for key in ['gdocs_resource_id', 'gdocs_access_token', 'url_text']]) + "\n")
+            add_directory_to_zip(temp_dir_name, zip_archive, basePath=request.registry.settings['transform_dir'])
+
+            templatePath = 'templates/error.pt'
+            response = {
+                'traceback': tb,
+            }
+            return render_to_response(templatePath, response, request=request)
+
         request.session.flash('The file was successfully converted.')
-
         return HTTPFound(location=request.route_url('preview_frames'))
 
     # First view or errors

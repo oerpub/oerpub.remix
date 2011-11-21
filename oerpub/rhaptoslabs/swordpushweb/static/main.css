@@ -280,3 +280,16 @@ div.splashbox p {
     background: #ffffe0;
     border-color: #f0f000;
 }
+
+#upload_error_message {
+    min-width: 900px;
+    margin: 0;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-style: solid;
+    border-width: 1px;
+    background: #ffffe0;
+    border-color: #f0f000;
+}
