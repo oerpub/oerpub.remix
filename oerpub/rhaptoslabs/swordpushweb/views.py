@@ -263,14 +263,14 @@ def choose_view(request):
                 url = form.data['url_text']
 
                 # download html:
-            #html = urllib2.urlopen(url).read() # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
-            import_opener = urllib2.build_opener()
-            import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-            import_request = import_opener.open(url)
-            html = import_request.read()
+                #html = urllib2.urlopen(url).read() # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
+                import_opener = urllib2.build_opener()
+                import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                import_request = import_opener.open(url)
+                html = import_request.read()
 
                 # transformation            
-            cnxml, objects = htmlsoup_to_cnxml(html, bDownloadImages=True, base_or_source_url=url)
+                cnxml, objects = htmlsoup_to_cnxml(html, bDownloadImages=True, base_or_source_url=url)
 
                 # write CNXML output
                 cnxml_filename = os.path.join(save_dir, 'index.cnxml')
