@@ -291,9 +291,9 @@ def choose_view(request):
                     finally:
                         image_file.close()
 
-                    htmlpreview = cnxml_to_htmlpreview(cnxml)
-                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                        index.write(htmlpreview)
+                htmlpreview = cnxml_to_htmlpreview(cnxml)
+                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                    index.write(htmlpreview)
 
                 # Zip up all the files. This is done now, since we have all the files
                 # available, and it also allows us to post a simple download link.
