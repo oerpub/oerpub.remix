@@ -254,10 +254,14 @@ def choose_view(request):
             url = form.data['url_text']
 
             # download html:
-            html = urllib2.urlopen(url).read()
+            #html = urllib2.urlopen(url).read() # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
+            import_opener = urllib2.build_opener()
+            import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            import_request = import_opener.open(url)
+            html = import_request.read()
 
             # transformation            
-            cnxml = htmlsoup_to_cnxml(html)
+            cnxml, objects = htmlsoup_to_cnxml(html, bDownloadImages=True, base_or_source_url=url)
 
             # write CNXML output
             cnxml_filename = os.path.join(save_dir, 'index.cnxml')
@@ -268,7 +272,15 @@ def choose_view(request):
             finally:
                 cnxml_file.close()
                 
-            # write images, not stable yet -> look at Gdocs code. TODO!
+            # write images
+            for image_filename, image in objects.iteritems():
+                image_filename = os.path.join(save_dir, image_filename)
+                image_file = open(image_filename, 'wb') # write binary, important!
+                try:
+                    image_file.write(image)
+                    image_file.flush()
+                finally:
+                    image_file.close()
                    
             htmlpreview = cnxml_to_htmlpreview(cnxml)
             with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
