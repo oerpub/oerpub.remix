@@ -281,19 +281,19 @@ def choose_view(request):
                 finally:
                     cnxml_file.close()
 
-            # write images
-            for image_filename, image in objects.iteritems():
-                image_filename = os.path.join(save_dir, image_filename)
-                image_file = open(image_filename, 'wb') # write binary, important!
-                try:
-                    image_file.write(image)
-                    image_file.flush()
-                finally:
-                    image_file.close()
+                # write images
+                for image_filename, image in objects.iteritems():
+                    image_filename = os.path.join(save_dir, image_filename)
+                    image_file = open(image_filename, 'wb') # write binary, important!
+                    try:
+                        image_file.write(image)
+                        image_file.flush()
+                    finally:
+                        image_file.close()
 
-                htmlpreview = cnxml_to_htmlpreview(cnxml)
-                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                    index.write(htmlpreview)
+                    htmlpreview = cnxml_to_htmlpreview(cnxml)
+                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                        index.write(htmlpreview)
 
                 # Zip up all the files. This is done now, since we have all the files
                 # available, and it also allows us to post a simple download link.
