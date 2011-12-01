@@ -8,7 +8,7 @@
 	<h1>Connexions Importer</h1>
 	<p class="status">You are logged in as ${request.session['username']}
 	  <br/><a href="${request.route_url('logout')}" target="_parent">Click here to sign out</a></p>
-	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf.png')}"/></a>
+	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf150.png')}"/></a>
       </div>
     </div>
     <div id="header2-container">
