@@ -237,6 +237,9 @@ def choose_view(request):
                 # get the Google Docs Entry
                 gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
 
+                # Save title in session
+                request.session['title'] = gd_entry.title.text
+
                 # Get the contents of the document
                 gd_entry_url = gd_entry.content.src
                 html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
@@ -298,7 +301,8 @@ def choose_view(request):
                 html = import_request.read()
 
                 # transformation            
-                cnxml, objects = htmlsoup_to_cnxml(html, bDownloadImages=True, base_or_source_url=url)
+                cnxml, objects, html_title = htmlsoup_to_cnxml(html, bDownloadImages=True, base_or_source_url=url)
+                request.session['title'] = html_title
 
                 # write CNXML output
                 cnxml_filename = os.path.join(save_dir, 'index.cnxml')
@@ -666,6 +670,11 @@ def metadata_view(request):
     for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
         defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
         config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
+    
+    # Get remembered title from the session    
+    if 'title' in session:
+        defaults['title'] = session['title']
+        config['metadata']['title'] = session['title']
 
     """
     for field_name in remember_fields:
