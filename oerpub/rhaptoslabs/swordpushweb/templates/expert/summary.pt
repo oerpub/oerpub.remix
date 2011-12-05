@@ -7,7 +7,7 @@
 	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
 	<h1>Connexions Importer</h1>
 	<p class="status">You are logged in as ${request.session['username']}
-	  <br/><a href="${request.route_url('logout')}">Click here to sign out</a></p>
+	  <br/><a href="${request.route_url('logout')}" target="_top">Click here to sign out</a></p>
 	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf150.png')}"/></a>
       </div>
     </div>

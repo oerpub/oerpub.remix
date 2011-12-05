@@ -14,6 +14,8 @@ def main(global_config, **settings):
     #config.add_route('admin_config_login', '/config_login')
     config.add_route('switch_expert_mode', '/switchmode')
     config.add_route('login', '/')
+    config.add_route('cnxlogin', '/cnxlogin')
+    config.add_route('cnxlogin_frames', '/upload')
     config.add_route('choose', '/choose')
     config.add_route('preview_frames', '/preview')
     config.add_route('preview_header', '/preview_header')
