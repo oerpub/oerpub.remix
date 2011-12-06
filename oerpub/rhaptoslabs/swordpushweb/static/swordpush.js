@@ -140,6 +140,9 @@ $(document).ready(function()
     //    $('#file-submit').click();
     //  }
     //});
+    
+    // HTML 5 polyfill for input forms (old and ie browsers)
+    $.webshims.polyfill('forms');
 
     // Show the edit roles form.
     $('#edit-roles').click(function(e) {
