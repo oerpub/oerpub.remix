@@ -141,9 +141,6 @@ $(document).ready(function()
     //  }
     //});
 
-    // add a watermark to url text field    
-    $('#url_text').watermark('http://www.example.com');
-
     // Show the edit roles form.
     $('#edit-roles').click(function(e) {
         // Populate the fields from the data.
