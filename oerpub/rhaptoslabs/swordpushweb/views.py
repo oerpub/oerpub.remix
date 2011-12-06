@@ -143,7 +143,35 @@ def login_view(request):
                                              )[0].text
 
     # Go to the upload page
-    return HTTPFound(location=request.route_url('choose'))
+    return HTTPFound(location=request.route_url('cnxlogin_frames'))
+
+
+@view_config(route_name='cnxlogin_frames', renderer='templates/cnxlogin_frames.pt')
+def cnxlogin_frames_view(request):
+    check_login(request)
+    return {}
+
+
+@view_config(route_name='cnxlogin')
+def cnxlogin_view(request):
+    check_login(request)
+
+    postUrl = {
+        'http://cnx.org/sword/servicedocument': 'http://cnx.org/login_form',
+        'http://50.57.120.10:8080/rhaptos/sword/servicedocument': 'http://50.57.120.10:8080/login_form',
+        'http://50.57.120.10:8080/sword/servicedocument': 'http://50.57.120.10:8080/login_form',
+    }.get(request.session['service_document_url'])
+
+    if postUrl is not None:
+        templatePath = 'templates/cnxlogin.pt'
+        response = {
+            'username': request.session['username'],
+            'password': request.session['password'],
+            'postUrl': postUrl,
+        }
+        return render_to_response(templatePath, response, request=request)
+    else:
+        return ''
 
 
 @view_config(route_name='logout', renderer='templates/login.pt')

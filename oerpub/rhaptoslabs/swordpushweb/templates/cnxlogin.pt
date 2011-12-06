@@ -1,0 +1,15 @@
+<html>
+<body onload="document.getElementById('submit').click();">
+  <form action="${postUrl}" name="loginform" method="post">
+    <input type="hidden" name="form.submitted" value="1" />
+    <input type="hidden" name="came_from" value="http://cnx.org/" />
+    <input type="hidden" name="js_enabled" id="js_enabled" value="1" />
+    <input type="hidden" name="cookies_enabled" id="cookies_enabled" value="1" />
+    <input type="hidden" name="login_name" id="login_name" value="${username}" />
+    <input type="hidden" name="pwd_empty" id="pwd_empty" value="0" />
+    <input type="text" size="10" name="__ac_name" value="${username}" id="__ac_name" />
+    <input type="password" size="10" name="__ac_password" id="__ac_password" value="${password}" />
+    <input type="submit" id="submit" name="submit" value="Log in" />
+  </form>
+</body>
+</html>
