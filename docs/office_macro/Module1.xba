@@ -21,8 +21,20 @@ Sub SaveAsSVG( cFile, dFile )
    dURL = ConvertToURL( dFile )
    
    On Error Goto ErrorHandler
-     oDoc.storeToURL( cURL, Array(_
-              MakePropertyValue( &quot;FilterName&quot;, &quot;draw_svg_Export&quot; ),)
+     oDoc.storeToURL( dURL, Array(MakePropertyValue( &quot;FilterName&quot;, &quot;draw_svg_Export&quot; ),))
+   	 oDoc.close( True )
+   ErrorHandler:
+   
+End Sub
+
+Sub SaveAsPNG( cFile, dFile ) 
+   &apos; mostly a copy of SaveAsPDF. Save as an SVG file. 
+   cURL = ConvertToURL( cFile )
+   oDoc = StarDesktop.loadComponentFromURL( cURL, &quot;_blank&quot;, 0, Array(MakePropertyValue( &quot;Hidden&quot;, True ),))
+   dURL = ConvertToURL( dFile )
+   
+   On Error Goto ErrorHandler
+     oDoc.storeToURL( dURL, Array(MakePropertyValue( &quot;FilterName&quot;, &quot;PNG - Portable Network Graphic&quot; ),))
    	 oDoc.close( True )
    ErrorHandler:
    
