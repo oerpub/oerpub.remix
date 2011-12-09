@@ -14,6 +14,32 @@ Sub SaveAsOOO( cFile, dFile )
 
 End Sub
 
+Sub SaveAsSVG( cFile, dFile ) 
+   &apos; mostly a copy of SaveAsPDF. Save as an SVG file. 
+   cURL = ConvertToURL( cFile )
+   oDoc = StarDesktop.loadComponentFromURL( cURL, &quot;_blank&quot;, 0, Array(MakePropertyValue( &quot;Hidden&quot;, True ),))
+   dURL = ConvertToURL( dFile )
+   
+   On Error Goto ErrorHandler
+     oDoc.storeToURL( dURL, Array(MakePropertyValue( &quot;FilterName&quot;, &quot;draw_svg_Export&quot; ),))
+   	 oDoc.close( True )
+   ErrorHandler:
+   
+End Sub
+
+Sub SaveAsPNG( cFile, dFile ) 
+   &apos; mostly a copy of SaveAsPDF. Save as an PNG file. 
+   cURL = ConvertToURL( cFile )
+   oDoc = StarDesktop.loadComponentFromURL( cURL, &quot;_blank&quot;, 0, Array(MakePropertyValue( &quot;Hidden&quot;, True ),))
+   dURL = ConvertToURL( dFile )
+   
+   On Error Goto ErrorHandler
+     oDoc.storeToURL( dURL, Array(MakePropertyValue( &quot;FilterName&quot;, &quot;draw_png_Export&quot; ),))
+   	 oDoc.close( True )
+   ErrorHandler:
+   
+End Sub
+
 Function MakePropertyValue( Optional cName As String, Optional uValue ) _
    As com.sun.star.beans.PropertyValue
    Dim oPropertyValue As New com.sun.star.beans.PropertyValue
