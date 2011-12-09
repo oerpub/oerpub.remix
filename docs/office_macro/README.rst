@@ -4,7 +4,7 @@ Getting OpenOffice set up:
 
 Install headless version::
 
-  apt-get install openoffice.org-headless openoffice.org-writer
+  apt-get install openoffice.org-headless openoffice.org-writer openoffice.org-draw
 
 Create macro. You need to do this as the user that will be running the
 sword services -- probably the web server or whoever is running
