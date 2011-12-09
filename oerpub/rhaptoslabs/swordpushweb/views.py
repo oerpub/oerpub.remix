@@ -76,9 +76,11 @@ def login_view(request):
     # Check if user is already authenticated
     else:
         loggedIn = True
-        for key in ['username', 'password', 'service_document_url']:
+        for key in ['username', 'password', 'service_document_url', 'collections', 'workspace_title', 'sword_version', 'maxuploadsize']:
             if not session.has_key(key):
                 loggedIn = False
+        if loggedIn:
+            return HTTPFound(location=request.route_url('cnxlogin_frames'))
 
     # TODO: check credentials against Connexions and ask for login
     # again if failed.
@@ -92,6 +94,8 @@ def login_view(request):
         }
         return render_to_response(templatePath, response, request=request)
 
+    # Here we know that the user is authenticated and that they did so
+    # by logging in (rather than having had a cookie set already)
     if TESTING:
         session['workspace_title'] = "Connexions"
         session['sword_version'] = "2.0"
