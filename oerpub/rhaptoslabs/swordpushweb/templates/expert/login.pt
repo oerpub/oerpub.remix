@@ -1,0 +1,46 @@
+<metal:use use-macro="base">
+<tal:body metal:fill-slot="content">
+
+<script>
+function check_submit() {
+  passed = true;
+  names = ["service_document_url", "username", "password"];
+  for(i in names) {
+    name = names[i];
+    x = document.forms["login_form"][name];
+    if((x.value == null) || (x.value == "")) {
+      x.style.background = '#ffce99';
+      passed = false;
+    } else {
+      x.style.background = '#ffffff';
+    }
+  }
+  return passed;
+}
+</script>
+<div tal:condition="econtext.has_key('login_error')" class="splashboxerror">${econtext.get('login_error', '')}</div>
+<div class="splashbox">
+  <div class="splashheading">
+    <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}" width="51" height="59" align="left"/>
+    Connexions Document Importer <span style="font-size:12pt;color:#ed891b;margin-left:1em;">Expert Interface</span>
+  </div>
+  ${form.begin(request.route_url('login'), name='login_form', onsubmit='return check_submit()')}
+  ${form.csrf_token()}
+  <center>
+    <table>
+      <tr><td><div class="formlabel">Service document URL</div></td></tr>
+      <tr><td><div class="formfield"><input type="text" name="service_document_url" value="${config['service_document_url']}" size="40"/></div></td></tr>
+      <tr><td><div class="formlabel">Username</div></td></tr>
+      <tr><td><div class="formfield"><input type="text" name="username" size="40"/></div></td></tr>
+      <tr><td><div class="formlabel">Password</div></td></tr>
+      <tr><td><div class="formfield"><input type="password" name="password" size="40"/></div></td></tr>
+      <tr><td align="right">${form.submit('form.submitted', 'Log in', class_='submit')}</td></tr>
+    </table>
+  </center>
+  ${form.end()}
+  <div align="right">
+    <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf200.png')}" width="200"/></a>
+  </div>
+</div>
+</tal:body>
+</metal:use>

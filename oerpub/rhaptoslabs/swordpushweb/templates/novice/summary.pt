@@ -1,0 +1,55 @@
+<metal:use use-macro="base">
+
+<tal:body metal:fill-slot="header">
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header">
+	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
+	<h1>Connexions Importer</h1>
+	<p class="status">You are logged in as ${request.session['username']}
+	  <br/><a href="${request.route_url('logout')}" target="_top">Click here to sign out</a></p>
+	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf150.png')}"/></a>
+      </div>
+    </div>
+  </div>
+</tal:body>
+
+<tal:body metal:fill-slot="content">
+  <div id="ie6-container-wrap">
+    <div id="container" style="padding-top: 50px;">
+      <div id="content">
+	<h1>Success</h1>
+
+	<p>Your document,
+	  <span class="highlight">${request.session['filename']}</span>,
+	  was imported successfully as a module called
+	  <span class="highlight">${module_title}</span>
+	  to the workspace called
+	  <span class="highlight">${request.session['deposit_workspace']}</span>
+	  on ${request.session['workspace_title']}.</p>
+	<p>
+          <span class="highlight">To publish</span> this module you will have to
+	</p>
+
+	<ol>
+	  <li tal:repeat="requirement requirements">
+            <div tal:omit-tag="" tal:condition="(requirement['type'] == 'licence') and (requirement['username'] == request.session['username'])">
+              <a href="${requirement['url']}" target="_blank">sign the Open Content license</a>
+	    </div>
+            <div tal:omit-tag="" tal:condition="(requirement['type'] == 'licence') and (requirement['username'] != request.session['username'])">
+              wait for ${requirement['name']} to sign the Open Content license
+	    </div>
+            <div tal:omit-tag="" tal:condition="requirement['type'] == 'role_request'">
+              wait for ${requirement['name']} to agree to being a<span tal:omit-tag="" tal:condition="requirement['role'][0].lower() in 'aeiou'">n</span> ${requirement['role'].lower()}<span tal:omit-tag="" tal:condition="requirement['email'] != ''"> (<a href="mailto:${requirement['email']}">send a reminder email</a>)</span>
+	    </div>
+          </li>
+	</ol>
+	<p><span class="highlight">To upload another document</span>,
+	  <a href="${request.route_url('choose')}">click here</a> to return to the beginning of the process.</p>
+
+      </div>
+    </div>
+  </div>
+</tal:body>
+
+</metal:use>

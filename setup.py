@@ -3,12 +3,20 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
+README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'pyramid_debugtoolbar']
+requires = [
+    'pyramid',
+    'pyramid_debugtoolbar',
+    'pyramid_simpleform',
+    'cryptacular',
+    'pyramid_beaker',
+    'pycrypto==2.3',
+    'Markdown',
+    ]
 
-setup(name='SwordPush',
+setup(name='oerpub.rhaptoslabs.swordpushweb',
       version='0.1.2',
       description='SwordPush',
       long_description=README + '\n\n' +  CHANGES,
@@ -30,7 +38,7 @@ setup(name='SwordPush',
       test_suite="swordpush",
       entry_points = """\
       [paste.app_factory]
-      main = swordpush:main
+      main = oerpub.rhaptoslabs.swordpushweb:main
       """,
       paster_plugins=['pyramid'],
       )

@@ -1,0 +1,34 @@
+<metal:main define-macro="main">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <head>
+    <title>
+      <metal:page_title define-slot="page_title">Connexions Document Importer</metal:page_title>
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <div tal:omit-tag="" tal:condition="econtext.get('codemirror', False)">
+      <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:codemirror/lib/codemirror.js')}"></script>
+      <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cnxml.js')}"></script>
+      <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:codemirror/lib/codemirror.css')}"/>
+      <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cnxml.css')}"/>
+      <style type="text/css">
+.CodeMirror {border: 1px solid black;}
+.CodeMirror-scroll {height: 100%; width: 100%; overflow-y: auto; }
+      </style>
+    </div>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.6.4.min.js')}"></script>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery.simplemodal.1.4.1.min.js')}"></script>
+    <script src="http://www.google.com/jsapi"></script>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
+    <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
+    <!--[if IE 6]>
+    <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
+    <![endif]-->
+  </head>
+  <body metal:define-slot="body">
+    <metal:content define-slot="header"/>
+    <metal:content define-slot="content"/>
+    <div class="expertmode"><a href="${request.route_url('switch_expert_mode')}" target="${econtext.get('expert_mode_switch_target', '_self')}"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gears_' + ['small','expert'][request.session.get('expert_mode',False)] + '.png')}" width="24" height="24"/></a></div>
+  </body>
+</html>
+</metal:main>

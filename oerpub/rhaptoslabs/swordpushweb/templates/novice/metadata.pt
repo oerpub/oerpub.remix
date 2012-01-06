@@ -1,0 +1,141 @@
+<metal:use use-macro="base">
+
+<tal:body metal:fill-slot="content">
+  <script>
+function check_submit() {
+  passed = true;
+  names = ["title"];
+  for(i in names) {
+    name = names[i];
+    x = document.forms["metadata_form"][name];
+    if((x.value == null) || (x.value == "")) {
+      x.style.background = '#ffce99';
+      passed = false;
+    } else {
+      x.style.background = '#ffffff';
+    }
+  }
+
+  if(passed) {
+    x = document.getElementById('form.submitted');
+    x.disabled = 'disabled';
+    x.value = 'Uploading...';
+  }
+
+  return passed;
+}
+  </script>
+  <!-- OLD ROLES CODE -->
+  <div id="roles-picker" style="display:none;">
+    <table cellspacing="0" id="roles-table">
+      <tr>
+        <th rowspan="2" width="200">ID</th>
+        <th colspan="3">Required Roles</th>
+        <th colspan="2">Optional Roles</th>
+        <th></th>
+      </tr>
+      <tr>
+        <th width="1">Author</th>
+        <th width="1">Maintainer</th>
+        <th width="1">Copyright</th>
+        <th width="1">Editor</th>
+        <th width="1">Translator</th>
+        <th width="1">Remove</th>
+      </tr>
+    </table>
+    <a href="#" id="add-role">Add Role</a><br/>
+    <form id="roles-picker-buttons" method="link" action="#">
+      <input type="submit" id="cancel-roles" value="Cancel roles" />
+      <input type="submit" id="submit-roles" value="Submit roles" />
+    </form>
+  </div>
+  <!-- /OLD ROLES CODE -->
+  ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
+  ${form.csrf_token()}
+  <!-- OLD ROLES CODE -->
+  <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
+    <tal:hidden>${form.hidden(field)}</tal:hidden>
+  </tal:field>
+  <!-- /OLD ROLES CODE -->
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header">
+	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
+	<h1>Connexions Importer</h1>
+	<p class="status">You are logged in as ${request.session['username']}
+	  <br/><a href="${request.route_url('logout')}" target="_top">Click here to sign out</a></p>
+	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf150.png')}"/></a>
+      </div>
+    </div>
+    <div id="header2-container">
+      <div id="header2">
+	Describe your module below. Form fields marked in red have to
+	be filled out. Once you are ready you can, if necessary,
+	change the workspace in which the module will be placed below
+	and click Upload.
+	<div style="text-align: right; margin-top: 5px;">
+	  <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+	  <span class="formfield">${form.submit('form.submitted', 'Upload', class_='submit')}</span>
+	</div>
+      </div>
+    </div>
+  </div>
+  <div id="ie6-container-wrap">
+    <div id="container" style="padding-top: 160px;">
+      <div id="content">
+	<table width="100%" border="0" cellspacing="0" cellpadding="2">
+	  <tr>
+	    <td width="50%" valign="top">
+	      <div class="formentry">
+		<div class="formlabel">Title <span class="formrequired">*</span></div>
+		<div class="forminfo">Enter the title of this module.</div>
+		<div class="formfield"><input type="text" name="title" size="40" value="${config['metadata']['title']}"/></div>
+	      </div>
+
+	      <div class="formentry">
+		<div class="formlabel">Subject</div>
+		<div class="forminfo">Select the subject categories that apply to this module.</div>
+	        <table>
+	          <tr tal:repeat="row python:range(3)">
+	            <td tal:repeat="column python:range(2)">
+	              <input type="checkbox" name="subject" tal:attributes="value subjects[row+column*3]; checked (subjects[row+column*3] in config['metadata']['subject'])"/>
+	              <span class="formlabel" tal:content="subjects[row+column*3]">Subject</span>
+	            </td>
+	          </tr>
+	        </table>
+	      </div>
+	      <div class="formentry">
+		<div class="formlabel">Summary</div>
+		<div class="forminfo">Enter a summary of the module.</div>
+		<div class="formfield"><textarea name="summary" rows="6" cols="40">${config['metadata']['summary']}</textarea></div>
+	      </div>
+	    </td>
+	    <td width="50%" valign="top">
+	      <div class="formentry">
+		<div class="formlabel">Language</div>
+		<div class="forminfo">Select the primary language for this module.</div>
+		<div class="formfield">${form.select("language", languages, selected_value=config['metadata']['language'])}</div>
+	      </div>
+	      <div class="formentry">
+		<div class="formlabel">Keywords (one per line)</div>
+		<div class="forminfo">Enter each keyword on its own
+		  line. Keywords are not displayed on the content, but
+		  are used behind the scenes to help people find it in
+		  searches.</div>
+		<div class="formfield"><textarea name="keywords" rows="4" cols="40">${config['metadata']['keywords']}</textarea></div>
+	      </div>
+	      <div class="formentry">
+		<div class="formlabel">Google Analytics Tracking Code</div>
+		<div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
+		<div class="formfield"><input type="text" name="google_code" size="40" value="${config['metadata']['google_code']}"/></div>
+	      </div>
+	    </td>
+	  </tr>
+	</table>
+      </div>
+    </div>
+  </div>
+  ${form.end()}
+</tal:body>
+
+</metal:use>

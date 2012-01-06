@@ -1,0 +1,308 @@
+
+body {
+    margin-top: 0;
+    padding: 0;
+    font-family: Verdana;
+    font-size: 12pt;
+}
+
+#header-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;	
+    z-index: 100;
+}
+
+#header-container {
+    height: 50px;
+    background: #f0f0ff;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #d0d0f0;
+    margin: 0;
+}
+
+#header {
+    width: 940px;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+
+#header h1 {
+    font-weight: bold;
+    font-size: 25px;
+    margin: 0;
+    position: absolute;
+    left: 30px;
+    top: 7px;
+}
+
+#header p.status {
+    font-size: 12px;
+    margin: 0;
+    position: absolute;
+    left: 450px;
+    top: 9px;
+}
+
+#header img.cnxlogo {
+    position: absolute;
+    margin: 0;
+    left: 0;
+    top: 10px;
+    width: 25px;
+}
+
+#header img.sflogo {
+    position: absolute;
+    margin: 0;
+    right: 0;
+    top: 5px;
+    width: 150px;
+}
+
+#header2-container {
+    background: white;
+    margin: 0;
+    padding: 5px;
+}
+
+#header2 {
+    width: 940px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0;
+    margin-top: 0;
+    position: relative;
+    padding: 5px;
+    border-style: solid;
+    border-width: 1px;
+    background: #ffffe0;
+    border-color: #f0f000;
+}
+
+#container {
+	width: 940px;
+	margin: 0 auto;
+	overflow: auto;
+	padding: 50px 0 10px;
+}
+
+#content {
+	float: left;
+	width: 940px;
+}
+
+div.pleasewait {
+    border-style: solid;
+    border-width: 1px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    background: #ffffe0;
+    border-color: #f0f000;
+}
+
+div.expertmode {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+}
+
+div.expertmode a img {
+  border-style: none;
+}
+
+/* HARMONIZE LINKS, KILL BORDER ON IMG LINKS */
+a {text-decoration: underline;}
+a:link, a:visited {color: #00f;}
+a:hover {color: #33f;}
+a:active {color: #fff;}
+a img, :link img, :visited img {border: none}
+
+.formlabel {
+    font-weight: bold;
+}
+
+.forminfo {
+    font-size: 90%;
+    color: #808080;
+}
+
+.formrequired {
+    color: #ff0000;
+}
+
+.formentry {
+    margin-bottom: 20px;
+}
+
+div.formfield input {
+    font-family: inherit;
+    font-size: inherit;
+    font-size: 90%;
+}
+
+div.formfield select {
+    font-family: inherit;
+    font-size: inherit;
+    font-size: 90%;
+}
+
+div.formfield textarea {
+    font-family: inherit;
+    font-size: inherit;
+    font-size: 90%;
+}
+
+.highlight {
+    color: #c04000;
+}
+
+div.loginblock {
+    font-size: 12px;
+    margin: 0;
+    position: absolute;
+    left: 410px;
+    top: 4px;
+}
+
+.loginlabel {
+}
+
+.loginfield {
+    font-size: 12px;
+    padding: 0;
+}
+
+div.headeraction {
+    font-size: 90%;
+    float: right;
+    color: #0000ff;
+    background: #f0f0ff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #0000ff;
+    margin-left: 10px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+div.headeraction a {
+    text-decoration: none;
+    color: #0000ff;
+}
+
+.splashbox {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  width: 400px;
+  padding: 10px;
+  background: #f0f0ff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d0d0f0;
+}
+
+.splashboxerror {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  margin-bottom: -40px;
+  width: 400px;
+  padding: 10px;
+  background: #fff0f0;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #f0d0d0;
+}
+
+.splashheading {
+  font-weight: bold;
+  font-size: 25px;
+  margin-bottom: 30px;
+}
+
+div.splashbox p {
+  margin-left: 7px;
+  margin-right: 7px;
+  text-align: justify;
+}
+
+/* OLD ROLES CODE */
+#simplemodal-overlay {
+    background-color:#000;
+}
+
+#simplemodal-container {
+    background-color:#ffffff;
+    border:8px solid #444;
+    padding:12px;
+}
+
+#simplemodal-container td.table-row-top {
+    border: none;
+    border-top: 2px solid black;
+    text-align: center;
+}
+
+#simplemodal-container td.table-row-mid {
+    border: none;
+    border-bottom: 1px solid black;
+    text-align: center;
+}
+
+#simplemodal-container td.table-row-bottom {
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+#simplemodal-container td.table-row-general {
+    border: none;
+}
+
+#simplemodal-container td {
+    border: none
+}
+/* /OLD ROLES CODE */
+
+#sword_treatment {
+    width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-style: solid;
+    border-width: 1px;
+    background: #ffffe0;
+    border-color: #f0f000;
+}
+
+#upload_error_message {
+    min-width: 900px;
+    margin: 0;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-style: solid;
+    border-width: 1px;
+    background: #ffffe0;
+    border-color: #f0f000;
+}

@@ -1,0 +1,18 @@
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+#header-wrap {
+    position: absolute;
+}
+
+#header-container {
+    margin-right: 17px;
+}
+
+#ie6-container-wrap {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
