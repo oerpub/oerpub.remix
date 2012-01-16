@@ -8,6 +8,6 @@ Quick Start
 
 Since this is still in development, and depends on lots of in-development packages, I recommend that you install it via the following buildout:
 
-https://github.com/jbeyers/oerpub.rhaptoslabs.swordpushweb-buildout
+https://github.com/oerpub/oerpub.rhaptoslabs.swordpushweb-buildout
 
 Instructions are in that readme.
