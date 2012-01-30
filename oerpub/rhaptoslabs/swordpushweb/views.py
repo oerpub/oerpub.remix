@@ -202,6 +202,11 @@ class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
 
+class ConversionError(Exception):
+	def __init__(self, str):
+		self.str = str
+	def __str__(self):
+		return self.str
 
 @view_config(route_name='choose')
 def choose_view(request):
@@ -453,10 +458,19 @@ def choose_view(request):
                     # Convert from other office format to odt if needed
                     odt_filename = original_filename
                     filename, extension = os.path.splitext(original_filename)
-                    if extension != '.odt':
-                        odt_filename = '%s.odt' % filename
-                        command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+		    if(extension != '.odt'):
+			odt_filename= '%s.odt' % filename
+                        command = '/usr/bin/soffice --headless --nologo --nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(\"' + escape_system(original_filename)[1:-1] + '\",\"' + odt_filename + '\")"'
                         os.system(command)
+                        try:
+                            fp = open(odt_filename, 'r')
+                            fp.close()
+                        except IOError as io:
+			    raise ConversionError(original_filename)
+
+
+
+				
 
                     # Convert and save all the resulting files.
                     tree, files, errors = transform(odt_filename)
@@ -477,7 +491,7 @@ def choose_view(request):
                     # Note that we cannot use zipfile as context manager, as that is only
                     # available from python 2.7
                     # TODO: Do a filesize check xxxx
-                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w') 
                     try:
                         zip_archive.writestr('index.cnxml', xml.encode('utf8'))
                         for filename, content in files.items():
@@ -490,9 +504,25 @@ def choose_view(request):
                 # onto the form again.
                 request.session['upload_dir'] = temp_dir_name
                 request.session['filename'] = form.data['upload'].filename
+	except ConversionError as e:
+            # Get timestamp
+	    if('title' in request.session):
+		print('SESSION contains '+str(request.session))
+		del request.session['title']
+
+            timestamp = datetime.datetime.now()
+            templatePath = 'templates/conv_error.pt'
+            response = { 'filename' : os.path.basename(e.__str__()) }
+            return render_to_response(templatePath, response, request=request)
+
         except Exception:
             # Record traceback
             import traceback
+	    if('title' in request.session):
+		print('SESSION contains '+str(request.session))
+		del request.session['title']
+		del request.session['filename']
+		del request.session['upload_dir']
             tb = traceback.format_exc()
             # Get software version from git
             try:
@@ -695,6 +725,7 @@ def metadata_view(request):
     """
     Handle metadata adding and uploads
     """
+    print('INSIDE METADATA_VIEW')
     check_login(request)
     templatePath = 'templates/%s/metadata.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
     session = request.session
@@ -739,6 +770,7 @@ def metadata_view(request):
     
     # Get remembered title from the session    
     if 'title' in session:
+	print('TITLE '+session['title']+' in session')
         defaults['title'] = session['title']
         config['metadata']['title'] = session['title']
 
@@ -776,6 +808,12 @@ def metadata_view(request):
         metadata = {}
 
         # Title
+
+	if(form.data['title']):
+		print('FORM_DATA')
+	else:
+		print('SESSION_FILENAME')
+
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
 
