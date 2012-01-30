@@ -655,7 +655,6 @@ def summary_view(request):
     dr = Deposit_Receipt(dom=dom)
     treatment = dr.treatment
 
-    import pdb;pdb.set_trace()
     import parse_sword_treatment
     response = parse_sword_treatment.markdown(treatment)
     if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"'):
