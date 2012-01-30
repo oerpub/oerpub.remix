@@ -1,11 +1,7 @@
 *~
 *.pyc
 oerpub.rhaptoslabs.swordpushweb.egg-info/
-bin/
-distribute-0.6.10.tar.gz
-include/
-lib/
-tags
 oerpub/rhaptoslabs/swordpushweb/transforms/*
 !oerpub/rhaptoslabs/swordpushweb/transforms/README
 oerpub/rhaptoslabs/data/
+

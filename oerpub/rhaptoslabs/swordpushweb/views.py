@@ -24,6 +24,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthoriz
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
+from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
 
@@ -201,6 +202,11 @@ class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
 
+class ConversionError(Exception):
+	def __init__(self, str):
+		self.str = str
+	def __str__(self):
+		return self.str
 
 @view_config(route_name='choose')
 def choose_view(request):
@@ -350,7 +356,7 @@ def choose_view(request):
                 request.session['upload_dir'] = temp_dir_name
                 request.session['filename'] = "HTML Document"
 
-            # Office or ZIP file
+            # Office, CNXML-ZIP or LaTeX-ZIP file
             else:
                 # Save the original file so that we can convert, plus keep it.
                 original_filename = os.path.join(
@@ -362,12 +368,23 @@ def choose_view(request):
                 saved_file.close()
                 input_file.close()
 
-                # Check if it is a ZIP file with at least index.cnxml in it
+                # Check if it is a ZIP file with at least index.cnxml or a LaTeX file in it
                 try:
                     zip_archive = zipfile.ZipFile(original_filename, 'r')
                     is_zip_archive = ('index.cnxml' in zip_archive.namelist())
+                    
+                    # Do we have a latex file?
+                    if not is_zip_archive:
+                        # incoming latex.zip must contain a latex.tex file, where "latex" is the base name.
+                        (latex_head, latex_tail) = os.path.split(original_filename)
+                        (latex_root, latex_ext)  = os.path.splitext(latex_tail)
+                        latex_basename = latex_root
+                        latex_filename = latex_basename + '.tex'
+                        is_latex_archive = (latex_filename in zip_archive.namelist())
+
                 except zipfile.BadZipfile:
                     is_zip_archive = False
+                    is_latex_archive = False
 
                 # ZIP package from previous conversion
                 if is_zip_archive:
@@ -385,16 +402,75 @@ def choose_view(request):
                     html = cnxml_to_htmlpreview(xml)
                     with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
                         index.write(html)
+                
+                # LaTeX
+                elif is_latex_archive:
+                    f = open(original_filename)
+                    latex_archive = f.read()
+
+                    # LaTeX 2 CNXML transformation
+                    cnxml, objects = latex_to_cnxml(latex_archive, original_filename)
+
+                    # write CNXML output
+                    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+                    cnxml_file = open(cnxml_filename, 'w')
+                    try:
+                        cnxml_file.write(cnxml)
+                        cnxml_file.flush()
+                    finally:
+                        cnxml_file.close()
+
+                    # write images
+                    for image_filename, image in objects.iteritems():
+                        image_filename = os.path.join(save_dir, image_filename)
+                        image_file = open(image_filename, 'wb') # write binary, important!
+                        try:
+                            image_file.write(image)
+                            image_file.flush()
+                        finally:
+                            image_file.close()
+
+                    htmlpreview = cnxml_to_htmlpreview(cnxml)
+                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                        index.write(htmlpreview)
+
+                    # Zip up all the files. This is done now, since we have all the files
+                    # available, and it also allows us to post a simple download link.
+                    # Note that we cannot use zipfile as context manager, as that is only
+                    # available from python 2.7
+                    # TODO: Do a filesize check xxxx
+                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                    try:
+                        zip_archive.writestr('index.cnxml', cnxml)
+                        for image_filename, image in objects.iteritems():
+                            zip_archive.writestr(image_filename, image)
+                    finally:
+                        zip_archive.close()
+
+                    # Keep the info we need for next uploads.  Note that this might kill
+                    # the ability to do multiple tabs in parallel, unless it gets offloaded
+                    # onto the form again.
+                    request.session['upload_dir'] = temp_dir_name
+                    request.session['filename'] = form.data['upload'].filename
 
                 # OOo / MS Word Conversion
                 else:
                     # Convert from other office format to odt if needed
                     odt_filename = original_filename
                     filename, extension = os.path.splitext(original_filename)
-                    if extension != '.odt':
-                        odt_filename = '%s.odt' % filename
-                        command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+		    if(extension != '.odt'):
+			odt_filename= '%s.odt' % filename
+                        command = '/usr/bin/soffice --headless --nologo --nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(\"' + escape_system(original_filename)[1:-1] + '\",\"' + odt_filename + '\")"'
                         os.system(command)
+                        try:
+                            fp = open(odt_filename, 'r')
+                            fp.close()
+                        except IOError as io:
+			    raise ConversionError(original_filename)
+
+
+
+				
 
                     # Convert and save all the resulting files.
                     tree, files, errors = transform(odt_filename)
@@ -415,7 +491,7 @@ def choose_view(request):
                     # Note that we cannot use zipfile as context manager, as that is only
                     # available from python 2.7
                     # TODO: Do a filesize check xxxx
-                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w') 
                     try:
                         zip_archive.writestr('index.cnxml', xml.encode('utf8'))
                         for filename, content in files.items():
@@ -428,9 +504,25 @@ def choose_view(request):
                 # onto the form again.
                 request.session['upload_dir'] = temp_dir_name
                 request.session['filename'] = form.data['upload'].filename
+	except ConversionError as e:
+            # Get timestamp
+	    if('title' in request.session):
+		print('SESSION contains '+str(request.session))
+		del request.session['title']
+
+            timestamp = datetime.datetime.now()
+            templatePath = 'templates/conv_error.pt'
+            response = { 'filename' : os.path.basename(e.__str__()) }
+            return render_to_response(templatePath, response, request=request)
+
         except Exception:
             # Record traceback
             import traceback
+	    if('title' in request.session):
+		print('SESSION contains '+str(request.session))
+		del request.session['title']
+		del request.session['filename']
+		del request.session['upload_dir']
             tb = traceback.format_exc()
             # Get software version from git
             try:
@@ -595,9 +687,9 @@ def summary_view(request):
 
     import parse_sword_treatment
     response = parse_sword_treatment.markdown(treatment)
-    if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Publication requirements:') != -1):
+    if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"'):
         response.update(parse_sword_treatment.cnx_1_0(treatment))
-    elif (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Before publishing:') != -1):
+    elif (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.1"'):
         response.update(parse_sword_treatment.test_server_1_0(treatment))
     else:
         print 'WARNING: No valid version number found in SWORD deposit receipt. Defaulting to showing the SWORD treatment as is.'
@@ -633,6 +725,7 @@ def metadata_view(request):
     """
     Handle metadata adding and uploads
     """
+    print('INSIDE METADATA_VIEW')
     check_login(request)
     templatePath = 'templates/%s/metadata.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
     session = request.session
@@ -677,6 +770,7 @@ def metadata_view(request):
     
     # Get remembered title from the session    
     if 'title' in session:
+	print('TITLE '+session['title']+' in session')
         defaults['title'] = session['title']
         config['metadata']['title'] = session['title']
 
@@ -714,6 +808,12 @@ def metadata_view(request):
         metadata = {}
 
         # Title
+
+	if(form.data['title']):
+		print('FORM_DATA')
+	else:
+		print('SESSION_FILENAME')
+
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
 
