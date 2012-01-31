@@ -694,9 +694,9 @@ def summary_view(request):
 
     import parse_sword_treatment
     response = parse_sword_treatment.markdown(treatment)
-    if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Publication requirements:') != -1):
+    if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"'):
         response.update(parse_sword_treatment.cnx_1_0(treatment))
-    elif (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"') and (treatment.find('Before publishing:') != -1):
+    elif (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.1"'):
         response.update(parse_sword_treatment.test_server_1_0(treatment))
     else:
         print 'WARNING: No valid version number found in SWORD deposit receipt. Defaulting to showing the SWORD treatment as is.'
