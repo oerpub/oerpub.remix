@@ -511,10 +511,10 @@ def choose_view(request):
             timestamp = datetime.datetime.now()
             templatePath = 'templates/conv_error.pt'
             response = { 'filename' : os.path.basename(e.__str__()) }
-	    tmp_obj = render_to_response(templatePath, response, request=request)
+#	    tmp_obj = render_to_response(templatePath, response, request=request)
 #	    if('title' in request.session):
 #		del request.session['title']
-            return tmp_obj
+            return render_to_response(templatePath, response, request=request)
 
         except Exception:
             # Record traceback
@@ -555,10 +555,12 @@ FORM DATA
             response = {
                 'traceback': tb,
             }
-            tmp_obj = render_to_response(templatePath, response, request=request)
+	    return render_to_response(templatePath, response, request=request)
+
+#            tmp_obj = render_to_response(templatePath, response, request=request)
 #	    if('title' in request.session):
 #		del request.session['title']
-            return tmp_obj
+#            return tmp_obj
 
         request.session.flash('The file was successfully converted.')
         return HTTPFound(location=request.route_url('preview_frames'))
