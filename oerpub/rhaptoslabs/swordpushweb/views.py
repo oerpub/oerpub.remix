@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import datetime
 import zipfile
@@ -506,23 +507,18 @@ def choose_view(request):
                 request.session['filename'] = form.data['upload'].filename
 	except ConversionError as e:
             # Get timestamp
-	    if('title' in request.session):
-		print('SESSION contains '+str(request.session))
-		del request.session['title']
 
             timestamp = datetime.datetime.now()
             templatePath = 'templates/conv_error.pt'
             response = { 'filename' : os.path.basename(e.__str__()) }
+#	    tmp_obj = render_to_response(templatePath, response, request=request)
+	    if('title' in request.session):
+		del request.session['title']
             return render_to_response(templatePath, response, request=request)
 
         except Exception:
             # Record traceback
             import traceback
-	    if('title' in request.session):
-		print('SESSION contains '+str(request.session))
-		del request.session['title']
-		del request.session['filename']
-		del request.session['upload_dir']
             tb = traceback.format_exc()
             # Get software version from git
             try:
@@ -559,7 +555,12 @@ FORM DATA
             response = {
                 'traceback': tb,
             }
-            return render_to_response(templatePath, response, request=request)
+	    return render_to_response(templatePath, response, request=request)
+
+#            tmp_obj = render_to_response(templatePath, response, request=request)
+	    if('title' in request.session):
+		del request.session['title']
+#            return tmp_obj
 
         request.session.flash('The file was successfully converted.')
         return HTTPFound(location=request.route_url('preview_frames'))
@@ -616,11 +617,10 @@ class CnxmlSchema(formencode.Schema):
 @view_config(route_name='cnxml', renderer='templates/expert/cnxml_editor.pt')
 def cnxml_view(request):
     check_login(request)
-
     form = Form(request, schema=CnxmlSchema)
-
     save_dir = os.path.join(request.registry.settings['transform_dir'], request.session['upload_dir'])
     cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+
 
     # Check for successful form completion
     if 'cnxml' in request.POST and form.validate():
@@ -655,7 +655,8 @@ def cnxml_view(request):
                 fp.close()
         finally:
             zip_archive.close()
-
+        if debug:
+            print "here"
         # Return to preview
         return HTTPFound(location=request.route_url('preview_frames'), request=request)
 
@@ -665,6 +666,8 @@ def cnxml_view(request):
 
     # Clean CNXML
     cnxml = clean_cnxml(cnxml)
+    cnxml = cnxml.decode('utf-8')
+    cnxml = unicode(cnxml)
 
     return {
         'codemirror': True,
