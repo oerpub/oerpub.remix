@@ -617,10 +617,7 @@ class CnxmlSchema(formencode.Schema):
 @view_config(route_name='cnxml', renderer='templates/expert/cnxml_editor.pt')
 def cnxml_view(request):
     check_login(request)
-    debug = True;
-
     form = Form(request, schema=CnxmlSchema)
-    #import pdb; pdb.set_trace()
     save_dir = os.path.join(request.registry.settings['transform_dir'], request.session['upload_dir'])
     cnxml_filename = os.path.join(save_dir, 'index.cnxml')
 
@@ -669,8 +666,8 @@ def cnxml_view(request):
 
     # Clean CNXML
     cnxml = clean_cnxml(cnxml)
-    cnxml=cnxml.decode('utf-8')
-    cnxml=unicode(cnxml)
+    cnxml = cnxml.decode('utf-8')
+    cnxml = unicode(cnxml)
 
     return {
         'codemirror': True,
