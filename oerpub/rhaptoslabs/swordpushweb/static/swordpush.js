@@ -110,6 +110,9 @@ function clear_role_checkboxes(e) {
     }
 };
 
+// HTML 5 polyfill for input forms (old and ie browsers)
+$.webshims.polyfill('forms');
+
 $(document).ready(function()
 {
 
@@ -129,7 +132,7 @@ $(document).ready(function()
     });
 
     // A friendly message confirming that the upload is happening.
-    $('#file-submit').click(function(e) {
+    $('#uploadform').submit(function(e) {
         $('#upload-wait').slideDown('slow');
     });
 
@@ -140,7 +143,7 @@ $(document).ready(function()
     //    $('#file-submit').click();
     //  }
     //});
-
+    
     // Show the edit roles form.
     $('#edit-roles').click(function(e) {
         // Populate the fields from the data.
@@ -196,10 +199,9 @@ picker.setVisible(true);
 // A simple callback implementation for Picker.
 function pickerCallback(data) {
 if(data.action == google.picker.Action.PICKED){
-    document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
-    document.getElementById('gdocs_access_token').value = data.docs[0].accessToken;
-    $('#file-submit').removeAttr('disabled');
-    $('#file-submit').click();
+    $('#gdocs_resource_id').val(google.picker.ResourceId.generate(data.docs[0]));
+    $('#gdocs_access_token').val(data.docs[0].accessToken);
+    $('#uploadform').submit();
 }
 }
 

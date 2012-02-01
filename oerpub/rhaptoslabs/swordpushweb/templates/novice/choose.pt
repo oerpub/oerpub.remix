@@ -27,10 +27,10 @@
         <center>
           <br/>
               <label for="upload">File:</label>
-              <input id="upload" name="upload" type="file" onchange="document.getElementById('file-submit').disabled=false;"/>
+              <input id="upload" name="upload" type="file" onchange="$('#file-submit').removeAttr('disabled');"/>
               <br/>
               <br/>
-              ${form.submit('form.submitted', 'Preview', class_='submit', id='file-submit', disabled='disabled')}
+              <input id="file-submit" type="button" value="Preview" disabled="disabled" onclick="$('#uploadform').submit()"/>
               <br/>
               <br/>
         </center>
@@ -47,7 +47,7 @@
         <center>
               <br/>
               <label>URL:</label>
-              <input id="url_text" name="url_text" type="url" size="80" placeholder="http://www.example.com" onkeydown="if(event.keyCode == 13){$('#file-submit').removeAttr('disabled');$('#file-submit').click();}">
+              <input id="url_text" name="url_text" type="url" size="80" placeholder="http://www.example.com"/>
               <br/>
               <br/>
           <div class="pleasewait" id="upload-wait" style="display:none;">
