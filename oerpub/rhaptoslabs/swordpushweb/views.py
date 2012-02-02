@@ -509,9 +509,9 @@ def choose_view(request):
             response = { 'filename' : os.path.basename(e.__str__()) }
             # tmp_obj = render_to_response(templatePath, response, request=request)
         
-        # if('title' in request.session):
-        # del request.session['title']
-        #     return render_to_response(templatePath, response, request=request)
+            if('title' in request.session):
+                del request.session['title']
+            return render_to_response(templatePath, response, request=request)
 
         except Exception:
             # Record traceback
@@ -552,11 +552,11 @@ FORM DATA
             response = {
                 'traceback': tb,
             }
-	    return render_to_response(templatePath, response, request=request)
+            if('title' in request.session):
+                del request.session['title']
+            return render_to_response(templatePath, response, request=request)
 
 #            tmp_obj = render_to_response(templatePath, response, request=request)
-	    if('title' in request.session):
-		del request.session['title']
 #            return tmp_obj
 
         request.session.flash('The file was successfully converted.')
