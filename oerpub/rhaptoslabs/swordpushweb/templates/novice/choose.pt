@@ -1,6 +1,7 @@
 <metal:use use-macro="base">
 
-<tal:body metal:fill-slot="content">
+<tal:body metal:fill-slot="content"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
   <div id="ie6-container-wrap">
     <div id="container">
       <div id="content">
@@ -39,14 +40,14 @@
                   <label>
                     <span style="visibility: hidden;" class="or-bullet">or</span> 
                     <span class="label-text">
-                      <img src="helper_files/word-icon.gif"> <strong>Microsoft Word</strong> or 
-                      <img src="helper_files/oo-icon.gif"> <strong>Open Office</strong>
+                        <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> or 
+                        <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
                     </span>
                   </label>
                   <div class="upload-form">
                     <p class="advanced">
                       <span class="advanced-marker" title="Advanced mode feature">
-                        <img src="helper_files/gear_orange_3.png"/>
+                          <img src="${images_url}/gear_orange_3.png"/>
                       </span> 
                       You can also upload a previously saved ZIP package with this option.
                     </p>
@@ -57,7 +58,7 @@
                   <label>
                     <span style="visibility: visible;" class="or-bullet">or</span> 
                     <span class="label-text">
-                      <img src="helper_files/google-docs-22.png">
+                        <img src="${images_url}/google-docs-22.png">
                    </span>
                   </label>
                   <div class="upload-form">
@@ -70,7 +71,7 @@
                   <label>
                     <span style="visibility: visible;" class="or-bullet">or</span> 
                     <span class="label-text">
-                      <span class="advanced" title="Advanced mode feature"><img src="helper_files/gear_orange_3.png"/></span>
+                        <span class="advanced" title="Advanced mode feature"><img src="${images_url}/gear_orange_3.png"/></span>
                       <strong>URL</strong> <span style="font-weight: normal;">(for converting an Internet page)</span>
                     </span>
                   </label>
@@ -93,7 +94,7 @@
         </div>
 
         <div id="footer">
-          <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="helper_files/sf150.png" width="150"/></a>
+            <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${images_url}/sf150.png" width="150"/></a>
         </div>
 
       </div>
