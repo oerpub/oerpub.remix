@@ -68,8 +68,41 @@
     </head>
 
     <body metal:define-slot="body">
-        <metal:content define-slot="header"/>
-        <metal:content define-slot="content"/>
+        <metal:header-container define-slot="header">
+        <div id="header-wrap">
+
+            <div id="header-container">
+
+                <div id="header-functions">
+                    <div id="expertmode">
+                        <span id="basic-message" style="display: none;">
+                            <span class="link-like">Switch to advanced mode</span>
+                        </span>
+                        <span id="advanced-message" style="display: none;">
+                            You are in advanced mode. 
+                            <span class="link-like">Return to basic mode.</span>
+                        </span>
+                        <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gear_orange_3.png')}" width="16" height="16"/>
+                    </div>
+                    <div id="status" tal:define="username request.session.username|nothing"
+                        tal:condition="username">
+                        <span id="user-id">You are logged in as: <strong tal:content="username">user name</strong></span>.
+                        <a href="logout">Sign out.</a>
+                    </div>
+                </div>
+
+                <div id="header">
+                    <img class="cnxlogo" src="http://oerpub.org/static/images/connexions_icon.png"/>
+                    <h1><a href="#">Connexions Importer</a></h1>
+                </div>
+
+            </div>
+        </div>
+        </metal:header-container>
+
+        <metal:content define-slot="content">
+            Main content goes here
+        </metal:content>
     </body>
 </html>
 </metal:main>
