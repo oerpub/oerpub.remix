@@ -1,5 +1,5 @@
 <metal:use use-macro="base">
-<tal:body metal:fill-slot="content">
+<tal:body metal:fill-slot="content-slot">
 
 <div id="ie6-container-wrap">
     <div id="container">
@@ -74,13 +74,7 @@
 
                 </div>
             </div>
-
-            <div id="footer">
-                <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf150.png')}" width="150"/></a>
-            </div>
-
         </div>
-
     </div>
 </div>
 

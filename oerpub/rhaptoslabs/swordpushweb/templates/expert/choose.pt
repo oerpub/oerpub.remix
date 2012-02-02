@@ -1,6 +1,6 @@
 <metal:use use-macro="base">
 
-<tal:body metal:fill-slot="content">
+<tal:body metal:fill-slot="content-slot">
     Export body content
 </tal:body>
 

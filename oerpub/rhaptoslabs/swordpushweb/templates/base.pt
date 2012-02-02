@@ -1,4 +1,5 @@
-<metal:main define-macro="main">
+<metal:main define-macro="main"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
     <head>
@@ -12,7 +13,7 @@
 
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.6.4.min.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery.simplemodal.1.4.1.min.js')}"></script>
-        <script src="http://www.google.com/jsapi"></script>
+        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/googlejsapi.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush-max-01.js')}"></script>
 
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main-max-01.css')}" type="text/css" media="screen" charset="utf-8" />
@@ -68,7 +69,7 @@
     </head>
 
     <body metal:define-slot="body">
-        <metal:header-container define-slot="header">
+        <metal:header-slot define-slot="header-slot">
         <div id="header-wrap">
 
             <div id="header-container">
@@ -87,7 +88,7 @@
                     <div id="status" tal:define="username request.session.username|nothing"
                         tal:condition="username">
                         <span id="user-id">You are logged in as: <strong tal:content="username">user name</strong></span>.
-                        <a href="logout">Sign out.</a>
+                        <a href="logout" target="_top">Sign out.</a>
                     </div>
                 </div>
 
@@ -98,11 +99,18 @@
 
             </div>
         </div>
-        </metal:header-container>
+        </metal:header-slot>
 
-        <metal:content define-slot="content">
-            Main content goes here
+        <metal:content define-slot="content-slot">
+        Main content goes here
         </metal:content>
+        
+        <metal:footer-slot define-slot="footer-slot">
+        <div id="footer">
+            <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${images_url}/sf150.png" width="150"/></a>
+        </div>
+        </metal:footer-slot>
+
     </body>
 </html>
 </metal:main>

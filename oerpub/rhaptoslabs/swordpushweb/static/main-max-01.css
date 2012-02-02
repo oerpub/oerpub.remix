@@ -458,7 +458,7 @@ iframe{
 
 #nav-column li.selected a{
   color: black;
-  background-image: url(nav-arrow-07.png);
+  background-image: url(images/nav-arrow-07.png);
   background-repeat: no-repeat;
   background-position: right .7em;
 }
