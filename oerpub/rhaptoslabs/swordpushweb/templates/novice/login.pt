@@ -46,6 +46,8 @@
                             <span class="errortext">Invalid username or password. Please try again.</span>
                         </div>
 
+                        ${form.begin(request.route_url('login'), name='login_form', onsubmit='return check_submit()')}
+                        ${form.csrf_token()}
                         <div class="advanced" style="display: none;">
                             <div class="formlabel">
                                 <span class="advanced-marker"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gear_orange_3.png')}"/></span>
@@ -53,7 +55,10 @@
                             </div>
                             <div class="forminfo">Enter service document URL</div>
                             <div class="formfield">
-                                <input type="text" name="url" style="width: 25em;" value="http://cnx.org/sword/servicedocument"/>
+                                <input type="text" name="service_document_url"
+                                value="${config.service_document_url}"
+                                style="width: 25em;"
+                                value="http://cnx.org/sword/servicedocument"/>
                             </div>
                         </div>
                         <table>
@@ -71,6 +76,8 @@
                                 </td>
                             </tr>
                         </table>
+                        ${form.end()}
+                        
                         <p>
                             If you do not yet have an account, go to
                             <a class="external" href="http://cnx.org/join_form">the Connexions site</a>
