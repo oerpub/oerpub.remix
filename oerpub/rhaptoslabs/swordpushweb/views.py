@@ -219,7 +219,7 @@ def choose_view(request):
     field_list = [('upload', 'File')]
 
     # Check for successful form completion
-    if 'form.submitted' in request.POST and form.validate():
+    if form.validate():
         try: # Catch-all exception block
             # Create a directory to do the conversions
             now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
