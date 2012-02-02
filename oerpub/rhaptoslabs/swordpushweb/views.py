@@ -204,10 +204,10 @@ class UploadSchema(formencode.Schema):
     upload = formencode.validators.FieldStorageUploadConverter()
 
 class ConversionError(Exception):
-	def __init__(self, str):
-		self.str = str
-	def __str__(self):
-		return self.str
+    def __init__(self, str):
+        self.str = str
+    def __str__(self):
+        return self.str
 
 @view_config(route_name='choose')
 def choose_view(request):
@@ -459,20 +459,16 @@ def choose_view(request):
                     # Convert from other office format to odt if needed
                     odt_filename = original_filename
                     filename, extension = os.path.splitext(original_filename)
-		    if(extension != '.odt'):
-			odt_filename= '%s.odt' % filename
-                        command = '/usr/bin/soffice --headless --nologo --nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(\"' + escape_system(original_filename)[1:-1] + '\",\"' + odt_filename + '\")"'
+                    if(extension != '.odt'):
+                        odt_filename= '%s.odt' % filename
+                        command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+                        print command
                         os.system(command)
                         try:
                             fp = open(odt_filename, 'r')
                             fp.close()
                         except IOError as io:
-			    raise ConversionError(original_filename)
-
-
-
-				
-
+                            raise ConversionError(original_filename)
                     # Convert and save all the resulting files.
                     tree, files, errors = transform(odt_filename)
                     xml = etree.tostring(tree)
@@ -505,16 +501,17 @@ def choose_view(request):
                 # onto the form again.
                 request.session['upload_dir'] = temp_dir_name
                 request.session['filename'] = form.data['upload'].filename
-	except ConversionError as e:
+        except ConversionError as e:
             # Get timestamp
 
             timestamp = datetime.datetime.now()
             templatePath = 'templates/conv_error.pt'
             response = { 'filename' : os.path.basename(e.__str__()) }
-#	    tmp_obj = render_to_response(templatePath, response, request=request)
-	    if('title' in request.session):
-		del request.session['title']
-            return render_to_response(templatePath, response, request=request)
+            # tmp_obj = render_to_response(templatePath, response, request=request)
+        
+        # if('title' in request.session):
+        # del request.session['title']
+        #     return render_to_response(templatePath, response, request=request)
 
         except Exception:
             # Record traceback
