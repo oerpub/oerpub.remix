@@ -655,8 +655,6 @@ def cnxml_view(request):
                 fp.close()
         finally:
             zip_archive.close()
-        if debug:
-            print "here"
         # Return to preview
         return HTTPFound(location=request.route_url('preview_frames'), request=request)
 
