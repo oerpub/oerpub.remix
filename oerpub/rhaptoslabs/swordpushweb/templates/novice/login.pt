@@ -1,55 +1,116 @@
 <metal:use use-macro="base">
 <tal:body metal:fill-slot="content">
 
-<script>
-function check_submit() {
-  passed = true;
-  names = ["username", "password"];
-  for(i in names) {
-    name = names[i];
-    x = document.forms["login_form"][name];
-    if((x.value == null) || (x.value == "")) {
-      x.style.background = '#ffce99';
-      passed = false;
-    } else {
-      x.style.background = '#ffffff';
-    }
-  }
-  return passed;
-}
-</script>
-<div tal:condition="econtext.has_key('login_error')" class="splashboxerror">${econtext.get('login_error', '')}</div>
-<div class="splashbox">
-  <div class="splashheading">
-    <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}" width="51" height="59" align="left"/>
-    Connexions Document Importer
-  </div>
-  <p>You need to sign in to Connexions to use this tool.</p>
-  ${form.begin(request.route_url('login'), name='login_form', onsubmit='return check_submit()')}
-  ${form.csrf_token()}
-  <input type="hidden" name="service_document_url" value="${config['service_document_url']}"/>
-  <center>
-    <table>
-      <tr>
-        <td><div class="formlabel"><label for="username">Username&nbsp;&nbsp;</label></div></td>
-        <td><div class="formfield"><input type="text" name="username"/></div></td>
-      </tr>
-      <tr>
-        <td><div class="formlabel"><label for="password">Password&nbsp;&nbsp;</label></div></td>
-        <td><div class="formfield"><input type="password" name="password"/></div></td>
-      </tr>
-      <tr>
-        <td colspan="2" align="right">${form.submit('form.submitted', 'Log in', class_='submit')}</td>
-      </tr>
-    </table>
-  </center>
-  ${form.end()}
-  <p>If you do not yet have an account, go to
-    <a href="http://cnx.org/join_form">the Connexions site</a>
-    to create one.</p>
-  <div align="right">
-    <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf200.png')}" width="200"/></a>
-  </div>
+<div id="header-wrap">
+
+    <div id="header-container">
+
+        <div id="header-functions">
+            <div id="expertmode">
+                <span id="basic-message" style="display: none;">
+                    <span class="link-like">Switch to advanced mode</span>
+                </span>
+                <span id="advanced-message" style="display: none;">
+                    You are in advanced mode. 
+                    <span class="link-like">Return to basic mode.</span>
+                </span>
+                <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gear_orange_3.png')}" width="16" height="16"/>
+            </div>
+            <!--
+            <div id="status">
+                <span id="user-id">You are logged in as: <strong>starkenbury</strong></span>.
+                <a href="#" target="_top">Sign out.</a>
+            </div>
+            -->
+        </div>
+
+        <div id="header">
+            <img class="cnxlogo" src="http://oerpub.org/static/images/connexions_icon.png"/>
+            <h1><a href="#">Connexions Importer</a></h1>
+        </div>
+
+    </div>
 </div>
+
+<div id="ie6-container-wrap">
+    <div id="container">
+        <div id="content">
+
+            <div id="left-column-wrap">
+                <div id="left-column">
+
+                    <div class="splashbox">
+                        <p>Please sign in using your <strong>Connexions username and password</strong>.</p>
+
+                        <div class="error" style="display: none;">
+                            <span class="errortext">Invalid username or password. Please try again.</span>
+                        </div>
+
+                        <div class="advanced" style="display: none;">
+                            <div class="formlabel">
+                                <span class="advanced-marker"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gear_orange_3.png')}"/></span>
+                                <label for="url">Change repository</label>
+                            </div>
+                            <div class="forminfo">Enter service document URL</div>
+                            <div class="formfield">
+                                <input type="text" name="url" style="width: 25em;" value="http://cnx.org/sword/servicedocument"/>
+                            </div>
+                        </div>
+                        <table>
+                            <tr>
+                                <td><div class="formlabel"><label for="username">Username</label></div></td>
+                                <td><div class="formfield"><input type="text" name="username"/></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="formlabel"><label for="password">Password</label></div></td>
+                                <td><div class="formfield"><input type="password" name="password"/></div></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="right" id="log-in">
+                                    <input class="button" id="form.submitted" name="form.submitted" type="submit" value="Log in" />
+                                </td>
+                            </tr>
+                        </table>
+                        <p>
+                            If you do not yet have an account, go to
+                            <a class="external" href="http://cnx.org/join_form">the Connexions site</a>
+                            to create one.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="right-column-wrap">
+                <div id="right-column">
+
+                    <h1>
+                        About the Connexions Importer
+                    </h1>
+
+                    <p>
+                        The Connexions Importer allows you to quickly create content in the 
+                        <a class="external" href="http://cnx.org/">Connexions</a> repository by sharing existing educational documents you have created.
+                    </p>
+                    <ul>
+                        <li>
+                            If you do not yet have an account, go to the <a class="external" href="http://cnx.org/join_form">Connexions site</a> to create one. 
+                        </li>
+                        <li>
+                            Then, come back here, login, and upload new content from a Word, Open Office, or Google Doc.
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+
+            <div id="footer">
+                <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf150.png')}" width="150"/></a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
 </tal:body>
 </metal:use>
