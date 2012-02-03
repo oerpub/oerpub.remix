@@ -395,7 +395,6 @@ function pickerCallback(data) {
     if(data.action == google.picker.Action.PICKED){
         document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
         document.getElementById('gdocs_access_token').value = data.docs[0].accessToken;
-        $('#file-submit').removeAttr('disabled');
-        $('#file-submit').click();
+        $('form#uploadform').submit(); 
     }
 }
