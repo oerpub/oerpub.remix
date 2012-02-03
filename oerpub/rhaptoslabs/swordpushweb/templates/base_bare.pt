@@ -12,8 +12,8 @@
     <![endif]-->
   </head>
   <body metal:define-slot="body">
-    <metal:content define-slot="header"/>
-    <metal:content define-slot="content"/>
+    <metal:content define-slot="header-slot"/>
+    <metal:content define-slot="content-slot"/>
   </body>
 </html>
 </metal:main>

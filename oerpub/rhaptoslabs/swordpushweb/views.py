@@ -590,7 +590,8 @@ def preview_frames_view(request):
 @view_config(route_name='preview_header')
 def preview_header_view(request):
     check_login(request)
-    templatePath = 'templates/%s/preview_header.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/%s/preview_header.pt'%(
+        ['novice','expert'][request.session.get('expert_mode', False)])
     return render_to_response(templatePath, {}, request=request)
 
 
@@ -601,9 +602,14 @@ def preview_side_view(request):
 
 @view_config(route_name='preview_body')
 def preview_body_view(request):
-    return HTTPFound('%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
-                     headers={'Cache-Control': 'max-age=0, must-revalidate', 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
-                     request=request)
+    return HTTPFound(
+        '%s%s/index.xhtml'% (
+            request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+            request.session['upload_dir']),
+        headers={'Cache-Control': 'max-age=0, must-revalidate',
+                 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
+        request=request
+    )
 
 
 class CnxmlSchema(formencode.Schema):

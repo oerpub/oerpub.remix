@@ -1,24 +1,82 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal">
-  <head>
-    <title>
-      <metal:page_title define-slot="page_title">Connexions Document Importer</metal:page_title>
-    </title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<metal:use use-macro="base">
+
+    <metal:script-slot fill-slot="script-slot">
     <script type="text/javascript">
         function ForcePreviewReload () {
             document.getElementById('preview_frame').contentDocument.location.reload(true);
         }
     </script>
-  </head>
-  <frameset rows="90,*" onload="ForcePreviewReload()">
-    <frame src="${header_url}" frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="no"/>
-    <frameset cols="50%,940,50%">
-      <frame frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="no"/>
-      <frame src="${body_url}" id="preview_frame" frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto"/>
-      <frame src="${request.route_url('preview_side')}" frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="no"/>
-    </frameset>
-  </frameset>
-</html>
+    </metal:script-slot>
+
+    <metal:header-slot fill-slot="header-slot">
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input type="button" class="button" value="&#171; Back: Choose document" id="back-to-chooser"
+                title="Return to the previous screen to choose a different document to convert"/>
+            </div>
+            <div id="forward-steps">
+                <input type="button" class="button forward-button" value="Next: Describe your module &#187;" 
+                title="Add/edit title and other information about the module"/>
+            </div>
+        </div>
+    </div>
+    </metal:header-slot>
+
+    <metal:content-slot fill-slot="content-slot">
+    <div id="ie6-container-wrap">
+        <div id="container">
+            <div id="content">
+                <div id="pageheader-wrap">
+
+                    <div id="module-actions">
+                        <span class="advanced">
+                            <h3>Module actions:</h3>
+                            <a class="button" title="Make changes to the module by editing its XML code." id="edit-xml">
+                                <span class="advanced-marker"><img src="helper_files/gear_orange_3.png"/></span>
+                                <span class="button-text">Edit XML</span>
+                            </a>
+                            <a class="button" title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy">
+                                <span class="advanced-marker"><img src="helper_files/gear_orange_3.png"/></span>
+                                <span class="button-text">Download a copy</span>
+                            </a>
+                        </span>
+                    </div>
+
+                    <div id="page-title">
+                        <h1>
+                            Preview:
+                            <span class="metatitle">
+                                <!--
+                                Add proper document title here.
+                                -->
+                                Conversion of my_doc.doc
+                            </span>
+                        </h1>
+                    </div>
+
+                    <div id="page-description">
+                        <p class="forminfo">
+                            View below how the module will appear in Connexions.
+                        </p>
+                    </div>
+
+                </div>
+
+                <iframe class="preview" id="preview-frame" src="${body_url}" id="preview_frame"
+                    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto"
+                    onload="ForcePreviewReload()">
+                </iframe>
+
+                <!--
+                <div id="footer">
+                    <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="helper_files/sf150.png" width="150"/></a>
+                </div>
+                -->
+
+            </div>
+        </div>
+    </div>
+    </metal:content-slot>
+
+</metal:use>
