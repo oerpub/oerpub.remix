@@ -518,3 +518,7 @@ iframe{
 #simplemodal-container td {
     border: none
 }
+
+iframe.preview {
+    background: url(images/preview-bg-03.png);
+}
