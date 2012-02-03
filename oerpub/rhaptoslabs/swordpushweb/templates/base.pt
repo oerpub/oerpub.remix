@@ -65,6 +65,10 @@
           return passed;
         }
         </script>
+        
+        <!-- Extra scripts -->
+        <metal:script-slot define-slot="script-slot">
+        </metal:script-slot>
 
     </head>
 
