@@ -1,10 +1,9 @@
 <metal:use use-macro="base">
-
+    
     <metal:workflownav fill-slot="workflownav">
     ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
     ${form.csrf_token()}
 
-    <span class="formfield">${form.submit('form.submitted', 'Upload', class_='submit')}</span>
     <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
         <tal:hidden>${form.hidden(field)}</tal:hidden>
     </tal:field>
@@ -198,6 +197,7 @@
         </div>
     </div>
     ${form.end()}
+    
     </metal:content-slot>
 
 </metal:use>

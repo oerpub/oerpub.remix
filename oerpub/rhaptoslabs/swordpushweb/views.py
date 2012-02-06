@@ -159,22 +159,16 @@ def login_view(request):
 def cnxlogin_view(request):
     check_login(request)
 
-    postUrl = {
-        'http://cnx.org/sword/servicedocument': 'http://cnx.org/login_form',
-        'http://50.57.120.10:8080/rhaptos/sword/servicedocument': 'http://50.57.120.10:8080/login_form',
-        'http://50.57.120.10:8080/sword/servicedocument': 'http://50.57.120.10:8080/login_form',
-    }.get(request.session['service_document_url'])
+    config = load_config(request)
+    login_url = config['login_url']
 
-    if postUrl is not None:
-        templatePath = 'templates/cnxlogin.pt'
-        response = {
-            'username': request.session['username'],
-            'password': request.session['password'],
-            'postUrl': postUrl,
-        }
-        return render_to_response(templatePath, response, request=request)
-    else:
-        return ''
+    templatePath = 'templates/cnxlogin.pt'
+    response = {
+        'username': request.session['username'],
+        'password': request.session['password'],
+        'login_url': login_url,
+    }
+    return render_to_response(templatePath, response, request=request)
 
 
 @view_config(route_name='logout', renderer='templates/login.pt')
@@ -1063,7 +1057,13 @@ def admin_config_view(request):
         'form': FormRenderer(form),
         'subjects': subjects,
         'languages': languages,
-        'roles': [('authors', 'Authors'), ('maintainers', 'Maintainers'), ('copyright', 'Copyright holders'), ('editors', 'Editors'), ('translators', 'Translators')],
+        'roles': [('authors', 'Authors'),
+                  ('maintainers', 'Maintainers'),
+                  ('copyright', 'Copyright holders'),
+                  ('editors', 'Editors'),
+                  ('translators',
+                  'Translators')
+                 ],
         'request': request,
         'config': config,
     }

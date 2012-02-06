@@ -413,3 +413,7 @@ function keyDown(event) {
     $('#url-submit').removeAttr('disabled');
   }
 }
+
+function submitloginform(event) {
+    document.getElementById('submit').click();
+}

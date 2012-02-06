@@ -2,6 +2,7 @@
     "workspace_url": None,
     #"service_document_url": u'http://cnx.org/sword/servicedocument',
     "service_document_url": u'http://localhost:8080/site/sword/servicedocument',
+    "login_url": u'http://localhost:8080/site/login_form',
     "edit_history": [('cscheffler', 'Mon Nov 14 11:48:05 2011 GMT')],
     "metadata": {
         "maintainers": [u'_USER_'],

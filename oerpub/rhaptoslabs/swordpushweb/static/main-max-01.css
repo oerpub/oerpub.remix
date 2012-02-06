@@ -530,3 +530,7 @@ iframe{
 body.preview {
     background: url(images/preview-bg-03.png);
 }
+
+.hidden {
+    display: none;
+}
