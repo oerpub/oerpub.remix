@@ -56,7 +56,6 @@ def login_view(request):
     Perform a 'login' by getting the service document from a sword repository.
     """
 
-    #request.session.get('expert_mode', False)
     templatePath = 'templates/login.pt'
 
     config = load_config(request)
@@ -68,9 +67,12 @@ def login_view(request):
     ]
     
     session = request.session
-
+    
+    # validate the form in order to compute all errors
+    valid_form = form.validate()
+    request['errors'] = form.all_errors()
     # Check for successful form completion
-    if 'form.submitted' in request.POST and form.validate():
+    if 'form.submitted' in request.POST and valid_form:
         # The login details are persisted on the session
         for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
@@ -153,12 +155,6 @@ def login_view(request):
     return HTTPFound(location=request.route_url('choose'))
 
 
-@view_config(route_name='cnxlogin_frames', renderer='templates/cnxlogin_frames.pt')
-def cnxlogin_frames_view(request):
-    check_login(request)
-    return {}
-
-
 @view_config(route_name='cnxlogin')
 def cnxlogin_view(request):
     check_login(request)
@@ -186,18 +182,6 @@ def logout_view(request):
     session = request.session
     session.invalidate()
     raise HTTPFound(location=request.route_url('login'))
-
-
-#@view_config(route_name='switch_expert_mode')
-#def switch_expert_mode_view(request):
-#    referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
-#    # HACK: to make frames view of preview page work out
-#    substr = '/preview_side'
-#    if referer[-len(substr):] == substr:
-#        referer = referer[:-len(substr)] + '/preview'
-#    # /HACK
-#    request.session['expert_mode'] = not request.session.get('expert_mode', False)
-#    raise HTTPFound(location=referer)
 
 
 class UploadSchema(formencode.Schema):
@@ -593,11 +577,6 @@ def preview_header_view(request):
     templatePath = 'templates/%s/preview_header.pt'%(
         ['novice','expert'][request.session.get('expert_mode', False)])
     return render_to_response(templatePath, {}, request=request)
-
-
-#@view_config(route_name='preview_side', renderer='templates/preview_side.pt')
-#def preview_side_view(request):
-#    return {'expert_mode_switch_target': '_parent'}
 
 
 @view_config(route_name='preview_body')

@@ -31,6 +31,7 @@
                 var winh = $(window).height();
                 var headerh = $("#header-container").outerHeight();
                 var wfnh = $("#workflownav-wrap").outerHeight();
+                var eh = $("#errors-wrap").outerHeight();
                 var contentp = parseInt($("#content").css("paddingTop"));
                 var contentp = contentp + parseInt($("#content").css("paddingBottom"));
                 var phwh = $("#pageheader-wrap").outerHeight();
@@ -44,7 +45,7 @@
                 /* Give the page's header the correct top margin (since the elements above
                    it are in a fixed position)
                 */
-                $("#content").css({'margin-top': headerh + wfnh})
+                $("#content").css({'margin-top': headerh + wfnh + eh})
             });
 
         </script>
@@ -108,6 +109,19 @@
             </div>
         </div>
         </metal:header-slot>
+
+        <metal:errors define-slot="errors">
+        <tal:errors define="errors python:request.get('errors')" condition="errors">
+        <div id="errors-wrap">
+            <div id="errors-container">
+                <span tal:repeat="error errors"
+                    tal:content="error">
+                    error
+                </span>
+            </div>
+        </div>
+        </tal:errors>
+        </metal:errors>
 
         <metal:content define-slot="content-slot">
         Main content goes here

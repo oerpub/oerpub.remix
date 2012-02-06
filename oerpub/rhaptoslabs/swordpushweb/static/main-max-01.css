@@ -129,14 +129,16 @@ span .button{
   vertical-align: -.35em;
 }
 
+#errors-wrap,
 #workflownav-wrap{
   position: fixed;
   top: 56px;
-  z-index: 2;
+  z-index: 3;
   width: 100%;
 }
 
-#workflownav-container{
+#workflownav-container,
+#errors-container {
   padding: .75em 2em;
   border-bottom: 1px solid #7E9AB4;
   background-color: #9abcdc;
@@ -145,6 +147,12 @@ span .button{
   box-shadow:         2px 1px 2px 2px #ddd;
   text-align: right;
 }
+
+#errors-container {
+  background-color: red;
+  text-align: left;
+}
+
 
 #expert-helper-text, #expert-activated-text{
   padding: 0 .5em;
