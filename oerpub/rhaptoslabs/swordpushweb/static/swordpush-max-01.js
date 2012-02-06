@@ -400,3 +400,14 @@ function pickerCallback(data) {
         $('form#uploadform').submit(); 
     }
 }
+
+function keyDown(event) {
+  if ($(this).value != '') {
+    $('#url-submit').removeAttr('disabled');
+  }
+  if (event.keyCode == 13) {
+    $('#file-submit').removeAttr('disabled');
+    $('#file-submit').click();
+    $('#url-submit').removeAttr('disabled');
+  }
+}
