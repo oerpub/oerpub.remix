@@ -133,6 +133,10 @@
         </div>
         </metal:footer-slot>
 
+        <iframe class="" id="cnx-login-from" src="${request.route_url('cnxlogin')}"
+            frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+        </iframe>
+
     </body>
 </html>
 </metal:main>

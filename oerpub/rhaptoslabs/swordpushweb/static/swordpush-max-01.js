@@ -357,22 +357,24 @@ $(document).ready(function()
 
 $(window).resize(function(){               
 
-  var winh = $(window).height();
-  var headerh = $("#header-container").outerHeight();
-  var wfnh = $("#workflownav-wrap").outerHeight();
-  var contentp = parseInt($("#content").css("paddingTop"));
-  var contentp = contentp + parseInt($("#content").css("paddingBottom"));
-  var phwh = $("#pageheader-wrap").outerHeight();
-  var ma = $("#module-actions .advanced").outerWidth();
+    var winh = $(window).height();
+    var headerh = $("#header-container").outerHeight();
+    var wfnh = $("#workflownav-wrap").outerHeight();
+    var eh = $("#errors-wrap").outerHeight();
+    var contentp = parseInt($("#content").css("paddingTop"));
+    var contentp = contentp + parseInt($("#content").css("paddingBottom"));
+    var phwh = $("#pageheader-wrap").outerHeight();
+    var ma = $("#module-actions .advanced").outerWidth();
 
-  // Make the iframe fit exactly inside the remaining space
-  $("iframe").height(winh - headerh - wfnh - contentp - phwh + 5);
-  $("iframe").width($(window).width() - 53);
+    // Make the iframe fit exactly inside the remaining space
+    $("iframe").height(winh - headerh - wfnh - contentp - phwh + 5);
+    $("iframe").width($(window).width() - 53);
+    $("iframe").contents().find('body').addClass('preview');
 
-  // Truncate the title if it gets too long
-  if ($("iframe").length != 0) {
-    $("#page-title").css({'white-space': 'nowrap', 'max-width': $(window).width() - ma - 100});
-  }
+    /* Give the page's header the correct top margin (since the elements above
+       it are in a fixed position)
+       */
+    $("#content").css({'margin-top': headerh + wfnh + eh})
 
 });
 
