@@ -290,57 +290,66 @@ def choose_view(request):
                 url = form.data['url_text']
 
                 # download html:
-                #html = urllib2.urlopen(url).read() # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
+                #html = urllib2.urlopen(url).read() 
+                # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
                 import_opener = urllib2.build_opener()
                 import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-                import_request = import_opener.open(url)
-                html = import_request.read()
-
-                # transformation            
-                cnxml, objects, html_title = htmlsoup_to_cnxml(html, bDownloadImages=True, base_or_source_url=url)
-                request.session['title'] = html_title
-
-                # write CNXML output
-                cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-                cnxml_file = open(cnxml_filename, 'w')
                 try:
-                    cnxml_file.write(cnxml)
-                    cnxml_file.flush()
-                finally:
-                    cnxml_file.close()
+                    import_request = import_opener.open(url)
+                    html = import_request.read()
 
-                # write images
-                for image_filename, image in objects.iteritems():
-                    image_filename = os.path.join(save_dir, image_filename)
-                    image_file = open(image_filename, 'wb') # write binary, important!
+                    # transformation            
+                    cnxml, objects, html_title = htmlsoup_to_cnxml(
+                        html, bDownloadImages=True, base_or_source_url=url)
+                    request.session['title'] = html_title
+
+                    # write CNXML output
+                    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+                    cnxml_file = open(cnxml_filename, 'w')
                     try:
-                        image_file.write(image)
-                        image_file.flush()
+                        cnxml_file.write(cnxml)
+                        cnxml_file.flush()
                     finally:
-                        image_file.close()
+                        cnxml_file.close()
 
-                htmlpreview = cnxml_to_htmlpreview(cnxml)
-                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                    index.write(htmlpreview)
+                    # write images
+                    for image_filename, image in objects.iteritems():
+                        image_filename = os.path.join(save_dir, image_filename)
+                        image_file = open(image_filename, 'wb') # write binary, important!
+                        try:
+                            image_file.write(image)
+                            image_file.flush()
+                        finally:
+                            image_file.close()
 
-                # Zip up all the files. This is done now, since we have all the files
-                # available, and it also allows us to post a simple download link.
-                # Note that we cannot use zipfile as context manager, as that is only
-                # available from python 2.7
-                # TODO: Do a filesize check xxxx
-                zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-                try:
-                    zip_archive.writestr('index.cnxml', cnxml)
-                    #for image_filename, image in objects.iteritems():
-                    #    zip_archive.writestr(image_filename, image)
-                finally:
-                    zip_archive.close()
+                    htmlpreview = cnxml_to_htmlpreview(cnxml)
+                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                        index.write(htmlpreview)
 
-                # Keep the info we need for next uploads.  Note that this might kill
-                # the ability to do multiple tabs in parallel, unless it gets offloaded
-                # onto the form again.
-                request.session['upload_dir'] = temp_dir_name
-                request.session['filename'] = "HTML Document"
+                    # Zip up all the files. This is done now, since we have all the files
+                    # available, and it also allows us to post a simple download link.
+                    # Note that we cannot use zipfile as context manager, as that is only
+                    # available from python 2.7
+                    # TODO: Do a filesize check xxxx
+                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                    try:
+                        zip_archive.writestr('index.cnxml', cnxml)
+                        #for image_filename, image in objects.iteritems():
+                        #    zip_archive.writestr(image_filename, image)
+                    finally:
+                        zip_archive.close()
+
+                    # Keep the info we need for next uploads.  Note that this might kill
+                    # the ability to do multiple tabs in parallel, unless it gets offloaded
+                    # onto the form again.
+                    request.session['upload_dir'] = temp_dir_name
+                    request.session['filename'] = "HTML Document"
+                except urllib2.URLError, e:
+                    request['errors'] = ['The URL %s could not be opened' %url,]
+                    response = {
+                        'form': FormRenderer(form),
+                    }
+                    return render_to_response(templatePath, response, request=request)
 
             # Office, CNXML-ZIP or LaTeX-ZIP file
             else:
