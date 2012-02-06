@@ -1,0 +1,78 @@
+<metal:use use-macro="base">
+
+    <metal:workflownav fill-slot="workflownav">
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input type="button" class="button"
+                value="&#171; Back: Choose document" id="back-to-chooser"
+                title="Return to the previous screen to choose a different document to convert"
+                url="${request.route_url('choose')}"/>
+            </div>
+            <div id="forward-steps">
+                <input type="button" id="forward-to-metadata"
+                class="button forward-button"
+                value="Next: Describe your module &#187;" 
+                url="${request.route_url('metadata')}"
+                title="Add/edit title and other information about the module"/>
+            </div>
+        </div>
+    </div>
+    </metal:workflownav>
+
+    <metal:content-slot fill-slot="content-slot">
+    <div id="ie6-container-wrap">
+        <div id="container">
+            <div id="content">
+                <div id="pageheader-wrap">
+
+                    <div id="module-actions">
+                        <span class="advanced">
+                            <h3>Module actions:</h3>
+                            <a class="button" title="Make changes to the module by editing its XML code." id="edit-xml">
+                                <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
+                                <span class="button-text">Edit XML</span>
+                            </a>
+                            <a class="button" title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy">
+                                <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
+                                <span class="button-text">Download a copy</span>
+                            </a>
+                        </span>
+                    </div>
+
+                    <div id="page-title">
+                        <h1>
+                            Preview:
+                            <span class="metatitle">
+                                <!--
+                                Add proper document title here.
+                                -->
+                                Conversion of my_doc.doc
+                            </span>
+                        </h1>
+                    </div>
+
+                    <div id="page-description">
+                        <p class="forminfo">
+                            View below how the module will appear in Connexions.
+                        </p>
+                    </div>
+
+                </div>
+
+                <iframe class="preview" id="preview-frame" src="${body_url}" id="preview_frame"
+                    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+                </iframe>
+
+                <!--
+                <div id="footer">
+                    <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="helper_files/sf150.png" width="150"/></a>
+                </div>
+                -->
+
+            </div>
+        </div>
+    </div>
+    </metal:content-slot>
+
+</metal:use>
