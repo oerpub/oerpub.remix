@@ -680,7 +680,7 @@ def cnxml_view(request):
 @view_config(route_name='summary')
 def summary_view(request):
     check_login(request)
-    templatePath = 'templates/%s/summary.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/summary.pt'
 
     # Note: need to extract the version string before passing dom to
     # Deposit_Receipt, which mangles dom.

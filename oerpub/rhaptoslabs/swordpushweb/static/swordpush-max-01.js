@@ -265,9 +265,20 @@ $(document).ready(function()
     }
   });
 
-  $("#forward-to-metadata").click(function(e){
+  $("#forward-to-metadata, #choose-new-document").click(function(e){
       window.location = $(this).attr('url');
   });
+
+  $("#upload-to-cnx").click(function(e){
+      // check required fields
+      title = $("#title").val();
+      if (title == '(Untitled)' || title.length() == 0) {
+          $('').show();
+          return false;
+      }
+      window.location = $(this).attr('url');
+  });
+
 
   // Reveal Google Analtyics field ("Describe your module" page)
   $("#formentry-ga .formlabel").click(function(){

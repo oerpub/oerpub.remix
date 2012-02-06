@@ -1,6 +1,14 @@
 <metal:use use-macro="base">
 
     <metal:workflownav fill-slot="workflownav">
+    ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
+    ${form.csrf_token()}
+
+    <span class="formfield">${form.submit('form.submitted', 'Upload', class_='submit')}</span>
+    <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
+        <tal:hidden>${form.hidden(field)}</tal:hidden>
+    </tal:field>
+
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
@@ -10,8 +18,9 @@
                     title="Return to the module preview">
             </div>
             <div id="forward-steps">
-                <input type="button" class="button forward-button"
+                <input id="upload-to-cnx" type="submit" class="button forward-button"
                     value="Finish: Upload to Connexions &raquo;"
+                    url="${request.route_url('metadata')}"
                     title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
             </div>
         </div>
@@ -19,13 +28,6 @@
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
-    ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
-    ${form.csrf_token()}
-
-    <span class="formfield">${form.submit('form.submitted', 'Upload', class_='submit')}</span>
-    <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
-        <tal:hidden>${form.hidden(field)}</tal:hidden>
-    </tal:field>
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
@@ -93,48 +95,33 @@
                                             Please enter a valid title
                                         </div>
                                         <div class="forminfo">Enter the title of this module.</div>
-                                        <div class="formfield"><input type="text" name="title" size="50" value=""/></div>
+                                        <div class="formfield">
+                                            <input type="text" name="title" size="50"
+                                                value="${config['metadata']['title']}"/>
+                                        </div>
                                     </div>
                                     <div class="formentry">
                                         <div class="formlabel">Subject</div>
                                         <div class="forminfo">Select the subject categories that apply to this module.</div>
                                         <table>
-                                            <tbody><tr>
-                                                    <td>
-                                                        <input type="checkbox" name="subject" value="Arts"/>
-                                                        <span class="formlabel">Arts</span>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="subject" value="Mathematics and Statistics"/>
-                                                        <span class="formlabel">Mathematics and Statistics</span>
+                                            <tbody>
+                                                <tr tal:repeat="row python:range(3)">
+                                                    <td tal:repeat="column python:range(2)">
+                                                        <input type="checkbox" name="subject" tal:attributes="value subjects[row+column*3]; checked (subjects[row+column*3] in config['metadata']['subject'])"/>
+                                                        <span class="formlabel" tal:content="subjects[row+column*3]">Subject</span>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <input type="checkbox" name="subject" value="Business"/>
-                                                        <span class="formlabel">Business</span>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="subject" value="Science and Technology"/>
-                                                        <span class="formlabel">Science and Technology</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <input type="checkbox" name="subject" value="Humanities"/>
-                                                        <span class="formlabel">Humanities</span>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" name="subject" value="Social Sciences"/>
-                                                        <span class="formlabel">Social Sciences</span>
-                                                    </td>
-                                            </tr></tbody>
+                                            </tbody>
                                         </table>
                                     </div>
                                     <div class="formentry">
                                         <div class="formlabel">Summary</div>
                                         <div class="forminfo">Enter a summary of the module.</div>
-                                        <div class="formfield"><textarea name="summary" rows="6" cols="45"></textarea></div>
+                                        <div class="formfield">
+                                            <textarea name="summary" rows="6" cols="40">
+                                                ${config['metadata']['summary']}
+                                            </textarea>
+                                        </div>
                                     </div>
                                 </td>
                                 <td width="50%" valign="top">
@@ -149,7 +136,11 @@
                                             line. Keywords are not displayed on the content, but
                                             are used behind the scenes to help people find it in
                                             searches.</div>
-                                        <div class="formfield"><textarea name="keywords" rows="4" cols="25"></textarea></div>
+                                        <div class="formfield">
+                                            <textarea name="keywords" rows="4" cols="40">
+                                                ${config['metadata']['keywords']}
+                                            </textarea>
+                                        </div>
                                     </div>
                                     <div class="formentry" id="formentry-ga">
                                         <div class="formlabel">
@@ -161,7 +152,10 @@
                                         </div>
                                         <div id="ga-field" style="display: none;">
                                             <div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
-                                            <div class="formfield"><input type="text" name="google_code" size="14" value=""/></div>
+                                            <div class="formfield">
+                                                <input type="text" name="google_code" size="40"
+                                                    value="${config['metadata']['google_code']}"/>
+                                            </div>
                                         </div>
                                     </div>
                                     <div style="display: none;" class="formentry advanced" id="roles">

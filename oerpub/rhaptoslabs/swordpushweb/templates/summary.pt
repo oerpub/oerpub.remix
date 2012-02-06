@@ -1,0 +1,73 @@
+<metal:use use-macro="base">
+
+    <metal:workflownav fill-slot="workflownav">
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="forward-steps">
+                <input type="button" id="choose-new-document"
+                    class="button forward-button"
+                    url="${request.route_url('choose')}"
+                    value="Work on another document"
+                    title="Return to the home page to create, edit, or adapt more modules">
+            </div>
+        </div>
+    </div>
+    </metal:workflownav>
+
+    <metal:content-slot fill-slot="content-slot">
+    <div id="ie6-container-wrap">
+        <div id="container">
+            <div id="content">
+
+                <div id="pageheader-wrap">
+
+                    <div id="module-actions">
+                        <span class="advanced">
+                            <a class="button" title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy">
+                                <span class="advanced-marker"><img src="helper_files/gear_orange_3.png"/></span>
+                                <span class="button-text">Download a copy</span>
+                            </a>
+                        </span>
+                    </div>
+
+                    <div id="page-title">
+                        <h1>
+                            Success
+                        </h1>
+                    </div>
+
+                    <p>
+                        <span class="highlight">${'"'+module_title+'"'}</span> was successfully uploaded to Connexions.
+                    </p>
+
+                    <p>
+                        <span class="highlight">It is not published yet!</span>
+                    </p>
+
+                    <p>
+                        <span>To publish and share your module:</span>
+                    </p>
+
+                    <ol>
+                        <li tal:repeat="requirement requirements">
+                            <div tal:omit-tag="" tal:condition="(requirement['type'] == 'licence') and (requirement['username'] == request.session['username'])">
+                                <a href="${requirement['url']}" target="_blank">sign the Open Content license</a>
+                            </div>
+                            <div tal:omit-tag="" tal:condition="(requirement['type'] == 'licence') and (requirement['username'] != request.session['username'])">
+                                wait for ${requirement['name']} to sign the Open Content license
+                            </div>
+                            <div tal:omit-tag="" tal:condition="requirement['type'] == 'role_request'">
+                                wait for ${requirement['name']} to agree to being a<span tal:omit-tag="" tal:condition="requirement['role'][0].lower() in 'aeiou'">n</span> ${requirement['role'].lower()}<span tal:omit-tag="" tal:condition="requirement['email'] != ''"> (<a href="mailto:${requirement['email']}">send a reminder email</a>)</span>
+                            </div>
+                        </li>
+                    </ol>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    </metal:content-slot>
+
+</metal:use>
