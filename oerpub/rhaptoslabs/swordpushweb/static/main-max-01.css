@@ -519,6 +519,6 @@ iframe{
     border: none
 }
 
-iframe.preview {
+body.preview {
     background: url(images/preview-bg-03.png);
 }

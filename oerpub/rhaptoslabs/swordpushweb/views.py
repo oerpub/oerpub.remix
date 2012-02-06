@@ -56,7 +56,8 @@ def login_view(request):
     Perform a 'login' by getting the service document from a sword repository.
     """
 
-    templatePath = 'templates/%s/login.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    #request.session.get('expert_mode', False)
+    templatePath = 'templates/login.pt'
 
     config = load_config(request)
 
@@ -82,7 +83,7 @@ def login_view(request):
             if not session.has_key(key):
                 loggedIn = False
         if loggedIn:
-            return HTTPFound(location=request.route_url('cnxlogin_frames'))
+            return HTTPFound(location=request.route_url('choose'))
 
     # TODO: check credentials against Connexions and ask for login
     # again if failed.
@@ -149,7 +150,7 @@ def login_view(request):
                                              )[0].text
 
     # Go to the upload page
-    return HTTPFound(location=request.route_url('cnxlogin_frames'))
+    return HTTPFound(location=request.route_url('choose'))
 
 
 @view_config(route_name='cnxlogin_frames', renderer='templates/cnxlogin_frames.pt')
@@ -187,16 +188,16 @@ def logout_view(request):
     raise HTTPFound(location=request.route_url('login'))
 
 
-@view_config(route_name='switch_expert_mode')
-def switch_expert_mode_view(request):
-    referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
-    # HACK: to make frames view of preview page work out
-    substr = '/preview_side'
-    if referer[-len(substr):] == substr:
-        referer = referer[:-len(substr)] + '/preview'
-    # /HACK
-    request.session['expert_mode'] = not request.session.get('expert_mode', False)
-    raise HTTPFound(location=referer)
+#@view_config(route_name='switch_expert_mode')
+#def switch_expert_mode_view(request):
+#    referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
+#    # HACK: to make frames view of preview page work out
+#    substr = '/preview_side'
+#    if referer[-len(substr):] == substr:
+#        referer = referer[:-len(substr)] + '/preview'
+#    # /HACK
+#    request.session['expert_mode'] = not request.session.get('expert_mode', False)
+#    raise HTTPFound(location=referer)
 
 
 class UploadSchema(formencode.Schema):
@@ -213,7 +214,7 @@ class ConversionError(Exception):
 def choose_view(request):
     check_login(request)
 
-    templatePath = 'templates/%s/choose.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/choose.pt'
 
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]
@@ -560,7 +561,7 @@ FORM DATA
 #            return tmp_obj
 
         request.session.flash('The file was successfully converted.')
-        return HTTPFound(location=request.route_url('preview_frames'))
+        return HTTPFound(location=request.route_url('preview'))
 
     # First view or errors
     response = {
@@ -570,8 +571,8 @@ FORM DATA
     return render_to_response(templatePath, response, request=request)
 
 
-@view_config(route_name='preview_frames', renderer='templates/preview_frames.pt')
-def preview_frames_view(request):
+@view_config(route_name='preview', renderer='templates/preview.pt')
+def preview_view(request):
     check_login(request)
 
     body_filename = request.session.get('preview-no-cache')
@@ -582,7 +583,6 @@ def preview_frames_view(request):
 
     return {
         'header_url': request.route_url('preview_header'),
-        #'body_url': '%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
         'body_url': request.route_url('preview_body'),
     }
 
@@ -595,9 +595,9 @@ def preview_header_view(request):
     return render_to_response(templatePath, {}, request=request)
 
 
-@view_config(route_name='preview_side', renderer='templates/preview_side.pt')
-def preview_side_view(request):
-    return {'expert_mode_switch_target': '_parent'}
+#@view_config(route_name='preview_side', renderer='templates/preview_side.pt')
+#def preview_side_view(request):
+#    return {'expert_mode_switch_target': '_parent'}
 
 
 @view_config(route_name='preview_body')
@@ -659,7 +659,7 @@ def cnxml_view(request):
         finally:
             zip_archive.close()
         # Return to preview
-        return HTTPFound(location=request.route_url('preview_frames'), request=request)
+        return HTTPFound(location=request.route_url('preview'), request=request)
 
     # Read CNXML
     with open(cnxml_filename, 'rt') as fp:
@@ -731,7 +731,7 @@ def metadata_view(request):
     """
     print('INSIDE METADATA_VIEW')
     check_login(request)
-    templatePath = 'templates/%s/metadata.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/metadata.pt'
     session = request.session
     config = load_config(request)
 

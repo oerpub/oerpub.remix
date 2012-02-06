@@ -200,82 +200,73 @@ $(document).ready(function()
   var confirmMsg2 = "Are you sure you want to leave this page? \n\nYour module has not been uploaded and any work on it will be lost if you return to the beginning.";
   var confirmMsg3 = "Are you sure you want to leave this page? \n\nYour changes have not been saved and any work will be lost if you leave this page.";
   var confirmMsg4 = "Are you sure you want to leave this page? \n\nYour module has not been uploaded and any work on it will be lost if you leave. \n\nTo attempt the upload again, click 'Cancel' and 'Try to upload again'.";
-  var fp = "http://mountainbunker.org/~maxwell/oerpub/front-page-06.html";
-  var hp = "http://mountainbunker.org/~maxwell/oerpub/choose-16.html";
-  var pp = "http://mountainbunker.org/~maxwell/oerpub/preview-gdoc-03.html";
   $("#status a").click(function(){
     if ($("#edit-frame").length != 0) {
       var c = confirm(confirmMsg3);
       if (c == true) { 
-        window.location = pp;
-        return false;
+        window.location = $(this).attr('url');
+        return true;
       } else {
+        e.preventDefault(); 
         return false;
       }
     } else if ($("#see-error").length != 0) {
       var c = confirm(confirmMsg4);
       if (c == true) { 
-        window.location = fp;
-        return false;
+        window.location = $(this).attr('url');
+        return true;
       } else {
+        e.preventDefault(); 
         return false;
       }
     } else if ($("iframe").length != 0 || $("#metadata").length != 0) {
       var c = confirm(confirmMsg1);
       if (c == true) { 
-        window.location = fp;
-        return false;
+        window.location = $(this).attr('url');
+        return true;
       } else {
+        e.preventDefault(); 
         return false;
       }
     } else {
-      window.location = fp;
-      return false;
+      window.location = $(this).attr('url');
+      return true;
     }
   });
-  $("#back-to-chooser, #header h1 a, #start-over input").click(function(){
+  $("#back-to-chooser, #header h1 a, #start-over input").click(function(e){
     if ($("#edit-frame").length != 0 || $("#metadata").length != 0 && $(this).attr("id") == 'back-to-chooser') {
       var c = confirm(confirmMsg3);
       if (c == true) { 
-        window.location = pp;
-        return false;
+        window.location = $(this).attr('url');
+        return true;
       } else {
+        e.preventDefault(); 
         return false;
       }
     } else if ($("#see-error").length != 0) {
       var c = confirm(confirmMsg4);
       if (c == true) { 
-        window.location = hp;
-        return false;
+        return true;
       } else {
+        e.preventDefault(); 
         return false;
       }
     } else if ($("iframe").length != 0 || $("#metadata").length != 0) {
       var c = confirm(confirmMsg2);
       if (c == true) { 
-        window.location = hp;
-        return false;
+        window.location = $(this).attr('url');
+        return true;
       } else {
+        e.preventDefault(); 
         return false;
       }
     } else {
-      window.location = hp;
-        return false;
+        return true;
     }
   });
 
-  // Show error examples on "Describe your module" page
-  $(".forward-button").click(function(){
-    if ($("#metadata").length != 0) {
-      $("input[name='title']").val("(Untitled)")
-      $("#formentry-title").addClass("error");
-      $("#formentry-title .errortext").show();
-      $("#ga-field").show();
-      $("input[name='google_code_opener']").attr('checked', true);
-      $("#formentry-ga").addClass("error");
-      $("input[name='google_code']").val("AA-7654321")
-      $("#formentry-ga .errortext").show();
-    }
+  $("#forward-to-metadata").click(function(e){
+      window.location = $(this).attr('url');
   });
 
   // Reveal Google Analtyics field ("Describe your module" page)
