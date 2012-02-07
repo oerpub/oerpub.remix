@@ -27,6 +27,9 @@
 
         <div id="main-column-wrap">
           <div id="main-column">
+              <div class="pleasewait" id="upload-wait" style="display: none;">
+                Your document is being processed. This may take a few moments.
+              </div>
 
             <div id="choose-upload">
               <h1>
@@ -91,9 +94,6 @@
                 </li>
               </ul>
               ${form.end()}
-              <div class="pleasewait" id="upload-wait" style="display: none;">
-                Your document is being processed. This may take a few moments.
-              </div>
             </div>
 
           </div>
