@@ -10,9 +10,12 @@
             title="Back to preview screen without saving"/>
         </div>
         <div id="forward-steps">
+            <input type="button" class="button"
+            value="Undo last change" 
+            disabled="disabled" title="Undo your last change">
             <input type="button" id="save-and-return" class="button forward-button"
-            value="Save: Return to preview  &#187;" 
-            title="Save changes and return to the preview screen"
+            value="Save and preview  &#187;" 
+            title="Save your changes in order to preview them"
             onclick="document.getElementById('form.submitted').click();">
         </div>
     </div>
@@ -27,8 +30,18 @@ ${form.csrf_token()}
 <div id="ie6-container-wrap">
     <div id="container">
         <div id="content">
-            <div id="header2">
-                Be careful not to break the XML!
+            <div id="page-title" style="white-space: nowrap; max-width: 1439px; ">
+                <h1>
+                    Edit:
+                    <span class="metatitle">
+                        Conversion of Google Doc
+                    </span>
+                </h1>
+            </div>
+            <div id="page-description">
+                <p class="forminfo">
+                    Be careful not to break the XML!
+                </p>
             </div>
             <textarea id="cnxml" name="cnxml">${cnxml}</textarea>
         </div>
