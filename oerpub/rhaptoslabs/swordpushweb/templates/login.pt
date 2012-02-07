@@ -10,10 +10,16 @@
 
                     <div class="splashbox">
                         <p>Please sign in using your <strong>Connexions username and password</strong>.</p>
-
-                        <div class="error" style="display: none;">
-                            <span class="errortext">Invalid username or password. Please try again.</span>
+                        <tal:errors define="errors python:request.get('errors') or [login_error]" condition="errors">
+                        <div class="error">
+                            <span class="errortext">
+                            </span>
+                            <span class="errortext" tal:repeat="error errors"
+                                tal:content="error">
+                                error
+                            </span>
                         </div>
+                        </tal:errors>
 
                         ${form.begin(request.route_url('login'), name='login_form', onsubmit='return check_submit()')}
                         ${form.csrf_token()}
@@ -83,4 +89,7 @@
 </div>
 
 </tal:body>
+
+<metal:errors fill-slot="errors" />
+
 </metal:use>
