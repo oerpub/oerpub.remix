@@ -29,7 +29,9 @@
                     <div id="module-actions">
                         <span class="advanced">
                             <h3>Module actions:</h3>
-                            <a class="button" title="Make changes to the module by editing its XML code." id="edit-xml">
+                            <a class="button" id="edit-xml"
+                                title="Make changes to the module by editing its XML code."
+                                href="${request.route_url('cnxml')}">
                                 <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
                                 <span class="button-text">Edit XML</span>
                             </a>
