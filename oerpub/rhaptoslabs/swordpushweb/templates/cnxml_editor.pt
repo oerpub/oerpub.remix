@@ -7,7 +7,7 @@
             <input type="button" class="button" id="back-to-preview"
             value="&#171; Cancel: Back to preview" 
             url="${request.route_url('preview')}"
-            title="Back to preview screen without saving"/>
+            title="Discard any edits you have made and return to the module preview">
         </div>
         <div id="forward-steps">
             <input type="button" class="button" id="undo-button"
