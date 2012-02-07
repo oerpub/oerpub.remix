@@ -10,7 +10,7 @@
 
                     <div class="splashbox">
                         <p>Please sign in using your <strong>Connexions username and password</strong>.</p>
-                        <tal:errors define="errors python:request.get('errors') or [login_error]" condition="errors">
+                        <tal:errors define="errors python:request.get('errors')" condition="errors">
                         <div class="error">
                             <span class="errortext">
                             </span>
