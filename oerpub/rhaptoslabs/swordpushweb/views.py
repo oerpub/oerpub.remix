@@ -124,11 +124,11 @@ def login_view(request):
         except:
             del session['username']
             del session['password']
+            request['errors'] = ["Invalid username or password. Please try again.",]
             response = {
                 'form': FormRenderer(form),
                 'field_list': field_list,
                 'config': config,
-                'login_error': "Invalid username or password. Please try again.",
             }
             return render_to_response(templatePath, response, request=request)
 
