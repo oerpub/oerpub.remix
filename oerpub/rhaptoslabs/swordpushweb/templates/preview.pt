@@ -20,7 +20,8 @@
     </div>
     </metal:workflownav>
 
-    <metal:content-slot fill-slot="content-slot">
+    <metal:content-slot fill-slot="content-slot"
+        tal:define="filename python:request.session.get('filename')">
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
@@ -49,10 +50,7 @@
                         <h1>
                             Preview:
                             <span class="metatitle">
-                                <!--
-                                Add proper document title here.
-                                -->
-                                Conversion of my_doc.doc
+                                Conversion of <span>${filename}</span>
                             </span>
                         </h1>
                     </div>
@@ -68,12 +66,6 @@
                 <iframe class="preview" id="preview-frame" src="${body_url}" id="preview_frame"
                     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
                 </iframe>
-
-                <!--
-                <div id="footer">
-                    <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="helper_files/sf150.png" width="150"/></a>
-                </div>
-                -->
 
             </div>
         </div>
