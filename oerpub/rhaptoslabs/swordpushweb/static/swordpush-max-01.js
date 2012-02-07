@@ -129,11 +129,6 @@ $(document).ready(function()
         $('#login-line').slideDown('slow');
     });
 
-    // A friendly message confirming that the upload is happening.
-    $('#file-submit').click(function(e) {
-        $('#upload-wait').slideDown('slow');
-    });
-
     // URL import upload field, enter pressed
     //$("#url_text").keyup(function(event){
     //  if(event.keyCode == 13){
@@ -346,7 +341,12 @@ $(document).ready(function()
     });
     
     $('input#upload').change(function(event){
+        $('#upload-wait').slideDown();
         $('form#uploadform').submit(); 
+    });
+
+    $('input#url-submit').click(function(event){
+        $('#upload-wait').slideDown();
     });
 
 });
@@ -399,6 +399,7 @@ function pickerCallback(data) {
     if(data.action == google.picker.Action.PICKED){
         document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
         document.getElementById('gdocs_access_token').value = data.docs[0].accessToken;
+        $('#upload-wait').slideDown();
         $('form#uploadform').submit(); 
     }
 }
@@ -408,9 +409,9 @@ function keyDown(event) {
     $('#url-submit').removeAttr('disabled');
   }
   if (event.keyCode == 13) {
-    $('#file-submit').removeAttr('disabled');
-    $('#file-submit').click();
+    $('#upload-wait').slideDown();
     $('#url-submit').removeAttr('disabled');
+    $('#url-submit').click();
   }
 }
 
