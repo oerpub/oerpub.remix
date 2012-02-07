@@ -599,7 +599,7 @@ class CnxmlSchema(formencode.Schema):
     cnxml = formencode.validators.String(not_empty=True)
 
 
-@view_config(route_name='cnxml', renderer='templates/expert/cnxml_editor.pt')
+@view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
     check_login(request)
     form = Form(request, schema=CnxmlSchema)
