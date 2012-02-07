@@ -10,9 +10,9 @@
             title="Back to preview screen without saving"/>
         </div>
         <div id="forward-steps">
-            <input type="button" class="button"
+            <input type="button" class="button" id="undo-button"
             value="Undo last change" 
-            disabled="disabled" title="Undo your last change">
+            title="Undo your last change">
             <input type="button" id="save-and-return" class="button forward-button"
             value="Save and preview  &#187;" 
             title="Save your changes in order to preview them"
@@ -67,6 +67,10 @@ ${form.end()}
 
 <script>
     var editor = CodeMirror.fromTextArea(document.getElementById("cnxml"), {mode: {name: "xmlpure"}, lineWrapping: true});
+
+    $('#undo-button').click(function(event) {
+        editor.undo();     
+    });
 </script>
 </tal:body>
 
