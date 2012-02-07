@@ -559,3 +559,28 @@ div.CodeMirror-lines {
     font-size: 12pt;
     line-height: 1em;
 }
+
+.codeblock, .pleasewait{
+    border: 1px solid #f0f000;
+    background-color: #ffffe0;
+}
+
+.codeblock{
+    font-size: 1.2em;
+    white-space: nowrap;
+    overflow-x: auto;
+    padding: 0 1em;
+}
+
+.pleasewait{
+    vertical-align: center;
+    font-weight: bold;
+    padding: .75em 1em;
+    margin: auto;
+    display: inline;
+    -moz-box-shadow:    3px 3px 2px 2px #ddd;
+    -webkit-box-shadow: 3px 3px 2px 2px #ddd;
+    box-shadow:         3px 3px 2px 2px #ddd;
+    z-index: 4;
+}
+
