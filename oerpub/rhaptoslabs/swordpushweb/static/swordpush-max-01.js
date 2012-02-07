@@ -260,8 +260,19 @@ $(document).ready(function()
     }
   });
 
-  $("#forward-to-metadata, #choose-new-document, #back-to-preview").click(function(e){
-      window.location = $(this).attr('url');
+  $("#forward-to-metadata").click(function(e){
+        window.location = $(this).attr('url');
+  });
+
+  $("#choose-new-document, #back-to-preview").click(function(e){
+      var c = confirm(confirmMsg3);
+      if (c == true) { 
+        window.location = $(this).attr('url');
+        return true;
+      } else {
+        e.preventDefault(); 
+        return false;
+      }
   });
 
   $("#upload-to-cnx").click(function(e){
