@@ -25,11 +25,11 @@ ${form.csrf_token()}
 <span>${form.submit('form.submitted', 'Preview', class_='hidden')}</span>
 
 <div id="ie6-container-wrap">
-    <div id="header2">
-        Be careful not to break the XML!
-    </div>
     <div id="container">
         <div id="content">
+            <div id="header2">
+                Be careful not to break the XML!
+            </div>
             <textarea id="cnxml" name="cnxml">${cnxml}</textarea>
         </div>
     </div>
