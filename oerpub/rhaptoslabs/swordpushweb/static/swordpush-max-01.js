@@ -341,12 +341,12 @@ $(document).ready(function()
     });
     
     $('input#upload').change(function(event){
-        $('#upload-wait').slideDown();
+        showWaitMessage();
         $('form#uploadform').submit(); 
     });
 
     $('input#url-submit').click(function(event){
-        $('#upload-wait').slideDown();
+        showWaitMessage();
     });
 
 });
@@ -399,7 +399,7 @@ function pickerCallback(data) {
     if(data.action == google.picker.Action.PICKED){
         document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
         document.getElementById('gdocs_access_token').value = data.docs[0].accessToken;
-        $('#upload-wait').slideDown();
+        showWaitMessage();
         $('form#uploadform').submit(); 
     }
 }
@@ -409,7 +409,7 @@ function keyDown(event) {
     $('#url-submit').removeAttr('disabled');
   }
   if (event.keyCode == 13) {
-    $('#upload-wait').slideDown();
+    showWaitMessage();
     $('#url-submit').removeAttr('disabled');
     $('#url-submit').click();
   }
@@ -417,4 +417,18 @@ function keyDown(event) {
 
 function submitloginform(event) {
     document.getElementById('submit').click();
+}
+
+// Max: added this for the swooshy wait message
+jQuery.fn.center = function () {
+    this.css("position","fixed");
+//  this.css("top", (($(window).height() - this.outerHeight()) / 2) + $(window).scrollTop() + "px");
+    this.css("top", $("#content h1").offset().top + "px");
+    this.css("left", (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft() + "px");
+    return this;
+}
+
+function showWaitMessage() {
+    $('#upload-wait').center();
+    $('#upload-wait').slideDown();
 }
