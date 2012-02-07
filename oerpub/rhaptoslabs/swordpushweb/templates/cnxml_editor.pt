@@ -1,0 +1,44 @@
+<metal:use use-macro="base">
+
+<metal:workflownav fill-slot="workflownav">
+<div id="workflownav-wrap">
+    <div id="workflownav-container">
+        <div id="back-steps">
+            <input type="button" class="button" id="back-to-preview"
+            value="&#171; Cancel: Back to preview" 
+            url="${request.route_url('preview')}"
+            title="Back to preview screen without saving"/>
+        </div>
+        <div id="forward-steps">
+            <input type="button" id="save-and-return" class="button forward-button"
+            value="Save: Return to preview  &#187;" 
+            title="Save changes and return to the preview screen"
+            onclick="document.getElementById('form.submitted').click();">
+        </div>
+    </div>
+</div>
+</metal:workflownav>
+
+<tal:body metal:fill-slot="content-slot">
+${form.begin(request.route_url('cnxml'), onsubmit="var temp=document.getElementById('form.submitted'); temp.disabled='disabled';")}
+${form.csrf_token()}
+<span>${form.submit('form.submitted', 'Preview', class_='hidden')}</span>
+
+<div id="ie6-container-wrap">
+    <div id="header2">
+        Be careful not to break the XML!
+    </div>
+    <div id="container">
+        <div id="content">
+            <textarea id="cnxml" name="cnxml">${cnxml}</textarea>
+        </div>
+    </div>
+</div>
+${form.end()}
+
+<script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("cnxml"), {mode: {name: "xmlpure"}, lineWrapping: true});
+</script>
+</tal:body>
+
+</metal:use>

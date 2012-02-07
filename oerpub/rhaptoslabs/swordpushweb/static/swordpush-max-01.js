@@ -265,7 +265,7 @@ $(document).ready(function()
     }
   });
 
-  $("#forward-to-metadata, #choose-new-document").click(function(e){
+  $("#forward-to-metadata, #choose-new-document, #back-to-preview").click(function(e){
       window.location = $(this).attr('url');
   });
 
