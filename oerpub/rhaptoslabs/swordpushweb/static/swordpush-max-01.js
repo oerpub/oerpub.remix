@@ -271,9 +271,9 @@ $(document).ready(function()
 
   $("#upload-to-cnx").click(function(e){
       // check required fields
-      title = $("#title").val();
-      if (title == '(Untitled)' || title.length() == 0) {
-          $('').show();
+      title = $("input[name='title']").val();
+      if (title == '(Untitled)' || title.length == 0) {
+          alert('You must supply at least a title.');
           return false;
       }
       window.location = $(this).attr('url');
