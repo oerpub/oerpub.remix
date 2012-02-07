@@ -4,7 +4,7 @@
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush-max-01.js')}"></script>
     </head>
     <body onload="submitloginform(event);">
-        <form action="${login_url}" name="loginform" method="post">
+        <form action="${login_url}" name="loginform" id="loginform" method="post">
             <input type="hidden" name="form.submitted" value="1" />
             <input type="hidden" name="came_from" value="http://cnx.org/" />
             <input type="hidden" name="js_enabled" id="js_enabled" value="1" />

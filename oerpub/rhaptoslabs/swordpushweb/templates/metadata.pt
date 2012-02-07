@@ -1,5 +1,25 @@
 <metal:use use-macro="base">
     
+    <metal:script-slot fill-slot="script-slot">
+    <script type="text/javascript">
+        function notLoggedInWaring() {
+            alert('You are not logged in to Connexions. You can continue now, but will have to log in to Connextions seperately to edit the uploaded content.');    
+        }
+
+        $(document).ready(function(){
+            var loginChecker = window.setInterval(function() {
+                loginform = $('form#loginform'); 
+                if (loginform.length == 0) {
+                    window.clearInterval(loginChecker);
+                    $('input.forward-button').unbind('click', notLoggedInWaring);
+                }
+            }, 10000);
+
+            $('input.forward-button').click(notLoggedInWaring);
+        });
+    </script>
+    </metal:script-slot>
+    
     <metal:workflownav fill-slot="workflownav">
     ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
     ${form.csrf_token()}
@@ -27,6 +47,10 @@
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
+    <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
+        frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+    </iframe>
+    
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
@@ -199,7 +223,7 @@
         </div>
     </div>
     ${form.end()}
-    
+
     </metal:content-slot>
 
 </metal:use>
