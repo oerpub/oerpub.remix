@@ -183,10 +183,11 @@ class UploadSchema(formencode.Schema):
     upload = formencode.validators.FieldStorageUploadConverter()
 
 class ConversionError(Exception):
-    def __init__(self, str):
-        self.str = str
+    def __init__(self, filename, msg=''):
+        self.filename = filename
+        self.msg = msg
     def __str__(self):
-        return self.str
+        return self.msg
 
 @view_config(route_name='choose')
 def choose_view(request):
@@ -459,7 +460,16 @@ def choose_view(request):
                             raise ConversionError(original_filename)
                     # Convert and save all the resulting files.
                     tree, files, errors = transform(odt_filename)
+                    errors = [
+                        e for e in errors if e['level'] == 'ERROR']
+                    if errors:
+                        msg = ''
+                        for error in errors:
+                            msg += '\t%s (id: %s)\n' % (error['msg'],
+                                                        error['id'])
+                        raise ConversionError(original_filename, msg)
                     xml = etree.tostring(tree)
+                    validate(xml)
                     with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
                         cnxml_file.write(xml)
                     for filename, content in files.items():
@@ -494,7 +504,8 @@ def choose_view(request):
 
             timestamp = datetime.datetime.now()
             templatePath = 'templates/conv_error.pt'
-            response = { 'filename' : os.path.basename(e.__str__()) }
+            response = {'filename' : os.path.basename(e.filename),
+                        'error': e.msg}
             # tmp_obj = render_to_response(templatePath, response, request=request)
         
             if('title' in request.session):
