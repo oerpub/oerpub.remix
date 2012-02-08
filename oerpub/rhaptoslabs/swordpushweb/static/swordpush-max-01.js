@@ -275,7 +275,7 @@ $(document).ready(function()
       }
   });
 
-  $("#upload-to-cnx").click(function(e){
+  $("#top-upload-to-cnx, #bottom-upload-to-cnx").click(function(e){
       // check required fields
       title = $("input[name='title']").val();
       if (title == '(Untitled)' || title.length == 0) {
