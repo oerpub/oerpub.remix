@@ -470,7 +470,7 @@ def choose_view(request):
                                                         error['id'])
                         raise ConversionError(original_filename, msg)
                     xml = etree.tostring(tree)
-                    valid, log = validate(xml)
+                    valid, log = validate(xml, validator="jing")
                     if not valid:
                         raise ConversionError(original_filename, log)
                     with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
