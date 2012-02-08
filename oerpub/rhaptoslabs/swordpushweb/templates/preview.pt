@@ -72,4 +72,5 @@
     </div>
     </metal:content-slot>
 
+    <metal:footer-slot fill-slot="footer-slot" />
 </metal:use>
