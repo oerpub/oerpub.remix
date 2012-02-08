@@ -17,10 +17,16 @@
                     title="Return to the module preview">
             </div>
             <div id="forward-steps">
-                <input id="upload-to-cnx" type="submit" class="button forward-button"
-                    value="Finish: Upload to Connexions &raquo;"
-                    url="${request.route_url('metadata')}"
-                    title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
+                <span class="advanced" style="display: none; ">
+                    <span class="advanced-marker" title="Advanced mode feature">
+                        <img src="${images_url}/gear_orange_3.png" />
+                    </span>
+                    <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                </span>
+                <input id="top-upload-to-cnx" type="submit" class="button forward-button"
+                value="Finish: Upload to Connexions &raquo;"
+                url="${request.route_url('metadata')}"
+                title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
             </div>
         </div>
     </div>
@@ -177,12 +183,6 @@
                                             <span class="button" id="edit-roles">Edit</span>
                                         </div>
                                         <br/>
-                                        <div>
-                                            <span class="advanced-marker" title="Advanced mode feature">
-                                                <img src="${images_url}/gear_orange_3.png" />
-                                            </span>
-                                            <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
-                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -193,8 +193,19 @@
                         Your module is being uploaded to Connexions. This may take a few moments.
                     </div>
 
+                    <div style="text-align: right;">
+                        <span class="advanced" style="display: none; ">
+                            <span class="advanced-marker" title="Advanced mode feature">
+                                <img src="${images_url}/gear_orange_3.png" />
+                            </span>
+                            <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                        </span>
+                        <input id="bottom-upload-to-cnx" type="submit" class="button forward-button"
+                        value="Finish: Upload to Connexions &raquo;"
+                        url="${request.route_url('metadata')}"
+                        title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
