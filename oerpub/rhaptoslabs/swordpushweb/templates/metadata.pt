@@ -17,12 +17,12 @@
                     title="Return to the module preview">
             </div>
             <div id="forward-steps">
-                <span class="advanced" style="display: none; ">
+                <!--span class="advanced" style="display: none; ">
                     <span class="advanced-marker" title="Advanced mode feature">
                         <img src="${images_url}/gear_orange_3.png" />
                     </span>
                     <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
-                </span>
+                </span-->
                 <input id="top-upload-to-cnx" type="submit" class="button forward-button"
                 value="Finish: Upload to Connexions &raquo;"
                 url="${request.route_url('metadata')}"
@@ -183,6 +183,12 @@
                                             <span class="button" id="edit-roles">Edit</span>
                                         </div>
                                         <br/>
+                                        <span class="advanced" style="display: none; ">
+                                            <span class="advanced-marker" title="Advanced mode feature">
+                                                <img src="${images_url}/gear_orange_3.png" />
+                                            </span>
+                                            <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                                        </span>
                                     </div>
                                 </td>
                             </tr>
@@ -194,12 +200,6 @@
                     </div>
 
                     <div style="text-align: right;">
-                        <span class="advanced" style="display: none; ">
-                            <span class="advanced-marker" title="Advanced mode feature">
-                                <img src="${images_url}/gear_orange_3.png" />
-                            </span>
-                            <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
-                        </span>
                         <input id="bottom-upload-to-cnx" type="submit" class="button forward-button"
                         value="Finish: Upload to Connexions &raquo;"
                         url="${request.route_url('metadata')}"
