@@ -756,7 +756,7 @@ def metadata_view(request):
     
     # Get remembered title from the session    
     if 'title' in session:
-	print('TITLE '+session['title']+' in session')
+        print('TITLE '+session['title']+' in session')
         defaults['title'] = session['title']
         config['metadata']['title'] = session['title']
 
@@ -795,10 +795,10 @@ def metadata_view(request):
 
         # Title
 
-	if(form.data['title']):
-		print('FORM_DATA')
-	else:
-		print('SESSION_FILENAME')
+        if(form.data['title']):
+            print('FORM_DATA')
+        else:
+            print('SESSION_FILENAME')
 
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
