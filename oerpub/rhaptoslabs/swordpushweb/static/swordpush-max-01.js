@@ -283,9 +283,11 @@ $(document).ready(function()
           return false;
       }
       showWaitMessage();
+      $('.forward-button').attr('disabled','disabled');
+      $('.forward-button').val('Uploading to Connexions ...');
+      $('#back-steps .button').attr('disabled','disabled');
       window.location = $(this).attr('url');
   });
-
 
   // Reveal Google Analtyics field ("Describe your module" page)
   $("#formentry-ga .formlabel").click(function(){

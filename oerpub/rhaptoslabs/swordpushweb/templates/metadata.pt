@@ -1,5 +1,16 @@
 <metal:use use-macro="base">
+    <metal:script-slot fill-slot="script-slot">    
+        <script type="text/javascript">
+
+            $(document).ready(function(){
+                $('.forward-button').removeAttr('disabled');
+                $('.forward-button').val("Finish: Upload to Connexions \u00bb");
+                $('#back-steps .button').removeAttr('disabled');
+            });
+
+        </script>
     
+    </metal:script-slot>    
     <metal:workflownav fill-slot="workflownav">
     ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
     ${form.csrf_token()}
