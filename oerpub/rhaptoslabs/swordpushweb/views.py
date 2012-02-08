@@ -18,6 +18,7 @@ from languages import languages
 from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
+from rhaptos.cnxmlutils.validatecnxml import validate
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
 import gdata.gauth
 import gdata.docs.client
@@ -469,7 +470,9 @@ def choose_view(request):
                                                         error['id'])
                         raise ConversionError(original_filename, msg)
                     xml = etree.tostring(tree)
-                    validate(xml)
+                    valid, log = validate(xml)
+                    if not valid:
+                        raise ConversionError(original_filename, log)
                     with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
                         cnxml_file.write(xml)
                     for filename, content in files.items():
