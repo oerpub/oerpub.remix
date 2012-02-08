@@ -57,6 +57,10 @@
                         </h1>
                     </div>
 
+                    <div class="pleasewait" id="upload-wait" style="display: none;">      
+                        Your module is being uploaded to Connexions. This may take a few moments.
+                    </div>
+
                     <div id="page-description">
                         <p class="forminfo">
                             <span class="required">* = Required field</span>
@@ -194,17 +198,6 @@
                             </tr>
                         </tbody>
                     </table>
-
-                    <div class="pleasewait" id="upload-wait" style="display: none;">      
-                        Your module is being uploaded to Connexions. This may take a few moments.
-                    </div>
-
-                    <div style="text-align: right;">
-                        <input id="bottom-upload-to-cnx" type="submit" class="button forward-button"
-                        value="Finish: Upload to Connexions &raquo;"
-                        url="${request.route_url('metadata')}"
-                        title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
-                    </div>
                 </div>
             </div>
         </div>

@@ -282,6 +282,7 @@ $(document).ready(function()
           alert('You must supply at least a title.');
           return false;
       }
+      showWaitMessage();
       window.location = $(this).attr('url');
   });
 
