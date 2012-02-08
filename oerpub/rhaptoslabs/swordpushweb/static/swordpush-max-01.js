@@ -378,9 +378,9 @@ $(window).resize(function(){
     var ma = $("#module-actions .advanced").outerWidth();
 
     // Make the iframe fit exactly inside the remaining space
-    $("iframe").height(winh - headerh - wfnh - contentp - phwh + 5);
-    $("iframe").width($(window).width() - 53);
-    $("iframe").contents().find('body').addClass('preview');
+    $("iframe.fitted").height(winh - headerh - wfnh - contentp - phwh + 5);
+    $("iframe.fitted").width($(window).width() - 53);
+    $("iframe.fitted").contents().find('body').addClass('preview');
 
     /* Give the page's header the correct top margin (since the elements above
        it are in a fixed position)

@@ -4,6 +4,10 @@
 
 <tal:body metal:fill-slot="content-slot"
     tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
+    <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
+        frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+    </iframe>
+
   <div id="ie6-container-wrap">
     <div id="container">
       <div id="content">

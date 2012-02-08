@@ -532,7 +532,8 @@ body.preview {
 }
 
 .hidden {
-    display: none;
+    width:0;
+    height:0;
 }
 
 #header2-container {
