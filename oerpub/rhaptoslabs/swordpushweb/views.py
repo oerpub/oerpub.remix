@@ -56,7 +56,7 @@ def login_view(request):
     Perform a 'login' by getting the service document from a sword repository.
     """
 
-    templatePath = 'templates/%s/login.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/login.pt'
 
     config = load_config(request)
 
@@ -67,9 +67,12 @@ def login_view(request):
     ]
     
     session = request.session
-
+    
+    # validate the form in order to compute all errors
+    valid_form = form.validate()
+    request['errors'] = form.all_errors()
     # Check for successful form completion
-    if 'form.submitted' in request.POST and form.validate():
+    if 'form.submitted' in request.POST and valid_form:
         # The login details are persisted on the session
         for field_name in [i[0] for i in field_list]:
             session[field_name] = form.data[field_name]
@@ -82,7 +85,7 @@ def login_view(request):
             if not session.has_key(key):
                 loggedIn = False
         if loggedIn:
-            return HTTPFound(location=request.route_url('cnxlogin_frames'))
+            return HTTPFound(location=request.route_url('choose'))
 
     # TODO: check credentials against Connexions and ask for login
     # again if failed.
@@ -121,11 +124,11 @@ def login_view(request):
         except:
             del session['username']
             del session['password']
+            request['errors'] = ["Invalid username or password. Please try again.",]
             response = {
                 'form': FormRenderer(form),
                 'field_list': field_list,
                 'config': config,
-                'login_error': "Invalid username or password. Please try again.",
             }
             return render_to_response(templatePath, response, request=request)
 
@@ -149,35 +152,23 @@ def login_view(request):
                                              )[0].text
 
     # Go to the upload page
-    return HTTPFound(location=request.route_url('cnxlogin_frames'))
-
-
-@view_config(route_name='cnxlogin_frames', renderer='templates/cnxlogin_frames.pt')
-def cnxlogin_frames_view(request):
-    check_login(request)
-    return {}
+    return HTTPFound(location=request.route_url('choose'))
 
 
 @view_config(route_name='cnxlogin')
 def cnxlogin_view(request):
     check_login(request)
 
-    postUrl = {
-        'http://cnx.org/sword/servicedocument': 'http://cnx.org/login_form',
-        'http://50.57.120.10:8080/rhaptos/sword/servicedocument': 'http://50.57.120.10:8080/login_form',
-        'http://50.57.120.10:8080/sword/servicedocument': 'http://50.57.120.10:8080/login_form',
-    }.get(request.session['service_document_url'])
+    config = load_config(request)
+    login_url = config['login_url']
 
-    if postUrl is not None:
-        templatePath = 'templates/cnxlogin.pt'
-        response = {
-            'username': request.session['username'],
-            'password': request.session['password'],
-            'postUrl': postUrl,
-        }
-        return render_to_response(templatePath, response, request=request)
-    else:
-        return ''
+    templatePath = 'templates/cnxlogin.pt'
+    response = {
+        'username': request.session['username'],
+        'password': request.session['password'],
+        'login_url': login_url,
+    }
+    return render_to_response(templatePath, response, request=request)
 
 
 @view_config(route_name='logout', renderer='templates/login.pt')
@@ -185,18 +176,6 @@ def logout_view(request):
     session = request.session
     session.invalidate()
     raise HTTPFound(location=request.route_url('login'))
-
-
-@view_config(route_name='switch_expert_mode')
-def switch_expert_mode_view(request):
-    referer = request.environ.get('HTTP_REFERER', request.route_url('login'))
-    # HACK: to make frames view of preview page work out
-    substr = '/preview_side'
-    if referer[-len(substr):] == substr:
-        referer = referer[:-len(substr)] + '/preview'
-    # /HACK
-    request.session['expert_mode'] = not request.session.get('expert_mode', False)
-    raise HTTPFound(location=referer)
 
 
 class UploadSchema(formencode.Schema):
@@ -214,7 +193,7 @@ def choose_view(request):
 #    import pdb; pdb.set_trace()
     check_login(request)
 
-    templatePath = 'templates/%s/choose.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/choose.pt'
 
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]
@@ -306,57 +285,66 @@ def choose_view(request):
                 url = form.data['url_text']
 
                 # download html:
-                #html = urllib2.urlopen(url).read() # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
+                #html = urllib2.urlopen(url).read() 
+                # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
                 import_opener = urllib2.build_opener()
                 import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-                import_request = import_opener.open(url)
-                html = import_request.read()
-
-                # transformation            
-                cnxml, objects, html_title = htmlsoup_to_cnxml(html, bDownloadImages=True, base_or_source_url=url)
-                request.session['title'] = html_title
-
-                # write CNXML output
-                cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-                cnxml_file = open(cnxml_filename, 'w')
                 try:
-                    cnxml_file.write(cnxml)
-                    cnxml_file.flush()
-                finally:
-                    cnxml_file.close()
+                    import_request = import_opener.open(url)
+                    html = import_request.read()
 
-                # write images
-                for image_filename, image in objects.iteritems():
-                    image_filename = os.path.join(save_dir, image_filename)
-                    image_file = open(image_filename, 'wb') # write binary, important!
+                    # transformation            
+                    cnxml, objects, html_title = htmlsoup_to_cnxml(
+                        html, bDownloadImages=True, base_or_source_url=url)
+                    request.session['title'] = html_title
+
+                    # write CNXML output
+                    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+                    cnxml_file = open(cnxml_filename, 'w')
                     try:
-                        image_file.write(image)
-                        image_file.flush()
+                        cnxml_file.write(cnxml)
+                        cnxml_file.flush()
                     finally:
-                        image_file.close()
+                        cnxml_file.close()
 
-                htmlpreview = cnxml_to_htmlpreview(cnxml)
-                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                    index.write(htmlpreview)
+                    # write images
+                    for image_filename, image in objects.iteritems():
+                        image_filename = os.path.join(save_dir, image_filename)
+                        image_file = open(image_filename, 'wb') # write binary, important!
+                        try:
+                            image_file.write(image)
+                            image_file.flush()
+                        finally:
+                            image_file.close()
 
-                # Zip up all the files. This is done now, since we have all the files
-                # available, and it also allows us to post a simple download link.
-                # Note that we cannot use zipfile as context manager, as that is only
-                # available from python 2.7
-                # TODO: Do a filesize check xxxx
-                zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-                try:
-                    zip_archive.writestr('index.cnxml', cnxml)
-                    #for image_filename, image in objects.iteritems():
-                    #    zip_archive.writestr(image_filename, image)
-                finally:
-                    zip_archive.close()
+                    htmlpreview = cnxml_to_htmlpreview(cnxml)
+                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                        index.write(htmlpreview)
 
-                # Keep the info we need for next uploads.  Note that this might kill
-                # the ability to do multiple tabs in parallel, unless it gets offloaded
-                # onto the form again.
-                request.session['upload_dir'] = temp_dir_name
-                request.session['filename'] = "HTML Document"
+                    # Zip up all the files. This is done now, since we have all the files
+                    # available, and it also allows us to post a simple download link.
+                    # Note that we cannot use zipfile as context manager, as that is only
+                    # available from python 2.7
+                    # TODO: Do a filesize check xxxx
+                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+                    try:
+                        zip_archive.writestr('index.cnxml', cnxml)
+                        #for image_filename, image in objects.iteritems():
+                        #    zip_archive.writestr(image_filename, image)
+                    finally:
+                        zip_archive.close()
+
+                    # Keep the info we need for next uploads.  Note that this might kill
+                    # the ability to do multiple tabs in parallel, unless it gets offloaded
+                    # onto the form again.
+                    request.session['upload_dir'] = temp_dir_name
+                    request.session['filename'] = "HTML Document"
+                except urllib2.URLError, e:
+                    request['errors'] = ['The URL %s could not be opened' %url,]
+                    response = {
+                        'form': FormRenderer(form),
+                    }
+                    return render_to_response(templatePath, response, request=request)
 
             # Office, CNXML-ZIP or LaTeX-ZIP file
             else:
@@ -562,8 +550,12 @@ FORM DATA
 #            return tmp_obj
 
         request.session.flash('The file was successfully converted.')
+<<<<<<< HEAD
         return HTTPFound(location=request.route_url('preview_frames'))
     print('Doing normal return!!!')
+=======
+        return HTTPFound(location=request.route_url('preview'))
+>>>>>>> 220d4cde78ba3a9f3cb2258067ce600a395f5044
 
     # First view or errors
     response = {
@@ -573,9 +565,14 @@ FORM DATA
     return render_to_response(templatePath, response, request=request)
 
 
+<<<<<<< HEAD
 @view_config(route_name='preview_frames', renderer='templates/preview_frames.pt')
 def preview_frames_view(request):
     print('PREVIEW FRAMES')
+=======
+@view_config(route_name='preview', renderer='templates/preview.pt')
+def preview_view(request):
+>>>>>>> 220d4cde78ba3a9f3cb2258067ce600a395f5044
     check_login(request)
 
     body_filename = request.session.get('preview-no-cache')
@@ -586,7 +583,6 @@ def preview_frames_view(request):
 
     return {
         'header_url': request.route_url('preview_header'),
-        #'body_url': '%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
         'body_url': request.route_url('preview_body'),
     }
 
@@ -595,10 +591,12 @@ def preview_frames_view(request):
 def preview_header_view(request):
     print('PREVIEW HEADER')
     check_login(request)
-    templatePath = 'templates/%s/preview_header.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/%s/preview_header.pt'%(
+        ['novice','expert'][request.session.get('expert_mode', False)])
     return render_to_response(templatePath, {}, request=request)
 
 
+<<<<<<< HEAD
 @view_config(route_name='preview_side', renderer='templates/preview_side.pt')
 def preview_side_view(request):
     print('PREVIEW SIDE')
@@ -612,6 +610,18 @@ def preview_body_view(request):
     return HTTPFound('%s%s/index.html'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
                      headers={'Cache-Control': 'max-age=0, must-revalidate', 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
                      request=request)
+=======
+@view_config(route_name='preview_body')
+def preview_body_view(request):
+    return HTTPFound(
+        '%s%s/index.xhtml'% (
+            request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+            request.session['upload_dir']),
+        headers={'Cache-Control': 'max-age=0, must-revalidate',
+                 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
+        request=request
+    )
+>>>>>>> 220d4cde78ba3a9f3cb2258067ce600a395f5044
 
 
 class CnxmlSchema(formencode.Schema):
@@ -619,7 +629,7 @@ class CnxmlSchema(formencode.Schema):
     cnxml = formencode.validators.String(not_empty=True)
 
 
-@view_config(route_name='cnxml', renderer='templates/expert/cnxml_editor.pt')
+@view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
     check_login(request)
     form = Form(request, schema=CnxmlSchema)
@@ -661,7 +671,7 @@ def cnxml_view(request):
         finally:
             zip_archive.close()
         # Return to preview
-        return HTTPFound(location=request.route_url('preview_frames'), request=request)
+        return HTTPFound(location=request.route_url('preview'), request=request)
 
     # Read CNXML
     with open(cnxml_filename, 'rt') as fp:
@@ -682,7 +692,7 @@ def cnxml_view(request):
 @view_config(route_name='summary')
 def summary_view(request):
     check_login(request)
-    templatePath = 'templates/%s/summary.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/summary.pt'
 
     # Note: need to extract the version string before passing dom to
     # Deposit_Receipt, which mangles dom.
@@ -733,7 +743,7 @@ def metadata_view(request):
     """
     print('INSIDE METADATA_VIEW')
     check_login(request)
-    templatePath = 'templates/%s/metadata.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
+    templatePath = 'templates/metadata.pt'
     session = request.session
     config = load_config(request)
 
@@ -776,7 +786,7 @@ def metadata_view(request):
     
     # Get remembered title from the session    
     if 'title' in session:
-	print('TITLE '+session['title']+' in session')
+        print('TITLE '+session['title']+' in session')
         defaults['title'] = session['title']
         config['metadata']['title'] = session['title']
 
@@ -815,10 +825,10 @@ def metadata_view(request):
 
         # Title
 
-	if(form.data['title']):
-		print('FORM_DATA')
-	else:
-		print('SESSION_FILENAME')
+        if(form.data['title']):
+            print('FORM_DATA')
+        else:
+            print('SESSION_FILENAME')
 
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
@@ -1077,7 +1087,13 @@ def admin_config_view(request):
         'form': FormRenderer(form),
         'subjects': subjects,
         'languages': languages,
-        'roles': [('authors', 'Authors'), ('maintainers', 'Maintainers'), ('copyright', 'Copyright holders'), ('editors', 'Editors'), ('translators', 'Translators')],
+        'roles': [('authors', 'Authors'),
+                  ('maintainers', 'Maintainers'),
+                  ('copyright', 'Copyright holders'),
+                  ('editors', 'Editors'),
+                  ('translators',
+                  'Translators')
+                 ],
         'request': request,
         'config': config,
     }
