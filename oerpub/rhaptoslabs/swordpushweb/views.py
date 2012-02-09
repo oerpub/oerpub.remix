@@ -199,6 +199,10 @@ def choose_view(request):
     form = Form(request, schema=UploadSchema)
     field_list = [('upload', 'File')]
 
+    # clear the session
+    if 'transformerror' in request.session:
+        del request.session['transformerror']
+
     # Check for successful form completion
     if form.validate():
         try: # Catch-all exception block
@@ -211,6 +215,12 @@ def choose_view(request):
                 temp_dir_name
                 )
             os.mkdir(save_dir)
+
+            # Keep the info we need for next uploads.  Note that this
+            # might kill the ability to do multiple tabs in parallel,
+            # unless it gets offloaded onto the form again.
+            request.session['upload_dir'] = temp_dir_name
+            request.session['filename'] = form.data['upload'].filename
 
             # Google Docs Conversion
             # if we have a Google Docs ID and Access token.
@@ -278,7 +288,6 @@ def choose_view(request):
                 # Keep the info we need for next uploads.  Note that this might kill
                 # the ability to do multiple tabs in parallel, unless it gets offloaded
                 # onto the form again.
-                request.session['upload_dir'] = temp_dir_name
                 request.session['filename'] = "Google Document"
 
             # HTML URL Import:
@@ -338,7 +347,6 @@ def choose_view(request):
                     # Keep the info we need for next uploads.  Note that this might kill
                     # the ability to do multiple tabs in parallel, unless it gets offloaded
                     # onto the form again.
-                    request.session['upload_dir'] = temp_dir_name
                     request.session['filename'] = "HTML Document"
                 except urllib2.URLError, e:
                     request['errors'] = ['The URL %s could not be opened' %url,]
@@ -438,12 +446,6 @@ def choose_view(request):
                     finally:
                         zip_archive.close()
 
-                    # Keep the info we need for next uploads.  Note that this might kill
-                    # the ability to do multiple tabs in parallel, unless it gets offloaded
-                    # onto the form again.
-                    request.session['upload_dir'] = temp_dir_name
-                    request.session['filename'] = form.data['upload'].filename
-
                 # OOo / MS Word Conversion
                 else:
                     # Convert from other office format to odt if needed
@@ -462,23 +464,11 @@ def choose_view(request):
                     # Convert and save all the resulting files.
                     tree, files, errors = transform(odt_filename)
                     xml = clean_cnxml(etree.tostring(tree))
-                    errors = [
-                        e for e in errors if e['level'] == 'ERROR']
-                    if errors:
-                        msg = ''
-                        for error in errors:
-                            msg += '\t%s (id: %s)\n' % (error['msg'],
-                                                        error['id'])
-                        raise ConversionError(original_filename, msg)
                     with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
                         cnxml_file.write(xml)
                     for filename, content in files.items():
                         with open(os.path.join(save_dir, filename), 'wb') as img_file:
                             img_file.write(content)
-
-                    valid, log = validate(xml, validator="jing")
-                    if not valid:
-                        raise ConversionError(original_filename, log)
 
                     # Convert the cnxml for preview.
                     html = cnxml_to_htmlpreview(xml)
@@ -498,11 +488,23 @@ def choose_view(request):
                     finally:
                         zip_archive.close()
 
-                # Keep the info we need for next uploads.  Note that this might kill
-                # the ability to do multiple tabs in parallel, unless it gets offloaded
-                # onto the form again.
-                request.session['upload_dir'] = temp_dir_name
-                request.session['filename'] = form.data['upload'].filename
+                    # first check if the XSL transforms returned any
+                    # errors
+                    errors = [
+                        e for e in errors if e['level'] == 'ERROR']
+                    if errors:
+                        msg = ''
+                        for error in errors:
+                            msg += '\t%s (id: %s)\n' % (error['msg'],
+                                                        error['id'])
+                        raise ConversionError(original_filename, msg)
+
+                    # now validate with jing
+                    valid, log = validate(xml, validator="jing")
+                    if not valid:
+                        raise ConversionError(original_filename, log)
+
+
         except ConversionError as e:
             # Get timestamp
 
@@ -510,6 +512,10 @@ def choose_view(request):
             templatePath = 'templates/conv_error.pt'
             response = {'filename' : os.path.basename(e.filename),
                         'error': e.msg}
+
+            # put the error on the session for retrieval on the editor
+            # view
+            request.session['transformerror'] = e.msg
         
             if('title' in request.session):
                 del request.session['title']
@@ -619,7 +625,7 @@ def cnxml_view(request):
     form = Form(request, schema=CnxmlSchema)
     save_dir = os.path.join(request.registry.settings['transform_dir'], request.session['upload_dir'])
     cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-
+    transformerror = request.session.get('transformerror')
 
     # Check for successful form completion
     if 'cnxml' in request.POST and form.validate():
@@ -633,8 +639,20 @@ def cnxml_view(request):
         os.rename(zip_filename, zip_filename + '~')
 
         # Save new CNXML
+        cnxml = form.data['cnxml']
         with open(cnxml_filename, 'wt') as fp:
-            fp.write(form.data['cnxml'])
+            fp.write(cnxml)
+
+        valid, log = validate(cnxml, validator="jing")
+        if not valid:
+            templatePath = 'templates/conv_error.pt'
+            response = {'filename' : os.path.basename(cnxml_filename),
+                        'error': log}
+
+            # put the error on the session for retrieval on the editor
+            # view
+            request.session['transformerror'] = log
+            return render_to_response(templatePath, response, request=request)
 
         # Convert the CNXML for preview
         html = cnxml_to_htmlpreview(form.data['cnxml'])
@@ -670,6 +688,7 @@ def cnxml_view(request):
         'codemirror': True,
         'form': FormRenderer(form),
         'cnxml': cnxml,
+        'transformerror': transformerror,
     }
 
 
