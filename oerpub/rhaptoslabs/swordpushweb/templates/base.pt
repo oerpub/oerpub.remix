@@ -59,6 +59,22 @@
                    it are in a fixed position)
                 */
                 $("#content").css({'margin-top': headerh + wfnh + eh})
+                
+                /* Get the expert mode cookie.
+                   If it does not exist we create it and set it to false.
+                   This means the UI will work in 'novice' mode until the user
+                   changes it.
+                */
+                var expertmode = $.cookie(em_cookie);
+                if (!expertmode) {
+                    expertmode = false;
+                    $.cookie(em_cookie, expertmode, { path: '/'});
+                }
+                if (expertmode == "true") {
+                    enableExpertMode();
+                } else {
+                    disableExpertMode();
+                }
             });
 
         </script>

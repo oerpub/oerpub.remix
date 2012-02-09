@@ -4,6 +4,7 @@
 
 var roles = new Array('authors', 'maintainers', 'copyright', 'editors', 'translators');
 var required_roles = new Array('authors', 'maintainers', 'copyright');
+var em_cookie = 'oerpushweb.expertmode';
 
 /* TODO: Check that required roles are specified */
 
@@ -147,18 +148,7 @@ $(document).ready(function() {
     });
 
     // Display advanced mode notice on click
-    $("#expertmode").toggle(function(){
-         updateCookie(true);
-         $("#advanced-message").show();
-         $("#basic-message").hide();
-         $(this).addClass("expert-activated");
-         $(".advanced").show();
-         }, function(){
-         updateCookie(false);
-         $("#advanced-message").hide();
-         $(this).removeClass("expert-activated");
-         $(".advanced").hide();
-    });
+    $("#expertmode").toggle(enableExpertMode, disableExpertMode);
 
     // Confirm if user really wants to sign out before work is uploaded
     var confirmMsg1 = "Are you sure you want to sign out? \n\nYour module has not been uploaded and any work on it will be lost if you sign out now.";
@@ -416,6 +406,20 @@ function showWaitMessage() {
 /* Update cookie depends on the javascript 'cookie.js' in the static folder
  * sibling to this file. */
 function updateCookie(expertmode) {
-    var cookie_name = 'oerpushweb.expertmode';
-    $.cookie(cookie_name, expertmode, { path: '/'});
+    $.cookie(em_cookie, expertmode, { path: '/'});
+}
+
+function enableExpertMode() {
+    updateCookie(true);
+    $("#advanced-message").show();
+    $("#basic-message").hide();
+    $(this).addClass("expert-activated");
+    $(".advanced").show();
+}
+
+function disableExpertMode(){
+     updateCookie(false);
+     $("#advanced-message").hide();
+     $(this).removeClass("expert-activated");
+     $(".advanced").hide();
 }
