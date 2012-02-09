@@ -70,10 +70,16 @@
                     expertmode = false;
                     $.cookie(em_cookie, expertmode, { path: '/'});
                 }
+                var element = $('#expertmode');
                 if (expertmode == "true") {
-                    enableExpertMode();
+                    enableExpertMode(element);
+                    /* this is necessary to put the 'toggle' function in the correct
+                       state. If I don't do this, you have to click the link twice in
+                       order to disable expert mode.
+                    */
+                    $('#expertmode').click();
                 } else {
-                    disableExpertMode();
+                    disableExpertMode(element);
                 }
             });
 

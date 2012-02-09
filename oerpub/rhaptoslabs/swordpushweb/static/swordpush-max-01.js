@@ -409,17 +409,17 @@ function updateCookie(expertmode) {
     $.cookie(em_cookie, expertmode, { path: '/'});
 }
 
-function enableExpertMode() {
+function enableExpertMode(element) {
     updateCookie(true);
     $("#advanced-message").show();
     $("#basic-message").hide();
-    $(this).addClass("expert-activated");
+    $(element).addClass("expert-activated");
     $(".advanced").show();
 }
 
-function disableExpertMode(){
+function disableExpertMode(element){
      updateCookie(false);
      $("#advanced-message").hide();
-     $(this).removeClass("expert-activated");
+     $(element).removeClass("expert-activated");
      $(".advanced").hide();
 }
