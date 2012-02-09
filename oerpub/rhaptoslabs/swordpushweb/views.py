@@ -211,6 +211,7 @@ class ConversionError(Exception):
 
 @view_config(route_name='choose')
 def choose_view(request):
+#    import pdb; pdb.set_trace()
     check_login(request)
 
     templatePath = 'templates/%s/choose.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
@@ -462,7 +463,6 @@ def choose_view(request):
                     if(extension != '.odt'):
                         odt_filename= '%s.odt' % filename
                         command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
-                        print command
                         os.system(command)
                         try:
                             fp = open(odt_filename, 'r')
@@ -470,6 +470,7 @@ def choose_view(request):
                         except IOError as io:
                             raise ConversionError(original_filename)
                     # Convert and save all the resulting files.
+
                     tree, files, errors = transform(odt_filename)
                     xml = etree.tostring(tree)
                     with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
@@ -503,7 +504,7 @@ def choose_view(request):
                 request.session['filename'] = form.data['upload'].filename
         except ConversionError as e:
             # Get timestamp
-
+            print('Got ConversionError!!!')
             timestamp = datetime.datetime.now()
             templatePath = 'templates/conv_error.pt'
             response = { 'filename' : os.path.basename(e.__str__()) }
@@ -515,6 +516,7 @@ def choose_view(request):
 
         except Exception:
             # Record traceback
+            print('Got Exception!!!')
             import traceback
             tb = traceback.format_exc()
             # Get software version from git
@@ -561,6 +563,7 @@ FORM DATA
 
         request.session.flash('The file was successfully converted.')
         return HTTPFound(location=request.route_url('preview_frames'))
+    print('Doing normal return!!!')
 
     # First view or errors
     response = {
@@ -572,6 +575,7 @@ FORM DATA
 
 @view_config(route_name='preview_frames', renderer='templates/preview_frames.pt')
 def preview_frames_view(request):
+    print('PREVIEW FRAMES')
     check_login(request)
 
     body_filename = request.session.get('preview-no-cache')
@@ -589,6 +593,7 @@ def preview_frames_view(request):
 
 @view_config(route_name='preview_header')
 def preview_header_view(request):
+    print('PREVIEW HEADER')
     check_login(request)
     templatePath = 'templates/%s/preview_header.pt'%(['novice','expert'][request.session.get('expert_mode', False)])
     return render_to_response(templatePath, {}, request=request)
@@ -596,12 +601,15 @@ def preview_header_view(request):
 
 @view_config(route_name='preview_side', renderer='templates/preview_side.pt')
 def preview_side_view(request):
+    print('PREVIEW SIDE')
     return {'expert_mode_switch_target': '_parent'}
 
 
 @view_config(route_name='preview_body')
 def preview_body_view(request):
-    return HTTPFound('%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
+    tmp_str='%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])
+    print('PREVIEW BODY '+tmp_str)
+    return HTTPFound('%s%s/index.html'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
                      headers={'Cache-Control': 'max-age=0, must-revalidate', 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
                      request=request)
 
