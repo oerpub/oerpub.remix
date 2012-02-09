@@ -550,12 +550,7 @@ FORM DATA
 #            return tmp_obj
 
         request.session.flash('The file was successfully converted.')
-<<<<<<< HEAD
-        return HTTPFound(location=request.route_url('preview_frames'))
-    print('Doing normal return!!!')
-=======
         return HTTPFound(location=request.route_url('preview'))
->>>>>>> 220d4cde78ba3a9f3cb2258067ce600a395f5044
 
     # First view or errors
     response = {
@@ -565,14 +560,8 @@ FORM DATA
     return render_to_response(templatePath, response, request=request)
 
 
-<<<<<<< HEAD
-@view_config(route_name='preview_frames', renderer='templates/preview_frames.pt')
-def preview_frames_view(request):
-    print('PREVIEW FRAMES')
-=======
 @view_config(route_name='preview', renderer='templates/preview.pt')
 def preview_view(request):
->>>>>>> 220d4cde78ba3a9f3cb2258067ce600a395f5044
     check_login(request)
 
     body_filename = request.session.get('preview-no-cache')
@@ -596,21 +585,6 @@ def preview_header_view(request):
     return render_to_response(templatePath, {}, request=request)
 
 
-<<<<<<< HEAD
-@view_config(route_name='preview_side', renderer='templates/preview_side.pt')
-def preview_side_view(request):
-    print('PREVIEW SIDE')
-    return {'expert_mode_switch_target': '_parent'}
-
-
-@view_config(route_name='preview_body')
-def preview_body_view(request):
-    tmp_str='%s%s/index.xhtml'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])
-    print('PREVIEW BODY '+tmp_str)
-    return HTTPFound('%s%s/index.html'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir']),
-                     headers={'Cache-Control': 'max-age=0, must-revalidate', 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
-                     request=request)
-=======
 @view_config(route_name='preview_body')
 def preview_body_view(request):
     return HTTPFound(
@@ -621,7 +595,6 @@ def preview_body_view(request):
                  'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
         request=request
     )
->>>>>>> 220d4cde78ba3a9f3cb2258067ce600a395f5044
 
 
 class CnxmlSchema(formencode.Schema):
