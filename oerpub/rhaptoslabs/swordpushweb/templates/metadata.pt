@@ -6,6 +6,9 @@
                 $('.forward-button').removeAttr('disabled');
                 $('.forward-button').val("Finish: Upload to Connexions \u00bb");
                 $('#back-steps .button').removeAttr('disabled');
+                $("#formentry-title").removeClass("error");
+                $("#formentry-title .errortext").hide();
+                $("#formentry-ga").removeClass("error");
             });
 
         </script>
