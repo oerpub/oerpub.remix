@@ -184,11 +184,53 @@ class UploadSchema(formencode.Schema):
     upload = formencode.validators.FieldStorageUploadConverter()
 
 class ConversionError(Exception):
-    def __init__(self, filename, msg=''):
-        self.filename = filename
+    def __init__(self, msg):
         self.msg = msg
     def __str__(self):
         return self.msg
+
+def save_cnxml(save_dir, cnxml, files):
+    # write CNXML output
+    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
+    cnxml_file = open(cnxml_filename, 'w')
+    try:
+        cnxml_file.write(cnxml)
+        cnxml_file.flush()
+    finally:
+        cnxml_file.close()
+
+    # write files
+    for filename, content in files:
+        filename = os.path.join(save_dir, filename)
+        f = open(filename, 'wb') # write binary, important!
+        try:
+            f.write(content)
+            f.flush()
+        finally:
+            f.close()
+
+    htmlpreview = cnxml_to_htmlpreview(cnxml)
+    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+        index.write(htmlpreview)
+
+    # Zip up all the files. This is done now, since we have all the files
+    # available, and it also allows us to post a simple download link.
+    # Note that we cannot use zipfile as context manager, as that is only
+    # available from python 2.7
+    # TODO: Do a filesize check xxxx
+    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
+    try:
+        zip_archive.writestr('index.cnxml', cnxml)
+        for filename, fileObj in files:
+            zip_archive.writestr(filename, fileObj)
+    finally:
+        zip_archive.close()
+
+def validate_cnxml(cnxml):
+    valid, log = validate(cnxml, validator="jing")
+    if not valid:
+        raise ConversionError(log)
+
 
 @view_config(route_name='choose')
 def choose_view(request):
@@ -221,7 +263,8 @@ def choose_view(request):
             # might kill the ability to do multiple tabs in parallel,
             # unless it gets offloaded onto the form again.
             request.session['upload_dir'] = temp_dir_name
-            request.session['filename'] = form.data['upload'].filename
+            if form.data['upload'] is not None:
+                request.session['filename'] = form.data['upload'].filename
 
             # Google Docs Conversion
             # if we have a Google Docs ID and Access token.
@@ -250,46 +293,16 @@ def choose_view(request):
                 # Transformation and get images
                 cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
 
-                # write CNXML output
-                cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-                cnxml_file = open(cnxml_filename, 'w')
-                try:
-                    cnxml_file.write(cnxml)
-                    cnxml_file.flush()
-                finally:
-                    cnxml_file.close()
+                cnxml = clean_cnxml(cnxml)
+                save_cnxml(save_dir, cnxml, objects.items())
 
-                # write images
-                for image_filename, image in objects.iteritems():
-                    image_filename = os.path.join(save_dir, image_filename)
-                    image_file = open(image_filename, 'wb') # write binary, important!
-                    try:
-                        image_file.write(image)
-                        image_file.flush()
-                    finally:
-                        image_file.close()
-
-                htmlpreview = cnxml_to_htmlpreview(cnxml)
-                with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                    index.write(htmlpreview)
-
-                # Zip up all the files. This is done now, since we have all the files
-                # available, and it also allows us to post a simple download link.
-                # Note that we cannot use zipfile as context manager, as that is only
-                # available from python 2.7
-                # TODO: Do a filesize check xxxx
-                zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-                try:
-                    zip_archive.writestr('index.cnxml', cnxml)
-                    for image_filename, image in objects.iteritems():
-                        zip_archive.writestr(image_filename, image)
-                finally:
-                    zip_archive.close()
-
-                # Keep the info we need for next uploads.  Note that this might kill
-                # the ability to do multiple tabs in parallel, unless it gets offloaded
-                # onto the form again.
+                # Keep the info we need for next uploads.  Note that
+                # this might kill the ability to do multiple tabs in
+                # parallel, unless it gets offloaded onto the form
+                # again.
                 request.session['filename'] = "Google Document"
+
+                validate_cnxml(cnxml)
 
             # HTML URL Import:
             elif form.data.get('url_text'):
@@ -309,46 +322,17 @@ def choose_view(request):
                         html, bDownloadImages=True, base_or_source_url=url)
                     request.session['title'] = html_title
 
-                    # write CNXML output
-                    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-                    cnxml_file = open(cnxml_filename, 'w')
-                    try:
-                        cnxml_file.write(cnxml)
-                        cnxml_file.flush()
-                    finally:
-                        cnxml_file.close()
+                    cnxml = clean_cnxml(cnxml)
+                    save_cnxml(save_dir, cnxml, objects.items())
 
-                    # write images
-                    for image_filename, image in objects.iteritems():
-                        image_filename = os.path.join(save_dir, image_filename)
-                        image_file = open(image_filename, 'wb') # write binary, important!
-                        try:
-                            image_file.write(image)
-                            image_file.flush()
-                        finally:
-                            image_file.close()
-
-                    htmlpreview = cnxml_to_htmlpreview(cnxml)
-                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                        index.write(htmlpreview)
-
-                    # Zip up all the files. This is done now, since we have all the files
-                    # available, and it also allows us to post a simple download link.
-                    # Note that we cannot use zipfile as context manager, as that is only
-                    # available from python 2.7
-                    # TODO: Do a filesize check xxxx
-                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-                    try:
-                        zip_archive.writestr('index.cnxml', cnxml)
-                        #for image_filename, image in objects.iteritems():
-                        #    zip_archive.writestr(image_filename, image)
-                    finally:
-                        zip_archive.close()
-
-                    # Keep the info we need for next uploads.  Note that this might kill
-                    # the ability to do multiple tabs in parallel, unless it gets offloaded
-                    # onto the form again.
+                    # Keep the info we need for next uploads.  Note that
+                    # this might kill the ability to do multiple tabs in
+                    # parallel, unless it gets offloaded onto the form
+                    # again.
                     request.session['filename'] = "HTML Document"
+
+                    validate_cnxml(cnxml)
+
                 except urllib2.URLError, e:
                     request['errors'] = ['The URL %s could not be opened' %url,]
                     response = {
@@ -396,12 +380,15 @@ def choose_view(request):
 
                     # Read CNXML
                     with open(os.path.join(save_dir, 'index.cnxml'), 'rt') as fp:
-                        xml = fp.read()
+                        cnxml = fp.read()
 
                     # Convert the CNXML to XHTML for preview
-                    html = cnxml_to_htmlpreview(xml)
+                    html = cnxml_to_htmlpreview(cnxml)
                     with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
                         index.write(html)
+
+                    cnxml = clean_cnxml(cnxml)
+                    validate_cnxml(cnxml)
                 
                 # LaTeX
                 elif is_latex_archive:
@@ -411,41 +398,9 @@ def choose_view(request):
                     # LaTeX 2 CNXML transformation
                     cnxml, objects = latex_to_cnxml(latex_archive, original_filename)
 
-                    # write CNXML output
-                    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-                    cnxml_file = open(cnxml_filename, 'w')
-                    try:
-                        cnxml_file.write(cnxml)
-                        cnxml_file.flush()
-                    finally:
-                        cnxml_file.close()
-
-                    # write images
-                    for image_filename, image in objects.iteritems():
-                        image_filename = os.path.join(save_dir, image_filename)
-                        image_file = open(image_filename, 'wb') # write binary, important!
-                        try:
-                            image_file.write(image)
-                            image_file.flush()
-                        finally:
-                            image_file.close()
-
-                    htmlpreview = cnxml_to_htmlpreview(cnxml)
-                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                        index.write(htmlpreview)
-
-                    # Zip up all the files. This is done now, since we have all the files
-                    # available, and it also allows us to post a simple download link.
-                    # Note that we cannot use zipfile as context manager, as that is only
-                    # available from python 2.7
-                    # TODO: Do a filesize check xxxx
-                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-                    try:
-                        zip_archive.writestr('index.cnxml', cnxml)
-                        for image_filename, image in objects.iteritems():
-                            zip_archive.writestr(image_filename, image)
-                    finally:
-                        zip_archive.close()
+                    cnxml = clean_cnxml(cnxml)
+                    save_cnxml(save_dir, cnxml, objects.items())
+                    validate_cnxml(cnxml)
 
                 # OOo / MS Word Conversion
                 else:
@@ -460,34 +415,13 @@ def choose_view(request):
                             fp = open(odt_filename, 'r')
                             fp.close()
                         except IOError as io:
-                            raise ConversionError(original_filename)
+                            raise ConversionError("%s not found" %
+                                                  original_filename)
                     # Convert and save all the resulting files.
 
                     tree, files, errors = transform(odt_filename)
-                    xml = clean_cnxml(etree.tostring(tree))
-                    with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
-                        cnxml_file.write(xml)
-                    for filename, content in files.items():
-                        with open(os.path.join(save_dir, filename), 'wb') as img_file:
-                            img_file.write(content)
-
-                    # Convert the cnxml for preview.
-                    html = cnxml_to_htmlpreview(xml)
-                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                        index.write(html)
-
-                    # Zip up all the files. This is done now, since we have all the files
-                    # available, and it also allows us to post a simple download link.
-                    # Note that we cannot use zipfile as context manager, as that is only
-                    # available from python 2.7
-                    # TODO: Do a filesize check xxxx
-                    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w') 
-                    try:
-                        zip_archive.writestr('index.cnxml', xml.encode('utf8'))
-                        for filename, content in files.items():
-                            zip_archive.writestr(filename, content)
-                    finally:
-                        zip_archive.close()
+                    cnxml = clean_cnxml(etree.tostring(tree))
+                    save_cnxml(save_dir, cnxml, files.items())
 
                     # first check if the XSL transforms returned any
                     # errors
@@ -498,20 +432,17 @@ def choose_view(request):
                         for error in errors:
                             msg += '\t%s (id: %s)\n' % (error['msg'],
                                                         error['id'])
-                        raise ConversionError(original_filename, msg)
+                        raise ConversionError(msg)
 
                     # now validate with jing
-                    valid, log = validate(xml, validator="jing")
-                    if not valid:
-                        raise ConversionError(original_filename, log)
-
+                    validate_cnxml(cnxml)
 
         except ConversionError as e:
             # Get timestamp
             print('Got ConversionError!!!')
             timestamp = datetime.datetime.now()
             templatePath = 'templates/conv_error.pt'
-            response = {'filename' : os.path.basename(e.filename),
+            response = {'filename' : request.session['filename'],
                         'error': e.msg}
 
             # put the error on the session for retrieval on the editor
@@ -646,17 +577,6 @@ def cnxml_view(request):
         with open(cnxml_filename, 'wt') as fp:
             fp.write(cnxml)
 
-        valid, log = validate(cnxml, validator="jing")
-        if not valid:
-            templatePath = 'templates/conv_error.pt'
-            response = {'filename' : os.path.basename(cnxml_filename),
-                        'error': log}
-
-            # put the error on the session for retrieval on the editor
-            # view
-            request.session['transformerror'] = log
-            return render_to_response(templatePath, response, request=request)
-
         # Convert the CNXML for preview
         html = cnxml_to_htmlpreview(form.data['cnxml'])
         with open(html_filename, 'w') as index:
@@ -675,6 +595,18 @@ def cnxml_view(request):
                 fp.close()
         finally:
             zip_archive.close()
+
+        valid, log = validate(cnxml, validator="jing")
+        if not valid:
+            templatePath = 'templates/conv_error.pt'
+            response = {'filename' : request.session['filename'],
+                        'error': log}
+
+            # put the error on the session for retrieval on the editor
+            # view
+            request.session['transformerror'] = log
+            return render_to_response(templatePath, response, request=request)
+
         # Return to preview
         return HTTPFound(location=request.route_url('preview'), request=request)
 
