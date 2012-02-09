@@ -1,21 +1,3 @@
-function updateCookies() {
-    var elements = jq('table.filter_criteria tbody td > *').filter('select');
-    for(var i=0;i < elements.length;i++) {
-        element = elements[i];
-        cookie_name = 'shiptrack_search_criterium.' + jq(element).attr('name');
-        var cookie_value = '';
-        values = jq(element).val();
-        if (values == null) {
-            cookie_value = values;
-        } else {
-            for(var val_count=0;val_count < values.length;val_count++) {
-                cookie_value = cookie_value + values[val_count] + ',';
-            };
-        }
-        jq.cookie(cookie_name, cookie_value, { path: '/'});
-    }
-}
-
 /******************************************************************************
 **
  * Cookie plugin
