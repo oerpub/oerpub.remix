@@ -58,7 +58,7 @@ ${form.csrf_token()}
                     <h1>
                         Edit:
                         <span class="metatitle">
-                            Conversion of Google Doc
+                            Conversion of <span tal:content="python:request.session.get('filename')">filename</span>
                         </span>
                     </h1>
                 </div>
