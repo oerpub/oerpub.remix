@@ -203,14 +203,33 @@ $(document).ready(function() {
     });
 
     $("#top-upload-to-cnx, #bottom-upload-to-cnx").click(function(e){
+        // reset the warnings
+        $("#formentry-title").removeClass("error");
+        $("#formentry-title .errortext").hide();
+        $("#formentry-ga").removeClass("error");
+        $("#formentry-ga .errortext").hide();
+
         // check required fields
+        var valid = true;
         title = $("input[name='title']").val();
         if (title == '(Untitled)' || title.length == 0) {
-            alert('You must supply at least a title.');
             $('#formentry-title').addClass('error')
             $("#formentry-title .errortext").show();
+            valid = false;
+        }
+        use_ga_code = $("input#google_code_opener").attr('checked');
+        ga_code = $("input[name='google_code']").val();
+        if (use_ga_code && ga_code.length == 0) {
+            $("#formentry-ga").addClass("error");
+            $("#formentry-ga .errortext").show();
+            $('#formentry-title').addClass('error')
+            $("#formentry-title .errortext").show();
+            valid = false;
+        }
+        if (!valid) {
             return false;
         }
+
         showWaitMessage();
         $('.forward-button').attr('disabled','disabled');
         $('.forward-button').val('Uploading to Connexions ...');
@@ -294,6 +313,7 @@ $(document).ready(function() {
 });
 
 function _doAction(message, event) {
+    // don't let the event propagate up, we handle all actions here.
     var element = event.target;
     var c = confirm(message);
     if (c == true) { 
@@ -302,9 +322,11 @@ function _doAction(message, event) {
             target = $(element).attr('url');
         }
         window.location = target;
+        event.stopPropagtion();
         return true;
     } else {
         event.preventDefault(); 
+        event.stopPropagtion();
         return false;
     }
 }
