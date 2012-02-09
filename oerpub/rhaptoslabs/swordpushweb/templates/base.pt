@@ -106,7 +106,7 @@
                     <div id="status" tal:define="username request.session.username|nothing"
                         tal:condition="username">
                         <span id="user-id">You are logged in as: <strong tal:content="username">user name</strong></span>.
-                        <a href="logout" target="_top">Sign out.</a>
+                        <a href="/logout" id="logout_link" target="_top">Sign out.</a>
                     </div>
                 </div>
 
