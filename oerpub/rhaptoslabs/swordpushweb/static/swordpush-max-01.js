@@ -294,6 +294,7 @@ $(document).ready(function() {
 });
 
 function _doAction(message, event) {
+    // don't let the event propagate up, we handle all actions here.
     var element = event.target;
     var c = confirm(message);
     if (c == true) { 
@@ -302,9 +303,11 @@ function _doAction(message, event) {
             target = $(element).attr('url');
         }
         window.location = target;
+        event.stopPropagtion();
         return true;
     } else {
         event.preventDefault(); 
+        event.stopPropagtion();
         return false;
     }
 }
