@@ -14,7 +14,7 @@
                 <p><strong>What can I do now?</strong></p>
                 <ul>
                     <li><a href="${request.route_url('choose')}">Go back to the beginning</a> to upload another file; or</li>
-                    <li>Look at the full error message.</li>
+                    <li><a href="${request.route_url('cnxml')}">Inspect the document in the advanced view</a></li>
                 </ul>
                 <p id="see-error">
                     <input type="checkbox"> See the full error message.
