@@ -1,36 +1,27 @@
 <metal:use use-macro="base">
 
-<tal:body metal:fill-slot="header">
-  <div id="header-wrap">
-    <div id="header-container">
-      <div id="header">
-	<img class="cnxlogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/connexions_icon.png')}"/>
-	<h1>Connexions Importer</h1>
-	<p class="status">You are logged in as ${request.session['username']}
-	  <br/><a href="${request.route_url('logout')}" target="_top">Click here to sign out</a></p>
-	<a href="http://www.shuttleworthfoundation.org/" target="_blank"><img class="sflogo" src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/sf150.png')}"/></a>
-      </div>
-    </div>
-  </div>
-</tal:body>
-
-<tal:body metal:fill-slot="content">
+<tal:body metal:fill-slot="content-slot">
   <div id="ie6-container-wrap">
     <div id="container">
       <div id="content">
-	<h1>Oops! There was a system error.</h1>
-	<p>Something went wrong while trying to load your
-	  document. This is probably because there is something wrong
-	  with this software. An error report has been submitted to
-	  the developers who will try to fix things.</p>
-	<p>Right now you can</p>
-	<ul>
-	  <li><a href="${request.route_url('choose')}">go back to the beginning</a> to upload another file; or</li>
-	  <li><a href="#" onclick="document.getElementById('upload_error_message').style.display = 'block'">view the full error message</a>.</li>
-        </ul>
-	<div id="upload_error_message" class="upload_error_message" style="display:none;">
-	  <pre>${traceback}</pre>
-	</div>
+            <div id="page-title">
+                <h1>System Error</h1>
+            </div>
+            <div class="error">
+                <span class="errortext">Oops! There was a system error.</span>
+            </div>
+
+            <p><strong>What can I do now?</strong></p>
+            <ul>
+                <li><a href="${request.route_url('choose')}">Go back to the beginning</a> to upload another file</li>
+            </ul>
+            <p id="see-error">
+                <input type="checkbox"> See the full error message.
+            </p>
+            <div style="display: none;" class="error_message codeblock" id="error_message">
+                <pre>${traceback}</pre>
+            </div>
+
       </div>
     </div>
   </div>
