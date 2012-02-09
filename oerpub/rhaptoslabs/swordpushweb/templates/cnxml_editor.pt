@@ -4,10 +4,19 @@
 <div id="workflownav-wrap">
     <div id="workflownav-container">
         <div id="back-steps">
-            <input type="button" class="button" id="back-to-preview"
-            value="&#171; Cancel: Back to preview" 
-            url="${request.route_url('preview')}"
-            title="Discard any edits you have made and return to the module preview">
+            <div tal:omit-tag="" tal:condition="econtext.get('transformerror')">
+                <input type="button" class="button"
+                    value="&#171; Back: Choose document" id="choose-new-document"
+                    title="Discard any edits you have made and choose a different document to convert"
+                    url="${request.route_url('choose')}"/>
+            </div>
+            <div tal:omit-tag="" tal:condition="not:econtext.get('transformerror')">
+                <input type="button" class="button" id="back-to-preview"
+                    value="&#171; Cancel: Back to preview" 
+                    url="${request.route_url('preview')}"
+                    title="Discard any edits you have made and return to the module preview">
+            </div>
+
         </div>
         <div id="forward-steps">
             <input type="button" class="button" id="undo-button"
@@ -59,6 +68,15 @@ ${form.csrf_token()}
                     </p>
                 </div>
             </div>
+            <div tal:condition="econtext.get('transformerror')">
+                <p>The cnxml does not validate properly.</p>
+                <p id="see-error">
+                    <input type="checkbox"> See the full error message.
+                </p>
+                <div style="display: none;" class="error_message codeblock" id="error_message">
+                    <pre>${transformerror}</pre>
+                </div>
+            </div>
             <textarea id="cnxml" name="cnxml">${cnxml}</textarea>
         </div>
     </div>
@@ -66,7 +84,7 @@ ${form.csrf_token()}
 ${form.end()}
 
 <script>
-    var editor = CodeMirror.fromTextArea(document.getElementById("cnxml"), {mode: {name: "xmlpure"}, lineWrapping: true});
+    var editor = CodeMirror.fromTextArea(document.getElementById("cnxml"), {mode: {name: "xmlpure"}, lineWrapping: true, lineNumbers: true});
 
     $('#undo-button').click(function(event) {
         editor.undo();     
