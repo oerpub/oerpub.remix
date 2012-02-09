@@ -42,7 +42,7 @@ ${form.csrf_token()}
             <div id="pageheader-wrap">
 
                 <div id="module-actions">
-                    <span class="advanced">
+                    <span class="advanced" style="display:inline;">
                         <h3>Module actions:</h3>
                         <a class="button"
                             tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])"
