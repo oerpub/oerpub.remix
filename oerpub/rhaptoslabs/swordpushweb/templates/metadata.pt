@@ -1,25 +1,19 @@
 <metal:use use-macro="base">
-    
-    <metal:script-slot fill-slot="script-slot">
-    <script type="text/javascript">
-        function notLoggedInWaring() {
-            alert('You are not logged in to Connexions. You can continue now, but will have to log in to Connextions seperately to edit the uploaded content.');    
-        }
+    <metal:script-slot fill-slot="script-slot">    
+        <script type="text/javascript">
 
-        $(document).ready(function(){
-            var loginChecker = window.setInterval(function() {
-                loginform = $('form#loginform'); 
-                if (loginform.length == 0) {
-                    window.clearInterval(loginChecker);
-                    $('input.forward-button').unbind('click', notLoggedInWaring);
-                }
-            }, 10000);
+            $(document).ready(function(){
+                $('.forward-button').removeAttr('disabled');
+                $('.forward-button').val("Finish: Upload to Connexions \u00bb");
+                $('#back-steps .button').removeAttr('disabled');
+                $("#formentry-title").removeClass("error");
+                $("#formentry-title .errortext").hide();
+                $("#formentry-ga").removeClass("error");
+            });
 
-            $('input.forward-button').click(notLoggedInWaring);
-        });
-    </script>
-    </metal:script-slot>
+        </script>
     
+    </metal:script-slot>    
     <metal:workflownav fill-slot="workflownav">
     ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
     ${form.csrf_token()}
@@ -37,20 +31,22 @@
                     title="Return to the module preview">
             </div>
             <div id="forward-steps">
-                <input id="upload-to-cnx" type="submit" class="button forward-button"
-                    value="Finish: Upload to Connexions &raquo;"
-                    url="${request.route_url('metadata')}"
-                    title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
+                <!--span class="advanced" style="display: none; ">
+                    <span class="advanced-marker" title="Advanced mode feature">
+                        <img src="${images_url}/gear_orange_3.png" />
+                    </span>
+                    <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                </span-->
+                <input id="top-upload-to-cnx" type="submit" class="button forward-button"
+                value="Finish: Upload to Connexions &raquo;"
+                url="${request.route_url('metadata')}"
+                title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
             </div>
         </div>
     </div>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
-    <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
-        frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
-    </iframe>
-    
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
@@ -73,6 +69,10 @@
                         <h1>
                             Describe your module
                         </h1>
+                    </div>
+
+                    <div class="pleasewait" id="upload-wait" style="display: none;">      
+                        Your module is being uploaded to Connexions. This may take a few moments.
                     </div>
 
                     <div id="page-description">
@@ -201,24 +201,18 @@
                                             <span class="button" id="edit-roles">Edit</span>
                                         </div>
                                         <br/>
-                                        <div>
+                                        <span class="advanced" style="display: none; ">
                                             <span class="advanced-marker" title="Advanced mode feature">
                                                 <img src="${images_url}/gear_orange_3.png" />
                                             </span>
                                             <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
-                                        </div>
+                                        </span>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-
-                    <div class="pleasewait" id="upload-wait" style="display: none;">      
-                        Your module is being uploaded to Connexions. This may take a few moments.
-                    </div>
-
                 </div>
-
             </div>
         </div>
     </div>

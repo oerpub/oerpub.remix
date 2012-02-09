@@ -37,7 +37,7 @@
                     </div>
 
                     <p>
-                        <span class="highlight">${'"'+module_title+'"'}</span> was successfully uploaded to Connexions.
+                        <span>${'"'+module_title+'"'}</span> was successfully uploaded to Connexions.
                     </p>
 
                     <p>

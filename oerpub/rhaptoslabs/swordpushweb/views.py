@@ -192,6 +192,7 @@ class ConversionError(Exception):
 
 @view_config(route_name='choose')
 def choose_view(request):
+#    import pdb; pdb.set_trace()
     check_login(request)
 
     templatePath = 'templates/choose.pt'
@@ -454,7 +455,6 @@ def choose_view(request):
                     if(extension != '.odt'):
                         odt_filename= '%s.odt' % filename
                         command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
-                        print command
                         os.system(command)
                         try:
                             fp = open(odt_filename, 'r')
@@ -462,6 +462,7 @@ def choose_view(request):
                         except IOError as io:
                             raise ConversionError(original_filename)
                     # Convert and save all the resulting files.
+
                     tree, files, errors = transform(odt_filename)
                     xml = clean_cnxml(etree.tostring(tree))
                     with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
@@ -507,7 +508,7 @@ def choose_view(request):
 
         except ConversionError as e:
             # Get timestamp
-
+            print('Got ConversionError!!!')
             timestamp = datetime.datetime.now()
             templatePath = 'templates/conv_error.pt'
             response = {'filename' : os.path.basename(e.filename),
@@ -523,6 +524,7 @@ def choose_view(request):
 
         except Exception:
             # Record traceback
+            print('Got Exception!!!')
             import traceback
             tb = traceback.format_exc()
             # Get software version from git
@@ -596,6 +598,7 @@ def preview_view(request):
 
 @view_config(route_name='preview_header')
 def preview_header_view(request):
+    print('PREVIEW HEADER')
     check_login(request)
     templatePath = 'templates/%s/preview_header.pt'%(
         ['novice','expert'][request.session.get('expert_mode', False)])

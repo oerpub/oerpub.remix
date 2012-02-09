@@ -50,9 +50,9 @@
                 var ma = $("#module-actions .advanced").outerWidth();
 
                 // Make the iframe fit exactly inside the remaining space
-                $("iframe").height(winh - headerh - wfnh - contentp - phwh + 5);
-                $("iframe").width($(window).width() - 53);
-                $("iframe").contents().find('body').addClass('preview');
+                $("iframe.fitted").height(winh - headerh - wfnh - contentp - phwh + 5);
+                $("iframe.fitted").width($(window).width() - 53);
+                $("iframe.fitted").contents().find('body').addClass('preview');
 
                 /* Give the page's header the correct top margin (since the elements above
                    it are in a fixed position)
@@ -106,13 +106,13 @@
                     <div id="status" tal:define="username request.session.username|nothing"
                         tal:condition="username">
                         <span id="user-id">You are logged in as: <strong tal:content="username">user name</strong></span>.
-                        <a href="logout" target="_top">Sign out.</a>
+                        <a href="/logout" id="logout_link" target="_top">Sign out.</a>
                     </div>
                 </div>
 
                 <div id="header">
                     <img class="cnxlogo" src="http://oerpub.org/static/images/connexions_icon.png"/>
-                    <h1><a href="#">Connexions Importer</a></h1>
+                    <h1><a href="/">Connexions Importer</a></h1>
                 </div>
                 
                 <metal:workflownav define-slot="workflownav">
