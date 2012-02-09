@@ -461,6 +461,7 @@ def choose_view(request):
                             raise ConversionError(original_filename)
                     # Convert and save all the resulting files.
                     tree, files, errors = transform(odt_filename)
+                    xml = clean_cnxml(etree.tostring(tree))
                     errors = [
                         e for e in errors if e['level'] == 'ERROR']
                     if errors:
@@ -469,15 +470,15 @@ def choose_view(request):
                             msg += '\t%s (id: %s)\n' % (error['msg'],
                                                         error['id'])
                         raise ConversionError(original_filename, msg)
-                    xml = etree.tostring(tree)
-                    valid, log = validate(xml, validator="jing")
-                    if not valid:
-                        raise ConversionError(original_filename, log)
                     with open(os.path.join(save_dir, 'index.cnxml'), 'w') as cnxml_file:
                         cnxml_file.write(xml)
                     for filename, content in files.items():
                         with open(os.path.join(save_dir, filename), 'wb') as img_file:
                             img_file.write(content)
+
+                    valid, log = validate(xml, validator="jing")
+                    if not valid:
+                        raise ConversionError(original_filename, log)
 
                     # Convert the cnxml for preview.
                     html = cnxml_to_htmlpreview(xml)
@@ -509,7 +510,6 @@ def choose_view(request):
             templatePath = 'templates/conv_error.pt'
             response = {'filename' : os.path.basename(e.filename),
                         'error': e.msg}
-            # tmp_obj = render_to_response(templatePath, response, request=request)
         
             if('title' in request.session):
                 del request.session['title']
