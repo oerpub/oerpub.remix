@@ -136,28 +136,29 @@ $(document).ready(function() {
 
     // Toggle advanced mode explanation on hover
     $("#expertmode").mouseover(function(){
-            if ($("#advanced-message").css("display") == 'none') {
+        if ($("#advanced-message").css("display") == 'none') {
             $("#basic-message").show();
             $(this).addClass("expert-activated");
-            }
-            }).mouseout(function(){
-                if ($("#advanced-message").css("display") == 'none') {
+        }}).mouseout(function(){
+            if ($("#advanced-message").css("display") == 'none') {
                 $("#basic-message").hide();
                 $(this).removeClass("expert-activated");
-                }
-                });
+        }
+    });
 
     // Display advanced mode notice on click
     $("#expertmode").toggle(function(){
-            $("#advanced-message").show();
-            $("#basic-message").hide();
-            $(this).addClass("expert-activated");
-            $(".advanced").show();
-            }, function(){
-            $("#advanced-message").hide();
-            $(this).removeClass("expert-activated");
-            $(".advanced").hide();
-            });
+         updateCookie(true);
+         $("#advanced-message").show();
+         $("#basic-message").hide();
+         $(this).addClass("expert-activated");
+         $(".advanced").show();
+         }, function(){
+         updateCookie(false);
+         $("#advanced-message").hide();
+         $(this).removeClass("expert-activated");
+         $(".advanced").hide();
+    });
 
     // Confirm if user really wants to sign out before work is uploaded
     var confirmMsg1 = "Are you sure you want to sign out? \n\nYour module has not been uploaded and any work on it will be lost if you sign out now.";
@@ -410,4 +411,11 @@ jQuery.fn.center = function () {
 function showWaitMessage() {
     $('#upload-wait').center();
     $('#upload-wait').slideDown();
+}
+
+/* Update cookie depends on the javascript 'cookie.js' in the static folder
+ * sibling to this file. */
+function updateCookie(expertmode) {
+    var cookie_name = 'oerpushweb.expertmode';
+    $.cookie(cookie_name, expertmode, { path: '/'});
 }
