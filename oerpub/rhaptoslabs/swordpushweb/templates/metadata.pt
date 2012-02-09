@@ -9,6 +9,7 @@
                 $("#formentry-title").removeClass("error");
                 $("#formentry-title .errortext").hide();
                 $("#formentry-ga").removeClass("error");
+                $("#formentry-ga .errortext").hide();
             });
 
         </script>
@@ -169,7 +170,8 @@
                                     </div>
                                     <div class="formentry" id="formentry-ga">
                                         <div class="formlabel">
-                                            <input type="checkbox" name="google_code_opener"/>
+                                            <input type="checkbox" id="google_code_opener"
+                                                name="google_code_opener"/>
                                             Add optional Google Analytics Tracking Code
                                         </div>
                                         <div class="errortext" style="display: none;">
