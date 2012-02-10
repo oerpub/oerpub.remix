@@ -450,17 +450,6 @@ def choose_view(request):
                     cnxml = clean_cnxml(etree.tostring(tree))
                     save_cnxml(save_dir, cnxml, files.items())
 
-                    # first check if the XSL transforms returned any
-                    # errors
-                    errors = [
-                        e for e in errors if e['level'] == 'ERROR']
-                    if errors:
-                        msg = ''
-                        for error in errors:
-                            msg += '\t%s (id: %s)\n' % (error['msg'],
-                                                        error['id'])
-                        raise ConversionError(msg)
-
                     # now validate with jing
                     validate_cnxml(cnxml)
 

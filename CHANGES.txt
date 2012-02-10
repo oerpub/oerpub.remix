@@ -21,6 +21,10 @@
 - Rename "remixable, sharable format" to "module"
   [rochecompaan]
 
+- Remove check for errors returned by odt2cnxml tranform since this is
+  inconsistent with what happens on cnx.org.
+  [rochecompaan]
+
 0.1.2
 -----
 
