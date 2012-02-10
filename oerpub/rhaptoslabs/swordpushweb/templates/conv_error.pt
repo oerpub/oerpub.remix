@@ -8,7 +8,7 @@
                     <h1>Failure</h1>
                 </div>
                 <div class="error">
-                    <span class="errortext">Oops! There was an error converting ${filename} to a remixable, shareable format.</span>
+                    <span class="errortext">Oops! There was an error converting ${filename} to a module.</span>
                 </div>
                 <p>Please try using one of the following file formats when uploading files to Connexions: .doc, .docx, .odt, or .zip for advanced users.
                 <p><strong>What can I do now?</strong></p>

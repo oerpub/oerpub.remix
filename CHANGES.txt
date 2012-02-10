@@ -1,19 +1,25 @@
 0.1.3 - unreleased
 ------------------
 
-- Add validation.
+- Add validation
   [rochecompaan]
 
 - Append "came_from=nothing" to login_url to speed up log in.
   [rochecompaan]
 
 - Catch libxml parser errors
+  [rochecompaan]
 
 - Refactor duplicate code that saves and backup files into a single
   save_cnxml method
+  [rochecompaan]
 
 - Refactor duplicate code that renders conversion error in to a single
   render_conversionerror method
+  [rochecompaan]
+
+- Rename "remixable, sharable format" to "module"
+  [rochecompaan]
 
 0.1.2
 -----
