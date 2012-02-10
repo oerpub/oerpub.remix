@@ -234,7 +234,6 @@ def validate_cnxml(cnxml):
 
 @view_config(route_name='choose')
 def choose_view(request):
-#    import pdb; pdb.set_trace()
     check_login(request)
 
     templatePath = 'templates/choose.pt'
@@ -511,9 +510,21 @@ FORM DATA
     return render_to_response(templatePath, response, request=request)
 
 
+class PreviewSchema(formencode.Schema):
+    allow_extra_fields = True
+    title = formencode.validators.String()
+
+
 @view_config(route_name='preview', renderer='templates/preview.pt')
 def preview_view(request):
     check_login(request)
+    
+    defaults = {}
+    defaults['title'] = request.session.get('title', '')
+    form = Form(request,
+                schema=PreviewSchema,
+                defaults=defaults
+               )
 
     body_filename = request.session.get('preview-no-cache')
     if body_filename is None:
@@ -524,6 +535,7 @@ def preview_view(request):
     return {
         'header_url': request.route_url('preview_header'),
         'body_url': request.route_url('preview_body'),
+        'form': FormRenderer(form),
     }
 
 

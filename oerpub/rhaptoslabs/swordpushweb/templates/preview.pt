@@ -1,6 +1,8 @@
 <metal:use use-macro="base">
 
     <metal:workflownav fill-slot="workflownav">
+    ${form.begin(request.route_url('metadata'), name="preview_form")}
+    ${form.csrf_token()}
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
@@ -10,8 +12,9 @@
                 url="${request.route_url('choose')}"/>
             </div>
             <div id="forward-steps">
-                <input type="button" id="forward-to-metadata"
+                <input id="forward-to-metadata"
                 class="button forward-button"
+                type="submit"
                 value="Next: Describe your module &#187;" 
                 url="${request.route_url('metadata')}"
                 title="Add/edit title and other information about the module"/>
@@ -70,6 +73,7 @@
             </div>
         </div>
     </div>
+    ${form.end()}
     </metal:content-slot>
 
     <metal:footer-slot fill-slot="footer-slot" />

@@ -16,7 +16,7 @@
     
     </metal:script-slot>    
     <metal:workflownav fill-slot="workflownav">
-    ${form.begin(request.route_url('metadata'), name="metadata_form", onsubmit="return check_submit();")}
+    ${form.begin(request.route_url('metadata'), name="metadata_form")}
     ${form.csrf_token()}
 
     <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
@@ -32,15 +32,8 @@
                     title="Return to the module preview">
             </div>
             <div id="forward-steps">
-                <!--span class="advanced" style="display: none; ">
-                    <span class="advanced-marker" title="Advanced mode feature">
-                        <img src="${images_url}/gear_orange_3.png" />
-                    </span>
-                    <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
-                </span-->
                 <input id="top-upload-to-cnx" type="submit" class="button forward-button"
                 value="Finish: Upload to Connexions &raquo;"
-                url="${request.route_url('metadata')}"
                 title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
             </div>
         </div>
