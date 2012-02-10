@@ -3,6 +3,9 @@ import sys
 import shutil
 import datetime
 import zipfile
+import traceback
+import libxml2
+from cStringIO import StringIO
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -189,47 +192,72 @@ class ConversionError(Exception):
     def __str__(self):
         return self.msg
 
+def save_and_backup_file(save_dir, filename, content, mode='w'):
+    """ save a file, but first make a backup if the file exists
+    """
+    filename = os.path.join(save_dir, filename)
+    if os.path.exists(filename):
+        os.rename(filename, filename + '~')
+    f = open(filename, mode)
+    f.write(content)
+    f.close()
+
 def save_cnxml(save_dir, cnxml, files):
     # write CNXML output
-    cnxml_filename = os.path.join(save_dir, 'index.cnxml')
-    cnxml_file = open(cnxml_filename, 'w')
-    try:
-        cnxml_file.write(cnxml)
-        cnxml_file.flush()
-    finally:
-        cnxml_file.close()
+    save_and_backup_file(save_dir, 'index.cnxml', cnxml)
 
     # write files
     for filename, content in files:
         filename = os.path.join(save_dir, filename)
         f = open(filename, 'wb') # write binary, important!
-        try:
-            f.write(content)
-            f.flush()
-        finally:
-            f.close()
+        f.write(content)
+        f.close()
 
-    htmlpreview = cnxml_to_htmlpreview(cnxml)
-    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-        index.write(htmlpreview)
+    # we generate the preview and save the error 
+    conversionerror = None
+    try:
+        htmlpreview = cnxml_to_htmlpreview(cnxml)
+    except libxml2.parserError:
+        conversionerror = traceback.format_exc()     
 
     # Zip up all the files. This is done now, since we have all the files
     # available, and it also allows us to post a simple download link.
     # Note that we cannot use zipfile as context manager, as that is only
     # available from python 2.7
     # TODO: Do a filesize check xxxx
-    zip_archive = zipfile.ZipFile(os.path.join(save_dir, 'upload.zip'), 'w')
-    try:
-        zip_archive.writestr('index.cnxml', cnxml)
-        for filename, fileObj in files:
-            zip_archive.writestr(filename, fileObj)
-    finally:
-        zip_archive.close()
+    ram = StringIO()
+    zip_archive = zipfile.ZipFile(ram, 'w')
+    zip_archive.writestr('index.cnxml', cnxml)
+    if not conversionerror:
+        save_and_backup_file(save_dir, 'index.xhtml', htmlpreview)
+        zip_archive.writestr('index.xhtml', htmlpreview)
+    for filename, fileObj in files:
+        zip_archive.writestr(filename, fileObj)
+    zip_archive.close()
+
+    zip_filename = os.path.join(save_dir, 'upload.zip')
+    save_and_backup_file(save_dir, zip_filename, ram.getvalue(), mode='wb')
+
+    if conversionerror:
+        raise ConversionError(conversionerror)
 
 def validate_cnxml(cnxml):
     valid, log = validate(cnxml, validator="jing")
     if not valid:
         raise ConversionError(log)
+
+def render_conversionerror(request, error):
+    print('Got ConversionError!!!')
+    templatePath = 'templates/conv_error.pt'
+    response = {'filename' : request.session['filename'], 'error': error}
+
+    # put the error on the session for retrieval on the editor
+    # view
+    request.session['transformerror'] = error
+
+    if('title' in request.session):
+        del request.session['title']
+    return render_to_response(templatePath, response, request=request)
 
 
 @view_config(route_name='choose')
@@ -438,25 +466,11 @@ def choose_view(request):
                     validate_cnxml(cnxml)
 
         except ConversionError as e:
-            # Get timestamp
-            print('Got ConversionError!!!')
-            timestamp = datetime.datetime.now()
-            templatePath = 'templates/conv_error.pt'
-            response = {'filename' : request.session['filename'],
-                        'error': e.msg}
-
-            # put the error on the session for retrieval on the editor
-            # view
-            request.session['transformerror'] = e.msg
-        
-            if('title' in request.session):
-                del request.session['title']
-            return render_to_response(templatePath, response, request=request)
+            return render_conversionerror(request, e.msg)
 
         except Exception:
             # Record traceback
             print('Got Exception!!!')
-            import traceback
             tb = traceback.format_exc()
             # Get software version from git
             try:
@@ -563,49 +577,25 @@ def cnxml_view(request):
 
     # Check for successful form completion
     if 'cnxml' in request.POST and form.validate():
-        import time
-        html_filename = os.path.join(save_dir, 'index.xhtml')
-        zip_filename = os.path.join(save_dir, 'upload.zip')
-
-        # Make backup of CNXML and HTML preview
-        os.rename(cnxml_filename, cnxml_filename + '~')
-        os.rename(html_filename, html_filename + '~')
-        os.rename(zip_filename, zip_filename + '~')
-
-        # Save new CNXML
         cnxml = form.data['cnxml']
-        with open(cnxml_filename, 'wt') as fp:
-            fp.write(cnxml)
 
-        # Convert the CNXML for preview
-        html = cnxml_to_htmlpreview(form.data['cnxml'])
-        with open(html_filename, 'w') as index:
-            index.write(html)
-
-        # Update ZIP package
-        old_zip_archive = zipfile.ZipFile(zip_filename + '~', 'r')
-        zip_archive = zipfile.ZipFile(zip_filename, 'w')
-        try:
-            zip_archive.writestr('index.cnxml', form.data['cnxml'].encode('utf8'))
-            for filename in old_zip_archive.namelist():
+        # get the list of files from upload.zip if it exists
+        files = []
+        zip_filename = os.path.join(save_dir, 'upload.zip')
+        if os.path.exists(zip_filename):
+            zip_archive = zipfile.ZipFile(zip_filename, 'r')
+            for filename in zip_archive.namelist():
                 if filename == 'index.cnxml':
                     continue
-                fp = old_zip_archive.open(filename, 'r')
-                zip_archive.writestr(filename, fp.read())
+                fp = zip_archive.open(filename, 'r')
+                files.append((filename, fp.read()))
                 fp.close()
-        finally:
-            zip_archive.close()
 
-        valid, log = validate(cnxml, validator="jing")
-        if not valid:
-            templatePath = 'templates/conv_error.pt'
-            response = {'filename' : request.session['filename'],
-                        'error': log}
-
-            # put the error on the session for retrieval on the editor
-            # view
-            request.session['transformerror'] = log
-            return render_to_response(templatePath, response, request=request)
+        try:
+            save_cnxml(save_dir, cnxml, files)
+            validate_cnxml(cnxml)
+        except ConversionError as e:
+            return render_conversionerror(request, e.msg)
 
         # Return to preview
         return HTTPFound(location=request.route_url('preview'), request=request)
