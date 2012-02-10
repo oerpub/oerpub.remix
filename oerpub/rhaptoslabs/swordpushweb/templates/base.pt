@@ -58,7 +58,7 @@
                 /* Give the page's header the correct top margin (since the elements above
                    it are in a fixed position)
                 */
-                $("#content").css({'margin-top': headerh + wfnh + eh})
+                $("#content").css({'margin-top': headerh + wfnh})
                 
                 /* Get the expert mode cookie.
                    If it does not exist we create it and set it to false.

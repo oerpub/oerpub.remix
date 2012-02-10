@@ -157,7 +157,9 @@ $(document).ready(function() {
     var confirmMsg4 = "Are you sure you want to leave this page? \n\nYour module has not been uploaded and any work on it will be lost if you leave. \n\nTo attempt the upload again, click 'Cancel' and 'Try to upload again'.";
 
     $("a#logout_link").click(function(event){
-        return _doAction(confirmMsg1, event);
+        if ($("iframe.fitted").length != 0 || $("#metadata").length != 0) {
+            return _doAction(confirmMsg1, event);
+        }
     });
 
     $("#status a").click(function(event){
@@ -165,12 +167,8 @@ $(document).ready(function() {
             return _doAction(confirmMsg3, event);
         } else if ($("#see-error").length != 0) {
             return _doAction(confirmMsg4, event);
-        } else if ($("iframe").length != 0 || $("#metadata").length != 0) {
-            return _doAction(confirmMsg1, event);
-        } else {
-            window.location = $(this).attr('url');
-            return true;
         }
+        return true;
     });
 
     $("#back-to-chooser, #header h1 a, #start-over input").click(function(e){
@@ -221,6 +219,9 @@ $(document).ready(function() {
         $('.forward-button').attr('disabled','disabled');
         $('.forward-button').val('Uploading to Connexions ...');
         $('#back-steps .button').attr('disabled','disabled');
+        // the submit here is necessary, because without it, chrome will
+        // not submit the form. This has to do with the fact that we are
+        // disabling the submit butt
         $('form[name="metadata_form"]').submit();
     });
 
@@ -309,11 +310,11 @@ function _doAction(message, event) {
             target = $(element).attr('url');
         }
         window.location = target;
-        event.stopPropagtion();
+        event.stopPropagation();
         return true;
     } else {
         event.preventDefault(); 
-        event.stopPropagtion();
+        event.stopPropagation();
         return false;
     }
 }

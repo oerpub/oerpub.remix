@@ -1,13 +1,18 @@
 <metal:use use-macro="base">
 
+<metal:script-slot fill-slot="script-slot">
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#header h1 a").unbind('click');
+    });
+</script>
+}    
+</metal:script-slot>
+
 <metal:workflownav fill-slot="workflownav" />
 
 <tal:body metal:fill-slot="content-slot"
     tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
-    <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
-        frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
-    </iframe>
-
   <div id="ie6-container-wrap">
     <div id="container">
       <div id="content">
@@ -16,13 +21,7 @@
           <div id="nav-column">
             <ul>
               <li id="nav-upload" class="selected">
-                <a href="#asdf" title="Upload new content"><span>Create</span></a>
-              </li>
-              <li id="nav-edit">
-                <a href="#asdf" title="Edit one of your existing modules"><span>Edit</span></a>
-              </li>
-              <li id="nav-adapt">
-               <a href="#asdf" title="Adapt any existing module"><span>Adapt</span></a>
+                <a href="" title="Upload new content"><span>Create</span></a>
               </li>
             </ul>
 
@@ -107,6 +106,11 @@
       </div>
     </div>
   </div>
+  
+  <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
+      frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+  </iframe>
+
 </tal:body>
 
 </metal:use>
