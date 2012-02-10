@@ -18,7 +18,7 @@ requires = [
     ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',
-      version='0.1.2',
+      version='0.1.3',
       description='SwordPush',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

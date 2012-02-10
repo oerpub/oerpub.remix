@@ -1,7 +1,7 @@
 {
     "workspace_url": None,
     "service_document_url": u'http://cnx.org/sword/servicedocument',
-    "login_url": u'http://cnx.org/login_form',
+    "login_url": u'http://cnx.org/login_form?came_from=nothing',
     "metadata": {
         "maintainers": [u'_USER_'],
         "authors": [u'_USER_'],
