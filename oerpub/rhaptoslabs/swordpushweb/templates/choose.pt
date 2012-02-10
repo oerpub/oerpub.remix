@@ -4,6 +4,29 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $("#header h1 a").unbind('click');
+        $(document).keydown(function(event) {
+            if (event.keyCode == 13) {
+                if (event.target.id == 'url_text' && $(event.target).val() != '') {
+                    showWaitMessage();
+                    $('input#url-submit').removeAttr('disabled');
+                    $('input#url-submit').click();
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                else {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            }
+        });
+        
+        $('input#url_text').keydown(function(event) {
+            if ($(event.target).val() != '') {
+                $('#url-submit').removeAttr('disabled');
+            } else if ($(event.target).val() == '') {
+                $('#url-submit').attr('disabled', 'disabled');
+            }
+        });
     });
 </script>
 }    
@@ -87,11 +110,8 @@
                     </span>
                   </label>
                   <div class="upload-form">
-<!--
-                    <input id="url_text" name="url_text" style="width: 30em;" placeholder="http://www.example.com" onkeydown="if(event.keyCode == 13){$('#file-submit').removeAttr('disabled');$('#file-submit').click();document.getElementById('url-submit').disabled=false;}" "="" type="url">
--->
-                    <input id="url_text" name="url_text" style="width: 30em;" placeholder="http://www.example.com" type="url" 
-                           onkeydown="keyDown(event)" />
+                    <input id="url_text" name="url_text" style="width: 30em;"
+                        placeholder="http://www.example.com" type="url" />
                     <input class="button" id="url-submit" name="url.submitted" value="Convert and preview &#187;" disabled="disabled" type="submit">
                   </div>
                 </li>

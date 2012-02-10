@@ -372,7 +372,7 @@ function pickerCallback(data) {
 }
 
 function keyDown(event) {
-    if ($(this).value != '') {
+    if ($(event.target).val() != '') {
         $('#url-submit').removeAttr('disabled');
     }
     if (event.keyCode == 13) {
