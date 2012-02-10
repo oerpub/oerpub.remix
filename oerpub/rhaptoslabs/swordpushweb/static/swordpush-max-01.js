@@ -185,10 +185,6 @@ $(document).ready(function() {
         }
     });
 
-    $("#forward-to-metadata").click(function(e){
-        window.location = $(this).attr('url');
-    });
-
     $("#choose-new-document, #back-to-preview").click(function(e){
         return _doAction(confirmMsg3, e);
     });
@@ -225,7 +221,7 @@ $(document).ready(function() {
         $('.forward-button').attr('disabled','disabled');
         $('.forward-button').val('Uploading to Connexions ...');
         $('#back-steps .button').attr('disabled','disabled');
-        window.location = $(this).attr('url');
+        $('form[name="metadata_form"]').submit();
     });
 
     // Reveal Google Analtyics field ("Describe your module" page)
@@ -385,6 +381,7 @@ function keyDown(event) {
     }
 }
 
+/* this submits the hidden login form to cnx. */
 function submitloginform(event) {
     document.getElementById('submit').click();
 }
