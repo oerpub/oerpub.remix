@@ -1,0 +1,18 @@
+{
+    "workspace_url": None,
+    "service_document_url": u'http://localhost:8080/site/sword/servicedocument',
+    "login_url": u'http://localhost:8080/site/login_form',
+    "metadata": {
+        "maintainers": [u'_USER_'],
+        "authors": [u'_USER_'],
+        "keywords": '',
+        "google_code": '',
+        "subject": (),
+        "copyright": [u'_USER_'],
+        "language": u'en',
+        "title": '',
+        "editors": [''],
+        "summary": '',
+        "translators": [''],
+    },
+}
