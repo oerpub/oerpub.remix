@@ -272,6 +272,8 @@ def choose_view(request):
     # clear the session
     if 'transformerror' in request.session:
         del request.session['transformerror']
+    if 'title' in request.session:
+        del request.session['title']
 
     # Check for successful form completion
     if form.validate():
