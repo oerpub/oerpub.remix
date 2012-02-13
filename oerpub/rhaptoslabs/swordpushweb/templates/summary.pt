@@ -59,10 +59,10 @@
                                 Your coauthors must agree.<span tal:omit-tag="" tal:condition="email != ''"> (<a href="mailto:${email}">Send them reminder emails.</a>)</span>
                             </div>
                             <div tal:omit-tag="" tal:condition="(type == 'licence') and (username == loggedin_user)">
-                                You must <a href="${url}" target="_blank">sign the Open Content License</a> at Connextions and then click "Publish".
+                                You must <a href="${url}" class="external" target="_blank">sign the Open Content License</a> at Connextions and then click "Publish".
                             </div>
                             <div tal:omit-tag="" tal:condition="(type == 'role_request') and (username != loggedin_user)">
-                                When your coauthors have agreed and you have signed the license, you can <a href="${url}" target="_blank">publish your module</a> at Connextions.
+                                When your coauthors have agreed and you have signed the license, you can <a href="${url}" class="external" target="_blank">publish your module</a> at Connextions.
                             </div>
                         </li>
                         </tal:requirements>
