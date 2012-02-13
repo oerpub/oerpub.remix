@@ -37,7 +37,7 @@
                     </div>
 
                     <p>
-                        <span>${'"'+module_title+'"'}</span> was successfully uploaded to Connexions.
+                        <span class="metatitle">${'"'+module_title+'"'}</span> was successfully uploaded to Connexions.
                     </p>
 
                     <p>
@@ -56,7 +56,7 @@
                                         loggedin_user python:request.session['username'];
                                         url python:requirement.get('url', '');">
                             <div tal:omit-tag="" tal:condition="(type == 'licence') and (username != loggedin_user)">
-                                Your coauthors must agree.<span tal:omit-tag="" tal:condition="email != ''"> (<a href="mailto:${email}">Send them reminder emails.</a>)</span>
+                                Your coauthors must agree.<span tal:omit-tag="" tal:condition="email != ''"> (<a href='mailto:${email} class="external"'>Send them reminder emails.</a>)</span>
                             </div>
                             <div tal:omit-tag="" tal:condition="(type == 'licence') and (username == loggedin_user)">
                                 You must <a href="${url}" class="external" target="_blank">sign the Open Content License</a> at Connextions and then click "Publish".
