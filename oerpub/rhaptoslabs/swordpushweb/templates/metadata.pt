@@ -32,6 +32,12 @@
                     title="Return to the module preview">
             </div>
             <div id="forward-steps">
+                <span class="advanced" style="display: none; ">
+                    <span class="advanced-marker" title="Advanced mode feature">
+                        <img src="${images_url}/gear_orange_3.png" />
+                    </span>
+                    <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                </span>
                 <input id="top-upload-to-cnx" type="submit" class="button forward-button"
                 value="Finish: Upload to Connexions &raquo;"
                 title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
@@ -137,9 +143,7 @@
                                         <div class="formlabel">Summary</div>
                                         <div class="forminfo">Enter a summary of the module.</div>
                                         <div class="formfield">
-                                            <textarea name="summary" rows="6" cols="40">
-                                                ${config['metadata']['summary']}
-                                            </textarea>
+                                            <textarea name="summary" rows="6" cols="60">${config['metadata']['summary']}</textarea>
                                         </div>
                                     </div>
                                 </td>
@@ -196,12 +200,6 @@
                                             <span class="button" id="edit-roles">Edit</span>
                                         </div>
                                         <br/>
-                                        <span class="advanced" style="display: none; ">
-                                            <span class="advanced-marker" title="Advanced mode feature">
-                                                <img src="${images_url}/gear_orange_3.png" />
-                                            </span>
-                                            <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
-                                        </span>
                                     </div>
                                 </td>
                             </tr>

@@ -171,13 +171,15 @@ $(document).ready(function() {
         return true;
     });
 
-    $("#back-to-chooser, #header h1 a, #start-over input").click(function(e){
+    $("#back-to-chooser, #header h1 a, #header img.cnxlogo, #start-over input").click(function(e){
         if ($("#edit-frame").length != 0 || $("#metadata").length != 0 && $(this).attr("id") == 'back-to-chooser') {
             return _doAction(confirmMsg3, e);
         } else if ($("#see-error").length != 0) {
             return _doAction(confirmMsg4, e);
         } else if ($("iframe").length != 0 || $("#metadata").length != 0) {
             return _doAction(confirmMsg2, e);
+        } else if ($("textarea#cnxml").length != 0) {
+            return _doAction(confirmMsg3, e);
         } else {
             return true;
         }
@@ -185,6 +187,15 @@ $(document).ready(function() {
 
     $("#choose-new-document, #back-to-preview").click(function(e){
         return _doAction(confirmMsg3, e);
+    });
+
+    $("#start-from-beginning").click(function(e){
+        var target = $(this).attr('href');
+        if (!target) {
+            target = $(this).attr('url');
+        }
+        window.location = target;
+        return true;
     });
 
     $("#top-upload-to-cnx, #bottom-upload-to-cnx").click(function(e){

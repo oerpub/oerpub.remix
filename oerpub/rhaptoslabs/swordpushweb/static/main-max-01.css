@@ -288,6 +288,10 @@ label img{
   margin-left: .5em;
 }
 
+#module-actions a:link{
+  color: black;
+}
+
 #pageheader-wrap{
   padding: 0 0 1em;
   margin-top: -.8em;
