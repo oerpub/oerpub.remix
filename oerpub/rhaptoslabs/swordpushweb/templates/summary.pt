@@ -49,22 +49,26 @@
                     </p>
 
                     <ol>
-                        <li tal:repeat="requirement requirements">
-                            <div tal:omit-tag="" tal:condition="(requirement['type'] == 'licence') and (requirement['username'] == request.session['username'])">
-                                <a href="${requirement['url']}" target="_blank">sign the Open Content license</a>
+                        <tal:requirements repeat="requirement requirements">
+                        <li tal:define="email python:requirement.get('email', '');
+                                        type python:requirement.get('type', '');
+                                        username python:requirement.get('username', '');
+                                        loggedin_user python:request.session['username'];
+                                        url python:requirement.get('url', '');">
+                            <div tal:omit-tag="" tal:condition="(type == 'licence') and (username != loggedin_user)">
+                                Your coauthors must agree.<span tal:omit-tag="" tal:condition="email != ''"> (<a href="mailto:${email}">Send them reminder emails.</a>)</span>
                             </div>
-                            <div tal:omit-tag="" tal:condition="(requirement['type'] == 'licence') and (requirement['username'] != request.session['username'])">
-                                wait for ${requirement['name']} to sign the Open Content license
+                            <div tal:omit-tag="" tal:condition="(type == 'licence') and (username == loggedin_user)">
+                                You must <a href="${url}" target="_blank">sign the Open Content License</a> at Connextions and then click "Publish".
                             </div>
-                            <div tal:omit-tag="" tal:condition="requirement['type'] == 'role_request'">
-                                wait for ${requirement['name']} to agree to being a<span tal:omit-tag="" tal:condition="requirement['role'][0].lower() in 'aeiou'">n</span> ${requirement['role'].lower()}<span tal:omit-tag="" tal:condition="requirement['email'] != ''"> (<a href="mailto:${requirement['email']}">send a reminder email</a>)</span>
+                            <div tal:omit-tag="" tal:condition="(type == 'role_request') and (username != loggedin_user)">
+                                When your coauthors have agreed and you have signed the license, you can <a href="${url}" target="_blank">publish your module</a> at Connextions.
                             </div>
                         </li>
+                        </tal:requirements>
                     </ol>
 
                 </div>
-
-
             </div>
         </div>
     </div>
