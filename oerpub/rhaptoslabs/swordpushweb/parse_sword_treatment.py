@@ -1,3 +1,14 @@
+import lxml
+from lxml.etree import ETXPath
+
+# common namespaces used in cnx atom/sword xml
+atomns = "http://www.w3.org/2005/Atom"
+swordns = "http://purl.org/net/sword/"
+dctermsns = "http://purl.org/dc/terms/"
+mdns = "http://cnx.rice.edu/mdml"
+xsins = "http://www.w3.org/2001/XMLSchema-instance"
+oerdcns = "http://cnx.org/aboutus/technology/schemas/oerdc"
+
 def __extract_from_substrings(treatment, substrStart, substrStop):
     start_pos = treatment.find(substrStart)
     if start_pos == -1:
@@ -129,3 +140,59 @@ def test_server_1_0(treatment):
         iRoleRequestPrefix='',
         iRoleRequestHasEmail=True,
     )
+
+def get_requirements(deposit_receipt):
+    dom = lxml.etree.fromstring(deposit_receipt)
+
+    find = ETXPath('//{%s}treatment' %swordns)
+    treatment = find(dom)[0]
+    
+    find = ETXPath('//{%s}a[contains(@href, "module_publish")]' %atomns)
+    license_links = [e.attrib.get('href') for e in find(treatment)]
+    find = ETXPath('//{%s}a[contains(@href, "module_view")]' %atomns)
+    preview_links = [e.attrib.get('href') for e in find(treatment)]
+    links = {'license_link': license_links[0],
+             'preview_link': preview_links[0],}
+
+    find = ETXPath('//{%s}title' %atomns)
+    module_title = find(dom)[0].text
+    
+    find = ETXPath('//{%s}identifier[contains(@*, "dcterms:URI")]' %dctermsns)
+    elements = find(dom)
+    module_url = elements[0].text
+    
+    collab_emails = []
+    creators, emails = _get_collaborators(dom, dctermsns, oerdcns, 'creator')
+    collab_emails.extend(emails)
+    maintainers, emails = _get_collaborators(dom, oerdcns, oerdcns, 'maintainer')
+    collab_emails.extend(emails)
+    rightsholders, emails = _get_collaborators(dom, dctermsns, oerdcns, 'rightsHolder')
+    collab_emails.extend(emails)
+    collaborators = {'creators': creators,
+                     'maintainers': maintainers,
+                     'rightsholders': rightsholders,
+                    }
+    collab_emails = ', '.join(set(collab_emails))
+
+    return {'treatment': treatment,
+            'links': links,
+            'module_title': module_title,
+            'module_url': module_url,
+            'collaborators': collaborators,
+            'emails': collab_emails,
+           }
+
+def _get_collaborators(dom, main_ns, attr_ns, role):
+    id_attr = '{%s}id' %attr_ns
+    email_attr = '{%s}email' %attr_ns
+    find = ETXPath('//{%s}%s' %(main_ns, role))
+    collaborators = {}
+    emails = []
+    for element in find(dom):
+        username = element.attrib.get(id_attr)
+        fullname = element.text
+        email = element.attrib.get(email_attr)
+        emails.append(email)
+        tmp_dict =  {'fullname': fullname, 'email': email}
+        collaborators[username] = tmp_dict
+    return collaborators, emails

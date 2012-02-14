@@ -624,23 +624,10 @@ def cnxml_view(request):
 def summary_view(request):
     check_login(request)
     templatePath = 'templates/summary.pt'
-
-    # Note: need to extract the version string before passing dom to
-    # Deposit_Receipt, which mangles dom.
-    dom = etree.fromstring(request.session['deposit_receipt'])
-    version_string = dom.find('{http://www.w3.org/2005/Atom}generator').text.strip()
-    dr = Deposit_Receipt(dom=dom)
-    treatment = dr.treatment
-
     import parse_sword_treatment
-    response = parse_sword_treatment.markdown(treatment)
-    if (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.0"'):
-        response.update(parse_sword_treatment.cnx_1_0(treatment))
-    elif (version_string == 'uri:"rhaptos.swordservice.plone" version:"1.1"'):
-        response.update(parse_sword_treatment.test_server_1_0(treatment))
-    else:
-        print 'WARNING: No valid version number found in SWORD deposit receipt. Defaulting to showing the SWORD treatment as is.'
 
+    deposit_receipt = request.session['deposit_receipt']
+    response = parse_sword_treatment.get_requirements(deposit_receipt)
     return render_to_response(templatePath, response, request=request)
 
 

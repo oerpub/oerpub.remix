@@ -48,24 +48,29 @@
                         <span>To publish and share your module:</span>
                     </p>
 
-                    <ol>
-                        <tal:requirements repeat="requirement requirements">
-                        <li tal:define="email python:requirement.get('email', '');
-                                        type python:requirement.get('type', '');
-                                        username python:requirement.get('username', '');
-                                        loggedin_user python:request.session['username'];
-                                        url python:requirement.get('url', '');">
-                            <div tal:omit-tag="" tal:condition="(type == 'licence') and (username != loggedin_user)">
-                                Your coauthors must agree.<span tal:omit-tag="" tal:condition="email != ''"> (<a href='mailto:${email} class="external"'>Send them reminder emails.</a>)</span>
-                            </div>
-                            <div tal:omit-tag="" tal:condition="(type == 'licence') and (username == loggedin_user)">
-                                You must <a href="${url}" class="external" target="_blank">sign the Open Content License</a> at Connexions and then click "Publish".
-                            </div>
-                            <div tal:omit-tag="" tal:condition="(type == 'role_request') and (username != loggedin_user)">
-                                When your coauthors have agreed and you have signed the license, you can <a href="${url}" class="external" target="_blank">publish your module</a> at Connexions.
-                            </div>
+                    <ol tal:define="loggedin_user python:request.session['username'];
+                                    creators python:collaborators.get('creators');
+                                    rightsholders python:collaborators.get('rightsholders');
+                                    maintainers python:collaborators.get('maintainers');
+                                    license_link python:links.get('license_link');
+                                    preview_link python:links.get('preview_link');
+                                    creator python:creators.get(loggedin_user);">
+                        <tal:no_collaborators condition="len(creators) == 1">
+                        <li>
+                            You must <a href="${license_link}" class="external" target="_blank">sign the Open Content License</a> at Connexions and then click "Publish".
                         </li>
-                        </tal:requirements>
+                        </tal:no_collaborators>
+                        <tal:collaborators condition="python:len(creators) > 1">
+                        <li> 
+                            Your coauthors must agree.<span tal:omit-tag="" tal:condition="emails != ''"> (<a href="mailto:${emails}" class="external">Send them reminder emails.</a>)</span>
+                        </li>
+                        <li>
+                            You must <a href="${license_link}" class="external" target="_blank">sign the Open Content License</a> at Connexions.
+                        </li>
+                        <li>
+                            When your coauthors have agreed and you have signed the license, you can <a href="${license_link}" class="external" target="_blank">publish your module</a> at Connexions.
+                        </li>
+                        </tal:collaborators>
                     </ol>
 
                 </div>
