@@ -51,7 +51,7 @@ class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     service_document_url = formencode.validators.String(not_empty=True)
     username = formencode.validators.PlainText(not_empty=True)
-    password = formencode.validators.PlainText(not_empty=True)
+    password = formencode.validators.NotEmpty()
 
 
 @view_config(route_name='login')
@@ -63,7 +63,6 @@ def login_view(request):
     templatePath = 'templates/login.pt'
 
     config = load_config(request)
-
     form = Form(request, schema=LoginSchema)
     field_list = [
         ('username',),
@@ -75,6 +74,7 @@ def login_view(request):
     # validate the form in order to compute all errors
     valid_form = form.validate()
     request['errors'] = form.all_errors()
+
     # Check for successful form completion
     if 'form.submitted' in request.POST and valid_form:
         # The login details are persisted on the session
