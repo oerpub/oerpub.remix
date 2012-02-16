@@ -5,6 +5,7 @@ import datetime
 import zipfile
 import traceback
 import libxml2
+import re
 from cStringIO import StringIO
 from lxml import etree
 from pyramid.view import view_config
@@ -259,6 +260,37 @@ def render_conversionerror(request, error):
         del request.session['title']
     return render_to_response(templatePath, response, request=request)
 
+def process_gdocs_resource(save_dir, gdocs_resource_id, gdocs_access_token=None):
+
+    # login to gdocs and get a client object
+    gd_client = getAuthorizedGoogleDocsClient()
+
+    # Create a AuthSub Token based on gdocs_access_token String
+    auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token) \
+                     if gdocs_access_token \
+                     else None
+
+    # get the Google Docs Entry
+    gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
+
+    # Get the contents of the document
+    gd_entry_url = gd_entry.content.src
+    html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
+
+    # Transformation and get images
+    cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
+
+    cnxml = clean_cnxml(cnxml)
+    save_cnxml(save_dir, cnxml, objects.items())
+
+    validate_cnxml(cnxml)
+
+    # Return the title and filename.  Old comment states
+    # that returning this filename might kill the ability to
+    # do multiple tabs in parallel, unless it gets offloaded
+    # onto the form again.
+    return (gd_entry.title.text, "Google Document")
+
 
 @view_config(route_name='choose')
 def choose_view(request):
@@ -301,73 +333,56 @@ def choose_view(request):
                 gdocs_resource_id = form.data['gdocs_resource_id']
                 gdocs_access_token = form.data['gdocs_access_token']
 
-                # TODO: Do the Google Docs transformation here
-
-                # login to gdocs and get a client object
-                gd_client = getAuthorizedGoogleDocsClient()
-
-                # Create a AuthSub Token based on gdocs_access_token String
-                auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token)
-
-                # get the Google Docs Entry
-                gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
-
-                # Save title in session
-                request.session['title'] = gd_entry.title.text
-
-                # Get the contents of the document
-                gd_entry_url = gd_entry.content.src
-                html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
-
-                # Transformation and get images
-                cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
-
-                cnxml = clean_cnxml(cnxml)
-                save_cnxml(save_dir, cnxml, objects.items())
-
-                # Keep the info we need for next uploads.  Note that
-                # this might kill the ability to do multiple tabs in
-                # parallel, unless it gets offloaded onto the form
-                # again.
-                request.session['filename'] = "Google Document"
-
-                validate_cnxml(cnxml)
+                (request.session['title'], request.session['filename']) = \
+                    process_gdocs_resource(save_dir, \
+                                           gdocs_resource_id, \
+                                           gdocs_access_token)
 
             # HTML URL Import:
             elif form.data.get('url_text'):
                 url = form.data['url_text']
 
-                # download html:
-                #html = urllib2.urlopen(url).read() 
-                # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
-                import_opener = urllib2.build_opener()
-                import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-                try:
-                    import_request = import_opener.open(url)
-                    html = import_request.read()
+                # Build a regex for Google Docs URLs
+                regex = re.compile("^https:\/\/docs\.google\.com\/.*document\/[^\/]\/([^\/]+)\/")
+                r = regex.search(url)
 
-                    # transformation            
-                    cnxml, objects, html_title = htmlsoup_to_cnxml(
+                # Take special action for Google Docs URLs
+                if r:
+                    gdocs_resource_id = r.groups()[0]
+                    (request.session['title'], request.session['filename']) = \
+                        process_gdocs_resource(save_dir, "document:" + gdocs_resource_id)
+                else:
+                    # download html:
+                    #html = urllib2.urlopen(url).read() 
+                    # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
+                    import_opener = urllib2.build_opener()
+                    import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                    try:
+                        import_request = import_opener.open(url)
+                        html = import_request.read()
+
+                        # transformation            
+                        cnxml, objects, html_title = htmlsoup_to_cnxml(
                         html, bDownloadImages=True, base_or_source_url=url)
-                    request.session['title'] = html_title
+                        request.session['title'] = html_title
 
-                    cnxml = clean_cnxml(cnxml)
-                    save_cnxml(save_dir, cnxml, objects.items())
+                        cnxml = clean_cnxml(cnxml)
+                        save_cnxml(save_dir, cnxml, objects.items())
 
-                    # Keep the info we need for next uploads.  Note that
-                    # this might kill the ability to do multiple tabs in
-                    # parallel, unless it gets offloaded onto the form
-                    # again.
-                    request.session['filename'] = "HTML Document"
+                        # Keep the info we need for next uploads.  Note that
+                        # this might kill the ability to do multiple tabs in
+                        # parallel, unless it gets offloaded onto the form
+                        # again.
+                        request.session['filename'] = "HTML Document"
 
-                    validate_cnxml(cnxml)
+                        validate_cnxml(cnxml)
 
-                except urllib2.URLError, e:
-                    request['errors'] = ['The URL %s could not be opened' %url,]
-                    response = {
-                        'form': FormRenderer(form),
-                    }
-                    return render_to_response(templatePath, response, request=request)
+                    except urllib2.URLError, e:
+                        request['errors'] = ['The URL %s could not be opened' %url,]
+                        response = {
+                            'form': FormRenderer(form),
+                            }
+                        return render_to_response(templatePath, response, request=request)
 
             # Office, CNXML-ZIP or LaTeX-ZIP file
             else:
