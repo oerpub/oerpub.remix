@@ -86,8 +86,6 @@ def clean_cnxml(iCnxml, iMaxColumns=80):
     newText = ""
 
     def wrap_text(iCnxml, iIndent, iColumns):
-        import textwrap
-        indent = ""#" " * iIndent
         return iCnxml
 
     while True:
