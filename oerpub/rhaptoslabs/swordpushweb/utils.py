@@ -20,12 +20,16 @@ def save_config(config, request):
     backup_filename = request.registry.settings['config_file'] + '~'
 
     # Update edit history
-    config['edit_history'].append((request.session.get("username"), time.asctime(time.gmtime()) + " GMT"))
+    edit_history = config.get('edit_history', [])
+    edit_history.append((request.session.get("username"),
+                         time.asctime(time.gmtime()) + " GMT"))
+    config['edit_history'] = edit_history
 
     save_string = pretty_print_dict(config)
     os.rename(config_filename, backup_filename)
     with open(config_filename, "wt") as fp:
         fp.write(save_string)
+        fp.close()
 
 
 def load_config(request):
