@@ -84,9 +84,7 @@ def clean_cnxml(iCnxml, iMaxColumns=80):
     def wrap_text(iCnxml, iIndent, iColumns):
         import textwrap
         indent = ""#" " * iIndent
-        return ''.join(textwrap.wrap(re.sub('\\s+', ' ', iCnxml), iColumns,
-                                     initial_indent=indent,
-                                     subsequent_indent="\n" + indent))
+        return iCnxml
 
     while True:
         tagStart = cnxml.find("<", cnxmlPos)
