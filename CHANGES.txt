@@ -1,5 +1,8 @@
 0.1.3 - unreleased
 ------------------
+- Cleared file upload form data after it is used
+  [yingjin]
+
 - Cleared URL form data after it is used
   [yingjin]
 

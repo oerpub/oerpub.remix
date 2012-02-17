@@ -401,6 +401,8 @@ def choose_view(request):
                 saved_file.close()
                 input_file.close()
 
+                form.data['upload'] = None
+
                 # Check if it is a ZIP file with at least index.cnxml or a LaTeX file in it
                 try:
                     zip_archive = zipfile.ZipFile(original_filename, 'r')
