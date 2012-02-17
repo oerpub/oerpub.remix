@@ -2,32 +2,20 @@
 
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
-    $(document).ready(function() {
+
+    $(document).ready(function(){
         $("#header h1 a").unbind('click');
-        $(document).keydown(function(event) {
-            if (event.keyCode == 13) {
-                if (event.target.id == 'url_text' && $(event.target).val() != '') {
-                    showWaitMessage();
-                    $('input#url-submit').removeAttr('disabled');
-                    $('input#url-submit').click();
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                else {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-            }
-        });
-        
-        $('input#url_text').keydown(function(event) {
-            if ($(event.target).val() != '') {
-                $('#url-submit').removeAttr('disabled');
-            } else if ($(event.target).val() == '') {
-                $('#url-submit').attr('disabled', 'disabled');
-            }
+        $('#url-submit').attr('disabled','disabled');
+        $('#url_text').live('paste change keyup', function(){
+           if($(this).val() != ''){
+              $('#url-submit').removeAttr('disabled');
+           }
+           else {
+              $('#url-submit').attr('disabled','disabled');
+           }
         });
     });
+
 </script>
 }    
 </metal:script-slot>
