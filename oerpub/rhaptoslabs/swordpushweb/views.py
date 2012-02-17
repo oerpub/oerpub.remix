@@ -333,6 +333,9 @@ def choose_view(request):
                 gdocs_resource_id = form.data['gdocs_resource_id']
                 gdocs_access_token = form.data['gdocs_access_token']
 
+                form.data['gdocs_resource_id'] = None
+                form.data['gdocs_access_token'] = None
+                
                 (request.session['title'], request.session['filename']) = \
                     process_gdocs_resource(save_dir, \
                                            gdocs_resource_id, \
@@ -341,6 +344,8 @@ def choose_view(request):
             # HTML URL Import:
             elif form.data.get('url_text'):
                 url = form.data['url_text']
+
+                form.data['url_text'] = None
 
                 # Build a regex for Google Docs URLs
                 regex = re.compile("^https:\/\/docs\.google\.com\/.*document\/[^\/]\/([^\/]+)\/")

@@ -1,5 +1,10 @@
 0.1.3 - unreleased
 ------------------
+- Cleared URL form data after it is used
+  [yingjin]
+
+- Cleared Gdocs Form Data after it is used
+  [yingjin] 
 
 - Change production port to 6544
   [therealmarv]
