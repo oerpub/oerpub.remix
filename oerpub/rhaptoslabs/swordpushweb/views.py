@@ -301,6 +301,9 @@ def choose_view(request):
                 gdocs_resource_id = form.data['gdocs_resource_id']
                 gdocs_access_token = form.data['gdocs_access_token']
 
+                form.data['gdocs_resource_id'] = None
+                form.data['gdocs_access_token'] = None
+
                 # TODO: Do the Google Docs transformation here
 
                 # login to gdocs and get a client object
