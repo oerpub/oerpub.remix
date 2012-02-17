@@ -345,6 +345,8 @@ def choose_view(request):
             elif form.data.get('url_text'):
                 url = form.data['url_text']
 
+                form.data['url_text'] = None
+
                 # Build a regex for Google Docs URLs
                 regex = re.compile("^https:\/\/docs\.google\.com\/.*document\/[^\/]\/([^\/]+)\/")
                 r = regex.search(url)
