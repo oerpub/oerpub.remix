@@ -25,6 +25,7 @@ sys.path.append('../../../../../rhaptos.cnxmlutils')
 
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
+from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 from utils import clean_cnxml, escape_system
 from lxml import etree
 
@@ -77,12 +78,12 @@ class SimpleTest(unittest.TestCase):
             process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
             std_output = process.communicate()
 
-            if(len(std_output[0]) != 0):
+            if(std_output[0] != None and len(std_output[0]) != 0):
                 diff_output=open(diff_filename,'w')
                 diff_output.write(std_output[0])
                 diff_output.close()
                 print('Differences in the testing of '+original_filename+', information on those differences has been placed in '+diff_filename)
-            elif(len(std_output[1]) != 0):
+            elif(std_output[1] != None and len(std_output[1]) != 0):
                 err_output=open(err_filename,'w')
                 err_output.write(std_output[1])
                 err_output.close()
@@ -125,12 +126,12 @@ class SimpleTest(unittest.TestCase):
             process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
             std_output = process.communicate()
 
-            if(len(std_output[0]) != 0):
+            if(std_output[0] != None and len(std_output[0]) != 0):
                 diff_output=open(diff_filename,'w')
                 diff_output.write(std_output[0])
                 diff_output.close()
                 print('Differences in the testing of '+original_filename+', information on those differences has been placed in '+diff_filename)
-            elif(len(std_output[1]) != 0):
+            elif(std_output[1] != None and len(std_output[1]) != 0):
                 err_output=open(err_filename,'w')
                 err_output.write(std_output[1])
                 err_output.close()
@@ -180,12 +181,12 @@ class SimpleTest(unittest.TestCase):
                 process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
                 std_output = process.communicate()
 
-                if(len(std_output[0]) != 0):
+                if(std_output[0] != None and len(std_output[0]) != 0):
                     diff_output=open(diff_filename,'w')
                     diff_output.write(std_output[0])
                     diff_output.close()
                     print('Differences in the testing of '+f+', information on those differences has been placed in '+diff_filename)
-                elif(len(std_output[1]) != 0):
+                elif(std_output[1] != None and len(std_output[1]) != 0):
                     err_output=open(err_filename,'w')
                     err_output.write(std_output[1])
                     err_output.close()
@@ -194,7 +195,51 @@ class SimpleTest(unittest.TestCase):
             except urllib2.URLError, e:
                 print('URL '+url+' could not be opened')
                 quit()
-                
+
+    def test_gdocs(self):
+        gdoc_files=os.listdir(test_folder_name+'gdocs/')
+        i=0
+
+        while(i < len(gdoc_files)):
+            f=gdoc_files[i]
+            filename, extension = os.path.splitext(f)
+            if(extension != '.gdoc'):
+                gdoc_files.remove(f)
+            else:
+                i=i+1
+
+        for f in gdoc_files:
+            original_filename=test_folder_name+'gdocs/'+f
+            filename, extension = os.path.splitext(original_filename)
+
+            valid_filename=filename+'.cnxml'
+            output_filename=filename+'.tmp'
+            diff_filename = filename+'.diff'
+            err_filename = filename+'.err'
+
+            fp=open(original_filename, 'r')
+            html=fp.read()
+            fp.close()
+            cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
+            cnxml = clean_cnxml(cnxml)
+
+            output=open(output_filename,'w')
+            output.write(cnxml)
+            output.close()
+
+            process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
+            std_output = process.communicate()
+
+            if(std_output[0] != None and len(std_output[0]) != 0):
+                diff_output=open(diff_filename,'w')
+                diff_output.write(std_output[0])
+                diff_output.close()
+                print('Differences in the testing of '+f+', information on those differences has been placed in '+diff_filename)
+            elif(std_output[1] != None and len(std_output[1]) != 0):
+                err_output=open(err_filename,'w')
+                err_output.write(std_output[1])
+                err_output.close()
+                print('Error(s) occurred while attempting to test for differences in CNXML output of '+f+', information on these errors are in '+err_filename)
 
 
 if __name__ == '__main__':

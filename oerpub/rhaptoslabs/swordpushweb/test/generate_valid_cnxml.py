@@ -19,6 +19,7 @@ sys.path.append('../../../../../rhaptos.cnxmlutils')
 
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
+from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 from utils import clean_cnxml, escape_system
 from lxml import etree
 
@@ -44,6 +45,18 @@ if(extension == '.odt' or extension == '.doc'):
     output.write(cnxml)
     output.close()
     os.remove(filename)
+elif(extension == '.gdoc'):
+    valid_filename=name+'.cnxml'
+    fp=open(filename, 'r')
+    html=fp.read()
+    fp.close()
+
+    cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
+    cnxml = clean_cnxml(cnxml)
+    output=open(valid_filename,'w')
+    output.write(cnxml)
+    output.close()
+
 else:
     print('Assuming this is a file containing a URL')
     f = filename
