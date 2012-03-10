@@ -23,6 +23,12 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 from utils import clean_cnxml, escape_system
 from lxml import etree
 
+def remove_ids(filename):
+    command='xsltproc -o tmp.xml removeid.xsl '+filename
+    os.system(command)
+    os.system('cp tmp.xml '+filename)
+    
+
 if(len(sys.argv) != 2):
     print('usage: python generate_valid_cnxml.py file')
     quit()
@@ -45,6 +51,7 @@ if(extension == '.odt' or extension == '.doc'):
     output.write(cnxml)
     output.close()
     os.remove(filename)
+    remove_ids(valid_filename)
 elif(extension == '.gdoc'):
     valid_filename=name+'.cnxml'
     fp=open(filename, 'r')
@@ -56,6 +63,7 @@ elif(extension == '.gdoc'):
     output=open(valid_filename,'w')
     output.write(cnxml)
     output.close()
+    remove_ids(valid_filename)
 
 else:
     print('Assuming this is a file containing a URL')
@@ -81,6 +89,7 @@ else:
         output=open(valid_filename,'w')
         output.write(cnxml)
         output.close()
+        remove_ids(valid_filename)
     except urllib2.URLError, e:
         print('URL '+url+' could not be opened')
         quit()

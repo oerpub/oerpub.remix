@@ -31,6 +31,11 @@ from lxml import etree
 
 test_folder_name='test_files/'
 
+def remove_ids(filename):
+    command='xsltproc -o tmp.xml removeid.xsl '+filename
+    os.system(command)
+    os.system('cp tmp.xml '+filename)
+
 class SimpleTest(unittest.TestCase):
     def setUp(self):
         pass
@@ -75,6 +80,7 @@ class SimpleTest(unittest.TestCase):
             output=open(output_filename,'w')
             output.write(cnxml)
             output.close()
+            remove_ids(output_filename)
             process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
             std_output = process.communicate()
 
@@ -123,6 +129,7 @@ class SimpleTest(unittest.TestCase):
             output=open(output_filename,'w')
             output.write(cnxml)
             output.close()
+            remove_ids(output_filename)
             process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
             std_output = process.communicate()
 
@@ -177,6 +184,7 @@ class SimpleTest(unittest.TestCase):
                 output=open(output_filename,'w')
                 output.write(cnxml)
                 output.close()
+                remove_ids(output_filename)
 
                 process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
                 std_output = process.communicate()
@@ -226,6 +234,7 @@ class SimpleTest(unittest.TestCase):
             output=open(output_filename,'w')
             output.write(cnxml)
             output.close()
+            remove_ids(output_filename)
 
             process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
             std_output = process.communicate()
