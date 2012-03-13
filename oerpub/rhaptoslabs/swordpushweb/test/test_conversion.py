@@ -34,7 +34,7 @@ test_folder_name='test_files/'
 def remove_ids(filename):
     command='xsltproc -o tmp.xml removeid.xsl '+filename
     os.system(command)
-    os.system('cp tmp.xml '+filename)
+    os.system('mv tmp.xml '+filename)
 
 class SimpleTest(unittest.TestCase):
     def setUp(self):
@@ -77,6 +77,7 @@ class SimpleTest(unittest.TestCase):
 
             tree, files, errors = transform(odt_filename)
             cnxml = clean_cnxml(etree.tostring(tree))
+            validate_cnxml(cnxml)
             output=open(output_filename,'w')
             output.write(cnxml)
             output.close()
@@ -126,6 +127,7 @@ class SimpleTest(unittest.TestCase):
 
             tree, files, errors = transform(odt_filename)
             cnxml = clean_cnxml(etree.tostring(tree))
+            validate_cnxml(cnxml)
             output=open(output_filename,'w')
             output.write(cnxml)
             output.close()
@@ -179,6 +181,7 @@ class SimpleTest(unittest.TestCase):
                 html, bDownloadImages=True, base_or_source_url=url)
 
                 cnxml = clean_cnxml(cnxml)
+                validate_cnxml(cnxml)
 
 
                 output=open(output_filename,'w')
@@ -230,6 +233,7 @@ class SimpleTest(unittest.TestCase):
             fp.close()
             cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
             cnxml = clean_cnxml(cnxml)
+            validate_cnxml(cnxml)
 
             output=open(output_filename,'w')
             output.write(cnxml)
