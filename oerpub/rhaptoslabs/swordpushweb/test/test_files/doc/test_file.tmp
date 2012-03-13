@@ -1,10 +1,11 @@
-<document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" id="imported-from-openoffice" cnxml-version="0.7">
- <title>
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
+  <title>
 Untitled Document
  </title>
- <content>
-  <para id="import-auto-idm892152">
+  <content>
+    <para>
 Test file
   </para>
- </content>
+  </content>
 </document>

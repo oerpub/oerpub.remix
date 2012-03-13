@@ -26,7 +26,7 @@ from lxml import etree
 def remove_ids(filename):
     command='xsltproc -o tmp.xml removeid.xsl '+filename
     os.system(command)
-    os.system('cp tmp.xml '+filename)
+    os.system('mv tmp.xml '+filename)
     
 
 if(len(sys.argv) != 2):
