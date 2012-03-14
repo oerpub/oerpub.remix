@@ -22,14 +22,24 @@ for egg in all_eggs:
 sys.path.append('../')
 sys.path.append('../../../../../oerpub.rhaptoslabs.html_gdocs2cnxml/src')
 sys.path.append('../../../../../rhaptos.cnxmlutils')
+sys.path.append('../../../../../oerpub.rhaptoslabs.latex2cnxml/src/oerpub/rhaptoslabs')
+sys.path.append('../../')
 
+from rhaptos.cnxmlutils.validatecnxml import validate
 from rhaptos.cnxmlutils.odt2cnxml import transform
+from latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 from utils import clean_cnxml, escape_system
 from lxml import etree
 
 test_folder_name='test_files/'
+
+def validate_cnxml(cnxml):
+    valid, log = validate(cnxml, validator="jing")
+    if not valid:
+        raise ConversionError(log)
+
 
 def remove_ids(filename):
     command='xsltproc -o tmp.xml removeid.xsl '+filename
@@ -253,6 +263,60 @@ class SimpleTest(unittest.TestCase):
                 err_output.write(std_output[1])
                 err_output.close()
                 print('Error(s) occurred while attempting to test for differences in CNXML output of '+f+', information on these errors are in '+err_filename)
+
+    def test_latex(self):
+        latex_files=os.listdir(test_folder_name+'latex/')
+        i=0
+        
+        while(i < len(latex_files)):
+            f=latex_files[i]
+            filename, extension = os.path.splitext(f)
+            if(extension != ''):
+                latex_files.remove(f)
+            else:
+                i=i+1
+
+        for f in latex_files:
+            original_filename=test_folder_name+'latex/'+f
+            filename, extension = os.path.splitext(original_filename)
+
+            valid_filename=filename+'.cnxml'
+            output_filename=filename+'.tmp'
+            diff_filename = filename+'.diff'
+            err_filename = filename+'.err'
+
+            fp=open(original_filename, 'r')
+            latex_archive = fp.read()
+
+            # LaTeX 2 CNXML transformation
+            cnxml, objects = latex_to_cnxml(latex_archive, original_filename)
+
+            cnxml = clean_cnxml(cnxml)
+            save_cnxml(save_dir, cnxml, objects.items())
+            validate_cnxml(cnxml)
+
+            fp.close()
+
+            output=open(output_filename,'w')
+            output.write(cnxml)
+            output.close()
+            remove_ids(output_filename)
+
+            process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
+            std_output = process.communicate()
+
+            if(std_output[0] != None and len(std_output[0]) != 0):
+                diff_output=open(diff_filename,'w')
+                diff_output.write(std_output[0])
+                diff_output.close()
+                print('Differences in the testing of '+f+', information on those differences has been placed in '+diff_filename)
+            elif(std_output[1] != None and len(std_output[1]) != 0):
+                err_output=open(err_filename,'w')
+                err_output.write(std_output[1])
+                err_output.close()
+                print('Error(s) occurred while attempting to test for differences in CNXML output of '+f+', information on these errors are in '+err_filename)
+
+
 
 
 if __name__ == '__main__':

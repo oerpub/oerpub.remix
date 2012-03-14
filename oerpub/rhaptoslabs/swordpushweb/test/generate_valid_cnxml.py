@@ -16,8 +16,10 @@ for egg in all_eggs:
 sys.path.append('../')
 sys.path.append('../../../../../oerpub.rhaptoslabs.html_gdocs2cnxml/src')
 sys.path.append('../../../../../rhaptos.cnxmlutils')
+sys.path.append('../../../../../oerpub.rhaptoslabs.latex2cnxml/src/oerpub/rhaptoslabs')
 
 from rhaptos.cnxmlutils.odt2cnxml import transform
+from latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 from utils import clean_cnxml, escape_system
@@ -52,6 +54,7 @@ if(extension == '.odt' or extension == '.doc'):
     output.close()
     os.remove(filename)
     remove_ids(valid_filename)
+
 elif(extension == '.gdoc'):
     valid_filename=name+'.cnxml'
     fp=open(filename, 'r')
@@ -64,6 +67,21 @@ elif(extension == '.gdoc'):
     output.write(cnxml)
     output.close()
     remove_ids(valid_filename)
+elif(extension == '.tex'):
+    valid_filename=name+'.cnxml'
+    fp = open(filename, 'r')
+    latex_archive = fp.read()
+    fp.close()
+
+    # LaTeX 2 CNXML transformation
+    cnxml, objects = latex_to_cnxml(latex_archive, filename)
+
+    cnxml = clean_cnxml(cnxml)
+    output = open(valid_filename, 'w')
+    output.write(cnxml)
+    output.close()
+    remove_ids(valid_filename)
+
 
 else:
     print('Assuming this is a file containing a URL')
