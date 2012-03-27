@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>
+[no-title]
+  </title>
+  <content>
+    <list list-type="enumerated">
+      <item>
+        <para>
+This is number 1 in the numbered list test
+     </para>
+      </item>
+      <item>
+        <para>
+Number 2
+     </para>
+      </item>
+      <item>
+        <para>
+Number 3
+     </para>
+      </item>
+    </list>
+    <para>
+      <newline/>
+    </para>
+    <para>
+      <newline/>
+    </para>
+    <list list-type="enumerated">
+      <item>
+        <para>
+This number 4 should be 2 lines below the others
+     </para>
+      </item>
+    </list>
+    <para>
+      <newline/>
+    </para>
+    <para>
+      <newline/>
+    </para>
+    <para>
+Separating text, two more lines down.
+   </para>
+    <para>
+      <newline/>
+    </para>
+    <list list-type="enumerated">
+      <item>
+        <para>
+New list starting at number 1! One line down.
+     </para>
+      </item>
+    </list>
+  </content>
+</document>

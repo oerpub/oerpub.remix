@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
+  <title>
+Untitled Document
+ </title>
+  <content>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+This is a right text test!
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+All of this text should be right justified.
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Muahahahaha!!!
+  </para>
+  </content>
+</document>

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
+  <title>
+Untitled Document
+ </title>
+  <content>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+A, E, I, O, U, Y with diacritics
+  </para>
+    <table summary="">
+      <tgroup cols="6">
+        <colspec colnum="1" colname="c1"/>
+        <colspec colnum="2" colname="c2"/>
+        <colspec colnum="3" colname="c3"/>
+        <colspec colnum="4" colname="c4"/>
+        <colspec colnum="5" colname="c5"/>
+        <colspec colnum="6" colname="c6"/>
+        <tbody>
+          <row>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+ 
+        </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+´
+        </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+`
+        </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+ˆ
+        </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+¨
+        </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+˜
+        </emphasis>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+a
+      </entry>
+            <entry>
+á
+      </entry>
+            <entry>
+à
+      </entry>
+            <entry>
+â
+      </entry>
+            <entry>
+ä
+      </entry>
+            <entry>
+ã
+      </entry>
+          </row>
+          <row>
+            <entry>
+e
+      </entry>
+            <entry>
+é
+      </entry>
+            <entry>
+è
+      </entry>
+            <entry>
+ê
+      </entry>
+            <entry>
+ë
+      </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>
+i
+      </entry>
+            <entry>
+í
+      </entry>
+            <entry>
+ì
+      </entry>
+            <entry>
+î
+      </entry>
+            <entry>
+ï
+      </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>
+o
+      </entry>
+            <entry>
+ó
+      </entry>
+            <entry>
+ò
+      </entry>
+            <entry>
+ô
+      </entry>
+            <entry>
+ö
+      </entry>
+            <entry>
+õ
+      </entry>
+          </row>
+          <row>
+            <entry>
+u
+      </entry>
+            <entry>
+ú
+      </entry>
+            <entry>
+ù
+      </entry>
+            <entry>
+û
+      </entry>
+            <entry>
+ü
+      </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>
+y
+      </entry>
+            <entry>
+ý
+      </entry>
+            <entry/>
+            <entry>
+ŷ
+      </entry>
+            <entry>
+ÿ
+      </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>
+A
+      </entry>
+            <entry>
+Á
+      </entry>
+            <entry>
+À
+      </entry>
+            <entry>
+Â
+      </entry>
+            <entry>
+Ä
+      </entry>
+            <entry>
+Ã
+      </entry>
+          </row>
+          <row>
+            <entry>
+E
+      </entry>
+            <entry>
+É
+      </entry>
+            <entry>
+È
+      </entry>
+            <entry>
+Ê
+      </entry>
+            <entry>
+Ë
+      </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>
+I
+      </entry>
+            <entry>
+Í
+      </entry>
+            <entry>
+Ì
+      </entry>
+            <entry>
+Î
+      </entry>
+            <entry>
+Ï
+      </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>
+O
+      </entry>
+            <entry>
+Ó
+      </entry>
+            <entry>
+Ò
+      </entry>
+            <entry>
+Ô
+      </entry>
+            <entry>
+Ö
+      </entry>
+            <entry>
+Õ
+      </entry>
+          </row>
+          <row>
+            <entry>
+U
+      </entry>
+            <entry>
+Ú
+      </entry>
+            <entry>
+Ù
+      </entry>
+            <entry>
+Û
+      </entry>
+            <entry>
+Ü
+      </entry>
+            <entry/>
+          </row>
+          <row>
+            <entry>
+Y
+      </entry>
+            <entry>
+Ý
+      </entry>
+            <entry/>
+            <entry>
+Ŷ
+      </entry>
+            <entry>
+Ÿ
+      </entry>
+            <entry/>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Other letters, ligatures and diacritical forms: ñ Ñ ç Ç å Å ø Ø æ Æ œ Œ þ Þ ð Ð ß
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Quotes: ‘ ’ “ ” « » ‹ › ‚ „ Dashes: – (en) — (em) Inverted signs: ¿ ¡ Other punctuation: … • § ¶ † ‡ © ®
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Greek: Uppercase: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω Lowercase: α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Mathematical symbols: Arrows: ← → ↔ ⇐ ⇒ ⇔ ↑ ↓ ⇑ ⇓ Logic: ∧ ¬ ∨ ≡ ≢ ∀ ∃ ∄ □ ◊ ∴ ∵ Set theory: ∈ ∋ ∉ ∌ ∩ ∪ ⊂ ⊃ ⊄ ⊅ ⊆ ⊇ ⊈ ⊉ ⊊ ⊋
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Mathematical symbols: Simple arithmetic: − ± ∓ × ÷ · ≤ ≥ ≠ Geometry: ° ′ ″ ⊥ ∥ ∠
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Mathematical symbols: Other: ∂ √ ∞ ∑ ∏ ∫ ∇ ∆ ∼ ∝ ≈ ≅ ⌊ ⌋ ⌈ ⌉ ⊕ ⊗ ⊙
+  </para>
+    <para xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" fo:font-style="normal" fo:font-weight="normal">
+Superscripts 0-9: ⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ Subscripts 0-9: ₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉
+  </para>
+  </content>
+</document>

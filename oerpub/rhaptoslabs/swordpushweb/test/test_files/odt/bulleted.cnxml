@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
+  <title>
+Untitled Document
+ </title>
+  <content>
+    <list list-type="bulleted">
+      <item>
+This is a bulleted points test.
+   </item>
+      <item>
+Bullet 2
+   </item>
+    </list>
+    <list list-type="bulleted">
+      <item>
+Skip a line, and now bullet 3
+   </item>
+    </list>
+    <para>
+And some normal text.
+  </para>
+  </content>
+</document>

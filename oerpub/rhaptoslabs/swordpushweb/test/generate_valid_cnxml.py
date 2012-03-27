@@ -40,9 +40,10 @@ name, extension = os.path.splitext(filename)
 if(extension == '.odt' or extension == '.doc'):
 
     if(extension == '.doc'):
-        command = '/usr/bin/soffice --headless --nologo --nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + os.getcwd()+'/'+filename + ',' + os.getcwd()+'/'+name+'.odt' + ')"'
-        print(command)
-        os.system(command)
+        doc_folder = os.getcwd()+'/'+os.path.dirname(name)
+        os.system('./converters/doc2odt -o '+doc_folder+' '+os.getcwd()+'/'+filename)
+        #command = '/usr/bin/soffice --headless --nologo --nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + os.getcwd()+'/'+filename + ',' + os.getcwd()+'/'+name+'.odt' + ')"'
+        #os.system(command)
         filename=name+'.odt'
 
 
@@ -52,8 +53,9 @@ if(extension == '.odt' or extension == '.doc'):
     output=open(valid_filename,'w')
     output.write(cnxml)
     output.close()
-    os.remove(filename)
     remove_ids(valid_filename)
+    if(extension == '.doc'):
+        os.remove(os.getcwd()+'/'+name+'.odt')
 
 elif(extension == '.gdoc'):
     valid_filename=name+'.cnxml'
@@ -81,7 +83,6 @@ elif(extension == '.tex'):
     output.write(cnxml)
     output.close()
     remove_ids(valid_filename)
-
 
 else:
     print('Assuming this is a file containing a URL')

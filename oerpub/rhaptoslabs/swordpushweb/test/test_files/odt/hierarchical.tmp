@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
+  <title>
+Untitled Document
+ </title>
+  <content>
+    <list list-type="enumerated" number-style="arabic">
+      <item>
+This is a hierarchical test with numbered lists
+    <list list-type="enumerated" number-style="arabic"><item>
+Indented 1
+      <list list-type="enumerated" number-style="arabic"><item>
+Indented 2
+        <list list-type="enumerated" number-style="arabic"><item>
+Indented 3
+         </item></list></item><item>
+Indented 2
+       </item></list></item><item>
+Indented 1
+     </item></list></item>
+      <item>
+Back out to base
+   </item>
+      <item>
+Hello World
+   </item>
+    </list>
+  </content>
+</document>
