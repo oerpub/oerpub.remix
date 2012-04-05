@@ -16,21 +16,31 @@ formats=[ 'doc', 'url', 'latex', 'odt']
 #formats=[ 'doc', 'latex', 'odt']
 
 def odt_to_doc(odt_file, doc_folder):
-    os.system('./converters/odt2doc -o '+doc_folder+' '+odt_file)
     basename=os.path.basename(odt_file)
     name,extension=os.path.splitext(basename)
-    return doc_folder+name+'.doc'
+    output_file = doc_folder+name+'.doc'
+    os.system('./converters/odt2doc -o '+doc_folder+' '+odt_file)
+    return output_file
 
 def odt_to_html(odt_file, html_folder):
-    os.system('./converters/odt2html -o '+html_folder+' '+odt_file)
     basename=os.path.basename(odt_file)
     name,extension=os.path.splitext(basename)
-    return html_folder+name+'.html'
+    output_file = html_folder+name+'.html'
+    os.system('./converters/odt2html -o '+html_folder+' '+odt_file)
+    return output_file
 
 def odt_to_latex(odt_file, latex_folder):
     name, extension = os.path.splitext(odt_file)
+    output_file = latex_folder+os.path.basename(name)+'.tex'
     os.system('./converters/abiword -o '+latex_folder+os.path.basename(name)+'.tex --to=tex '+odt_file)
-    return latex_folder+os.path.basename(name)+'.tex'
+    return output_file
+
+overwrite = False
+print(len(sys.argv))
+if(len(sys.argv) > 1):
+    if(sys.argv[1] == 'ow'):
+        overwrite = True
+        print('DO OVERWRITE')
 
 odt_folder='./test_files/odt/'
 all_tests_odt_files = os.listdir(odt_folder)
@@ -53,6 +63,18 @@ for form in formats:
         for f in all_files:
             os.remove(format_folder+f)
     for f in all_tests_odt_files:
+
+        output_file = format_folder+os.path.splitext(f)[0]+'.cnxml'
+        output_file = output_file + '.cnxml'
+        try:
+            fp = open(output_file)
+            fp.close()
+            os.system('python generate_valid_cnxml.py '+gen_file)
+        except:
+            print('Skipping generating files for '+form+' '+os.path.splitext(f)[0])
+            if(overwrite == False):
+                continue
+
         gen_file = ''
         if(form == 'doc'):
             gen_file = odt_to_doc(odt_folder+f, format_folder)
@@ -62,8 +84,7 @@ for form in formats:
             gen_file = odt_to_latex(odt_folder+f, format_folder)
         elif(form == 'odt'):
             gen_file = odt_folder+f
-        print('generated file '+gen_file)
-        os.system('python generate_valid_cnxml.py '+gen_file)
+        
 
 rids = [ ]
 
