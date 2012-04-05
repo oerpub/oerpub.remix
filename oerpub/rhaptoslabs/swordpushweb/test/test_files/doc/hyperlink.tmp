@@ -4,10 +4,12 @@
 Untitled Document
  </title>
   <content>
-    <figure>
-      <media>
-        <image mime-type="image/jpg" src="graphics1.jpg" height="886" width="665"/>
-      </media>
-    </figure>
+    <para>
+This is a hyperlink test. This is a link to
+   <link url="http://www.google.com/"><emphasis effect="underline">
+http://www.google.com
+    </emphasis></link>
+:
+  </para>
   </content>
 </document>

@@ -1,17 +1,21 @@
+import warnings
 import unittest
 import sys
 import os
 import subprocess
 import urllib2
 
-eggs_location= '../../../../../../eggs/'
-repo_location='../../../../../'
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
 
-all_eggs=os.listdir(eggs_location)
-for egg in all_eggs:
-    full_path=eggs_location+egg
-    if os.path.isdir(full_path):
-        sys.path.append(full_path)
+    eggs_location= '../../../../../../eggs/'
+    repo_location='../../../../../'
+
+    all_eggs=os.listdir(eggs_location)
+    for egg in all_eggs:
+        full_path=eggs_location+egg
+        if os.path.isdir(full_path):
+            sys.path.append(full_path)
 #all_repos=os.listdir(repo_location)
 #for repo in all_repos:
 #    full_path=repo_location+repo
@@ -19,26 +23,30 @@ for egg in all_eggs:
 #        sys.path.append(full_path)
 #        sys.path.append(full_path+'/src')
 
-sys.path.append('../')
-sys.path.append('../../../../../oerpub.rhaptoslabs.html_gdocs2cnxml/src')
-sys.path.append('../../../../../rhaptos.cnxmlutils')
-sys.path.append('../../../../../oerpub.rhaptoslabs.latex2cnxml/src/oerpub/rhaptoslabs')
-sys.path.append('../../')
+    sys.path.append('../')
+    sys.path.append('../../../../../oerpub.rhaptoslabs.html_gdocs2cnxml/src')
+    sys.path.append('../../../../../rhaptos.cnxmlutils')
+    sys.path.append('../../../../../oerpub.rhaptoslabs.latex2cnxml/src/oerpub/rhaptoslabs')
+    sys.path.append('../../')
+    sys.path.append('../splitter')
 
-from rhaptos.cnxmlutils.validatecnxml import validate
-from rhaptos.cnxmlutils.odt2cnxml import transform
-from latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
-from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
-from utils import clean_cnxml, escape_system
-from lxml import etree
+    from splitter import get_gdoc, upload_doc, construct_url
+
+    from rhaptos.cnxmlutils.validatecnxml import validate
+    from rhaptos.cnxmlutils.odt2cnxml import transform
+    from latex2cnxml.latex2cnxml import latex_to_cnxml
+    from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
+    from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
+    from utils import clean_cnxml, escape_system
+    from lxml import etree
 
 test_folder_name='test_files/'
 
 def validate_cnxml(cnxml):
     valid, log = validate(cnxml, validator="jing")
     if not valid:
-        raise ConversionError(log)
+        print(log)
+        quit()
 
 
 def remove_ids(filename):
@@ -218,29 +226,45 @@ class SimpleTest(unittest.TestCase):
                 quit()
 
     def test_gdocs(self):
-        gdoc_files=os.listdir(test_folder_name+'gdocs/')
+        doc_files=os.listdir(test_folder_name+'doc/')
+        rids = [ ]
         i=0
-
-        while(i < len(gdoc_files)):
-            f=gdoc_files[i]
+        while(i < len(doc_files)):
+            f=doc_files[i]
             filename, extension = os.path.splitext(f)
-            if(extension != '.gdoc'):
-                gdoc_files.remove(f)
+            if(extension != '.doc'):
+                doc_files.remove(f)
             else:
                 i=i+1
+        for d in doc_files:
+            try:
+                just_filename=os.path.basename(d)
+                just_filename, extension = os.path.splitext(just_filename)
+                rid = upload_doc(test_folder_name+'doc/'+d, 'application/msword',just_filename)
+                rids.append(rid)
+            except KeyboardInterrupt:
+                exit()
+            except :
+                print('Error uploading '+just_filename+' to gdocs')
+        count = 0
+        for rid in rids:
+            filename = os.path.basename(doc_files[count])
+            filename,ext = os.path.splitext(filename)
 
-        for f in gdoc_files:
-            original_filename=test_folder_name+'gdocs/'+f
-            filename, extension = os.path.splitext(original_filename)
+            valid_filename='./test_files/gdocs/'+filename+'.cnxml'
+            output_filename='./test_files/gdocs/'+filename+'.tmp'
+            diff_filename = './test_files/gdocs/'+filename+'.diff'
+            err_filename = './test_files/gdocs/'+filename+'.err'
 
-            valid_filename=filename+'.cnxml'
-            output_filename=filename+'.tmp'
-            diff_filename = filename+'.diff'
-            err_filename = filename+'.err'
-
-            fp=open(original_filename, 'r')
-            html=fp.read()
-            fp.close()
+            gdoc_url = construct_url(rid[9:])
+            rid,original_title = get_gdoc(gdoc_url, './test_files/gdocs')
+            html_filename = './test_files/gdocs/'+rid[9:]+'.htm'
+            html_file = open(html_filename, 'r')
+            try:
+                html = html_file.read()
+                html_file.flush()
+            finally:
+                html_file.close()
             cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
             cnxml = clean_cnxml(cnxml)
             validate_cnxml(cnxml)
@@ -249,6 +273,7 @@ class SimpleTest(unittest.TestCase):
             output.write(cnxml)
             output.close()
             remove_ids(output_filename)
+            os.remove('./test_files/gdocs/'+rid[9:]+'.htm')
 
             process = subprocess.Popen(['diff',valid_filename,output_filename], shell=False, stdout=subprocess.PIPE)
             std_output = process.communicate()
@@ -257,12 +282,14 @@ class SimpleTest(unittest.TestCase):
                 diff_output=open(diff_filename,'w')
                 diff_output.write(std_output[0])
                 diff_output.close()
-                print('Differences in the testing of '+f+', information on those differences has been placed in '+diff_filename)
+                print('Differences in the testing of gdoc '+filename+', information on those differences has been placed in '+diff_filename)
             elif(std_output[1] != None and len(std_output[1]) != 0):
                 err_output=open(err_filename,'w')
                 err_output.write(std_output[1])
                 err_output.close()
-                print('Error(s) occurred while attempting to test for differences in CNXML output of '+f+', information on these errors are in '+err_filename)
+                print('Error(s) occurred while attempting to test for differences in CNXML output of gdoc '+filename+', information on these errors are in '+err_filename)
+            count = count + 1
+
 
     def test_latex(self):
         latex_files=os.listdir(test_folder_name+'latex/')

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>
+bulleted_hier
+  </title>
+  <content>
+    <list list-type="bulleted">
+      <item>
+This is hierarchical with bullets instead (small circle marker)
+     <list list-type="bulleted"><item>
+Wheee indented 1 (empty circle marker)
+       <list list-type="bulleted"><item>
+Indented 2 (square black marker)
+         <list list-type="bulleted"><item>
+Indented 3 (small circle marker again)
+           <list list-type="bulleted"><item>
+Indented 4
+            </item></list></item></list></item></list></item></list></item>
+    </list>
+  </content>
+</document>

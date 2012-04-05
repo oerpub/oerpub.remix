@@ -27,5 +27,6 @@ Copy everything, but remove id attributes.
 
 <!-- remove ids (do nothing with them so that they will disapear) -->
 <xsl:template match="@id"/>
+<xsl:template match="@alt"/>
 
 </xsl:stylesheet>

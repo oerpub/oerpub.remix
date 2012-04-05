@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>
+hierarchical
+  </title>
+  <content>
+    <list list-type="enumerated">
+      <item>
+This is a hierarchical test with numbered lists
+     <list list-type="enumerated"><item>
+Indented 1
+       <list list-type="enumerated"><item>
+Indented 2
+         <list list-type="enumerated"><item>
+Indented 3
+          </item></list></item><item>
+Indented 2
+        </item></list></item><item>
+Indented 1
+      </item></list></item>
+      <item>
+Back out to base
+    </item>
+      <item>
+Hello World
+    </item>
+    </list>
+  </content>
+</document>

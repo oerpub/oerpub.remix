@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>
+unicode
+  </title>
+  <content>
+    <para>
+A, E, I, O, U, Y with diacritics
+   </para>
+    <table summary="">
+      <tgroup cols="6">
+        <tbody>
+          <row>
+            <entry>
+              <para>
+                <emphasis effect="bold"/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+´
+         </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+`
+         </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+ˆ
+         </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+¨
+         </emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">
+˜
+         </emphasis>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+a
+        </para>
+            </entry>
+            <entry>
+              <para>
+á
+        </para>
+            </entry>
+            <entry>
+              <para>
+à
+        </para>
+            </entry>
+            <entry>
+              <para>
+â
+        </para>
+            </entry>
+            <entry>
+              <para>
+ä
+        </para>
+            </entry>
+            <entry>
+              <para>
+ã
+        </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+e
+        </para>
+            </entry>
+            <entry>
+              <para>
+é
+        </para>
+            </entry>
+            <entry>
+              <para>
+è
+        </para>
+            </entry>
+            <entry>
+              <para>
+ê
+        </para>
+            </entry>
+            <entry>
+              <para>
+ë
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+i
+        </para>
+            </entry>
+            <entry>
+              <para>
+í
+        </para>
+            </entry>
+            <entry>
+              <para>
+ì
+        </para>
+            </entry>
+            <entry>
+              <para>
+î
+        </para>
+            </entry>
+            <entry>
+              <para>
+ï
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+o
+        </para>
+            </entry>
+            <entry>
+              <para>
+ó
+        </para>
+            </entry>
+            <entry>
+              <para>
+ò
+        </para>
+            </entry>
+            <entry>
+              <para>
+ô
+        </para>
+            </entry>
+            <entry>
+              <para>
+ö
+        </para>
+            </entry>
+            <entry>
+              <para>
+õ
+        </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+u
+        </para>
+            </entry>
+            <entry>
+              <para>
+ú
+        </para>
+            </entry>
+            <entry>
+              <para>
+ù
+        </para>
+            </entry>
+            <entry>
+              <para>
+û
+        </para>
+            </entry>
+            <entry>
+              <para>
+ü
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+y
+        </para>
+            </entry>
+            <entry>
+              <para>
+ý
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+ŷ
+        </para>
+            </entry>
+            <entry>
+              <para>
+ÿ
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+A
+        </para>
+            </entry>
+            <entry>
+              <para>
+Á
+        </para>
+            </entry>
+            <entry>
+              <para>
+À
+        </para>
+            </entry>
+            <entry>
+              <para>
+Â
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ä
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ã
+        </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+E
+        </para>
+            </entry>
+            <entry>
+              <para>
+É
+        </para>
+            </entry>
+            <entry>
+              <para>
+È
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ê
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ë
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+I
+        </para>
+            </entry>
+            <entry>
+              <para>
+Í
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ì
+        </para>
+            </entry>
+            <entry>
+              <para>
+Î
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ï
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+O
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ó
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ò
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ô
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ö
+        </para>
+            </entry>
+            <entry>
+              <para>
+Õ
+        </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+U
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ú
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ù
+        </para>
+            </entry>
+            <entry>
+              <para>
+Û
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ü
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+Y
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ý
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+Ŷ
+        </para>
+            </entry>
+            <entry>
+              <para>
+Ÿ
+        </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para>
+Other letters, ligatures and diacritical forms: ñ Ñ ç Ç å Å ø Ø æ Æ œ Œ þ Þ ð Ð ß
+   </para>
+    <para>
+Quotes: ' ' " " « » ‹ › ' " Dashes: - (en) - (em) Inverted signs: ¿ ¡ Other punctuation: … • § ¶ † ‡ © ®
+   </para>
+    <para>
+Greek: Uppercase: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω Lowercase: α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω
+   </para>
+    <para>
+Mathematical symbols: Arrows: ← → ↔ ⇐ ⇒ ⇔ ↑ ↓ ⇑ ⇓ Logic: ∧ ¬ ∨ ≡ ≢ ∀ ∃ ∄ □ ◊ ∴ ∵ Set theory: ∈ ∋ ∉ ∌ ∩ ∪ ⊂ ⊃ ⊄ ⊅ ⊆ ⊇ ⊈ ⊉ ⊊ ⊋
+   </para>
+    <para>
+Mathematical symbols: Simple arithmetic: − ± ∓ × ÷ · ≤ ≥ ≠ Geometry: ° ′ ″ ⊥ ∥ ∠
+   </para>
+    <para>
+Mathematical symbols: Other: ∂ √ ∞ ∑ ∏ ∫ ∇ ∆ ∼ ∝ ≈ ≅ ⌊ ⌋ ⌈ ⌉ ⊕ ⊗ ⊙
+   </para>
+    <para>
+Superscripts 0-9: ⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ Subscripts 0-9: ₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉
+   </para>
+    <para>
+      <newline/>
+    </para>
+  </content>
+</document>

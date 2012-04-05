@@ -57,18 +57,6 @@ if(extension == '.odt' or extension == '.doc'):
     if(extension == '.doc'):
         os.remove(os.getcwd()+'/'+name+'.odt')
 
-elif(extension == '.gdoc'):
-    valid_filename=name+'.cnxml'
-    fp=open(filename, 'r')
-    html=fp.read()
-    fp.close()
-
-    cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
-    cnxml = clean_cnxml(cnxml)
-    output=open(valid_filename,'w')
-    output.write(cnxml)
-    output.close()
-    remove_ids(valid_filename)
 elif(extension == '.tex'):
     valid_filename=name+'.cnxml'
     fp = open(filename, 'r')
@@ -84,24 +72,21 @@ elif(extension == '.tex'):
     output.close()
     remove_ids(valid_filename)
 
-else:
+elif(extension=='.html'):
     print('Assuming this is a file containing a URL')
     f = filename
     input_file=open(f,'r')
-    url=input_file.readline()
-    input_file.close()
 
-    valid_filename=f+'.cnxml'
+    name,extension = os.path.splitext(filename)
+    valid_filename=name+'.cnxml'
 
-    import_opener = urllib2.build_opener()
-    import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
     try:
-        import_request = import_opener.open(url)
-        html = import_request.read()
+        html = input_file.read()
+        input_file.close()
 
         # transformation            
         cnxml, objects, html_title = htmlsoup_to_cnxml(
-        html, bDownloadImages=True, base_or_source_url=url)
+        html, bDownloadImages=True, base_or_source_url=filename)
 
         cnxml = clean_cnxml(cnxml)
 

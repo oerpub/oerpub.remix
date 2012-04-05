@@ -4,10 +4,10 @@
 Untitled Document
  </title>
   <content>
-    <figure>
-      <media>
-        <image mime-type="image/jpg" src="graphics1.jpg" height="886" width="665"/>
-      </media>
-    </figure>
+    <para>
+      <emphasis effect="italics">
+This is an italics text test. 1 2 3 4 5 # Hello World!!!
+   </emphasis>
+    </para>
   </content>
 </document>
