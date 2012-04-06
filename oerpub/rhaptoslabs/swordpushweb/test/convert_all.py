@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 sys.path.append('../splitter')
 sys.path.append('../../../../../oerpub.rhaptoslabs.html_gdocs2cnxml/src')
 sys.path.append('../../../../../rhaptos.cnxmlutils')
@@ -90,6 +91,15 @@ rids = [ ]
 
 doc_folder='./test_files/doc/'
 doc_files = os.listdir(doc_folder)
+
+have_test_file = False
+try:
+    fp = open('./test_files/gdocs/test_files')
+    fp.close()
+    have_test_file = True
+except:
+    print('No gdocs test file')
+
 i = 0
 while(i < len(doc_files)):
     current_file = doc_files[i]
@@ -111,11 +121,24 @@ for d in doc_files:
 #    except :
 #        print('Error uploading '+just_filename+' to gdocs')
 
+if(have_test_file):
+    fp = open('./test_files/gdocs/test_files')
+    for url in fp:
+        if(url[0] == '#'):
+            continue
+        match_doc_id = re.match(r'^.*docs\.google\.com/document/d/([^/]+).*$', url)
+        if match_doc_id:
+            rids.append('document:'+match_doc_id.group(1))
+    fp.close()
+
 count = 0
 for rid in rids:
     print(rid)
-    filename = os.path.basename(doc_files[count])
-    filename,ext = os.path.splitext(filename)
+    if(count < len(doc_files)):
+        filename = os.path.basename(doc_files[count])
+        filename,ext = os.path.splitext(filename)
+    else:
+        filename = rid[9:]
 
     valid_filename='./test_files/gdocs/'+filename+'.cnxml'
 
