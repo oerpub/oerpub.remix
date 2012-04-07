@@ -134,7 +134,7 @@
                 </div>
 
                 <div id="header">
-                    <img class="cnxlogo" src="http://oerpub.org/static/images/connexions_icon.png"/>
+                    <img class="cnxlogo" src="/static/images/connexions_icon.png"/>
                     <h1><a href="/">Connexions Importer</a></h1>
                 </div>
                 
