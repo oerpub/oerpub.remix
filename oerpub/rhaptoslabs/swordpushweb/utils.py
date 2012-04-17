@@ -44,6 +44,11 @@ def escape_system(input_string):
 
 
 def clean_cnxml(iCnxml, iMaxColumns=80):
+    return iCnxml
+
+#TODO Marvin: Needs rework! Destroys semantic of xml text nodes.
+#http://code.google.com/p/oer-roadmap/issues/detail?id=138
+def clean_cnxml_old_before_bug_138(iCnxml, iMaxColumns=80):
     """
     iMaxColumns -- maximum number of columns to allow when wrapping text.
 
