@@ -619,6 +619,7 @@ def cnxml_view(request):
                 fp.close()
 
         try:
+            cnxml = cnxml.encode('utf-8')
             save_cnxml(save_dir, cnxml, files)
             validate_cnxml(cnxml)
         except ConversionError as e:
