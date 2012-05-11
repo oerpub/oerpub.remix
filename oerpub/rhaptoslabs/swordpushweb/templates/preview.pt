@@ -69,7 +69,7 @@
                 <script type="text/javascript">
                     function ForcePreviewReload () {
                         var src = jQuery('iframe#preview-frame.preview').attr('src');
-                        jQuery('iframe#preview-frame.preview').attr('src');
+                        jQuery('iframe#preview-frame.preview').attr('src', src);
                     }
                 </script>
 
