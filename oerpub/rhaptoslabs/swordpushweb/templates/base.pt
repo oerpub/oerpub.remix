@@ -60,7 +60,6 @@
                     // if we have a preview_url, reload it
                     var p_url = $(fittedframe).attr('preview_url');
                     if (p_url.length > 0) {
-                        alert(p_url);
                         $(fittedframe).attr('src', p_url);
                     }
                 } 
