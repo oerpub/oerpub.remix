@@ -544,7 +544,8 @@ class PreviewSchema(formencode.Schema):
     title = formencode.validators.String()
 
 
-@view_config(route_name='preview', renderer='templates/preview.pt')
+@view_config(route_name='preview', renderer='templates/preview.pt',
+    http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
 def preview_view(request):
     check_login(request)
     
@@ -583,8 +584,7 @@ def preview_body_view(request):
         '%s%s/index.xhtml'% (
             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
             request.session['upload_dir']),
-        headers={'Cache-Control': 'max-age=0, must-revalidate',
-                 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
+        headers={'Cache-Control': 'max-age=0, must-revalidate, no-cache, no-store'},
         request=request
     )
 
