@@ -31,7 +31,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-
+from oerpub.rhaptoslabs.slideimporter.slideshare import main 
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
 
 TESTING = False
@@ -1041,3 +1041,7 @@ def admin_config_view(request):
         'config': config,
     }
     return response
+
+@view_config(route_name='slideshare_importer')
+def importer(request):
+    return Response(main())
