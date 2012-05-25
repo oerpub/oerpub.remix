@@ -34,7 +34,7 @@ import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare
-from oerpub.rhaptoslabs.slideimporter.google_presentations import *
+from oerpub.rhaptoslabs.slideimporter.google_presentations import upload_to_googledocs
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
 
 TESTING = False
@@ -1062,11 +1062,11 @@ def importer(request):
                 shutil.copyfileobj(input_file, saved_file)
                 saved_file.close()
                 input_file.close()
-               
-                respo = upload_to_googledocs("saketkc","howdoyoudothis1314.",original_filename)
+                upload_to_gdocs = upload_to_googledocs("saketkc","howdoyoudothis1314.",original_filename)
+                upload_to_ss = upload_to_slideshare("saketkc",original_filename)
                 form.data['upload'] = None
                 
 		
-		return Response(resp)
+		return Response(upload_to_gdocs)
     response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
     return render_to_response(templatePath, response, request=request)
