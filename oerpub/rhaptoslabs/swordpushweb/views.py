@@ -1042,10 +1042,10 @@ def admin_config_view(request):
     return response
 
 @view_config(route_name='slideshare_importer')
-def importer(request,renderer='templates/importer.pt'):
-    template_path = 'templates/importer.pt'
+def importer(request):
+    templatePath = 'templates/importer.pt'
     form = Form(request, schema=UploadSchema)
     config = load_config(request)
     field_list = [('upload', 'File')]
     response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
-    return render_to_response(templatePath = 'templates/importer.pt',response, request=request)
+    return render_to_response(templatePath, response, request=request)
