@@ -54,7 +54,6 @@ class LoginSchema(formencode.Schema):
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.NotEmpty()
 
-
 @view_config(route_name='login')
 def login_view(request):
     """
@@ -1043,5 +1042,14 @@ def admin_config_view(request):
     return response
 
 @view_config(route_name='slideshare_importer')
-def importer(request):
-    return Response(main())
+def importer(request,renderer='templates/importer.pt'):
+	template_path = 'templates/importer.pt'
+    form = Form(request, schema=UploadSchema)
+    config = load_config(request)
+	field_list = [('upload', 'File')]
+	response = {
+            'form': FormRenderer(form),
+            'field_list': field_list,
+            'config': config,
+        }
+    return render_to_response(templatePath = 'templates/importer.pt',response, request=request)
