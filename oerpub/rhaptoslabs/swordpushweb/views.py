@@ -1046,10 +1046,6 @@ def importer(request,renderer='templates/importer.pt'):
     template_path = 'templates/importer.pt'
     form = Form(request, schema=UploadSchema)
     config = load_config(request)
-	field_list = [('upload', 'File')]
-	response = {
-            'form': FormRenderer(form),
-            'field_list': field_list,
-            'config': config,
-        }
+    field_list = [('upload', 'File')]
+    response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
     return render_to_response(templatePath = 'templates/importer.pt',response, request=request)
