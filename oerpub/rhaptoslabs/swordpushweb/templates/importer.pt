@@ -1,89 +1,124 @@
 <metal:use use-macro="base">
-<tal:body metal:fill-slot="content-slot">
 
-<div id="ie6-container-wrap">
+<metal:script-slot fill-slot="script-slot">
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        $("#header h1 a").unbind('click');
+        $('#url-submit').attr('disabled','disabled');
+        $('#url_text').live('paste change keyup', function(){
+           if($(this).val() != ''){
+              $('#url-submit').removeAttr('disabled');
+           }
+           else {
+              $('#url-submit').attr('disabled','disabled');
+           }
+        });
+    });
+
+</script>
+}    
+</metal:script-slot>
+
+<metal:workflownav fill-slot="workflownav" />
+
+<tal:body metal:fill-slot="content-slot"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
+  <div id="ie6-container-wrap">
     <div id="container">
-        <div id="content">
+      <div id="content">
 
-            <div id="left-column-wrap">
-                <div id="left-column">
+        <div id="nav-column-wrap">
+          <div id="nav-column">
+            <ul>
+              <li id="nav-upload" class="selected">
+                <a href="" title="Upload new content"><span>Create</span></a>
+              </li>
+            </ul>
 
-                    <div class="splashbox">
-                        <p>Please sign in using your <strong>Connexions username and password</strong>.</p>
-                        <tal:errors define="errors python:request.get('errors')" condition="errors">
-                        <div class="error">
-                            <span class="errortext">
-                            </span>
-                            <span class="errortext" tal:repeat="error errors"
-                                tal:content="error">
-                                error
-                            </span>
-                        </div>
-                        </tal:errors>
-
-                        ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
-                        ${form.csrf_token()}
-                        <div class="advanced" style="display: none;">
-                            <div class="formlabel">
-                                <span class="advanced-marker"><img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gear_orange_3.png')}"/></span>
-                                <label for="url">Change repository</label>
-                            </div>
-                            <div class="forminfo">Enter service document URL</div>
-                            <div class="formfield">
-                                <input type="text" name="service_document_url"
-                                value="${config.service_document_url}"
-                                style="width: 25em;"
-                                value="http://cnx.org/sword/servicedocument"/>
-                            </div>
-                        </div>
-                        <table>
-                            <tr>
-                                 <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
-								<input id="upload" name="upload" style="visibility: hidden;" type="file" />
-     
-                            </tr>
-                            
-                            <
-                        </table>
-                        ${form.end()}
-                        
-                        <p>
-                            If you do not yet have an account, go to
-                            <a class="external" href="http://cnx.org/join_form">the Connexions site</a>
-                            to create one.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="right-column-wrap">
-                <div id="right-column">
-
-                    <h1>
-                        About the Connexions Importer
-                    </h1>
-
-                    <p>
-                        The Connexions Importer allows you to quickly create content in the 
-                        <a class="external" href="http://cnx.org/">Connexions</a> repository by sharing existing educational documents you have created.
-                    </p>
-                    <ul>
-                        <li>
-                            If you do not yet have an account, go to the <a class="external" href="http://cnx.org/join_form">Connexions site</a> to create one. 
-                        </li>
-                        <li>
-                            Then, come back here, login, and upload new content from a Word, Open Office, or Google Doc.
-                        </li>
-                    </ul>
-
-                </div>
-            </div>
+          </div>
         </div>
+
+        <div id="main-column-wrap">
+          <div id="main-column">
+              <div class="pleasewait" id="upload-wait" style="display: none;">
+                Your document is being processed. This may take a few moments.
+              </div>
+
+            <div id="choose-upload">
+              <h1>
+                Upload new content
+              </h1>
+              <p class="forminfo">
+                Choose one of the following to create a new module. A preview will appear in the next step so that you can review it before 
+                uploading the module to your Personal Workspace.
+              </p>
+
+              <ul id="create-new-list">
+                <li>
+                  <label>
+                    <span style="visibility: hidden;" class="or-bullet">or</span> 
+                    <span class="label-text">
+                        <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> or 
+                        <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
+                    </span>
+                  </label>
+                  ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='uploadform')}
+                  ${form.csrf_token()}
+                  <div class="upload-form">
+                    <p class="advanced">
+                      <span class="advanced-marker" title="Advanced mode feature">
+                          <img src="${images_url}/gear_orange_3.png"/>
+                      </span> 
+                      You can also upload a previously saved ZIP package with this option.
+                    </p>
+                    <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
+                    <input id="upload" name="upload" style="visibility: hidden;" type="file" />
+                  </div>
+                </li>
+                <li>
+                  <label>
+                    <span style="visibility: visible;" class="or-bullet">or</span> 
+                    <span class="label-text">
+                        <img src="${images_url}/google-docs-22.png">
+                   </span>
+                  </label>
+                  ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')}
+                  ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
+                  <div class="upload-form">
+                    <input class="button" id="google-submit" name="form.submitted" value="Select and preview &#187;" onclick="newPicker();">
+                  </div>
+                </li>
+                <li class="advanced" style="display: none;">
+                  <label>
+                    <span style="visibility: visible;" class="or-bullet">or</span> 
+                    <span class="label-text">
+                        <span class="advanced" title="Advanced mode feature"><img src="${images_url}/gear_orange_3.png"/></span>
+                      <strong>URL</strong> <span style="font-weight: normal;">(for converting an Internet page)</span>
+                    </span>
+                  </label>
+                  <div class="upload-form">
+                    <input id="url_text" name="url_text" style="width: 30em;"
+                        placeholder="http://www.example.com" type="url" />
+                    <input class="button" id="url-submit" name="url.submitted" value="Convert and preview &#187;" disabled="disabled" type="submit">
+                  </div>
+                </li>
+              </ul>
+              ${form.end()}
+            </div>
+
+          </div>
+        </div>
+        
+
+      </div>
     </div>
-</div>
+  </div>
+  
+  <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
+      frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+  </iframe>
 
 </tal:body>
-
-<metal:errors fill-slot="errors" />
 
 </metal:use>
