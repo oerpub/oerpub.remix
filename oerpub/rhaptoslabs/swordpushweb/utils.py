@@ -1,3 +1,9 @@
+import os
+import libxml2
+import libxslt
+
+current_dir = os.path.dirname(__file__)
+
 def pretty_print_dict(x, indent=0):
     output = '{'
     indentString = '    ' * (indent+1)
@@ -42,11 +48,20 @@ def load_config(request):
 def escape_system(input_string):
     return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
-
+# Pretty CNXML printing with libxml2 because etree/lxml cannot do pretty printing semantic correct
 def clean_cnxml(iCnxml, iMaxColumns=80):
-    return iCnxml
+    xsl = os.path.join(current_dir, 'utils_pretty.xsl')
+    style_doc = libxml2.parseFile(xsl)
+    style = libxslt.parseStylesheetDoc(style_doc)
+    doc = libxml2.parseDoc(iCnxml)
+    result = style.applyStylesheet(doc, None)
+    pretty_cnxml = style.saveResultToString(result)
+    style.freeStylesheet()
+    doc.freeDoc()
+    result.freeDoc()
+    return pretty_cnxml
 
-#TODO Marvin: Needs rework! Destroys semantic of xml text nodes.
+#TODO Marvin: Destroys semantic of xml text nodes. Can be removed in the future.
 #http://code.google.com/p/oer-roadmap/issues/detail?id=138
 def clean_cnxml_old_before_bug_138(iCnxml, iMaxColumns=80):
     """
