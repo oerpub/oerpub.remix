@@ -1070,3 +1070,18 @@ def importer(request):
 		return Response(upload_to_gdocs)
     response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
     return render_to_response(templatePath, response, request=request)
+
+@view_config(route_name='google_oauth')
+def oauth_start(request):
+    """View function that begins the Google OAuth authentication process"""
+    SCOPES = 'https://docs.google.com/feeds/ https://docs.googleusercontent.com/'
+    GDATA_CONSUMER_KEY = '640541804881.apps.googleusercontent.com'
+    GDATA_CONSUMER_SECRET = '3fZ0f8pAGSRC7C7YzV5IBZxl'
+    client = gdata.docs.client.DocsClient(source='Connexions')
+    oauth_callback_url = "http://localhost:6543/oauth2callback"#request.build_absolute_uri()
+    request_token = client.GetOAuthToken(
+        SCOPES,
+        oauth_callback_url,
+        GDATA_CONSUMER_KEY,
+        consumer_secret=GDATA_CONSUMER_SECRET
+    )

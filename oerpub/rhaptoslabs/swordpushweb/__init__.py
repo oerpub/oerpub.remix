@@ -23,7 +23,8 @@ def main(global_config, **settings):
     config.add_route('logout', '/logout')
     config.add_route('change_workspace', '/change_workspace')
     config.add_route('slideshare_importer', '/slideshare_importer')
-    
+    config.add_route('google_oauth', '/google_oauth')
+
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
     config.add_route('catchall_static', '/preview_css/*subpath', 'oerpub.rhaptoslabs.swordpushweb.static.static_view')
