@@ -37,6 +37,12 @@ from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare
 from oerpub.rhaptoslabs.slideimporter.google_presentations import upload_to_googledocs
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
 
+import httplib2
+import sys
+import urllib
+import urlparse
+import oauth2 as oauth
+
 TESTING = False
 
 
@@ -1072,16 +1078,20 @@ def importer(request):
     return render_to_response(templatePath, response, request=request)
 
 @view_config(route_name='google_oauth')
-def oauth_start(request):
-    """View function that begins the Google OAuth authentication process"""
-    SCOPES = 'https://docs.google.com/feeds/ https://docs.googleusercontent.com/'
-    GDATA_CONSUMER_KEY = '640541804881.apps.googleusercontent.com'
-    GDATA_CONSUMER_SECRET = '3fZ0f8pAGSRC7C7YzV5IBZxl'
-    client = gdata.docs.client.DocsClient(source='Connexions')
-    oauth_callback_url = "http://localhost:6543/oauth2callback"#request.build_absolute_uri()
-    request_token = client.GetOAuthToken(
-        SCOPES,
-        oauth_callback_url,
-        GDATA_CONSUMER_KEY,
-        consumer_secret=GDATA_CONSUMER_SECRET
-    )
+def authenticate_user_with_oauth(request):
+	oauth = GoogleOAuth()
+	oauth.set_oauth_callback_url()
+	saved_request_token = oauth.get_oauth_token_from_google()	
+	request.session['saved_request_token'] = saved_request_token
+	return HTTPFound(oauth.get_authorization_url_from_google())
+
+@view_config(route_name='oauth2callback'):
+def upload_document(request):
+	if not request.session.has_key('saved_request_token'):
+		return HTTPFound(location = '/google_oauth')
+	oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
+	oauth.authorize_request_token
+	uploader = GooglePresentationUploader()
+	uploader.authentincate_client_with_oauth2(oauth.get_token_key,oauth.get_token_secret)
+	uploader.upload(filepath)
+
