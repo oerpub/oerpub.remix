@@ -1063,15 +1063,16 @@ def return_slideshare_upload_form(request):
             original_filename = os.path.join(
                     save_dir,
                     form.data['upload'].filename.replace(os.sep, '_'))
-                saved_file = open(original_filename, 'wb')
-                input_file = form.data['upload'].file
-                shutil.copyfileobj(input_file, saved_file)
-                saved_file.close()
-                input_file.close()
-                upload_to_ss = upload_to_slideshare("saketkc",original_filename)
-                response = {"slideshow_id" : upload_to_ss}
-                templatePath = "templates/slideshare_preview.pt"
-                return render_to_response(templatePath,response,request=request)
+                    
+                    saved_file = open(original_filename, 'wb')
+                    input_file = form.data['upload'].file
+                    shutil.copyfileobj(input_file, saved_file)
+                    saved_file.close()
+                    input_file.close()
+                    upload_to_ss = upload_to_slideshare("saketkc",original_filename)
+                    response = {"slideshow_id" : upload_to_ss}
+                    templatePath = "templates/slideshare_preview.pt"
+                    return render_to_response(templatePath,response,request=request)
 
 
     return render_to_response(templatePath,response,request=request)
