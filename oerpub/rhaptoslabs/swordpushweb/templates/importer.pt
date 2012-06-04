@@ -1,25 +1,6 @@
 <metal:use use-macro="base">
 
-<metal:script-slot fill-slot="script-slot">
-<script type="text/javascript">
 
-    $(document).ready(function(){
-        $('input#file-submit').click(function(event){
-			event.preventDefault();
-			$('input#upload').click();
-		});
-		$('input#upload').change(function(event){
-			showWaitMessage();
-			$('form#uploadform').submit();
-		});
-	
-        
-     });
-   
-
-</script>
-}    
-</metal:script-slot>
 
 <metal:workflownav fill-slot="workflownav" />
 
