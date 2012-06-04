@@ -1,25 +1,5 @@
 <metal:use use-macro="base">
 
-<metal:script-slot fill-slot="script-slot">
-<script type="text/javascript">
-
-    $(document).ready(function(){
-        $('input#file-submit').click(function(event){
-			event.preventDefault();
-			$('input#upload').click();
-		});
-		$('input#upload').change(function(event){
-			showWaitMessage();
-			$('form#uploadform').submit();
-		});
-	
-        
-     });
-   
-
-</script>
-}    
-</metal:script-slot>
 
 <metal:workflownav fill-slot="workflownav" />
 
@@ -64,17 +44,7 @@
                         <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
                     </span>
                   </label>
-                  ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='uploadform')}
-                  ${form.csrf_token()}
-                  <div class="upload-form">
-                    
-                    <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
-                    <input id="upload" name="upload" style="visibility: hidden;" type="file" />
-                  </div>
-                </li>
-                
-              </ul>
-              ${form.end()}
+                <iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshow_id}" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen></iframe>
             </div>
 
           </div>

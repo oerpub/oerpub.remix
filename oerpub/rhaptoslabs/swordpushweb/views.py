@@ -1,5 +1,4 @@
 import os
-import sys
 import shutil
 import datetime
 import zipfile
@@ -13,7 +12,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
-from pyramid.response import Response
+
 
 import formencode
 
@@ -34,8 +33,8 @@ import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare
-from oerpub.rhaptoslabs.slideimporter.google_presentations import *
-from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
+from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
+from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
 TESTING = False
 
@@ -71,9 +70,9 @@ def login_view(request):
         ('username',),
         ('password',),
     ]
-    
+
     session = request.session
-    
+
     # validate the form in order to compute all errors
     valid_form = form.validate()
     request['errors'] = form.all_errors()
@@ -216,12 +215,12 @@ def save_cnxml(save_dir, cnxml, files):
         f.write(content)
         f.close()
 
-    # we generate the preview and save the error 
+    # we generate the preview and save the error
     conversionerror = None
     try:
         htmlpreview = cnxml_to_htmlpreview(cnxml)
     except libxml2.parserError:
-        conversionerror = traceback.format_exc()     
+        conversionerror = traceback.format_exc()
 
     # Zip up all the files. This is done now, since we have all the files
     # available, and it also allows us to post a simple download link.
@@ -339,7 +338,7 @@ def choose_view(request):
 
                 form.data['gdocs_resource_id'] = None
                 form.data['gdocs_access_token'] = None
-                
+
                 (request.session['title'], request.session['filename']) = \
                     process_gdocs_resource(save_dir, \
                                            gdocs_resource_id, \
@@ -362,7 +361,7 @@ def choose_view(request):
                         process_gdocs_resource(save_dir, "document:" + gdocs_resource_id)
                 else:
                     # download html:
-                    #html = urllib2.urlopen(url).read() 
+                    #html = urllib2.urlopen(url).read()
                     # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
                     import_opener = urllib2.build_opener()
                     import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
@@ -370,7 +369,7 @@ def choose_view(request):
                         import_request = import_opener.open(url)
                         html = import_request.read()
 
-                        # transformation            
+                        # transformation
                         cnxml, objects, html_title = htmlsoup_to_cnxml(
                         html, bDownloadImages=True, base_or_source_url=url)
                         request.session['title'] = html_title
@@ -411,7 +410,7 @@ def choose_view(request):
                 try:
                     zip_archive = zipfile.ZipFile(original_filename, 'r')
                     is_zip_archive = ('index.cnxml' in zip_archive.namelist())
-                    
+
                     # Do we have a latex file?
                     if not is_zip_archive:
                         # incoming latex.zip must contain a latex.tex file, where "latex" is the base name.
@@ -444,7 +443,7 @@ def choose_view(request):
 
                     cnxml = clean_cnxml(cnxml)
                     validate_cnxml(cnxml)
-                
+
                 # LaTeX
                 elif is_latex_archive:
                     f = open(original_filename)
@@ -549,7 +548,7 @@ class PreviewSchema(formencode.Schema):
 @view_config(route_name='preview', renderer='templates/preview.pt')
 def preview_view(request):
     check_login(request)
-    
+
     defaults = {}
     defaults['title'] = request.session.get('title', '')
     form = Form(request,
@@ -728,8 +727,8 @@ def metadata_view(request):
     for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
         defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
         config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
-    
-    # Get remembered title from the session    
+
+    # Get remembered title from the session
     if 'title' in session:
         print('TITLE '+session['title']+' in session')
         defaults['title'] = session['title']
@@ -788,7 +787,7 @@ def metadata_view(request):
         metadata['oerdc:oer-subject'] = form.data['subject']
 
         # Keywords
-        metadata['dcterms:subject'] = [i.strip() for i in 
+        metadata['dcterms:subject'] = [i.strip() for i in
                                        form.data['keywords'].splitlines()
                                        if i.strip()]
 
@@ -861,12 +860,12 @@ def metadata_view(request):
     <generator uri="rhaptos.swordservice.plone" version="1.0"> uri:"rhaptos.swordservice.plone" version:"1.0"</generator>
 
     <!-- The metadata begins -->
-    <dcterms:identifier xsi:type="dcterms:URI">http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926</dcterms:identifier> 
-    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
-    <dcterms:identifier xsi:type="oerdc:ContentId">module.2011-10-06.9527952926</dcterms:identifier> 
+    <dcterms:identifier xsi:type="dcterms:URI">http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926</dcterms:identifier>
+    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier>
+    <dcterms:identifier xsi:type="oerdc:ContentId">module.2011-10-06.9527952926</dcterms:identifier>
     <dcterms:title>Word created with multipart</dcterms:title>
-    <dcterms:created>2011/10/06 15:29:12.821 Universal</dcterms:created> 
-    <dcterms:modified>2011/10/06 15:29:15.879 Universal</dcterms:modified> 
+    <dcterms:created>2011/10/06 15:29:12.821 Universal</dcterms:created>
+    <dcterms:modified>2011/10/06 15:29:15.879 Universal</dcterms:modified>
     <dcterms:creator oerdc:id="user1"
                      oerdc:email="useremail1@localhost.net"
                      oerdc:pending="False">firstname1 lastname1</dcterms:creator>
@@ -897,49 +896,49 @@ def metadata_view(request):
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges>
         This is brand new.
-    </oerdc:descriptionOfChanges> 
+    </oerdc:descriptionOfChanges>
     <oerdc:oer-subject>Arts</oerdc:oer-subject>
     <dcterms:subject xsi:type="oerdc:Subject">Arts</dcterms:subject>
     <dcterms:subject>music</dcterms:subject>
     <dcterms:subject>passion</dcterms:subject>
     <dcterms:abstract>A bit of summary.</dcterms:abstract>
-    <dcterms:language xsi:type="ISO639-1">es</dcterms:language> 
+    <dcterms:language xsi:type="ISO639-1">es</dcterms:language>
     <dcterms:license xsi:type="dcterms:URI"></dcterms:license>
     <sword:treatment>
         Module 'Word created with multipart' was imported via the SWORD API.
         You can <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view">preview your module here</a> to see what it will look like once it is published.
-        
-        The current description of the changes you have made for this version of the module: This is brand new.
-        
 
-        
+        The current description of the changes you have made for this version of the module: This is brand new.
+
+
+
         Publication requirements:
-        
+
             1. Author (firstname1 lastname1, account:user1), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
-        
-        
+
+
             2. Author (Roche Compaan, account:roche), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
-        
-        
+
+
             3. Author (firstname2 lastname2, account:user2), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
-        
-        
+
+
             4. You cannot publish with pending role requests. Contributor, Roche Compaan (account:roche),
 must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=roche">agree to thw pending requests</a>.
-        
-        
+
+
             5. You cannot publish with pending role requests. Contributor, Daniel Williamson (account:user85),
 must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user85">agree to thw pending requests</a>.
-        
-        
+
+
             6. You cannot publish with pending role requests. Contributor, firstname2 lastname2 (account:user2),
 must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user2">agree to thw pending requests</a>.
-        
-        
+
+
             7. You cannot publish with pending role requests. Contributor, firstname3 lastname3 (account:user3),
 must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user3">agree to thw pending requests</a>.
-        
-        
+
+
     </sword:treatment>
     <!-- For all UNPUBLISHED modules -->
     <link rel="alternate"
@@ -1043,33 +1042,16 @@ def admin_config_view(request):
         'config': config,
     }
     return response
-
-@view_config(route_name='oauth2callback')
-def importer(request):
+@view_config(route_name='slideshare_importer',request_method='GET')
+def return_slideshare_upload_form(request):
+    check_login(request)
     templatePath = 'templates/importer.pt'
     form = Form(request, schema=UploadSchema)
-    config = load_config(request)
-    field_list = [('upload', 'File')]
-    if not 'form.submitted' in request.POST:
-		url = request.host_url + request.path_qs
-		request.session['url'] = url.replace('%2F','/')
-    
-    #if not request.session.has_key('url'):
-		
-		#request.session['oauth_verifier'] = request.GET('oauth_verifier')
-		
-    if form.validate():
-		oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
-		url = request.session['url'] #+'&oauth_token=' + request.session['oauth_token']
-		print url
-		oauth.authorize_request_token(request.session['saved_request_token'],url)
-		access_token = oauth.get_access_token()
-		guploader = GooglePresentationUploader()
-		guploader.authentincate_client_with_oauth2(oauth.get_token_key(),oauth.get_token_secret())
-		print oauth.get_token_secret()
-		print oauth.get_token_key()
-		
-		
+    response = {'form':form}
+    validate_form = form.validate()
+    if 'form.submitted' in  request.POST:
+        if validate_form:
+
 		original_filename = os.path.join(
                     "/home/saket",
                     form.data['upload'].filename.replace(os.sep, '_'))
@@ -1086,7 +1068,53 @@ def importer(request):
                 guploader.publish_presentation_on_web()
                 resource_id = guploader.get_resource_id().split(':')[1]
                 form.data['upload'] = None
-                
+
+
+    return render_to_response(templatePath,response,request=request)
+
+@view_config(route_name='oauth2callback')
+def importer(request):
+    templatePath = 'templates/importer.pt'
+    form = Form(request, schema=UploadSchema)
+    config = load_config(request)
+    field_list = [('upload', 'File')]
+    if not 'form.submitted' in request.POST:
+		url = request.host_url + request.path_qs
+		request.session['url'] = url.replace('%2F','/')
+
+    #if not request.session.has_key('url'):
+
+		#request.session['oauth_verifier'] = request.GET('oauth_verifier')
+
+    if form.validate():
+		oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
+		url = request.session['url'] #+'&oauth_token=' + request.session['oauth_token']
+		print url
+		oauth.authorize_request_token(request.session['saved_request_token'],url)
+		access_token = oauth.get_access_token()
+		guploader = GooglePresentationUploader()
+		guploader.authentincate_client_with_oauth2(oauth.get_token_key(),oauth.get_token_secret())
+		print oauth.get_token_secret()
+		print oauth.get_token_key()
+
+
+		original_filename = os.path.join(
+                    "/home/saket",
+                    form.data['upload'].filename.replace(os.sep, '_'))
+                saved_file = open(original_filename, 'wb')
+                input_file = form.data['upload'].file
+                shutil.copyfileobj(input_file, saved_file)
+                saved_file.close()
+                input_file.close()
+                upload_to_ss = upload_to_slideshare("saketkc",original_filename)
+                print guploader
+                upload_to_gdocs = guploader.upload(original_filename)
+                #guploader.get_resource_id()
+                guploader.get_first_revision_feed()
+                guploader.publish_presentation_on_web()
+                resource_id = guploader.get_resource_id().split(':')[1]
+                form.data['upload'] = None
+
 		templatePath = "templates/google_ss_preview.pt"
 		response = {"google_resource_id" : resource_id,}
 		return render_to_response(templatePath,response,request=request)
@@ -1095,10 +1123,10 @@ def importer(request):
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
-	
+
 	oauth = GoogleOAuth()
 	oauth.set_oauth_callback_url()
-	saved_request_token = oauth.get_oauth_token_from_google()	
+	saved_request_token = oauth.get_oauth_token_from_google()
 	request.session['saved_request_token'] = saved_request_token
 	print oauth.get_authorization_url_from_google()
 	return HTTPFound(location=str(oauth.get_authorization_url_from_google()))
