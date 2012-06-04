@@ -1052,8 +1052,8 @@ def return_slideshare_upload_form(request):
     if 'form.submitted' in  request.POST:
         if validate_form:
 			## Create a temp directory with the username and current timestamp for it to be unique
-			now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-            # TODO: This has a good chance of being unique, but even so...
+            now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+            # TODO: This has a good chance of being unique, but even so..
             temp_dir_name = '%s-%s' % (request.session['username'], now_string)
             save_dir = os.path.join(
                 request.registry.settings['slideshare_import_dir'],
