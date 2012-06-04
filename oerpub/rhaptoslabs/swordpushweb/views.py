@@ -1042,7 +1042,7 @@ def admin_config_view(request):
         'config': config,
     }
     return response
-@view_config(route_name='slideshare_importer',request_method='GET')
+@view_config(route_name='slideshare_importer')
 def return_slideshare_upload_form(request):
     check_login(request)
     templatePath = 'templates/importer.pt'
