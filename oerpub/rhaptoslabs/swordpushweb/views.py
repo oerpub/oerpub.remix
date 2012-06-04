@@ -1049,27 +1049,27 @@ def return_slideshare_upload_form(request):
     form = Form(request, schema=UploadSchema)
     response = {'form':FormRenderer(form)}
     validate_form = form.validate()
-    if 'form.submitted' in  request.POST:
-        if validate_form:
-			## Create a temp directory with the username and current timestamp for it to be unique
-            now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-            # TODO: This has a good chance of being unique, but even so..
-            temp_dir_name = '%s-%s' % (request.session['username'], now_string)
-            save_dir = os.path.join(
-                request.registry.settings['slideshare_import_dir'],
-                temp_dir_name
-                )
-            os.mkdir(save_dir)
-            original_filename = os.path.join(save_dir, form.data['upload'].filename.replace(os.sep, '_'))
-            saved_file = open(original_filename, 'wb')
-            input_file = form.data['upload'].file
-            shutil.copyfileobj(input_file, saved_file)
-            saved_file.close()
-            input_file.close()
-            upload_to_ss = upload_to_slideshare("saketkc",original_filename)
-            response = {"slideshow_id" : upload_to_ss}
-            templatePath = "templates/slideshare_preview.pt"
-            return render_to_response(templatePath,response,request=request)
+    #if 'form.submitted' in  request.POST:
+	if validate_form:
+		## Create a temp directory with the username and current timestamp for it to be unique
+		now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+		# TODO: This has a good chance of being unique, but even so..
+		temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+		save_dir = os.path.join(
+			request.registry.settings['slideshare_import_dir'],
+			temp_dir_name
+			)
+		os.mkdir(save_dir)
+		original_filename = os.path.join(save_dir, form.data['upload'].filename.replace(os.sep, '_'))
+		saved_file = open(original_filename, 'wb')
+		input_file = form.data['upload'].file
+		shutil.copyfileobj(input_file, saved_file)
+		saved_file.close()
+		input_file.close()
+		upload_to_ss = upload_to_slideshare("saketkc",original_filename)
+		response = {"slideshow_id" : upload_to_ss}
+		templatePath = "templates/slideshare_preview.pt"
+		return render_to_response(templatePath,response,request=request)
 
 
     return render_to_response(templatePath,response,request=request)
