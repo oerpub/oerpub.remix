@@ -34,14 +34,8 @@ import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare
-from oerpub.rhaptoslabs.slideimporter.google_presentations import upload_to_googledocs
+from oerpub.rhaptoslabs.slideimporter.google_presentations import *
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
-
-import httplib2
-import sys
-import urllib
-import urlparse
-import oauth2 as oauth
 
 TESTING = False
 
@@ -1058,6 +1052,10 @@ def importer(request):
     field_list = [('upload', 'File')]
     
     if form.validate():
+		oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
+		oauth.authorize_request_token
+		uploader = GooglePresentationUploader()
+		uploader.authentincate_client_with_oauth2(oauth.get_token_key,oauth.get_token_secret)
 		
 		
 		original_filename = os.path.join(
@@ -1068,7 +1066,7 @@ def importer(request):
                 shutil.copyfileobj(input_file, saved_file)
                 saved_file.close()
                 input_file.close()
-                upload_to_gdocs = upload_to_googledocs("saketkc","howdoyoudothis1314.",original_filename)
+                upload_to_gdocs = uploader.upload(original_filename)
                 upload_to_ss = upload_to_slideshare("saketkc",original_filename)
                 form.data['upload'] = None
                 
@@ -1079,19 +1077,46 @@ def importer(request):
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
+	
 	oauth = GoogleOAuth()
 	oauth.set_oauth_callback_url()
 	saved_request_token = oauth.get_oauth_token_from_google()	
 	request.session['saved_request_token'] = saved_request_token
-	return HTTPFound(oauth.get_authorization_url_from_google())
+	print oauth.get_authorization_url_from_google()
+	return HTTPFound(location=str(oauth.get_authorization_url_from_google()))
 
-@view_config(route_name='oauth2callback'):
+@view_config(route_name='oauth2callback')
 def upload_document(request):
-	if not request.session.has_key('saved_request_token'):
-		return HTTPFound(location = '/google_oauth')
-	oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
-	oauth.authorize_request_token
-	uploader = GooglePresentationUploader()
-	uploader.authentincate_client_with_oauth2(oauth.get_token_key,oauth.get_token_secret)
-	uploader.upload(filepath)
+	templatePath = 'templates/importer.pt'
+	form = Form(request, schema=UploadSchema)
+	config = load_config(request)
+	field_list = [('upload', 'File')]
+	valid_form = form.validate()
+	request['errors'] = form.all_errors()
 
+    # Check for successful form completion
+	if 'form.submitted' in request.POST and valid_form:
+		if not request.session.has_key('saved_request_token'):
+			return HTTPFound(location = '/google_oauth')
+		oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
+		oauth.authorize_request_token
+		guploader = GooglePresentationUploader()
+		guploader.authentincate_client_with_oauth2(oauth.get_token_key,oauth.get_token_secret)
+	#	uploader.upload("/home/saket/Downloads/ch1.ppt")
+		print guploader
+		original_filename = os.path.join("/home/saket",form.data['upload'].filename.replace(os.sep, '_'))
+		saved_file = open(original_filename, 'wb')
+		input_file = form.data['upload'].file
+		shutil.copyfileobj(input_file, saved_file)
+		saved_file.close()
+		input_file.close()
+		upload_to_ss = upload_to_slideshare("saketkc",original_filename)
+		print upload_to_ss
+		upload_to_gdocs = guploader.upload(original_filename)
+		
+		form.data['upload'] = None
+        #return Response("upload_to_gdocs")
+	response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
+	return render_to_response(templatePath, response, request=request)
+	
+	
