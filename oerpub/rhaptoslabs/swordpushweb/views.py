@@ -1049,7 +1049,7 @@ def return_slideshare_upload_form(request):
     form = Form(request, schema=UploadSchema)
     response = {'form':FormRenderer(form)}
     validate_form = form.validate()
-	if 'form.submitted' in  request.POST:
+	#if 'form.submitted' in  request.POST:
     if validate_form:
 		## Create a temp directory with the username and current timestamp for it to be unique
 		now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
