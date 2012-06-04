@@ -1,0 +1,72 @@
+<metal:use use-macro="base">
+
+    <metal:workflownav fill-slot="workflownav">
+   
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+              
+            </div>
+            
+        </div>
+    </div>
+    </metal:workflownav>
+
+    <metal:content-slot fill-slot="content-slot">
+    <div id="ie6-container-wrap">
+        <div id="container">
+            <div id="content">
+                <div id="pageheader-wrap">
+
+                    <div id="module-actions">
+                        <span class="advanced">
+                            <h3>Module actions:</h3>
+                            <a class="button" id="edit-xml"
+                                title="Make changes to the module by editing its XML code."
+                                href="${request.route_url('cnxml')}">
+                                
+                                <span class="button-text">Edit XML</span>
+                            </a>
+                            
+                        </span>
+                    </div>
+
+                    <div id="page-title">
+                        <h1>
+                            Preview:
+                            <span class="metatitle">
+                                
+                            </span>
+                        </h1>
+                    </div>
+
+                    <div id="page-description">
+                        <p class="forminfo">
+                            View below how the module will appear in Connexions.
+                        </p>
+                    </div>
+
+                </div>
+
+                <script type="text/javascript">
+                    function ForcePreviewReload () {
+                        var src = jQuery('iframe#preview-frame.preview').attr('src');
+                        jQuery('iframe#preview-frame.preview').attr('src', src);
+                    }
+                </script>
+
+                
+                
+                <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
+					frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" 
+					webkitallowfullscreen="true">
+				</iframe>
+
+            </div>
+        </div>
+    </div>
+    
+    </metal:content-slot>
+
+    <metal:footer-slot fill-slot="footer-slot" />
+</metal:use>

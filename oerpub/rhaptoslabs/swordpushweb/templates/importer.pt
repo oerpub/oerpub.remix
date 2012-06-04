@@ -63,7 +63,7 @@
                         <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
                     </span>
                   </label>
-                  ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='uploadform')}
+                  ${form.begin(request.route_url('oauth2callback'), multipart='multipart', id='uploadform')}
                   ${form.csrf_token()}
                   <div class="upload-form">
                     <p class="advanced">
