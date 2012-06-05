@@ -32,7 +32,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare,get_slideshow_info
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -1049,16 +1049,17 @@ def admin_config_view(request):
 @view_config(route_name='slideshare_importer')
 def return_slideshare_upload_form(request):
     check_login(request)
-    templatePath = 'templates/importer.pt'
     form = Form(request, schema=ImporterSchema)
     response = {'form':FormRenderer(form),'slideshow_id': '123'}
     validate_form = form.validate()
-    print form.all_errors()
-
-	#if 'form.submitted' in  request.POST:
-	
+    if request.GET('slideshow_id'):
+		response = get_slideshow_info(show_slideshow(request.GET('slideshow_id')))
+		if response == '0' or response == '1':
+			return {form : FormRenderer(form),'conversion_flag': True}
+		else:
+			return {form : FormRenderer(form),'conversion_flag': False, 'oembed': True}
     if validate_form:
-		print "I am here"
+		
 		## Create a temp directory with the username and current timestamp for it to be unique
 		now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
 		# TODO: This has a good chance of being unique, but even so..
