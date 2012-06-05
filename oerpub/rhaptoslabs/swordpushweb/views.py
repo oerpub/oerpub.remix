@@ -32,7 +32,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare,get_slideshow_info
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
