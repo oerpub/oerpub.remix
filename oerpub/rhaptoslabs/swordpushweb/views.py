@@ -1046,13 +1046,13 @@ def admin_config_view(request):
         'config': config,
     }
     return response
-@view_config(route_name='slideshare_importer')
+@view_config(route_name='slideshare_importer',renderer='templates/importer.pt')
 def return_slideshare_upload_form(request):
     check_login(request)
     form = Form(request, schema=ImporterSchema)
     response = {'form':FormRenderer(form),'slideshow_id': '123'}
     validate_form = form.validate()
-    if request.GET('slideshow_id'):
+    if request.GET.get('slideshow_id'):
 		response = get_slideshow_info(show_slideshow(request.GET('slideshow_id')))
 		if response == '0' or response == '1':
 			return {form : FormRenderer(form),'conversion_flag': True}
@@ -1076,12 +1076,18 @@ def return_slideshare_upload_form(request):
 		saved_file.close()
 		input_file.close()
 		upload_to_ss = upload_to_slideshare("saketkc",original_filename)
-		response = {"slideshow_id" : upload_to_ss}
-		templatePath = "templates/slideshare_preview.pt"
-		return render_to_response(templatePath,response,request=request)
+		
+		response = show_slideshow(upload_to_ss)
+		print response
+		if response == '0' or response == '1':
+			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
+		else:
+			return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True,'slideshow_id': upload_to_ss}
+		
+		
 
 
-    return render_to_response(templatePath,response,request=request)
+    return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
 
 @view_config(route_name='oauth2callback')
 def importer(request):

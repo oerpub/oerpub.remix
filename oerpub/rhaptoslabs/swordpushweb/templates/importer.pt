@@ -6,9 +6,9 @@
     $(document).ready(function(){
     
         $('input#import-submit').click(function(event){
-        alert("d");
         event.preventDefault();
-		showWaitMessage();
+        $('#import-submit').attr("disabled", true);
+        showWaitMessage();
 		$('form#importform').submit();	
 		
         });
@@ -61,7 +61,7 @@
                   <div class="upload-form">
                     
                     
-                    <input id="importer" name="importer"  type="file" /> <br/>
+                    <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" accept= "application/msword, application/pdf, application/postscript, application/ppt"/> <br/>
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </div>
                   
@@ -69,12 +69,12 @@
                 </li>
                 <li>
                 
-                <p tal:condition="exists:oembed">
+                <p tal:condition="oembed">
 					<iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshow_id}" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen></iframe>
                 </p>
                 
                 
-					<p tal:condition="exists:conversion_flag">
+					<p tal:condition="conversion_flag">
 						Slieshow in Queue for Conversion
 						<a href="/?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
 					</p>
