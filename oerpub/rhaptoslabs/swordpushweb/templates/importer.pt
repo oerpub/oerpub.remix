@@ -76,7 +76,7 @@
                 
 					<p tal:condition="conversion_flag">
 						Slieshow in Queue for Conversion
-						<a href="/?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
+						<a href="/slideshow_importer?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
 					</p>
 
                 </li>
