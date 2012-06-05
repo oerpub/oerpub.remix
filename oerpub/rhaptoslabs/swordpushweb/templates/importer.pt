@@ -67,23 +67,24 @@
                   
                   
                 </li>
-                <li>
-                
-                <p tal:condition="oembed">
-					<iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshow_id}" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen></iframe>
-                </p>
-                
+              </ul>
+              ${form.end()}
+                <div id="embed-ss">
+					<p tal:condition="oembed">
+						<iframe id="slideshare-embed" src="http://www.slideshare.net/slideshow/embed_code/${slideshow_id}" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen></iframe>
+					</p>
+				</div>
+                <div id="conversion-ss">
                 
 					<p tal:condition="conversion_flag">
 						Slieshow in Queue for Conversion
-						<a href="/slideshow_importer?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
+						<a href="/slideshare_importer?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
 					</p>
-
-                </li>
+				</div>      
                 
-              </ul>
               
-              ${form.end()}
+              
+              
             </div>
 
           </div>

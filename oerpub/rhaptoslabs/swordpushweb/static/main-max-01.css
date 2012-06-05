@@ -387,6 +387,11 @@ iframe{
   border: 1px dotted #bbb;
 }
 
+iframe #slideshare-embed{
+  height: 355px;
+  margin-left: 20%;
+  
+}
 #left-column-wrap{
   width: 50%;
   float: left;

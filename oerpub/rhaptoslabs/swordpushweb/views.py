@@ -1053,11 +1053,12 @@ def return_slideshare_upload_form(request):
     response = {'form':FormRenderer(form),'slideshow_id': '123'}
     validate_form = form.validate()
     if request.GET.get('slideshow_id'):
-		response = show_slideshow(request.GET.get('slideshow_id'))
+		slideshow_id = request.GET.get('slideshow_id')
+		response = show_slideshow(slideshow_id)
 		if response == '0' or response == '1':
-			return {form : FormRenderer(form),'conversion_flag': True}
+			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': slideshow_id}
 		else:
-			return {form : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': request.GET.get('slideshow_id')}
+			return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': slideshow_id}
     if validate_form:
 		
 		## Create a temp directory with the username and current timestamp for it to be unique
