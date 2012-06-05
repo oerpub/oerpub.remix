@@ -32,7 +32,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link,get_slideshow_status
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -1055,9 +1055,9 @@ def return_slideshare_upload_form(request):
     validate_form = form.validate()
     if request.GET.get('slideshow_id'):
 		slideshow_id = request.GET.get('slideshow_id')
-		all_details = get_detais(slideshow_id)
+		all_details = get_details(slideshow_id)		
 		download_link = get_download_link(all_details)
-		
+		response = get_slideshow_status(all_details)
 		if response == '0' or response == '1':
 			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': slideshow_id}
 		else:
@@ -1079,10 +1079,8 @@ def return_slideshare_upload_form(request):
 		shutil.copyfileobj(input_file, saved_file)
 		saved_file.close()
 		input_file.close()
-		upload_to_ss = upload_to_slideshare("saketkc",original_filename)
-		
-		response = show_slideshow(upload_to_ss)
-		print response
+		upload_to_ss = upload_to_slideshare("saketkc",original_filename)		
+		response = show_slideshow(upload_to_ss)		
 		if response == '0' or response == '1':
 			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
 		else:
