@@ -387,7 +387,7 @@ iframe{
   border: 1px dotted #bbb;
 }
 
-iframe #slideshare-embed{
+#slideshare-embed{
   height: 355px;
   margin-left: 20%;
   
