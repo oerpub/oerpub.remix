@@ -73,6 +73,9 @@
 					<p tal:condition="oembed">
 						<iframe id="slideshare-embed" src="http://www.slideshare.net/slideshow/embed_code/${slideshow_id}" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen></iframe>
 					</p>
+					
+					<br/>
+					<a href="${download_link}">Download Original Slides</a>
 				</div>
                 <div id="conversion-ss">
                 
@@ -81,6 +84,7 @@
 						<a href="/slideshare_importer?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
 					</p>
 				</div>      
+				
                 
               
               

@@ -32,7 +32,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -1046,6 +1046,7 @@ def admin_config_view(request):
         'config': config,
     }
     return response
+    
 @view_config(route_name='slideshare_importer',renderer='templates/importer.pt')
 def return_slideshare_upload_form(request):
     check_login(request)
@@ -1054,11 +1055,13 @@ def return_slideshare_upload_form(request):
     validate_form = form.validate()
     if request.GET.get('slideshow_id'):
 		slideshow_id = request.GET.get('slideshow_id')
-		response = show_slideshow(slideshow_id)
+		all_details = get_detais(slideshow_id)
+		download_link = get_download_link(all_details)
+		
 		if response == '0' or response == '1':
 			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': slideshow_id}
 		else:
-			return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': slideshow_id}
+			return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': slideshow_id, 'download_link': download_link}
     if validate_form:
 		
 		## Create a temp directory with the username and current timestamp for it to be unique
