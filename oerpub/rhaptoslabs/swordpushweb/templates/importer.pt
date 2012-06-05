@@ -1,5 +1,26 @@
 <metal:use use-macro="base">
 
+<metal:script-slot fill-slot="script-slot">
+<script type="text/javascript">
+
+    $(document).ready(function(){
+    
+        $('input#import-submit').click(function(event){
+        alert("d");
+        event.preventDefault();
+		showWaitMessage();
+		$('form#importform').submit();	
+		
+        });
+        
+        
+    });
+    
+    
+
+</script>
+}    
+</metal:script-slot>
 
 
 <metal:workflownav fill-slot="workflownav" />
@@ -14,7 +35,7 @@
           <div id="nav-column">
             <ul>
               <li id="nav-upload" class="selected">
-                <a href="" title="Upload new content"><span>Create</span></a>
+                <a href="" title="Import to SlideShare"><span>Import</span></a>
               </li>
             </ul>
 
@@ -24,37 +45,35 @@
         <div id="main-column-wrap">
           <div id="main-column">
               <div class="pleasewait" id="upload-wait" style="display: none;">
-                Your document is being processed. This may take a few moments.
+                Your document is being uploaded to SlideShare . This may take few moments.
               </div>
 
             <div id="choose-upload">
               <h1>
-                Upload new content
+                Import your Presentations
               </h1>
-              <p class="forminfo">
-                Choose one of the following to create a new module. A preview will appear in the next step so that you can review it before 
-                uploading the module to your Personal Workspace.
-              </p>
-
+              
               <ul id="create-new-list">
                 <li>
-                  <label>
-                    <span style="visibility: hidden;" class="or-bullet">or</span> 
-                    <span class="label-text">
-                        <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> or 
-                        <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
-                    </span>
-                  </label>
-                  ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='uploadform')}
+                  
+                  ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}
                   <div class="upload-form">
                     
-                    <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
-                    <input id="upload" name="upload" style="visibility: hidden;" type="file" />
+                    
+                    <input id="importer" name="importer"  type="file" /> <br/>
+                    <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </div>
+                  
+                  
+                </li>
+                <li>
+                <p tal:condition="exists:request/slideshow_id" tal:content="request/slideshow_id">message goes here</p>
+
                 </li>
                 
               </ul>
+              
               ${form.end()}
             </div>
 

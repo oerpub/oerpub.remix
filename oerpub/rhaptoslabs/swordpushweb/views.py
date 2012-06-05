@@ -188,6 +188,10 @@ class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
 
+class ImporterSchema(formencode.Schema):
+    allow_extra_fields = True
+    importer = formencode.validators.FieldStorageUploadConverter()
+
 class ConversionError(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -1046,11 +1050,15 @@ def admin_config_view(request):
 def return_slideshare_upload_form(request):
     check_login(request)
     templatePath = 'templates/importer.pt'
-    form = Form(request, schema=UploadSchema)
-    response = {'form':FormRenderer(form)}
+    form = Form(request, schema=ImporterSchema)
+    response = {'form':FormRenderer(form),'slideshow_id': '123'}
     validate_form = form.validate()
+    print form.all_errors()
+
 	#if 'form.submitted' in  request.POST:
+	
     if validate_form:
+		print "I am here"
 		## Create a temp directory with the username and current timestamp for it to be unique
 		now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
 		# TODO: This has a good chance of being unique, but even so..
@@ -1060,9 +1068,9 @@ def return_slideshare_upload_form(request):
 			temp_dir_name
 			)
 		os.mkdir(save_dir)
-		original_filename = os.path.join(save_dir, form.data['upload'].filename.replace(os.sep, '_'))
+		original_filename = os.path.join(save_dir, form.data['importer'].filename.replace(os.sep, '_'))
 		saved_file = open(original_filename, 'wb')
-		input_file = form.data['upload'].file
+		input_file = form.data['importer'].file
 		shutil.copyfileobj(input_file, saved_file)
 		saved_file.close()
 		input_file.close()
