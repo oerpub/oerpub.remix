@@ -61,7 +61,7 @@
                   <div class="upload-form">
                     
                     
-                    <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" accept= "application/msword, application/pdf, application/postscript, application/ppt"/> <br/>
+                    <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </div>
                   
