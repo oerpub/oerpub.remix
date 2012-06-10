@@ -1050,6 +1050,7 @@ def admin_config_view(request):
 @view_config(route_name='slideshare_importer',renderer='templates/importer.pt')
 def return_slideshare_upload_form(request):
     check_login(request)
+    session = request.session
     form = Form(request, schema=ImporterSchema)
     response = {'form':FormRenderer(form),'slideshow_id': '123'}
     validate_form = form.validate()
@@ -1073,6 +1074,7 @@ def return_slideshare_upload_form(request):
 			temp_dir_name
 			)
 		os.mkdir(save_dir)
+		uploaded_filename = form.data['importer'].filename.replace(os.sep, '_')
 		original_filename = os.path.join(save_dir, form.data['importer'].filename.replace(os.sep, '_'))
 		saved_file = open(original_filename, 'wb')
 		input_file = form.data['importer'].file
@@ -1080,7 +1082,84 @@ def return_slideshare_upload_form(request):
 		saved_file.close()
 		input_file.close()
 		upload_to_ss = upload_to_slideshare("saketkc",original_filename)		
-		response = show_slideshow(upload_to_ss)		
+		response = show_slideshow(upload_to_ss)
+		conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)
+		collections = [{'title': i.title, 'href': i.href}
+		                          for i in sword2cnx.get_workspaces(conn)]
+		workspaces = [(i['href'], i['title']) for i in collections]
+		zipped_filepath = os.path.join(save_dir,"cnxupload.zip")		
+		#relative_path = os.path.join("upload",uploaded_filename)
+		zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
+		zip_archive.write(original_filename,uploaded_filename)	    
+		cnxml = """<?xml version="1.0"?>
+		<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
+
+		<title>TEST12121212121</title>
+		<metadata xmlns:md="http://cnx.rice.edu/mdml"
+		mdml-version="0.5">
+		<!-- WARNING! The 'metadata' section is read only. Do not edit below.
+		Changes to the metadata section in the source will not be saved. -->
+		<md:repository>http://cnx.org/content</md:repository>
+		<md:content-id>new</md:content-id>
+		<md:title>(Untitled)</md:title>
+		<md:version>**new**</md:version>
+		<md:created>2012/06/09 19:36:14.622 GMT-5</md:created>
+		<md:revised>2012/06/09 19:36:14.622 GMT-5</md:revised>
+		<md:actors>
+		<md:person userid="saketkc">
+		<md:firstname>Saket</md:firstname>
+		<md:surname>Choudhary</md:surname>
+		<md:fullname>Saket Choudhary</md:fullname>
+		<md:email>saketkc@gmail.com</md:email>
+		</md:person>
+		</md:actors>
+		<md:roles>
+		<md:role type="author">saketkc</md:role>
+		<md:role type="maintainer">saketkc</md:role>
+		<md:role type="licensor">saketkc</md:role>
+		</md:roles>
+		<md:license url="" />
+		<!-- For information on license requirements for use or modification, see license url in the
+		above <md:license> element.
+		For information on formatting required attribution, see the URL:
+		CONTENT_URL/content_info#cnx_cite_header
+		where CONTENT_URL is the value provided above in the <md:content-url> element.
+		-->
+		<md:abstract></md:abstract>
+		<md:language>en</md:language>
+		<!-- WARNING! The 'metadata' section is read only. Do not edit above.
+		Changes to the metadata section in the source will not be saved. -->
+		</metadata>
+
+		<content>
+		<section id="intro"><title>Introduction</title><para id="intropara1">These slides are meant to go with the Connexions authoring guide. Students can use the slides on their own and faculty can use them to teach workshops on authoring Connexions' modules.</para></section>
+		<section id="externalservices"><title>Online viewable slides</title><section id="slideshare"><title>SlideShare Version</title><figure id="cnx-slideshare"><title>Connexions: Create Globally, Educate Locally</title><media id="ss-media" display="block" alt="Slide show introducing the ideas behind Connexions.">
+		<flash id="ss-video" mime-type="application/x-shockwave-flash" src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=cnxdemo-090820214427-phpapp02&amp;stripped_title=cnxdemo" width="425" height="344">
+		<param name="allowscriptaccess" value="always"/>
+		<param name="allowfullscreen" value="true"/>
+		</flash>
+		</media>
+		</figure></section></section>
+		</content>
+
+		</document>
+		"""		
+		zip_archive.writestr("index.cnxml", cnxml)
+		zip_archive.close()	    
+		with open(zipped_filepath, 'rb') as zip_file:
+			deposit_receipt = conn.create(
+				col_iri = workspaces[0][0],		    
+				payload = zip_file,
+				filename = 'upload.zip',
+				mimetype = 'application/zip',
+				packaging = 'http://purl.org/net/sword/package/SimpleZip',
+				in_progress = True)
+
+        		
 		if response == '0' or response == '1':
 			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
 		else:
@@ -1136,6 +1215,8 @@ def importer(request):
 
 		templatePath = "templates/google_ss_preview.pt"
 		response = {"google_resource_id" : resource_id,}
+		
+
 		return render_to_response(templatePath,response,request=request)
     response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
     return render_to_response(templatePath, response, request=request)
