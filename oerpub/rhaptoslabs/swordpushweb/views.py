@@ -1055,47 +1055,47 @@ def return_slideshare_upload_form(request):
     response = {'form':FormRenderer(form),'slideshow_id': '123'}
     validate_form = form.validate()
     if request.GET.get('slideshow_id'):
-		slideshow_id = request.GET.get('slideshow_id')
-		all_details = get_details(slideshow_id)		
-		download_link = get_download_link(all_details)
-		response = get_slideshow_status(all_details)
-		if response == '0' or response == '1':
-			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': slideshow_id}
-		else:
-			return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': slideshow_id, 'download_link': download_link}
+        slideshow_id = request.GET.get('slideshow_id')
+        all_details = get_details(slideshow_id)
+        download_link = get_download_link(all_details)
+        response = get_slideshow_status(all_details)
+        if response == '0' or response == '1':
+            return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': slideshow_id}
+        else:
+            return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': slideshow_id, 'download_link': download_link}
     if validate_form:
-		
-		## Create a temp directory with the username and current timestamp for it to be unique
-		now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-		# TODO: This has a good chance of being unique, but even so..
-		temp_dir_name = '%s-%s' % (request.session['username'], now_string)
-		save_dir = os.path.join(
-			request.registry.settings['slideshare_import_dir'],
-			temp_dir_name
-			)
-		os.mkdir(save_dir)
-		uploaded_filename = form.data['importer'].filename.replace(os.sep, '_')
-		original_filename = os.path.join(save_dir, form.data['importer'].filename.replace(os.sep, '_'))
-		saved_file = open(original_filename, 'wb')
-		input_file = form.data['importer'].file
-		shutil.copyfileobj(input_file, saved_file)
-		saved_file.close()
-		input_file.close()
-		upload_to_ss = upload_to_slideshare("saketkc",original_filename)		
-		response = show_slideshow(upload_to_ss)
-		conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+
+        ## Create a temp directory with the username and current timestamp for it to be unique
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        # TODO: This has a good chance of being unique, but even so..
+        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        save_dir = os.path.join(
+            request.registry.settings['slideshare_import_dir'],
+            temp_dir_name
+        )
+        os.mkdir(save_dir)
+        uploaded_filename = form.data['importer'].filename.replace(os.sep, '_')
+        original_filename = os.path.join(save_dir, form.data['importer'].filename.replace(os.sep, '_'))
+        saved_file = open(original_filename, 'wb')
+        input_file = form.data['importer'].file
+        shutil.copyfileobj(input_file, saved_file)
+        saved_file.close()
+        input_file.close()
+        upload_to_ss = upload_to_slideshare("saketkc",original_filename)		
+        response = show_slideshow(upload_to_ss)
+        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
                                     always_authenticate=True,
                                     download_service_document=True)
-		collections = [{'title': i.title, 'href': i.href}
-		                          for i in sword2cnx.get_workspaces(conn)]
-		workspaces = [(i['href'], i['title']) for i in collections]
-		zipped_filepath = os.path.join(save_dir,"cnxupload.zip")		
-		#relative_path = os.path.join("upload",uploaded_filename)
-		zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-		zip_archive.write(original_filename,uploaded_filename)	    
-		cnxml = """<?xml version="1.0"?>
+        collections = [{'title': i.title, 'href': i.href}
+                                  for i in sword2cnx.get_workspaces(conn)]
+        workspaces = [(i['href'], i['title']) for i in collections]
+        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")		
+        #relative_path = os.path.join("upload",uploaded_filename)
+        zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
+        zip_archive.write(original_filename,uploaded_filename)	    
+        cnxml = """<?xml version="1.0"?>
 		<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
 
 		<title>TEST12121212121</title>
@@ -1148,26 +1148,37 @@ def return_slideshare_upload_form(request):
 
 		</document>
 		"""		
-		zip_archive.writestr("index.cnxml", cnxml)
-		zip_archive.close()	    
-		with open(zipped_filepath, 'rb') as zip_file:
-			deposit_receipt = conn.create(
-				col_iri = workspaces[0][0],		    
-				payload = zip_file,
-				filename = 'upload.zip',
-				mimetype = 'application/zip',
-				packaging = 'http://purl.org/net/sword/package/SimpleZip',
-				in_progress = True)
-
-        		
-		if response == '0' or response == '1':
-			return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
-		else:
-			return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True,'slideshow_id': upload_to_ss}
 		
-		
+        metadata = {}
+        metadata['dcterms:title'] = uploaded_filename.split(".")[0]
+        metadata['dcterms:abstract'] = "summary"
+        metadata['dcterms:language'] = "en"
+        metadata['oerdc:oer-subject'] = ""
+        metadata['dcterms:subject'] = ""
+        metadata['oerdc:analyticsCode'] = ""
+        metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
 
+        # Build metadata entry object
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        metadata_entry = sword2cnx.MetaData(metadata)
 
+        zip_archive.writestr("index.cnxml", cnxml)
+        zip_archive.close()	    
+        with open(zipped_filepath, 'rb') as zip_file:
+            deposit_receipt = conn.create(
+                col_iri = workspaces[0][0],
+                metadata_entry = metadata_entry,
+                payload = zip_file,
+                filename = 'upload.zip',
+                mimetype = 'application/zip',
+                packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                in_progress = True)
+        if response == '0' or response == '1':
+            return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
+        else:
+            return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True,'slideshow_id': upload_to_ss}
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
 
 @view_config(route_name='oauth2callback')
@@ -1230,4 +1241,3 @@ def authenticate_user_with_oauth(request):
 	request.session['saved_request_token'] = saved_request_token
 	print oauth.get_authorization_url_from_google()
 	return HTTPFound(location=str(oauth.get_authorization_url_from_google()))
-

@@ -3,21 +3,15 @@
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
 
-    $(document).ready(function(){
-    
+    $(document).ready(function(){    	
         $('input#import-submit').click(function(event){
         event.preventDefault();
         $('#import-submit').attr("disabled", true);
         showWaitMessage();
-		$('form#importform').submit();	
-		
-        });
-        
-        
+        $('form#importform').submit();	
+        });        
     });
     
-    
-
 </script>
 }    
 </metal:script-slot>
@@ -30,7 +24,6 @@
   <div id="ie6-container-wrap">
     <div id="container">
       <div id="content">
-
         <div id="nav-column-wrap">
           <div id="nav-column">
             <ul>
@@ -38,15 +31,14 @@
                 <a href="" title="Import to SlideShare"><span>Import</span></a>
               </li>
             </ul>
-
           </div>
         </div>
-
+        
         <div id="main-column-wrap">
           <div id="main-column">
-              <div class="pleasewait" id="upload-wait" style="display: none;">
-                Your document is being uploaded to SlideShare . This may take few moments.
-              </div>
+            <div class="pleasewait" id="upload-wait" style="display: none;">
+              Your document is being uploaded to SlideShare . This may take few moments.
+             </div>
 
             <div id="choose-upload">
               <h1>
@@ -54,48 +46,35 @@
               </h1>
               
               <ul id="create-new-list">
-                <li>
-                  
+                <li>                  
                   ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}
-                  <div class="upload-form">
-                    
-                    
+                  <div class="upload-form">          
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
-                  </div>
-                  
-                  
+                  </div>             
                 </li>
               </ul>
               ${form.end()}
-                <div id="embed-ss">
-					<p tal:condition="oembed">
-						<iframe id="slideshare-embed" src="http://www.slideshare.net/slideshow/embed_code/${slideshow_id}" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen></iframe>
-						<br/>
-					<a href="${download_link}">Download Original Slides</a>
-					</p>
-					
-					
-				</div>
-                <div id="conversion-ss">
-                
-					<p tal:condition="conversion_flag">
-						Slieshow in Queue for Conversion
-						<a href="/slideshare_importer?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
-					</p>
-				</div>      
-				
-                
               
-              
+              <div id="embed-ss">
+                <p tal:condition="oembed">
+                  <iframe id="slideshare-embed" src="http://www.slideshare.net/slideshow/embed_code/${slideshow_id}" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen></iframe>
+                  <br/>
+                  <a href="${download_link}">Download Original Slides</a>
+                </p>
+              </div>
+
+              <div id="conversion-ss">
+                <p tal:condition="conversion_flag">
+                    Slieshow in Queue for Conversion
+                    <a href="/slideshare_importer?slideshow_id=${slideshow_id}" id="refresh-status">Refresh Status</a>
+                </p>
+              </div>         
               
             </div>
-
           </div>
         </div>
-        
-
       </div>
     </div>
   </div>
