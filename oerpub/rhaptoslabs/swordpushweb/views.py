@@ -1241,3 +1241,79 @@ def authenticate_user_with_oauth(request):
 	request.session['saved_request_token'] = saved_request_token
 	print oauth.get_authorization_url_from_google()
 	return HTTPFound(location=str(oauth.get_authorization_url_from_google()))
+
+@view_config(route_name='updatecnx')
+def update_cnx_metadata(request):
+    session = request.session
+    conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)
+    collections = [{'title': i.title, 'href': i.href}
+                              for i in sword2cnx.get_workspaces(conn)]
+    workspaces = [(i['href'], i['title']) for i in collections]
+    zipped_filepath = "/home/saket/Desktop/testme.zip" #os.path.join(save_dir,"cnxupload.zip")		
+    #relative_path = os.path.join("upload",uploaded_filename)
+    metadata = {}
+    metadata['dcterms:title'] = "THISIST"
+    metadata['dcterms:abstract'] = "summary"
+    metadata['dcterms:language'] = "en"
+    metadata['oerdc:oer-subject'] = ""
+    metadata['dcterms:subject'] = ""
+    metadata['oerdc:analyticsCode'] = ""
+    metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
+
+    # Build metadata entry object
+    for key in metadata.keys():
+        if metadata[key] == '':
+            del metadata[key]
+    metadata_entry = sword2cnx.MetaData(metadata)
+
+    with open(zipped_filepath, 'rb') as zip_file:
+        deposit_receipt = conn.create(
+            col_iri = workspaces[0][0],
+            metadata_entry = metadata_entry,
+            payload = zip_file,
+            filename = 'upload.zip',
+            mimetype = 'application/zip',
+            packaging = 'http://purl.org/net/sword/package/SimpleZip',
+            in_progress = True)
+    #print deposit_receipt
+    soup = BeautifulSoup(deposit_receipt.to_xml())
+    data = soup.find("link",rel="edit")
+    edit_iri = data['href']
+    metadata = {}
+    #metadata['oerdc:analyticsCode'] = "AS123456"
+    metadata['dcterms:title'] = "WORKING ER2121ERER"
+    metadata['dcterms:abstract'] = "summary123 updated"
+    metadata['dcterms:language'] = "en"
+    
+    metadata['oerdc:descriptionOfChanges'] = 'Saket TEst'
+    for key in metadata.keys():
+        if metadata[key] == '':
+            del metadata[key]
+    metadata_entry = sword2cnx.MetaData(metadata)
+    
+    conn2 = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)
+    
+    update = conn2.update(metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True,dr=deposit_receipt)
+    print update
+    
+    metadata = {}
+    metadata['oerdc:analyticsCode'] = ""
+    for key in metadata.keys():
+        if metadata[key] == '':
+            del metadata[key]
+    metadata_entry = sword2cnx.MetaData(metadata)
+    update = conn2.append(metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True,dr=deposit_receipt)
+    print update
+    
+    
+    
+    return Response("OOK")
+

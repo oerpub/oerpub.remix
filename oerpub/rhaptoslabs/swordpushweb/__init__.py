@@ -25,6 +25,7 @@ def main(global_config, **settings):
     config.add_route('slideshare_importer', '/slideshare_importer')
     config.add_route('google_oauth', '/google_oauth')
     config.add_route('oauth2callback', '/oauth2callback')
+    config.add_route('updatecnx', '/updatecnx')
 
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
