@@ -12,7 +12,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
-
+from pyramid.response import Response
 
 import formencode
 
@@ -1090,6 +1090,7 @@ def return_slideshare_upload_form(request):
                                     download_service_document=True)
         collections = [{'title': i.title, 'href': i.href}
                                   for i in sword2cnx.get_workspaces(conn)]
+        session['collections'] = collections
         workspaces = [(i['href'], i['title']) for i in collections]
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")		
         #relative_path = os.path.join("upload",uploaded_filename)
@@ -1148,14 +1149,14 @@ def return_slideshare_upload_form(request):
 
 		</document>
 		"""		
-		
+        session['title'] = uploaded_filename.split(".")[0]
         metadata = {}
         metadata['dcterms:title'] = uploaded_filename.split(".")[0]
         metadata['dcterms:abstract'] = "summary"
         metadata['dcterms:language'] = "en"
-        metadata['oerdc:oer-subject'] = ""
-        metadata['dcterms:subject'] = ""
-        metadata['oerdc:analyticsCode'] = ""
+        metadata['oerdc:oer-subject'] = "Arts"
+        metadata['dcterms:subject'] = "Arts"
+        metadata['oerdc:analyticsCode'] = "ua123"
         metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
 
         # Build metadata entry object
@@ -1175,10 +1176,17 @@ def return_slideshare_upload_form(request):
                 mimetype = 'application/zip',
                 packaging = 'http://purl.org/net/sword/package/SimpleZip',
                 in_progress = True)
-        if response == '0' or response == '1':
-            return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
-        else:
-            return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True,'slideshow_id': upload_to_ss}
+        session['dr'] = deposit_receipt
+        soup = BeautifulSoup(deposit_receipt.to_xml())
+        data = soup.find("link",rel="edit")
+        edit_iri = data['href']
+        session['edit_iri'] = edit_iri
+        raise HTTPFound(location=request.route_url('updatecnx'))
+    
+        #if response == '0' or response == '1':
+        #    return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
+        #else:
+        #    return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True,'slideshow_id': upload_to_ss}
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
 
 @view_config(route_name='oauth2callback')
@@ -1244,76 +1252,120 @@ def authenticate_user_with_oauth(request):
 
 @view_config(route_name='updatecnx')
 def update_cnx_metadata(request):
+
+    check_login(request)
+    templatePath = 'templates/update_metadata.pt'
     session = request.session
-    conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+    config = load_config(request)
+    workspaces = [(i['href'], i['title']) for i in session['collections']]
+    subjects = ["Arts",
+                "Business",
+                "Humanities",
+                "Mathematics and Statistics",
+                "Science and Technology",
+                "Social Sciences",
+                ]
+    
+    field_list = [
+                  ['authors', 'authors', {'type': 'hidden'}],
+                  ['maintainers', 'maintainers', {'type': 'hidden'}],
+                  ['copyright', 'copyright', {'type': 'hidden'}],
+                  ['editors', 'editors', {'type': 'hidden'}],
+                  ['translators', 'translators', {'type': 'hidden'}],
+                  ['title', 'Title', {'type': 'text'}],
+                  ['summary', 'Summary', {'type': 'textarea'}],
+                  ['keywords', 'Keywords (One per line)', {'type': 'textarea'}],
+                  ['subject', 'Subject', {'type': 'checkbox',
+                                          'values': subjects}],
+                  ['language', 'Language', {'type': 'select',
+                                            'values': languages,
+                                            'selected_value': 'en'}],
+                  ['google_code', 'Google Analytics Code', {'type': 'text'}],
+                  ['workspace', 'Workspace', {'type': 'select',
+                                            'values': workspaces}],
+                  ]
+    remember_fields = [field[0] for field in field_list[5:]]
+
+    defaults = {}
+    for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
+        defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
+        config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
+
+    # Get remembered title from the session
+    if 'title' in session:
+        print('TITLE '+session['title']+' in session')
+        defaults['title'] = session['title']
+        config['metadata']['title'] = session['title']
+
+    form = Form(request,
+                schema=MetadataSchema,
+                defaults=defaults
+                )
+
+    # Check for successful form completion
+    if form.validate():
+
+        # Persist the values that should be persisted in the session, and
+        # delete the others.
+        for field_name in remember_fields:
+            if form.data['keep_%s' % field_name]:
+                session[field_name] = form.data[field_name]
+            else:
+                if field_name in session:
+                    del(session[field_name])       
+        
+        metadata = {}
+        if(form.data['title']):
+            print('FORM_DATA')
+        else:
+            print('SESSION_FILENAME')
+
+        metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
+                                    else session['filename']
+
+        
+        metadata['dcterms:abstract'] = form.data['summary'].strip()        
+        metadata['dcterms:language'] = form.data['language']        
+        metadata['oerdc:oer-subject'] = form.data['subject']        
+        metadata['dcterms:subject'] = [i.strip() for i in
+                                       form.data['keywords'].splitlines()
+                                       if i.strip()]
+        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
+        metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        metadata_entry = sword2cnx.MetaData(metadata)
+
+        role_metadata = {}
+        role_mappings = {'authors': 'dcterms:creator',
+                         'maintainers': 'oerdc:maintainer',
+                         'copyright': 'dcterms:rightsHolder',
+                         'editors': 'oerdc:editor',
+                         'translators': 'oerdc:translator'}
+        for k, v in role_mappings.items():
+            role_metadata[v] = form.data[k].split(',')
+        for key, value in role_metadata.iteritems():
+            for v in value:
+                v = v.strip()
+                if v:
+                    metadata_entry.add_field(key, '', {'oerdc:id': v})
+        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
                                     always_authenticate=True,
                                     download_service_document=True)
-    collections = [{'title': i.title, 'href': i.href}
-                              for i in sword2cnx.get_workspaces(conn)]
-    workspaces = [(i['href'], i['title']) for i in collections]
-    zipped_filepath = "/home/saket/Desktop/testme.zip" #os.path.join(save_dir,"cnxupload.zip")		
-    #relative_path = os.path.join("upload",uploaded_filename)
-    metadata = {}
-    metadata['dcterms:title'] = "THISIST"
-    metadata['dcterms:abstract'] = "summary"
-    metadata['dcterms:language'] = "en"
-    metadata['oerdc:oer-subject'] = ""
-    metadata['dcterms:subject'] = ""
-    metadata['oerdc:analyticsCode'] = ""
-    metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
+        update = conn.update(edit_iri=session['edit_iri']metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)
+        print update
+        return Response("OK")
+        
 
-    # Build metadata entry object
-    for key in metadata.keys():
-        if metadata[key] == '':
-            del metadata[key]
-    metadata_entry = sword2cnx.MetaData(metadata)
-
-    with open(zipped_filepath, 'rb') as zip_file:
-        deposit_receipt = conn.create(
-            col_iri = workspaces[0][0],
-            metadata_entry = metadata_entry,
-            payload = zip_file,
-            filename = 'upload.zip',
-            mimetype = 'application/zip',
-            packaging = 'http://purl.org/net/sword/package/SimpleZip',
-            in_progress = True)
-    #print deposit_receipt
-    soup = BeautifulSoup(deposit_receipt.to_xml())
-    data = soup.find("link",rel="edit")
-    edit_iri = data['href']
-    metadata = {}
-    #metadata['oerdc:analyticsCode'] = "AS123456"
-    metadata['dcterms:title'] = "WORKING ER2121ERER"
-    metadata['dcterms:abstract'] = "summary123 updated"
-    metadata['dcterms:language'] = "en"
-    
-    metadata['oerdc:descriptionOfChanges'] = 'Saket TEst'
-    for key in metadata.keys():
-        if metadata[key] == '':
-            del metadata[key]
-    metadata_entry = sword2cnx.MetaData(metadata)
-    
-    conn2 = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
-                                    user_name=session['username'],
-                                    user_pass=session['password'],
-                                    always_authenticate=True,
-                                    download_service_document=True)
-    
-    update = conn2.update(metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True,dr=deposit_receipt)
-    print update
-    
-    metadata = {}
-    metadata['oerdc:analyticsCode'] = ""
-    for key in metadata.keys():
-        if metadata[key] == '':
-            del metadata[key]
-    metadata_entry = sword2cnx.MetaData(metadata)
-    update = conn2.append(metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True,dr=deposit_receipt)
-    print update
-    
-    
-    
-    return Response("OOK")
-
+    response =  {
+        'form': FormRenderer(form),
+        'field_list': field_list,
+        'workspaces': workspaces,
+        'languages': languages,
+        'subjects': subjects,
+        'config': config,
+    }
+    return render_to_response(templatePath, response, request=request)
