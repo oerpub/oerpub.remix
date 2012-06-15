@@ -1356,7 +1356,7 @@ def update_cnx_metadata(request):
                                     user_pass=session['password'],
                                     always_authenticate=True,
                                     download_service_document=True)
-        update = conn.update(edit_iri=session['edit_iri']metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)
+        update = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)
         print update
         return Response("OK")
         
