@@ -15,6 +15,8 @@ requires = [
     'pyramid_beaker',
     'pycrypto==2.5',
     'Markdown',
+    'BeautifulSoup==3.2.1',
+    
     ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',

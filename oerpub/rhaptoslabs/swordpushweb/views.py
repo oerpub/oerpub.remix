@@ -5,7 +5,7 @@ import zipfile
 import traceback
 import libxml2
 import re
-
+from BeautifulSoup import BeautifulSoup
 
 from cStringIO import StringIO
 from lxml import etree
@@ -1095,11 +1095,12 @@ def return_slideshare_upload_form(request):
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")		
         #relative_path = os.path.join("upload",uploaded_filename)
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-        zip_archive.write(original_filename,uploaded_filename)	    
+        zip_archive.write(original_filename,uploaded_filename)	
+        username = session['username']    
         cnxml = """<?xml version="1.0"?>
 		<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
 
-		<title>TEST12121212121</title>
+		<title>Title</title>
 		<metadata xmlns:md="http://cnx.rice.edu/mdml"
 		mdml-version="0.5">
 		<!-- WARNING! The 'metadata' section is read only. Do not edit below.
@@ -1108,20 +1109,20 @@ def return_slideshare_upload_form(request):
 		<md:content-id>new</md:content-id>
 		<md:title>(Untitled)</md:title>
 		<md:version>**new**</md:version>
-		<md:created>2012/06/09 19:36:14.622 GMT-5</md:created>
-		<md:revised>2012/06/09 19:36:14.622 GMT-5</md:revised>
+		<md:created></md:created>
+		<md:revised></md:revised>
 		<md:actors>
-		<md:person userid="saketkc">
-		<md:firstname>Saket</md:firstname>
-		<md:surname>Choudhary</md:surname>
-		<md:fullname>Saket Choudhary</md:fullname>
-		<md:email>saketkc@gmail.com</md:email>
+		<md:person userid="""+username+""">
+		<md:firstname></md:firstname>
+		<md:surname></md:surname>
+		<md:fullname></md:fullname>
+		<md:email></md:email>
 		</md:person>
 		</md:actors>
 		<md:roles>
-		<md:role type="author">saketkc</md:role>
-		<md:role type="maintainer">saketkc</md:role>
-		<md:role type="licensor">saketkc</md:role>
+		<md:role type="author">"""+username+"""</md:role>
+		<md:role type="maintainer">"""+username+"""</md:role>
+		<md:role type="licensor">"""+username+"""</md:role>
 		</md:roles>
 		<md:license url="" />
 		<!-- For information on license requirements for use or modification, see license url in the
@@ -1139,10 +1140,8 @@ def return_slideshare_upload_form(request):
 		<content>
 		<section id="intro"><title>Introduction</title><para id="intropara1">These slides are meant to go with the Connexions authoring guide. Students can use the slides on their own and faculty can use them to teach workshops on authoring Connexions' modules.</para></section>
 		<section id="externalservices"><title>Online viewable slides</title><section id="slideshare"><title>SlideShare Version</title><figure id="cnx-slideshare"><title>Connexions: Create Globally, Educate Locally</title><media id="ss-media" display="block" alt="Slide show introducing the ideas behind Connexions.">
-		<flash id="ss-video" mime-type="application/x-shockwave-flash" src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=cnxdemo-090820214427-phpapp02&amp;stripped_title=cnxdemo" width="425" height="344">
-		<param name="allowscriptaccess" value="always"/>
-		<param name="allowfullscreen" value="true"/>
-		</flash>
+		
+        <iframe src="http://www.slideshare.net/slideshow/embed_code/13343060" width="425" height="355" allowfullscreen></iframe>
 		</media>
 		</figure></section></section>
 		</content>
@@ -1154,9 +1153,9 @@ def return_slideshare_upload_form(request):
         metadata['dcterms:title'] = uploaded_filename.split(".")[0]
         metadata['dcterms:abstract'] = "summary"
         metadata['dcterms:language'] = "en"
-        metadata['oerdc:oer-subject'] = "Arts"
-        metadata['dcterms:subject'] = "Arts"
-        metadata['oerdc:analyticsCode'] = "ua123"
+        metadata['oerdc:oer-subject'] = ""
+        metadata['dcterms:subject'] = ""
+        metadata['oerdc:analyticsCode'] = ""
         metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
 
         # Build metadata entry object
