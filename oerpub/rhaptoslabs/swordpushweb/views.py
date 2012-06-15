@@ -1234,6 +1234,7 @@ def importer(request):
 
 		templatePath = "templates/google_ss_preview.pt"
 		response = {"google_resource_id" : resource_id,}
+		return HTTPFound(location=request.route_url('updatecnx'))
 		
 
 		return render_to_response(templatePath,response,request=request)
