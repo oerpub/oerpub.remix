@@ -752,6 +752,7 @@ def metadata_view(request):
 
     # Check for successful form completion
     if form.validate():
+        print form.data
 
         # Persist the values that should be persisted in the session, and
         # delete the others.
@@ -1112,7 +1113,7 @@ def return_slideshare_upload_form(request):
 		<md:created></md:created>
 		<md:revised></md:revised>
 		<md:actors>
-		<md:person userid="""+username+""">
+		<md:person userid="""+"\""+username+"\""+""">
 		<md:firstname></md:firstname>
 		<md:surname></md:surname>
 		<md:fullname></md:fullname>
@@ -1120,9 +1121,9 @@ def return_slideshare_upload_form(request):
 		</md:person>
 		</md:actors>
 		<md:roles>
-		<md:role type="author">"""+username+"""</md:role>
-		<md:role type="maintainer">"""+username+"""</md:role>
-		<md:role type="licensor">"""+username+"""</md:role>
+		<md:role type="author">"""+"\""+username+"\""+"""</md:role>
+		<md:role type="maintainer">"""+"\""+username+"\""+"""</md:role>
+		<md:role type="licensor">"""+"\""+username+"\""+"""</md:role>
 		</md:roles>
 		<md:license url="" />
 		<!-- For information on license requirements for use or modification, see license url in the
@@ -1141,7 +1142,8 @@ def return_slideshare_upload_form(request):
 		<section id="intro"><title>Introduction</title><para id="intropara1">These slides are meant to go with the Connexions authoring guide. Students can use the slides on their own and faculty can use them to teach workshops on authoring Connexions' modules.</para></section>
 		<section id="externalservices"><title>Online viewable slides</title><section id="slideshare"><title>SlideShare Version</title><figure id="cnx-slideshare"><title>Connexions: Create Globally, Educate Locally</title><media id="ss-media" display="block" alt="Slide show introducing the ideas behind Connexions.">
 		
-        <iframe src="http://www.slideshare.net/slideshow/embed_code/13343060" width="425" height="355" allowfullscreen></iframe>
+        <iframe src="http://www.slideshare.net/slideshow/embed_code/13343060" width="425" height="355">
+        </iframe>
 		</media>
 		</figure></section></section>
 		</content>
@@ -1252,11 +1254,15 @@ def authenticate_user_with_oauth(request):
 
 @view_config(route_name='updatecnx')
 def update_cnx_metadata(request):
-
+    """
+    Handle metadata adding and uploads
+    """
+    print('INSIDE METADATA_VIEW')
     check_login(request)
     templatePath = 'templates/update_metadata.pt'
     session = request.session
     config = load_config(request)
+
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
                 "Business",
@@ -1265,7 +1271,9 @@ def update_cnx_metadata(request):
                 "Science and Technology",
                 "Social Sciences",
                 ]
-    
+    # The roles fields are comma-separated strings. This makes the javascript
+    # easier on the client side, and is easy to parse. The fields are hidden,
+    # and the values will be user ids, which should not have commas in them.
     field_list = [
                   ['authors', 'authors', {'type': 'hidden'}],
                   ['maintainers', 'maintainers', {'type': 'hidden'}],
@@ -1286,6 +1294,7 @@ def update_cnx_metadata(request):
                   ]
     remember_fields = [field[0] for field in field_list[5:]]
 
+    # Get remembered fields from the session
     defaults = {}
     for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
         defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
@@ -1297,6 +1306,13 @@ def update_cnx_metadata(request):
         defaults['title'] = session['title']
         config['metadata']['title'] = session['title']
 
+    """
+    for field_name in remember_fields:
+        if field_name in session:
+            defaults[field_name] = session[field_name]
+            defaults['keep_%s' % field_name] = True
+    """
+
     form = Form(request,
                 schema=MetadataSchema,
                 defaults=defaults
@@ -1304,6 +1320,7 @@ def update_cnx_metadata(request):
 
     # Check for successful form completion
     if form.validate():
+        print form.data
 
         # Persist the values that should be persisted in the session, and
         # delete the others.
@@ -1312,8 +1329,8 @@ def update_cnx_metadata(request):
                 session[field_name] = form.data[field_name]
             else:
                 if field_name in session:
-                    del(session[field_name])       
-        
+                    del(session[field_name])
+
         metadata = {}
         if(form.data['title']):
             print('FORM_DATA')
@@ -1326,12 +1343,7 @@ def update_cnx_metadata(request):
         
         metadata['dcterms:abstract'] = form.data['summary'].strip()        
         metadata['dcterms:language'] = form.data['language']        
-        metadata['oerdc:oer-subject'] = form.data['subject']        
-        metadata['dcterms:subject'] = [i.strip() for i in
-                                       form.data['keywords'].splitlines()
-                                       if i.strip()]
-        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
-        metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
+        #metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
@@ -1357,6 +1369,18 @@ def update_cnx_metadata(request):
                                     download_service_document=True)
         update = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)
         print update
+        metadata={}
+        metadata['oerdc:oer-subject'] = form.data['subject']        
+        metadata['dcterms:subject'] = [i.strip() for i in
+                                       form.data['keywords'].splitlines()
+                                       if i.strip()]
+        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        metadata_entry = sword2cnx.MetaData(metadata)
+        add = conn.append(se_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
+        print add
         return Response("OK")
         
 
@@ -1367,5 +1391,5 @@ def update_cnx_metadata(request):
         'languages': languages,
         'subjects': subjects,
         'config': config,
-    }
+    }    
     return render_to_response(templatePath, response, request=request)

@@ -23,7 +23,22 @@
         <tal:hidden>${form.hidden(field)}</tal:hidden>
     </tal:field>
 
-    
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            
+            <div id="forward-steps">
+                <span class="advanced" style="display: none; ">
+                    <span class="advanced-marker" title="Advanced mode feature">
+                        <img src="${images_url}/gear_orange_3.png" />
+                    </span>
+                    <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                </span>
+                <input id="top-upload-to-cnx" type="submit" class="button forward-button"
+                value="Finish: Upload Metadata to Connexions &raquo;"
+                title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
+            </div>
+        </div>
+    </div>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
@@ -36,7 +51,12 @@
 
                     <div id="module-actions">
                         <span class="advanced" style="display: none;">
-                            
+                            <a class="button"
+                                tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])"
+                                title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy">
+                                <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
+                                <span class="button-text">Download a copy</span>
+                            </a>
                         </span>
                     </div>
 
@@ -189,4 +209,3 @@
     </metal:content-slot>
 
 </metal:use>
-
