@@ -12,7 +12,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
-from pyramid.response import Response
+
 
 import formencode
 
@@ -1360,14 +1360,13 @@ def update_cnx_metadata(request):
                 del metadata[key]        
         add = conn.update_metadata_for_resource(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
         
-        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
-        metadata['oerdc:oer-subject'] = form.data['subject']                
+        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()        
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
-        return Response("OK")
+        raise HTTPFound(location=request.route_url('login'))
         
 
     response =  {
