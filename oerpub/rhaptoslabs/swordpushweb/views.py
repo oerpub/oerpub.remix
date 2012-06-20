@@ -1153,14 +1153,7 @@ def return_slideshare_upload_form(request):
         session['title'] = uploaded_filename.split(".")[0]
         metadata = {}
         metadata['dcterms:title'] = uploaded_filename.split(".")[0]
-        metadata['dcterms:abstract'] = "summary"
-        metadata['dcterms:language'] = "en"
-        metadata['oerdc:oer-subject'] = ""
-        metadata['dcterms:subject'] = ""
-        metadata['oerdc:analyticsCode'] = ""
-        metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
-
-        # Build metadata entry object
+        
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
@@ -1306,13 +1299,6 @@ def update_cnx_metadata(request):
         defaults['title'] = session['title']
         config['metadata']['title'] = session['title']
 
-    """
-    for field_name in remember_fields:
-        if field_name in session:
-            defaults[field_name] = session[field_name]
-            defaults['keep_%s' % field_name] = True
-    """
-
     form = Form(request,
                 schema=MetadataSchema,
                 defaults=defaults
@@ -1339,14 +1325,6 @@ def update_cnx_metadata(request):
 
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
-
-        
-        metadata['dcterms:abstract'] = form.data['summary'].strip()        
-        metadata['dcterms:language'] = form.data['language']        
-        #metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
-        for key in metadata.keys():
-            if metadata[key] == '':
-                del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
 
         role_metadata = {}
@@ -1367,20 +1345,28 @@ def update_cnx_metadata(request):
                                     user_pass=session['password'],
                                     always_authenticate=True,
                                     download_service_document=True)
-        update = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)
-        print update
+        update = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)        
         metadata={}
-        metadata['oerdc:oer-subject'] = form.data['subject']        
+        metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
+                                    else session['filename']
+        metadata['dcterms:abstract'] = form.data['summary'].strip()        
+        metadata['dcterms:language'] = form.data['language']        
         metadata['dcterms:subject'] = [i.strip() for i in
                                        form.data['keywords'].splitlines()
                                        if i.strip()]
+        metadata['oerdc:oer-subject'] = form.data['subject']                
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]        
+        add = conn.update_metadata_for_resource(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
+        
         metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
+        metadata['oerdc:oer-subject'] = form.data['subject']                
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
-        add = conn.append(se_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
-        print add
+        add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
         return Response("OK")
         
 
