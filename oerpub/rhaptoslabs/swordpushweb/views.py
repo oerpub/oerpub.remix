@@ -1366,7 +1366,7 @@ def update_cnx_metadata(request):
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
-        raise HTTPFound(location=request.route_url('login'))
+        return HTTPFound(location=request.route_url('slideshare_importer'))
         
 
     response =  {
