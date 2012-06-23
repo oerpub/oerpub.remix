@@ -32,7 +32,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link,get_slideshow_status
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link,get_slideshow_status,get_slideshow_download_url
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -683,6 +683,8 @@ class MetadataSchema(formencode.Schema):
     editors = formencode.validators.String()
     translators = formencode.validators.String()
 
+class UpdatedMetadataSchema(MetadataSchema):
+    introductory_paragraphs = formencode.validators.String(not_empty=True)
 
 @view_config(route_name='metadata')
 def metadata_view(request):
@@ -1082,74 +1084,77 @@ def return_slideshare_upload_form(request):
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
         input_file.close()
-        upload_to_ss = upload_to_slideshare("saketkc",original_filename)		
-        response = show_slideshow(upload_to_ss)
+        slideshow_id = upload_to_slideshare("saketkc",original_filename)        
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
                                     always_authenticate=True,
                                     download_service_document=True)
-        collections = [{'title': i.title, 'href': i.href}
-                                  for i in sword2cnx.get_workspaces(conn)]
-        session['collections'] = collections
-        workspaces = [(i['href'], i['title']) for i in collections]
-        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")		
-        #relative_path = os.path.join("upload",uploaded_filename)
+        #collections = [{'title': i.title, 'href': i.href}
+        #                          for i in sword2cnx.get_workspaces(conn)]
+        #session['collections'] = collections
+        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")        
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)	
         username = session['username']    
-        cnxml = """<?xml version="1.0"?>
-		<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
+        slideshare_details = get_details(slideshow_id)
+        slideshare_download_url = get_slideshow_download_url(slideshow_id)
+        cnxml = """
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
+  <title>TEST DOC</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
+       Changes to the metadata section in the source will not be saved. -->
+  <md:repository>http://cnx.org/content</md:repository>
+  <md:content-id>new</md:content-id>
+  <md:title>""</md:title>
+  <md:version>**new**</md:version>
+  <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
+  <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
+  <md:actors>
+    <md:person userid="""+"\""+username+"\""+""">
+      <md:firstname></md:firstname>
+      <md:surname></md:surname>
+      <md:fullname></md:fullname>
+      <md:email></md:email>
+    </md:person>
+  </md:actors>
+  <md:roles>
+    <md:role type="author">"""+username+"""</md:role>
+    <md:role type="maintainer">"""+username+"""</md:role>
+    <md:role type="licensor">"""+username+"""</md:role>
+  </md:roles>
+  <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
+  <!-- For information on license requirements for use or modification, see license url in the
+       above <md:license> element.
+       For information on formatting required attribution, see the URL:
+         CONTENT_URL/content_info#cnx_cite_header
+       where CONTENT_URL is the value provided above in the <md:content-url> element.
+  -->
+  <md:abstract/>
+  <md:language>en</md:language>
+  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
+       Changes to the metadata section in the source will not be saved. -->
+</metadata>
+<featured-links>
+  <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
+       Changes to the links section in the source will not be saved. -->
+    <link-group type="supplemental">
+      <link url="Training_Authoring.ppt" strength="3">Download the original slides in PPT format</link>
+      <link url="http://cnx.org/content/col10151/latest/" strength="2">The Textbook: Learning to author in Connexions</link>
+      <link url="""+ "\"" +slideshare_download_url + "\"" +""" strength="2">SlideShare PPT Download Link</link>
+    </link-group>
+  <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
+       Changes to the links section in the source will not be saved. -->
+</featured-links>
 
-		<title>Title</title>
-		<metadata xmlns:md="http://cnx.rice.edu/mdml"
-		mdml-version="0.5">
-		<!-- WARNING! The 'metadata' section is read only. Do not edit below.
-		Changes to the metadata section in the source will not be saved. -->
-		<md:repository>http://cnx.org/content</md:repository>
-		<md:content-id>new</md:content-id>
-		<md:title>(Untitled)</md:title>
-		<md:version>**new**</md:version>
-		<md:created></md:created>
-		<md:revised></md:revised>
-		<md:actors>
-		<md:person userid="""+"\""+username+"\""+""">
-		<md:firstname></md:firstname>
-		<md:surname></md:surname>
-		<md:fullname></md:fullname>
-		<md:email></md:email>
-		</md:person>
-		</md:actors>
-		<md:roles>
-		<md:role type="author">"""+"\""+username+"\""+"""</md:role>
-		<md:role type="maintainer">"""+"\""+username+"\""+"""</md:role>
-		<md:role type="licensor">"""+"\""+username+"\""+"""</md:role>
-		</md:roles>
-		<md:license url="" />
-		<!-- For information on license requirements for use or modification, see license url in the
-		above <md:license> element.
-		For information on formatting required attribution, see the URL:
-		CONTENT_URL/content_info#cnx_cite_header
-		where CONTENT_URL is the value provided above in the <md:content-url> element.
-		-->
-		<md:abstract></md:abstract>
-		<md:language>en</md:language>
-		<!-- WARNING! The 'metadata' section is read only. Do not edit above.
-		Changes to the metadata section in the source will not be saved. -->
-		</metadata>
-
-		<content>
-		<section id="intro"><title>Introduction</title><para id="intropara1">These slides are meant to go with the Connexions authoring guide. Students can use the slides on their own and faculty can use them to teach workshops on authoring Connexions' modules.</para></section>
-		<section id="externalservices"><title>Online viewable slides</title><section id="slideshare"><title>SlideShare Version</title><figure id="cnx-slideshare"><title>Connexions: Create Globally, Educate Locally</title><media id="ss-media" display="block" alt="Slide show introducing the ideas behind Connexions.">
-		
-        <iframe src="http://www.slideshare.net/slideshow/embed_code/13343060" width="425" height="355">
-        </iframe>
-		</media>
-		</figure></section></section>
-		</content>
-
-		</document>
-		"""		
+<content>
+  <para id="ss-embed"><media id="ss-embed">Iframe Embed to appear here </media>
+  </para>
+</content>
+</document>"""
+        
         session['title'] = uploaded_filename.split(".")[0]
         metadata = {}
         metadata['dcterms:title'] = uploaded_filename.split(".")[0]
@@ -1175,12 +1180,7 @@ def return_slideshare_upload_form(request):
         data = soup.find("link",rel="edit")
         edit_iri = data['href']
         session['edit_iri'] = edit_iri
-        raise HTTPFound(location=request.route_url('updatecnx'))
-    
-        #if response == '0' or response == '1':
-        #    return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': upload_to_ss}
-        #else:
-        #    return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True,'slideshow_id': upload_to_ss}
+        raise HTTPFound(location=request.route_url('updatecnx'))    
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
 
 @view_config(route_name='oauth2callback')
@@ -1248,14 +1248,12 @@ def authenticate_user_with_oauth(request):
 @view_config(route_name='updatecnx')
 def update_cnx_metadata(request):
     """
-    Handle metadata adding and uploads
-    """
-    print('INSIDE METADATA_VIEW')
+    Handle update of metadata to cnx 
+    """    
     check_login(request)
     templatePath = 'templates/update_metadata.pt'
     session = request.session
     config = load_config(request)
-
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
                 "Business",
@@ -1263,10 +1261,7 @@ def update_cnx_metadata(request):
                 "Mathematics and Statistics",
                 "Science and Technology",
                 "Social Sciences",
-                ]
-    # The roles fields are comma-separated strings. This makes the javascript
-    # easier on the client side, and is easy to parse. The fields are hidden,
-    # and the values will be user ids, which should not have commas in them.
+                ]   
     field_list = [
                   ['authors', 'authors', {'type': 'hidden'}],
                   ['maintainers', 'maintainers', {'type': 'hidden'}],
@@ -1286,30 +1281,24 @@ def update_cnx_metadata(request):
                                             'values': workspaces}],
                   ]
     remember_fields = [field[0] for field in field_list[5:]]
-
-    # Get remembered fields from the session
     defaults = {}
+    
     for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
         defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
         config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
-
-    # Get remembered title from the session
+    
     if 'title' in session:
         print('TITLE '+session['title']+' in session')
         defaults['title'] = session['title']
         config['metadata']['title'] = session['title']
 
     form = Form(request,
-                schema=MetadataSchema,
+                schema=UpadatedMetadataSchema,
                 defaults=defaults
                 )
 
     # Check for successful form completion
     if form.validate():
-        print form.data
-
-        # Persist the values that should be persisted in the session, and
-        # delete the others.
         for field_name in remember_fields:
             if form.data['keep_%s' % field_name]:
                 session[field_name] = form.data[field_name]
@@ -1318,15 +1307,9 @@ def update_cnx_metadata(request):
                     del(session[field_name])
 
         metadata = {}
-        if(form.data['title']):
-            print('FORM_DATA')
-        else:
-            print('SESSION_FILENAME')
-
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
         metadata_entry = sword2cnx.MetaData(metadata)
-
         role_metadata = {}
         role_mappings = {'authors': 'dcterms:creator',
                          'maintainers': 'oerdc:maintainer',
@@ -1358,16 +1341,14 @@ def update_cnx_metadata(request):
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]        
-        add = conn.update_metadata_for_resource(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
-        
+        add = conn.update_metadata_for_resource(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)   
         metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()        
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
-        return HTTPFound(location=request.route_url('slideshare_importer'))
-        
+        return HTTPFound(location=request.route_url('slideshare_importer'))     
 
     response =  {
         'form': FormRenderer(form),
