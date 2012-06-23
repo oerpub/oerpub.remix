@@ -684,7 +684,7 @@ class MetadataSchema(formencode.Schema):
     translators = formencode.validators.String()
 
 class UpdatedMetadataSchema(MetadataSchema):
-    introductory_paragraphs = formencode.validators.String(not_empty=True)
+    introductory_paragraphs = formencode.validators.String()
 
 @view_config(route_name='metadata')
 def metadata_view(request):
@@ -1258,8 +1258,7 @@ def update_cnx_metadata(request):
     check_login(request)
     templatePath = 'templates/update_metadata.pt'
     session = request.session
-    config = load_config(request)
-    config['metadata']['introductory_paragraphs'] = session['transcript']
+    config = load_config(request)    
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
                 "Business",
@@ -1429,6 +1428,8 @@ def update_cnx_metadata(request):
         #upload_new_content = conn.append(edit_iri=session['edit_iri'],
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
         return HTTPFound(location=request.route_url('slideshare_importer'))     
+    
+    config['metadata']['introductory_paragraphs'] = session['transcript']
 
     response =  {
         'form': FormRenderer(form),
