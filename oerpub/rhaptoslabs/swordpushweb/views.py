@@ -1102,7 +1102,8 @@ def return_slideshare_upload_form(request):
         username = session['username']    
         slideshare_details = get_details(slideshow_id)
         slideshare_download_url = get_slideshow_download_url(slideshare_details)
-        config['metadata']['introductory_paragraphs']  = get_transcript(slideshare_details)
+        #config['metadata']['introductory_paragraphs']  = get_transcript(slideshare_details)
+        session['transcript'] = get_transcript(slideshare_details)
         cnxml = """
 <document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
   <title>TEST DOC</title>
@@ -1258,6 +1259,7 @@ def update_cnx_metadata(request):
     templatePath = 'templates/update_metadata.pt'
     session = request.session
     config = load_config(request)
+    config['metadata']['introductory_paragraphs'] = session['transcript']
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     subjects = ["Arts",
                 "Business",
