@@ -32,7 +32,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link,get_slideshow_status,get_slideshow_download_url
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link,get_slideshow_status,get_slideshow_download_url,get_transcript
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -1094,12 +1094,14 @@ def return_slideshare_upload_form(request):
         #                          for i in sword2cnx.get_workspaces(conn)]
         #session['collections'] = collections
         workspaces = [(i['href'], i['title']) for i in session['collections']]
-        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")        
+        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")     
+        session['userfilepath'] = zipped_filepath
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)	
         username = session['username']    
         slideshare_details = get_details(slideshow_id)
         slideshare_download_url = get_slideshow_download_url(slideshare_details)
+        config['metadata']['introductory_paragraphs']  = get_transcript(slideshare_details)
         cnxml = """
 <document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
   <title>TEST DOC</title>
@@ -1150,7 +1152,8 @@ def return_slideshare_upload_form(request):
 </featured-links>
 
 <content>
-  <para id="ss-embed"><media id="ss-embed">Iframe Embed to appear here </media>
+  <para id="ss-embed">Iframe Embed to appear here 
+  <media id="ss-iframe-embed"></media>
   </para>
 </content>
 </document>"""
@@ -1347,6 +1350,80 @@ def update_cnx_metadata(request):
             if metadata[key] == '':
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
+        new_cnxml = """
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
+  <title>TEST DOC</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
+       Changes to the metadata section in the source will not be saved. -->
+  <md:repository>http://cnx.org/content</md:repository>
+  <md:content-id>new</md:content-id>
+  <md:title>""</md:title>
+  <md:version>**new**</md:version>
+  <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
+  <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
+  <md:actors>
+    <md:person userid="""+"\""+username+"\""+""">
+      <md:firstname></md:firstname>
+      <md:surname></md:surname>
+      <md:fullname></md:fullname>
+      <md:email></md:email>
+    </md:person>
+  </md:actors>
+  <md:roles>
+    <md:role type="author">"""+username+"""</md:role>
+    <md:role type="maintainer">"""+username+"""</md:role>
+    <md:role type="licensor">"""+username+"""</md:role>
+  </md:roles>
+  <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
+  <!-- For information on license requirements for use or modification, see license url in the
+       above <md:license> element.
+       For information on formatting required attribution, see the URL:
+         CONTENT_URL/content_info#cnx_cite_header
+       where CONTENT_URL is the value provided above in the <md:content-url> element.
+  -->
+  <md:abstract/>
+  <md:language>en</md:language>
+  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
+       Changes to the metadata section in the source will not be saved. -->
+</metadata>
+<featured-links>
+  <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
+       Changes to the links section in the source will not be saved. -->
+    <link-group type="supplemental">
+      <link url="Training_Authoring.ppt" strength="3">Download the original slides in PPT format</link>
+      <link url="http://cnx.org/content/col10151/latest/" strength="2">The Textbook: Learning to author in Connexions</link>
+      <link url="""+ "\"" +slideshare_download_url + "\"" +""" strength="2">SlideShare PPT Download Link</link>
+    </link-group>
+  <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
+       Changes to the links section in the source will not be saved. -->
+</featured-links>
+
+<content>
+  <para id="ss-embed">"""+form.data['introductory_paragraphs']+"""
+  <media id="ss-iframe-embed"></media>
+  </para>
+</content>
+</document>"""
+        user_uploaded_zip = zipfile.Zipfile(session['userfilepath'],'a')
+        old_cnxml = user_uploaded_zip.read('index.cnxml')
+        soup = BeautifulSoup(old_cnxml)
+        old_content = soup.content.renderContents()
+        newsoup = BeautifulSoup("""<content><para id='introduction'>"""+form.data['introductory_paragraphs']+"""</para>"""+old_content +"""</content>""")
+        old_cnxml.content.replaceWith(newsoup)
+        user_uploaded_zip.writestr("index.cnxml",old_cnxml)
+        user_uploaded_zip.close()
+        with open(user_uploaded_, 'rb') as zip_file:
+            deposit_receipt = conn.append(                
+                payload = zip_file,
+                filename = 'upload.zip',
+                mimetype = 'application/zip',
+                packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                edit_iri=session['edit_iri'])        
+        
+        
+        
+        #upload_new_content = conn.append(edit_iri=session['edit_iri'],
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
         return HTTPFound(location=request.route_url('slideshare_importer'))     
 
