@@ -1353,7 +1353,7 @@ def update_cnx_metadata(request):
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
         
-        user_uploaded_zip = zipfile.Zipfile(session['userfilepath'],'a')
+        user_uploaded_zip = zipfile.ZipFile(session['userfilepath'],'a')
         old_cnxml = user_uploaded_zip.read('index.cnxml')
         soup = BeautifulSoup(old_cnxml)
         old_content = soup.content.renderContents()
