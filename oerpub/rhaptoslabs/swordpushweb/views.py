@@ -1293,7 +1293,7 @@ def update_cnx_metadata(request):
         config['metadata']['title'] = session['title']
 
     form = Form(request,
-                schema=UpadatedMetadataSchema,
+                schema=UpdatedMetadataSchema,
                 defaults=defaults
                 )
 
