@@ -1053,9 +1053,10 @@ def admin_config_view(request):
 @view_config(route_name='slideshare_importer',renderer='templates/importer.pt')
 def return_slideshare_upload_form(request):
     check_login(request)
+    config = load_config(request)
     session = request.session
     form = Form(request, schema=ImporterSchema)
-    response = {'form':FormRenderer(form),'slideshow_id': '123'}
+    response = {'form':FormRenderer(form)}
     validate_form = form.validate()
     if request.GET.get('slideshow_id'):
         slideshow_id = request.GET.get('slideshow_id')
