@@ -1099,7 +1099,7 @@ def return_slideshare_upload_form(request):
         zip_archive.write(original_filename,uploaded_filename)	
         username = session['username']    
         slideshare_details = get_details(slideshow_id)
-        slideshare_download_url = get_slideshow_download_url(slideshow_id)
+        slideshare_download_url = get_slideshow_download_url(slideshare_details)
         cnxml = """
 <document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
   <title>TEST DOC</title>
