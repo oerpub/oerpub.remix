@@ -1352,61 +1352,7 @@ def update_cnx_metadata(request):
             if metadata[key] == '':
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
-        new_cnxml = """
-<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
-  <title>TEST DOC</title>
-<metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
-  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
-       Changes to the metadata section in the source will not be saved. -->
-  <md:repository>http://cnx.org/content</md:repository>
-  <md:content-id>new</md:content-id>
-  <md:title>""</md:title>
-  <md:version>**new**</md:version>
-  <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
-  <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
-  <md:actors>
-    <md:person userid="""+"\""+username+"\""+""">
-      <md:firstname></md:firstname>
-      <md:surname></md:surname>
-      <md:fullname></md:fullname>
-      <md:email></md:email>
-    </md:person>
-  </md:actors>
-  <md:roles>
-    <md:role type="author">"""+username+"""</md:role>
-    <md:role type="maintainer">"""+username+"""</md:role>
-    <md:role type="licensor">"""+username+"""</md:role>
-  </md:roles>
-  <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
-  <!-- For information on license requirements for use or modification, see license url in the
-       above <md:license> element.
-       For information on formatting required attribution, see the URL:
-         CONTENT_URL/content_info#cnx_cite_header
-       where CONTENT_URL is the value provided above in the <md:content-url> element.
-  -->
-  <md:abstract/>
-  <md:language>en</md:language>
-  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
-       Changes to the metadata section in the source will not be saved. -->
-</metadata>
-<featured-links>
-  <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
-       Changes to the links section in the source will not be saved. -->
-    <link-group type="supplemental">
-      <link url="Training_Authoring.ppt" strength="3">Download the original slides in PPT format</link>
-      <link url="http://cnx.org/content/col10151/latest/" strength="2">The Textbook: Learning to author in Connexions</link>
-      <link url="""+ "\"" +slideshare_download_url + "\"" +""" strength="2">SlideShare PPT Download Link</link>
-    </link-group>
-  <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
-       Changes to the links section in the source will not be saved. -->
-</featured-links>
-
-<content>
-  <para id="ss-embed">"""+form.data['introductory_paragraphs']+"""
-  <media id="ss-iframe-embed"></media>
-  </para>
-</content>
-</document>"""
+        
         user_uploaded_zip = zipfile.Zipfile(session['userfilepath'],'a')
         old_cnxml = user_uploaded_zip.read('index.cnxml')
         soup = BeautifulSoup(old_cnxml)
