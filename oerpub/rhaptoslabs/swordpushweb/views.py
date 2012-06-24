@@ -31,9 +31,9 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
-
+import convert # Imports JOD convert script
+import check_jod #Imports script which checks to see if JOD is running
 TESTING = False
 
 
@@ -461,7 +461,12 @@ def choose_view(request):
                     odt_filename = original_filename
                     filename, extension = os.path.splitext(original_filename)
                     if(extension != '.odt'):
+                        converter = convert.DocumentConverterClient()
+                        converter.convert(original_filename, 'odt', 'doc', original_filename)
+                        #convert(self, filename, output_type, output_file)
+                        '''
                         odt_filename= '%s.odt' % filename
+                        if 
                         command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
                         os.system(command)
                         try:
@@ -470,6 +475,7 @@ def choose_view(request):
                         except IOError as io:
                             raise ConversionError("%s not found" %
                                                   original_filename)
+                        '''
                     # Convert and save all the resulting files.
 
                     tree, files, errors = transform(odt_filename)
@@ -619,7 +625,6 @@ def cnxml_view(request):
                 fp.close()
 
         try:
-            cnxml = cnxml.encode('utf-8')
             save_cnxml(save_dir, cnxml, files)
             validate_cnxml(cnxml)
         except ConversionError as e:
