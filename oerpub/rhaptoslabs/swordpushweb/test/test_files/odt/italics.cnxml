@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
-  <title>
-Untitled Document
- </title>
+  <title>Untitled Document</title>
   <content>
     <para>
-      <emphasis effect="italics">
-This is an italics text test. 1 2 3 4 5 # Hello World!!!
-   </emphasis>
+      <emphasis effect="italics">This is an italics text test. 1 2 3 4 5 # Hello World!!!</emphasis>
     </para>
   </content>
 </document>

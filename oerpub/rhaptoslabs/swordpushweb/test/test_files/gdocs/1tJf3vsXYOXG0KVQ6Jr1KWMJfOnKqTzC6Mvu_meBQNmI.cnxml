@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>BUG (More Heading weirdness Content disappears)</title>
+  <content>
+    <para>
+      <newline/>
+    </para>
+    <section>
+      <title>Heading 2 or Heading 3</title>
+      <para>There is a Heading 1 below this and its content disappears.</para>
+      <para>
+        <newline/>
+      </para>
+    </section>
+    <section>
+      <title>Heading 1</title>
+      <para>content disappears</para>
+    </section>
+  </content>
+</document>

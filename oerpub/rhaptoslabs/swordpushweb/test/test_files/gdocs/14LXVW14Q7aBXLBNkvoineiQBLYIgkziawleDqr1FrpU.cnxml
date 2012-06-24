@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>BUG: (multiple-style emphasis missing) Fletcher Gr 6_Life and Living 1</title>
+  <content>
+    <para>
+      <emphasis effect="bold">
+        <emphasis effect="underline">MAKE A FOOD WEB</emphasis>
+      </emphasis>
+    </para>
+    <para>
+      <emphasis effect="bold">
+        <emphasis effect="underline">Material and Apparatus</emphasis>
+      </emphasis>
+    </para>
+    <list list-type="bulleted">
+      <item>
+        <emphasis effect="italics">
+          <emphasis effect="bold">
+            <emphasis effect="underline">bold underline italics</emphasis>
+          </emphasis>
+        </emphasis>
+      </item>
+      <item>
+        <emphasis effect="bold">
+          <emphasis effect="underline">bold underline</emphasis>
+        </emphasis>
+      </item>
+      <item>
+        <emphasis effect="italics">
+          <emphasis effect="bold">bold italics</emphasis>
+        </emphasis>
+      </item>
+      <item>
+        <emphasis effect="italics">
+          <emphasis effect="underline">italics underlined</emphasis>
+        </emphasis>
+      </item>
+      <item>
+        <emphasis effect="italics">italics</emphasis>
+      </item>
+    </list>
+    <para>
+      <newline/>
+    </para>
+    <para>
+      <emphasis effect="bold">
+        <emphasis effect="underline">Method</emphasis>
+      </emphasis>
+    </para>
+  </content>
+</document>

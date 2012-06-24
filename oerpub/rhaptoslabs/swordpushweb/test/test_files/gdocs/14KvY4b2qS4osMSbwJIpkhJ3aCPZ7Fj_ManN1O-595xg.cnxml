@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>Bug130</title>
+  <content>
+    <para>
+      <emphasis effect="bold">This table should show three columns of equal width and the whole table should span the page.</emphasis>
+    </para>
+    <para>
+      <newline/>
+    </para>
+    <para/>
+    <table summary="" pgwide="1">
+      <tgroup cols="3">
+        <colspec colnum="1" colwidth="146.5pt"/>
+        <colspec colnum="2" colwidth="148.8pt"/>
+        <colspec colnum="3" colwidth="151.8pt"/>
+        <tbody>
+          <row>
+            <entry>
+              <para>
+                <emphasis effect="bold">Date</emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">Time</emphasis>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <emphasis effect="bold">Temperature</emphasis>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+            <entry>
+              <para>
+                <newline/>
+              </para>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para/>
+  </content>
+</document>

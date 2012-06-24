@@ -58,6 +58,11 @@ num_tests = len(all_tests_odt_files)
 print('Have '+str(num_tests)+' tests: '+str(all_tests_odt_files))
 
 for form in formats:
+    folder_path = './test_files/'+form+'/'
+    if(not os.path.exists(folder_path)):
+        os.makedirs(folder_path)
+
+for form in formats:
     format_folder = './test_files/'+form+'/'
     all_files=os.listdir(format_folder)
     if(form != 'odt'):

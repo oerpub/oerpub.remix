@@ -1,29 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
-  <title>
-Untitled Document
- </title>
+  <title>Untitled Document</title>
   <content>
     <?cnx.warning Unwrapping a list with only 1 item, another list?>
-    <para>
-This is hierarchical with bullets instead (small circle marker)
-   </para>
+    <para>This is hierarchical with bullets instead (small circle marker)</para>
     <?cnx.warning Unwrapping a list with only 1 item, another list?>
-    <para>
-Wheee indented 1 (empty circle marker)
-    </para>
+    <para>Wheee indented 1 (empty circle marker)</para>
     <?cnx.warning Unwrapping a list with only 1 item, another list?>
-    <para>
-Indented 2 (square black marker)
-     </para>
+    <para>Indented 2 (square black marker)</para>
     <?cnx.warning Unwrapping a list with only 1 item, another list?>
-    <para>
-Indented 3 (small circle marker again)
-      </para>
+    <para>Indented 3 (small circle marker again)</para>
     <?cnx.warning Unwrapping a list with only 1 item, another list?>
-    <para>
-Indented 4
-       </para>
+    <para>Indented 4</para>
     <list list-type="bulleted">
       <item/>
     </list>

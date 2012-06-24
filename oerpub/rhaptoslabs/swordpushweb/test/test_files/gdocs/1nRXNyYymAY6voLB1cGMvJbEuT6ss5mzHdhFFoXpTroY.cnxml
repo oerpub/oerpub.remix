@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>BUG (Empty Headings Cause Craziness) Fletcher Gr 6_Life and Living 2</title>
+  <content>
+    <section>
+      <title>EMPTY HEADINGS CAUSE MUCH CRAZINESS</title>
+      <para>This document came from cutting and pasting a section of the Life and Living document from one gdoc to the next. The cutting and pasting results in some very nasty formatting issues, including the empty headings, which were not present in the original document.</para>
+    </section>
+    <section>
+      <title>5. Light (This is a Heading 2 and the empty space below is also</title>
+      <para>The stuff that follows the empty heading 2 starts with "Measure the photo-period". But instead you will see something from the end of the document that starts with "Questions". From what I can tell you lose everything from the empty heading 2 down to the next Heading 2 in the document. And then you get everything to the next emtpy heading 2 in which the proceess repeats. And you end up with multiple copies of the part that starts with "Questions". <emphasis effect="bold">EMPTY HEADING 2 BELOW followed by the text "Measure the photo-period"</emphasis></para>
+      <para/>
+      <para>1. There is some nasty Arial 7 in the space here.         <emphasis effect="bold">This text gets lost:</emphasis> Measure the <emphasis effect="bold">photo-period</emphasis> of your study site by keeping a record of the times of</para>
+      <para>sunrise and sunset over a two-week period</para>
+      <para>2.            Observe the effects of photo-period on the behaviour of plants.  Daisies open during</para>
+      <para>the day and close at night.  If there are any of these plants in you study area, you</para>
+      <para>can keep a record of the times they open and close.  Complete the table below of</para>
+      <para>when the flowers open and close.</para>
+    </section>
+    <section>
+      <title>6. Studying biotic factors (HEADING 2) (ends up repeated twice)</title>
+      <para>If the ecosystem you have chosen covers a large area, it might be difficult to observe all the living organisms in your study.  You can get some idea of the plant and animal diversity in the ecosystem you are studying by choosing a small sample area to study.</para>
+      <para>3.            Make a distribution map showing where you found the different organisms.  Give each different organism you found a code.  Draw a box like the one below to represent your grid.  Use the codes to make a map by showing where in the grid you found each organism.  You can colour code your map if you like.</para>
+      <para>A distribution grid - <emphasis effect="bold">EMPTY HEADING 2 BELOW THIS TABLE followed by "How many kinds</emphasis> ..." which disappears.  </para>
+      <para/>
+      <table summary="" pgwide="1">
+        <tgroup cols="2">
+          <colspec colnum="1" colwidth="222.2pt"/>
+          <colspec colnum="2" colwidth="223.8pt"/>
+          <tbody>
+            <row>
+              <entry>
+                <para>
+                  <newline/>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <newline/>
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                  <newline/>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <newline/>
+                </para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para>
+        <newline/>
+      </para>
+      <para/>
+      <para>1.            How many kinds of plants and animals did you find?  Which parts of your grid contained the most organisms? <emphasis effect="bold">THERE ARE 0 EMPTY HEADING 2's below</emphasis></para>
+    </section>
+    <section>
+      <title>Questions (ends up repeated in the converted document)</title>
+      <div/>
+    </section>
+    <section>
+      <title>1.] Differentiate between a Food Chain and Food Web?</title>
+      <div/>
+    </section>
+    <section>
+      <title>2.] What is the study of ecosystems referred to as?</title>
+      <div/>
+    </section>
+    <section>
+      <title>3.] Name the five trophic levels present in most food chains.</title>
+      <div/>
+    </section>
+    <section>
+      <title>4.] Why does each trophic level contain approximately 10 percent less energy than the</title>
+      <para>preceeding level [the level before]</para>
+      <para>5.]        The Kruger National Park is the largest nature reserve in South Africa. Provide an as</para>
+      <para>example of another nature reserve which is a popular attraction?</para>
+    </section>
+  </content>
+</document>
