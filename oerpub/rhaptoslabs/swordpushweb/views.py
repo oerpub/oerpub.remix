@@ -462,20 +462,26 @@ def choose_view(request):
                     filename, extension = os.path.splitext(original_filename)
                     if(extension != '.odt'):
                         converter = convert.DocumentConverterClient()
-                        converter.convert(original_filename, 'odt', filename + '.odt')
+                        print original_filename
+                        print filename + '.odt'
+                        # Checks to see if JOD is active on the machine. If it is the conversion occurs using JOD else it converts using OO headless
+                        if jod_check.check('office[0-9]'):
+                            try:
+                                converter.convert(original_filename, 'odt', filename + '.odt')
+                            except Exception as e:
+                                print e
                         #convert(self, filename, output_type, output_file)
-                        '''
-                        odt_filename= '%s.odt' % filename
-                        if 
-                        command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
-                        os.system(command)
-                        try:
-                            fp = open(odt_filename, 'r')
-                            fp.close()
-                        except IOError as io:
-                            raise ConversionError("%s not found" %
-                                                  original_filename)
-                        '''
+                        else:
+                            odt_filename= '%s.odt' % filename
+                            command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+                            os.system(command)
+                            try:
+                                fp = open(odt_filename, 'r')
+                                fp.close()
+                            except IOError as io:
+                                raise ConversionError("%s not found" %
+                                                      original_filename)
+                    
                     # Convert and save all the resulting files.
 
                     tree, files, errors = transform(odt_filename)
