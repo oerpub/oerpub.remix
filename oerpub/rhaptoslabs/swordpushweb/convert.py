@@ -74,7 +74,7 @@ class MultiPartForm(object):
         flattened = list(itertools.chain(*parts))
         flattened.append('--' + self.boundary + '--')
         flattened.append('')
-        return '\r\n'.join(flattened)
+        return '\r\n'.join(unicode(flattened.decode('utf-8')))
 
 
 class DocumentConverterClient:
