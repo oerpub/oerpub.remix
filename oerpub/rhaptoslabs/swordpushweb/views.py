@@ -487,6 +487,7 @@ def choose_view(request):
                     # Convert and save all the resulting files.
 
                     tree, files, errors = transform(odt_filename)
+                    print "Finished transforming the conversion.."
                     cnxml = clean_cnxml(etree.tostring(tree))
                     #cnxml=cnxml.decode('utf-8')
                     #cnxml=unicode(cnxml)
