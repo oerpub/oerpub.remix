@@ -73,7 +73,7 @@ class MultiPartForm(object):
         # then return CR+LF separated data
         flattened = list(itertools.chain(*parts))
         flattened.append('--' + self.boundary + '--')
-        flattened.append('')
+        flattened.append('').encode('utf-8')
         return '\r\n'.join(flattened).decode('utf-8')
 
 
