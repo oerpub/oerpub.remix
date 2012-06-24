@@ -467,6 +467,7 @@ def choose_view(request):
                         # Checks to see if JOD is active on the machine. If it is the conversion occurs using JOD else it converts using OO headless
                         if jod_check.check('office[0-9]'):
                             try:
+                                print "Using JOD.."
                                 converter.convert(original_filename, 'odt', filename + '.odt')
                             except Exception as e:
                                 print e
@@ -475,12 +476,13 @@ def choose_view(request):
                             odt_filename= '%s.odt' % filename
                             command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
                             os.system(command)
-                            try:
-                                fp = open(odt_filename, 'r')
-                                fp.close()
-                            except IOError as io:
-                                raise ConversionError("%s not found" %
-                                                      original_filename)
+                        try:
+                            fp = open(odt_filename, 'r')
+                            fp.close()
+                            print "Found the converted file"
+                        except IOError as io:
+                            raise ConversionError("%s not found" %
+                                                  original_filename)
                     
                     # Convert and save all the resulting files.
 
