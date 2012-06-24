@@ -102,6 +102,8 @@ class DocumentConverterClient:
             # Reads and writes converted data to a file
             response = urllib2.urlopen(request).read()
             result_file = open(output_file, 'w')
+            response = unicode(response)
+            response = response.encode('utf-8')
             result_file.write(response)           
             t2 = time.time()  
             print 'Conversion Successful! \nConversion took %0.3f ms' % ((t2-t1)*1000.0)
