@@ -86,7 +86,7 @@ class DocumentConverterClient:
         # Create the form with simple fields
         multi_form = MultiPartForm()
         # Adds the Document location and the output format
-        file_handle=open(filename, 'rb')
+        file_handle=open(filename,  'rb')
         multi_form.add_file('inputDocument', filename, 
                 file_handle)
         multi_form.add_field('outputFormat', output_type)
@@ -101,7 +101,7 @@ class DocumentConverterClient:
             t1 = time.time()
             # Reads and writes converted data to a file
             response = urllib2.urlopen(request).read()
-            result_file = open(output_file, 'w','utf-8')
+            result_file = open(output_file, 'wb')
             result_file.write(response)            
             t2 = time.time()  
             print 'Conversion Successful! \nConversion took %0.3f ms' % ((t2-t1)*1000.0)
