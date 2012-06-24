@@ -101,9 +101,9 @@ class DocumentConverterClient:
             t1 = time.time()
             # Reads and writes converted data to a file
             response = urllib2.urlopen(request).read()
-            result_file = open(output_file, 'w')
+            result_file = open(output_file, 'w','utf-8')
             result_file.write(response)            
-            t2 = time.time()
+            t2 = time.time()  
             print 'Conversion Successful! \nConversion took %0.3f ms' % ((t2-t1)*1000.0)
             return True
         except urllib2.HTTPError as e:
