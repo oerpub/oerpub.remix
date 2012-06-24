@@ -462,7 +462,7 @@ def choose_view(request):
                     filename, extension = os.path.splitext(original_filename)
                     if(extension != '.odt'):
                         converter = convert.DocumentConverterClient()
-                        converter.convert(original_filename, 'odt', 'doc', original_filename)
+                        converter.convert(original_filename, 'odt', original_filename)
                         #convert(self, filename, output_type, output_file)
                         '''
                         odt_filename= '%s.odt' % filename
