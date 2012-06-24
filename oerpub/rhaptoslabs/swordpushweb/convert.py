@@ -92,7 +92,7 @@ class DocumentConverterClient:
         multi_form.add_field('outputFormat', output_type)
         body = str(multi_form)
         # Build the request
-        url = 'http://localhost:8080/converter/converted/document.' + output_type
+        url = 'http://localhost:8185/converter/converted/document.' + output_type
         request= urllib2.Request(url, data=body)
         # Header to specify that the request contains multipart/form  data
         request.add_header('Content-type', multi_form.get_content_type())
