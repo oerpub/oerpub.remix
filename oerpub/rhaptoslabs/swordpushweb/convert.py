@@ -74,7 +74,6 @@ class MultiPartForm(object):
         flattened = list(itertools.chain(*parts))
         flattened.append('--' + self.boundary + '--')
         flattened.append('')
-        #'test'.join(flattened)
         return '\r\n'.join(flattened)
 
 
