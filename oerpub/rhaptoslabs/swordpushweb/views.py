@@ -33,7 +33,7 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
 import convert # Imports JOD convert script
-import check_jod #Imports script which checks to see if JOD is running
+import jod_check #Imports script which checks to see if JOD is running
 TESTING = False
 
 
