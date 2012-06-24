@@ -476,7 +476,7 @@ def choose_view(request):
                             command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
                             os.system(command)
                             try:
-                                fp = open(odt_filename, 'r')
+                                fp = open(odt_filename, 'r', 'utf-8')
                                 fp.close()
                             except IOError as io:
                                 raise ConversionError("%s not found" %
@@ -486,8 +486,8 @@ def choose_view(request):
 
                     tree, files, errors = transform(odt_filename)
                     cnxml = clean_cnxml(etree.tostring(tree))
-                    cnxml=cnxml.decode('utf-8')
-                    cnxml=unicode(cnxml)
+                    #cnxml=cnxml.decode('utf-8')
+                    #cnxml=unicode(cnxml)
 
                     save_cnxml(save_dir, cnxml, files.items())
 
