@@ -496,7 +496,6 @@ def choose_view(request):
 
         except Exception:
             # Record traceback
-            print('Got Exception!!!')
             tb = traceback.format_exc()
             # Get software version from git
             try:
