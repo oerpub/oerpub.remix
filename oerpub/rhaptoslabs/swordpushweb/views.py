@@ -486,6 +486,9 @@ def choose_view(request):
 
                     tree, files, errors = transform(odt_filename)
                     cnxml = clean_cnxml(etree.tostring(tree))
+                    cnxml=cnxml.decode('utf-8')
+                    cnxml=unicode(cnxml)
+
                     save_cnxml(save_dir, cnxml, files.items())
 
                     # now validate with jing
