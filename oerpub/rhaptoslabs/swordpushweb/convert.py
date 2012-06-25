@@ -103,6 +103,7 @@ class DocumentConverterClient:
             response = urllib2.urlopen(request).read()
             result_file = open(output_file, 'w')
             response = unicode(response, encoding='utf-8')
+            response = response.decode('utf-8')
             #response = response.encode('utf-8')
             result_file.write(response)           
             t2 = time.time()  
