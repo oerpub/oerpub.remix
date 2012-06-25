@@ -465,8 +465,7 @@ def choose_view(request):
                         print original_filename
                         print filename + '.odt'
                         # Checks to see if JOD is active on the machine. If it is the conversion occurs using JOD else it converts using OO headless
-                        #if jod_check.check('office[0-9]'):
-                        if False
+                        if jod_check.check('office[0-9]'):
                             try:
                                 print "Using JOD.."
                                 converter.convert(original_filename, 'odt', filename + '.odt')
