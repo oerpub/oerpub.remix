@@ -465,7 +465,8 @@ def choose_view(request):
                         print original_filename
                         print filename + '.odt'
                         # Checks to see if JOD is active on the machine. If it is the conversion occurs using JOD else it converts using OO headless
-                        if jod_check.check('office[0-9]'):
+                        #if jod_check.check('office[0-9]'):
+                        if False
                             try:
                                 print "Using JOD.."
                                 converter.convert(original_filename, 'odt', filename + '.odt')
@@ -473,6 +474,7 @@ def choose_view(request):
                                 print e
                         #convert(self, filename, output_type, output_file)
                         else:
+                            print "Using Open office"
                             odt_filename= '%s.odt' % filename
                             command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
                             os.system(command)
@@ -487,7 +489,6 @@ def choose_view(request):
                     # Convert and save all the resulting files.
 
                     tree, files, errors = transform(odt_filename)
-                    print "Finished transforming the conversion.."
                     cnxml = clean_cnxml(etree.tostring(tree))
                     #cnxml=cnxml.decode('utf-8')
                     #cnxml=unicode(cnxml)
