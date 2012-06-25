@@ -191,7 +191,7 @@ class UploadSchema(formencode.Schema):
 class ImporterSchema(formencode.Schema):
     allow_extra_fields = True
     importer = formencode.validators.FieldStorageUploadConverter()
-    introductory_paragraphs = formencode.validators.PlainText(
+    introductory_paragraphs = formencode.validators.PlainText()
 
 class ConversionError(Exception):
     def __init__(self, msg):
