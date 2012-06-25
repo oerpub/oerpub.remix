@@ -32,7 +32,7 @@ import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
-import convert # Imports JOD convert script
+import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 TESTING = False
 
@@ -394,9 +394,9 @@ def choose_view(request):
             # Office, CNXML-ZIP or LaTeX-ZIP file
             else:
                 # Save the original file so that we can convert, plus keep it.
-                original_filename = os.path.join(
+                original_filename = str(os.path.join(
                     save_dir,
-                    form.data['upload'].filename.replace(os.sep, '_'))
+                    form.data['upload'].filename.replace(os.sep, '_')))
                 saved_file = open(original_filename, 'wb')
                 input_file = form.data['upload'].file
                 shutil.copyfileobj(input_file, saved_file)
@@ -458,29 +458,24 @@ def choose_view(request):
                 # OOo / MS Word Conversion
                 else:
                     # Convert from other office format to odt if needed
-                    odt_filename = original_filename
                     filename, extension = os.path.splitext(original_filename)
+	            odt_filename = str(filename) + '.odt'
+
                     if(extension != '.odt'):
-                        converter = convert.DocumentConverterClient()
-                        print original_filename
-                        print filename + '.odt'
+                        converter = JOD.DocumentConverterClient()
                         # Checks to see if JOD is active on the machine. If it is the conversion occurs using JOD else it converts using OO headless
                         if jod_check.check('office[0-9]'):
                             try:
-                                print "Using JOD.."
-                                converter.convert(original_filename, 'odt', filename + '.odt')
+                		converter.convert(original_filename, 'odt', filename + '.odt')
                             except Exception as e:
                                 print e
-                        #convert(self, filename, output_type, output_file)
                         else:
-                            print "Using Open office"
                             odt_filename= '%s.odt' % filename
                             command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
                             os.system(command)
                         try:
                             fp = open(odt_filename, 'r')
                             fp.close()
-                            print "Found the converted file"
                         except IOError as io:
                             raise ConversionError("%s not found" %
                                                   original_filename)
@@ -489,8 +484,6 @@ def choose_view(request):
 
                     tree, files, errors = transform(odt_filename)
                     cnxml = clean_cnxml(etree.tostring(tree))
-                    #cnxml=cnxml.decode('utf-8')
-                    #cnxml=unicode(cnxml)
 
                     save_cnxml(save_dir, cnxml, files.items())
 

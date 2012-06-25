@@ -7,6 +7,7 @@ import mimetools
 import mimetypes
 import socket
 import time
+import base64
 from urllib2 import urlopen
 #from keepalive import HTTPHandler
 from cStringIO import StringIO
@@ -35,6 +36,8 @@ class MultiPartForm(object):
         """Add a file to be uploaded."""
         file_handle.seek(0)
         body = file_handle.read()
+	#body = base64.b64encode(body)
+	#body = body.decode('ISO_8859_1')
         if mimetype is None:
             mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
         self.files.append((fieldname, filename, mimetype, body))
@@ -86,7 +89,7 @@ class DocumentConverterClient:
         # Create the form with simple fields
         multi_form = MultiPartForm()
         # Adds the Document location and the output format
-        file_handle=open(filename,  'rb')
+        file_handle = open(filename,  'rb')
         multi_form.add_file('inputDocument', filename, 
                 file_handle)
         multi_form.add_field('outputFormat', output_type)
@@ -102,10 +105,7 @@ class DocumentConverterClient:
             # Reads and writes converted data to a file
             response = urllib2.urlopen(request).read()
             result_file = open(output_file, 'w')
-            response = unicode(response, encoding='utf-8')
-            response = response.decode('utf-8')
-            #response = response.encode('utf-8')
-            result_file.write(response)           
+	    result_file.write(response)
             t2 = time.time()  
             print 'Conversion Successful! \nConversion took %0.3f ms' % ((t2-t1)*1000.0)
             return True
@@ -140,8 +140,9 @@ if __name__ == '__main__':
             print help
             sys.exit()
         converter = DocumentConverterClient()
-        # Grabs all the documents listed in the directory. testbed_directory should refer to the testbed location of the google docs
-        ls_output = subprocess.check_output(["ls", testbed_directory])
+        # Grabs all the documents listed in the directory. testbed_directory should refer to the testbed location of the google docs 
+	#ls_output = subprocess.check_output(["ls", testbed_directory])
+	ls_output = subprocess.Popen(['ls', testbed_directory], stdout=subprocess.PIPE).communicate()[0]
         # Splits all the filenames using new lines as the delimiter
         files_in_directory = ls_output.split('\n')
         # Gets the number of documents which will be useful for iterations
