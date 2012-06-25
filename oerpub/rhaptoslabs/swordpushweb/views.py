@@ -1059,6 +1059,7 @@ def return_slideshare_upload_form(request):
     form = Form(request, schema=ImporterSchema)
     response = {'form':FormRenderer(form)}
     validate_form = form.validate()
+    print form.all_errors()
     if request.GET.get('slideshow_id'):
         slideshow_id = request.GET.get('slideshow_id')
         all_details = get_details(slideshow_id)
