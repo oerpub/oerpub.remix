@@ -684,8 +684,6 @@ class MetadataSchema(formencode.Schema):
     editors = formencode.validators.String()
     translators = formencode.validators.String()
 
-class UpdatedMetadataSchema(MetadataSchema):
-    introductory_paragraphs = formencode.validators.String()
 
 @view_config(route_name='metadata')
 def metadata_view(request):
@@ -1300,7 +1298,7 @@ def update_cnx_metadata(request):
         config['metadata']['title'] = session['title']
 
     form = Form(request,
-                schema=UpdatedMetadataSchema,
+                schema=MetadataSchema,
                 defaults=defaults
                 )
 
