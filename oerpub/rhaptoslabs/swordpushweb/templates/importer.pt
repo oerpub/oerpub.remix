@@ -53,6 +53,13 @@
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </div>             
+                  <div class="formentry">
+                    <div class="formlabel">Introductory paragraph</div>
+                    <div class="forminfo">A small intoduction for the slides</div>
+                    <div class="formfield">
+                        <textarea name="introductory_paragraphs" rows="6" cols="60"></textarea>
+                    </div>
+                  </div>
                 </li>
               </ul>
               ${form.end()}

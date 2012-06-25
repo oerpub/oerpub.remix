@@ -191,6 +191,7 @@ class UploadSchema(formencode.Schema):
 class ImporterSchema(formencode.Schema):
     allow_extra_fields = True
     importer = formencode.validators.FieldStorageUploadConverter()
+    introductory_paragraphs = formencode.validators.PlainText(
 
 class ConversionError(Exception):
     def __init__(self, msg):
@@ -1154,8 +1155,8 @@ def return_slideshare_upload_form(request):
 </featured-links>
 
 <content>
-  <para id="ss-embed">Iframe Embed to appear here 
-  <media id="ss-iframe-embed"></media>
+  <para id="intro-para-1">"""+form.data['introductory_paragraphs']+"""
+  
   </para>
 </content>
 </document>"""
@@ -1352,31 +1353,8 @@ def update_cnx_metadata(request):
             if metadata[key] == '':
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
-        
-        user_uploaded_zip = zipfile.ZipFile(session['userfilepath'],'a')
-        old_cnxml = user_uploaded_zip.read('index.cnxml')
-        soup = BeautifulSoup(old_cnxml)
-        old_content = soup.content.renderContents()
-        newsoup = BeautifulSoup("""<content><para id='introduction'>"""+form.data['introductory_paragraphs']+"""</para>"""+old_content +"""</content>""")
-        old_cnxml.content.replaceWith(newsoup)
-        user_uploaded_zip.writestr("index.cnxml",old_cnxml)
-        user_uploaded_zip.close()
-        with open(user_uploaded_, 'rb') as zip_file:
-            deposit_receipt = conn.append(                
-                payload = zip_file,
-                filename = 'upload.zip',
-                mimetype = 'application/zip',
-                packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                edit_iri=session['edit_iri'])        
-        
-        
-        
-        #upload_new_content = conn.append(edit_iri=session['edit_iri'],
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
         return HTTPFound(location=request.route_url('slideshare_importer'))     
-    
-    config['metadata']['introductory_paragraphs'] = session['transcript']
-
     response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
