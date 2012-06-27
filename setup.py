@@ -16,7 +16,8 @@ requires = [
     'pycrypto==2.5',
     'Markdown',
     'BeautifulSoup==3.2.1',
-    
+    'MySQL-python'
+
     ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',
