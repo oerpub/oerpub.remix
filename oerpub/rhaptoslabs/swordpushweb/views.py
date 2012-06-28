@@ -12,7 +12,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
-
+from pyramid.response import Response
 
 import formencode
 
@@ -1190,7 +1190,7 @@ def return_slideshare_upload_form(request):
 
 @view_config(route_name='oauth2callback')
 def importer(request):
-    templatePath = 'templates/importer.pt'
+    """templatePath = 'templates/importer.pt'
     form = Form(request, schema=UploadSchema)
     config = load_config(request)
     field_list = [('upload', 'File')]
@@ -1238,7 +1238,31 @@ def importer(request):
 
 		return render_to_response(templatePath,response,request=request)
     response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
-    return render_to_response(templatePath, response, request=request)
+    return render_to_response(templatePath, response, request=request)"""
+    session = request.session
+    try:
+        connection = _mysql.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')
+        oauth_token =  request.GET.get('oauth_token')
+        oauth_verifier = request.GET.get('oauth_verifier')        
+        #with connection:
+        #cursor = connection.cursor()
+        query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_verifier+"'"+")"
+        print query
+        connection.query(query)
+        return Response("OK")
+    
+    except _mysql.Error, e:
+  
+        print "Error %d: %s" % (e.args[0], e.args[1])
+        
+
+    finally:
+    
+        if connection:
+            connection.close()
+
+    
+    
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
