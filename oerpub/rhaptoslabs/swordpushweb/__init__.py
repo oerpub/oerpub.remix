@@ -22,7 +22,7 @@ def main(global_config, **settings):
     config.add_route('summary', '/summary')
     config.add_route('logout', '/logout')
     config.add_route('change_workspace', '/change_workspace')
-    config.add_route('slideshare_importer', '/slideshare_importer')
+    config.add_route('importer', '/importer')
     config.add_route('google_oauth', '/google_oauth')
     config.add_route('oauth2callback', '/oauth2callback')
     config.add_route('updatecnx', '/updatecnx')
