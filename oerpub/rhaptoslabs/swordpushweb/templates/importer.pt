@@ -59,7 +59,7 @@
               </ul>
               <ul id="create-new-list">
                 <li>                  
-                  ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='importform')}
+                  ${form.begin(request.route_url('importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}
                   <div class="upload-form" style="display:none">          
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
