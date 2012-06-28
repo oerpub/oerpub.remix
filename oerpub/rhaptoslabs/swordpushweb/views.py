@@ -6,7 +6,7 @@ import traceback
 import libxml2
 import re
 from BeautifulSoup import BeautifulSoup
-
+import _mysql
 from cStringIO import StringIO
 from lxml import etree
 from pyramid.view import view_config
