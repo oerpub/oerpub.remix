@@ -1268,11 +1268,11 @@ def importer(request):
 def authenticate_user_with_oauth(request):
 
     oauth2 = GoogleOAuth()
-    #oauth.set_oauth_callback_url()
-    #saved_request_token = oauth.get_oauth_token_from_google()
-    #request.session['saved_request_token'] = saved_request_token
+    oauth.set_oauth_callback_url()
+    saved_request_token = oauth.get_oauth_token_from_google()
+    request.session['saved_request_token'] = saved_request_token
     #print oauth.get_authorization_url_from_google()
-    return HTTPFound(location=str(oauth2.test_oauth2()))
+    return HTTPFound(location=str(oauth2.get_authorization_url_from_google()))
 
 @view_config(route_name='updatecnx')
 def update_cnx_metadata(request):
