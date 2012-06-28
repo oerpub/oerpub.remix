@@ -7,6 +7,7 @@ import libxml2
 import re
 from BeautifulSoup import BeautifulSoup
 import _mysql
+import MySQLdb as mdb
 from cStringIO import StringIO
 from lxml import etree
 from pyramid.view import view_config
@@ -1244,12 +1245,9 @@ def importer(request):
         connection = _mysql.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')
         oauth_token =  request.GET.get('oauth_token')
         oauth_verifier = request.GET.get('oauth_verifier')        
-        #with connection:
-        #cursor = connection.cursor()
-        query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_verifier+"'"+")"
-        print query
+        query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_verifier+"'"+")"     
         connection.query(query)
-        return Response("OK")
+        return HTTPFound(request.route_url('slideshare_importer'))
     
     except _mysql.Error, e:
   
@@ -1262,16 +1260,29 @@ def importer(request):
             connection.close()
 
     
+def is_returning_google_user(username):
+    connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')    
+    query = "SELECT * FROm user WHERE username="+username
+    with con:
+        cur = con.cursor()
+        cur.execute(query)
+        numrows = int(cur.rowcount)
+        if numrows == 0:
+            return True
+        else :
+            return False
     
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
-
-    oauth2 = GoogleOAuth()
+    session = request.session
+    username = session['username']
+    if (is_returning_google_user(username)):
+        return HTTPFound(location=request.route_url('slideshare_importer'))
+    oauth = GoogleOAuth()
     oauth.set_oauth_callback_url()
     saved_request_token = oauth.get_oauth_token_from_google()
-    request.session['saved_request_token'] = saved_request_token
-    #print oauth.get_authorization_url_from_google()
+    request.session['saved_request_token'] = saved_request_token    
     return HTTPFound(location=str(oauth2.get_authorization_url_from_google()))
 
 @view_config(route_name='updatecnx')
