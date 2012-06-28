@@ -16,7 +16,7 @@ requires = [
     'pycrypto==2.5',
     'Markdown',
     'BeautifulSoup==3.2.1',
-    'MySQL-python'
+    'MySQL-python==1.2.3',
 
     ]
 
