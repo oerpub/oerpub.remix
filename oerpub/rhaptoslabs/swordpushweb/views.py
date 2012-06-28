@@ -1050,7 +1050,7 @@ def admin_config_view(request):
     }
     return response
     
-@view_config(route_name='slideshare_importer',renderer='templates/importer.pt')
+@view_config(route_name='importer',renderer='templates/importer.pt')
 def return_slideshare_upload_form(request):
     check_login(request)
     config = load_config(request)

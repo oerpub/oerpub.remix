@@ -46,10 +46,22 @@
               </h1>
               
               <ul id="create-new-list">
+                <li>
+                    <span class ="label-text">
+                        <div class="left" style="float:left; clear:both;"><img src="${images_url}/google-docs.png"> <strong>Google Presentations</strong></div> or
+                        <div class="right"><img src="${images_url}/slideshare.png"> <strong>SlideShare</strong></div>
+                        <div class="left" style="float:left; clear:both;"><input type="checkbox" name="importer" value="google" /></div>
+                        <div class="right"><input type="checkbox" name="importer" value="slideshare" /></div>
+
+
+                    </span>
+                </li>
+              </ul>
+              <ul id="create-new-list">
                 <li>                  
                   ${form.begin(request.route_url('slideshare_importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}
-                  <div class="upload-form">          
+                  <div class="upload-form" style="display:none">          
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </div>             
