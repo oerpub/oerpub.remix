@@ -47,14 +47,15 @@
               
               <ul id="create-new-list">
                 <li>
-                    <span class ="label-text" id="choose-importer-box">
-                        <div class="left"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></div>
-                        <div class="right"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></div> 
+                
+                    <div class ="upload-form" id="choose-importer-box">
+                        <div class="left"><span class="label-text"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
+                        <div class="right"><span class="label-text"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div> 
                         <div class="left"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>                    
                         <div class="right"><input type="checkbox" id="import-to-ss" name="importer" value="google"/></div>
-                        <div align="center"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
+                        <input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit">
                         <br/><br/>
-                    </span>
+                    </div>
                 </li>
               
               
