@@ -1073,9 +1073,9 @@ def is_returning_google_user(username):
         numrows = int(cur.rowcount)
         print "NUM ROWS",numrows
         if numrows == 0:
-            return True
-        else :
             return False
+        else :
+            return True
 
     
 @view_config(route_name='importer',renderer='templates/importer.pt')
