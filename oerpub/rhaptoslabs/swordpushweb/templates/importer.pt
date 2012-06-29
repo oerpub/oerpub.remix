@@ -66,11 +66,11 @@
                 <li id="file-browser">                  
                   ${form.begin(request.route_url('importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}
-                  <span class="upload-form" style="display:none">          
+                  <span class="upload-form">          
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
                     
-                    <input type='hidden' id='upload-to-ss' value="">
-                    <input type='hidden' id='upload-to-google' value="">
+                    <input type='hidden' name='upload-to-ss' id='upload-to-ss' value="">
+                    <input type='hidden' name='upload-to-google' id='upload-to-google' value="">
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </span>             
                   <span class="formentry">

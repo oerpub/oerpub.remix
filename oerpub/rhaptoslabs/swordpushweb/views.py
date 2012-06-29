@@ -1098,6 +1098,8 @@ def return_slideshare_upload_form(request):
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")     
         session['userfilepath'] = zipped_filepath
+        print form.data['upload-to-google']
+        print form.data['upload-to-ss']
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)	
         username = session['username']    
