@@ -1058,7 +1058,7 @@ def get_oauth_token_and_secret(username):
         connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
         with connection:
             cursor = connection.cursor()
-            cursor.execute("SELECT oauth_token,oauth_secret FROM users WHERE username='"+username+"'")
+            cursor.execute("SELECT oauth_token,oauth_secret FROM user WHERE username='"+username+"'")
             row = cursor.fetchone()
             return {"oauth_token": row[0],"oauth_secret":row[1]}            
     except mdb.Error, e:
@@ -1066,7 +1066,7 @@ def get_oauth_token_and_secret(username):
 
 def is_returning_google_user(username):
     connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')    
-    query = "SELECT * FROm user WHERE username="+username
+    query = "SELECT * FROM user WHERE username='"+username+"'"
     with connection:
         cur = connection.cursor()
         cur.execute(query)
@@ -1117,7 +1117,8 @@ def return_slideshare_upload_form(request):
         upload_to_ss = form.data['upload_to_ss']
         username = session['username']
         if (upload_to_ss=="true"):
-            slideshow_id = upload_to_slideshare("saketkc",original_filename)        
+            #slideshow_id = upload_to_slideshare("saketkc",original_filename)        
+            print "ss"
         if (upload_to_google == "true"):
             if is_returning_google_user(username):
                 oauth_token_and_secret = get_oauth_token_and_secret(username)
