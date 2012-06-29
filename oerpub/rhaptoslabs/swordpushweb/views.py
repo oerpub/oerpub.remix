@@ -192,6 +192,8 @@ class UploadSchema(formencode.Schema):
 class ImporterSchema(formencode.Schema):
     allow_extra_fields = True
     importer = formencode.validators.FieldStorageUploadConverter()
+    upload_to_ss = formencode.validators.String()
+    upload_to_google = formencode.validators.String()
     introductory_paragraphs = formencode.validators.PlainText()
 
 class ConversionError(Exception):
@@ -1098,8 +1100,8 @@ def return_slideshare_upload_form(request):
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")     
         session['userfilepath'] = zipped_filepath
-        print form.data['upload-to-google']
-        print form.data['upload-to-ss']
+        print form.data['upload_to_google']
+        print form.data['upload_to_ss']
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)	
         username = session['username']    
