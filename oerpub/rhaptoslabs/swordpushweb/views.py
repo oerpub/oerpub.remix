@@ -1115,6 +1115,7 @@ def return_slideshare_upload_form(request):
         input_file.close()
         upload_to_google = form.data['upload_to_google']
         upload_to_ss = form.data['upload_to_ss']
+        username = session['username']
         if (upload_to_ss=="true"):
             slideshow_id = upload_to_slideshare("saketkc",original_filename)        
         if (upload_to_google == "true"):
