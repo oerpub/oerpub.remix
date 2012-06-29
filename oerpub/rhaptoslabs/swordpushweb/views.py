@@ -1061,7 +1061,7 @@ def get_oauth_token_and_secret(username):
             cursor.execute("SELECT oauth_token,oauth_secret FROM users WHERE username='"+username+"'")
             row = cursor.fetchone()
             return {"oauth_token": row[0],"oauth_secret":row[1]}            
-    except mdb.Error, e::
+    except mdb.Error, e:
         print e
 
 def is_returning_google_user(username):
