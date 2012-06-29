@@ -1071,6 +1071,7 @@ def is_returning_google_user(username):
         cur = connection.cursor()
         cur.execute(query)
         numrows = int(cur.rowcount)
+        print "NUM ROWS",numrows
         if numrows == 0:
             return True
         else :
@@ -1118,6 +1119,7 @@ def return_slideshare_upload_form(request):
         username = session['username']
         if (upload_to_ss=="true"):
             #slideshow_id = upload_to_slideshare("saketkc",original_filename)        
+            slideshow_id="123"
             print "ss"
         if (upload_to_google == "true"):
             if is_returning_google_user(username):
