@@ -48,30 +48,38 @@
               <ul id="create-new-list">
                 <li>
                     <span class ="label-text" id="choose-importer-box">
-                        <div class="left" style="float:left; clear:both;"><img src="${images_url}/google-docs-22.png"> <strong>Google Presentations</strong></div> or
-                        <div class="right"><img src="${images_url}/slideshare.png"> <strong>SlideShare</strong></div>
-                        <div class="left" style="float:left; clear:both;"><input type="checkbox" name="importer" value="google" /></div>
-                        <div class="right"><input type="checkbox" name="importer" value="slideshare" /></div>
+                        <div class="left" style="float:left; clear:both; padding:3px;"><img src="${images_url}/slideshare.png"> <strong>SlideShare</strong><div class="right"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <br/><br/>
+                        
+                        <div align="center"> OR </div>
+                        
+                        <div class="left" style="float:left; clear:both; padding:3px"><img src="${images_url}/google-docs-22.png"> <strong>Google Presentations</strong> <input type="checkbox" id="import-to-ss" name="importer" value="google"/></div> 
+                        
+                        
+                        
                         <input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit">
 
                     </span>
                 </li>
-              </ul>
-              <ul id="create-new-list"  style="display:none;">
-                <li>                  
+              
+              
+                <li id="file-browser" style="display:none;">                  
                   ${form.begin(request.route_url('importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}
                   <div class="upload-form" style="display:none">          
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
+                    
+                    <input type='hidden' id='upload-to-ss' value="">
+                    <input type='hidden' id='upload-to-google' value="">
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </div>             
-                  <div class="formentry">
+                  <span class="formentry">
                     <div class="formlabel">Introductory paragraph</div>
                     <div class="forminfo">A small intoduction for the slides</div>
                     <div class="formfield">
                         <textarea name="introductory_paragraphs" rows="6" cols="60"></textarea>
                     </div>
-                  </div>
+                  </span>
                 </li>
               </ul>
               ${form.end()}
