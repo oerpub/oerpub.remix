@@ -1117,7 +1117,7 @@ def return_slideshare_upload_form(request):
         upload_to_ss = form.data['upload_to_ss']
         if (upload_to_ss=="true"):
             slideshow_id = upload_to_slideshare("saketkc",original_filename)        
-        if (upload_to_goole == "true"):
+        if (upload_to_google == "true"):
             if is_returning_google_user(username):
                 oauth_token_and_secret = get_oauth_token_and_secret(username)
                 oauth_token = oauth_token_and_secret["oauth_token"]

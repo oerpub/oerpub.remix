@@ -70,7 +70,7 @@
                     <input type='hidden' name='upload_to_google' id='upload-to-google' value="false">
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                             
-                    <span class="label-text">
+                    <span>
                       <div class="formlabel">Introductory paragraph</div>
                       <div class="forminfo">A small intoduction for the slides</div>
                       <div class="formfield">
