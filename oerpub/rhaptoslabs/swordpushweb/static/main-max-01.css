@@ -247,9 +247,8 @@ div.left {
     float: left;
     clear: both;
 }
-div.left {
-    float: right;
-    clear: both;
+div.right {
+    float: right;    
 }
 
 
