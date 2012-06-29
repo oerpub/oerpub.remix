@@ -310,20 +310,21 @@ $(document).ready(function() {
     });
     
     $('input#choose-importer').click(function(event){
-        $("#choose-importer-box").slideUp()
-        $("#file-browser").show().slideDown();
+        $('#choose-importer-box').slideUp()
+        $('#file-browser').show().slideDown();
         if ($('#import-to-google').is(':checked')) {
-            $("input#upload-to-google").val("true");
+            $('input#upload-to-google').val("true");
         
         } 
         if ($('#import-to-ss').is(':checked')) {
-            $("input#upload-to-ss").val("true");
+            $('input#upload-to-ss').val("true");
         
         } 
-        $("input#upload-to-ss").val("true");
-        $("input#upload-to-ss").val("true");
+        $('input#upload-to-ss').val("true");
+        $('input#upload-to-ss').val("true");
         
     });
+    $('#file-browser').hide();
 });
 
 function _doAction(message, event) {

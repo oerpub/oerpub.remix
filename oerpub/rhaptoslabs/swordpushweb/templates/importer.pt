@@ -48,7 +48,7 @@
               <ul id="create-new-list">
                 <li>
                     <span class ="label-text" id="choose-importer-box">
-                        <div class="left" style="float:left; clear:both; padding:3px;"><img src="${images_url}/slideshare.png"> <strong>SlideShare</strong><div class="right"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <div class="left" style="float:left; clear:both; padding:3px;"><img src="${images_url}/slideshare.png"> <strong>SlideShare</strong><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
                         <br/><br/>
                         
                         <div align="center"> OR </div>
@@ -63,16 +63,16 @@
                 </li>
               
               
-                <li id="file-browser" style="display:none;">                  
+                <li id="file-browser">                  
                   ${form.begin(request.route_url('importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}
-                  <div class="upload-form" style="display:none">          
+                  <span class="upload-form" style="display:none">          
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
                     
                     <input type='hidden' id='upload-to-ss' value="">
                     <input type='hidden' id='upload-to-google' value="">
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
-                  </div>             
+                  </span>             
                   <span class="formentry">
                     <div class="formlabel">Introductory paragraph</div>
                     <div class="forminfo">A small intoduction for the slides</div>
