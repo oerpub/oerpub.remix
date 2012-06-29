@@ -47,17 +47,17 @@
               
               <ul id="create-new-list">
                 <li>
-                    <span class ="label-text">
-                        <div class="left" style="float:left; clear:both;"><img src="${images_url}/google-docs.png"> <strong>Google Presentations</strong></div> or
+                    <span class ="label-text" id="choose-importer-box">
+                        <div class="left" style="float:left; clear:both;"><img src="${images_url}/google-docs-22.png"> <strong>Google Presentations</strong></div> or
                         <div class="right"><img src="${images_url}/slideshare.png"> <strong>SlideShare</strong></div>
                         <div class="left" style="float:left; clear:both;"><input type="checkbox" name="importer" value="google" /></div>
                         <div class="right"><input type="checkbox" name="importer" value="slideshare" /></div>
-
+                        <input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit">
 
                     </span>
                 </li>
               </ul>
-              <ul id="create-new-list">
+              <ul id="create-new-list"  style="display:none;">
                 <li>                  
                   ${form.begin(request.route_url('importer'), multipart='multipart', id='importform')}
                   ${form.csrf_token()}

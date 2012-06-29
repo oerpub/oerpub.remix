@@ -308,7 +308,11 @@ $(document).ready(function() {
     $('input#url-submit').click(function(event){
         showWaitMessage();
     });
-
+    
+    $('input#choose-importer').click(function(event){
+        $("#choose-importer-box").hide();
+        $("#create-new-list").show();
+    });
 });
 
 function _doAction(message, event) {
