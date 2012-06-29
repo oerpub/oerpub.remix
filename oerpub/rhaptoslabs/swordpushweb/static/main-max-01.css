@@ -243,6 +243,11 @@ label img{
   padding-top: 1em;
 }
 
+div.left {
+    float: left;
+    clear: both;
+}
+
 #edit-existing-contents ul, #edit-existing-contents li{
   list-style-type: none;
   display: block;

@@ -48,17 +48,11 @@
               <ul id="create-new-list">
                 <li>
                     <span class ="label-text" id="choose-importer-box">
-                        <div class="left" style="float:left; clear:both; padding:3px;"><img src="${images_url}/slideshare.png"> <strong>SlideShare</strong><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
-                        <br/><br/>
-                        
-                        <div align="center"> OR </div>
-                        
-                        <div class="left" style="float:left; clear:both; padding:3px"><img src="${images_url}/google-docs-22.png"> <strong>Google Presentations</strong> <input type="checkbox" id="import-to-ss" name="importer" value="google"/></div> 
-                        
-                        
-                        
+                        <div class="left"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></div>
+                        <div class="right"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></div> 
+                        <div class="left"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>                    
+                        <div class="right"><input type="checkbox" id="import-to-ss" name="importer" value="google"/></div>
                         <input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit">
-
                     </span>
                 </li>
               
