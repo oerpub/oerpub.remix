@@ -1051,6 +1051,31 @@ def admin_config_view(request):
         'config': config,
     }
     return response
+
+
+def get_oauth_token_and_secret(username):
+    try:
+        connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
+        with connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT oauth_token,oauth_secret FROM users WHERE username='"+username+"'")
+            row = cursor.fetchone()
+            return {"oauth_token": row[0],"oauth_secret":row[1]}            
+    except mdb.Error, e::
+        print e
+
+def is_returning_google_user(username):
+    connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')    
+    query = "SELECT * FROm user WHERE username="+username
+    with con:
+        cur = con.cursor()
+        cur.execute(query)
+        numrows = int(cur.rowcount)
+        if numrows == 0:
+            return True
+        else :
+            return False
+
     
 @view_config(route_name='importer',renderer='templates/importer.pt')
 def return_slideshare_upload_form(request):
@@ -1088,7 +1113,24 @@ def return_slideshare_upload_form(request):
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
         input_file.close()
-        slideshow_id = upload_to_slideshare("saketkc",original_filename)        
+        upload_to_google = form.data['upload_to_google']
+        upload_to_ss = form.data['upload_to_ss']
+        if (upload_to_ss=="true"):
+            slideshow_id = upload_to_slideshare("saketkc",original_filename)        
+        if (upload_to_goole == "true"):
+            if is_returning_google_user(username):
+                oauth_token_and_secret = get_oauth_token_and_secret(username)
+                oauth_token = oauth_token_and_secret["oauth_token"]
+                oauth_secret = oauth_token_and_secret["oauth_secret"]
+                guploader = GooglePresentationUploader()
+                guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)               
+                print guploader
+                upload_to_gdocs = guploader.upload(original_filename)
+                #guploader.get_resource_id()
+                guploader.get_first_revision_feed()
+                guploader.publish_presentation_on_web()
+                resource_id = guploader.get_resource_id().split(':')[1]
+                form.data['upload'] = None            
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
@@ -1100,8 +1142,7 @@ def return_slideshare_upload_form(request):
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")     
         session['userfilepath'] = zipped_filepath
-        print form.data['upload_to_google']
-        print form.data['upload_to_ss']
+        
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)	
         username = session['username']    
@@ -1262,20 +1303,6 @@ def importer(request):
     
         if connection:
             connection.close()
-
-    
-def is_returning_google_user(username):
-    connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')    
-    query = "SELECT * FROm user WHERE username="+username
-    with con:
-        cur = con.cursor()
-        cur.execute(query)
-        numrows = int(cur.rowcount)
-        if numrows == 0:
-            return True
-        else :
-            return False
-    
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):

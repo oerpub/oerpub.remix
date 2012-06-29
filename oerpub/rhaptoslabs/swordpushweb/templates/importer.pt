@@ -69,8 +69,8 @@
                   <div class="upload-form">          
                     <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
                     
-                    <input type='hidden' name='upload_to_ss' id='upload-to-ss' value="">
-                    <input type='hidden' name='upload_to_google' id='upload-to-google' value="">
+                    <input type='hidden' name='upload_to_ss' id='upload-to-ss' value="false">
+                    <input type='hidden' name='upload_to_google' id='upload-to-google' value="false">
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                   </div>             
                   <span class="formentry">
