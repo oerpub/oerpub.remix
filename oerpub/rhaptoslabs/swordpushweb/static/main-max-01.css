@@ -246,7 +246,10 @@ label img{
 div.left {
     float: left;
     clear: both;
+    padding : 4px;
+
 }
+
 div.right {
     float: right;    
 }

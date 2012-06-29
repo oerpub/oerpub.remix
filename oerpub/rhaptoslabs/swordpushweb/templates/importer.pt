@@ -47,13 +47,14 @@
               
               <ul id="create-new-list">
                 <li>
-                
-                    <div class ="upload-form" id="choose-importer-box">
+                    <div class="upload-form" id="choose-importer-box">                        
                         <div class="left"><span class="label-text"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
-                        <div class="right"><span class="label-text"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div> 
-                        <div class="left"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>                    
                         <div class="right"><input type="checkbox" id="import-to-ss" name="importer" value="google"/></div>
-                        <input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit">
+                        <br/><br/>
+                        <div class="left"><span class="label-text"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
+                        <div class="right"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <br/><br/><br/><br/>
+                        <div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
                         <br/><br/>
                     </div>
                 </li>
@@ -68,14 +69,15 @@
                     <input type='hidden' name='upload_to_ss' id='upload-to-ss' value="false">
                     <input type='hidden' name='upload_to_google' id='upload-to-google' value="false">
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
-                  </div>             
-                  <span class="formentry">
-                    <div class="formlabel">Introductory paragraph</div>
-                    <div class="forminfo">A small intoduction for the slides</div>
-                    <div class="formfield">
-                        <textarea name="introductory_paragraphs" rows="6" cols="60"></textarea>
-                    </div>
-                  </span>
+                            
+                    <span class="label-text">
+                      <div class="formlabel">Introductory paragraph</div>
+                      <div class="forminfo">A small intoduction for the slides</div>
+                      <div class="formfield">
+                          <textarea name="introductory_paragraphs" rows="6" cols="60"></textarea>
+                      </div>
+                    </span>
+                  </div>   
                 </li>
               </ul>
               ${form.end()}
