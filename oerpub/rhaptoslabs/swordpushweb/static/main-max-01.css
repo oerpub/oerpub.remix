@@ -247,6 +247,11 @@ div.left {
     float: left;
     clear: both;
 }
+div.left {
+    float: right;
+    clear: both;
+}
+
 
 #edit-existing-contents ul, #edit-existing-contents li{
   list-style-type: none;
