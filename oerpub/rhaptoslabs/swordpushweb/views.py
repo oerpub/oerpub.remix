@@ -1067,8 +1067,8 @@ def get_oauth_token_and_secret(username):
 def is_returning_google_user(username):
     connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')    
     query = "SELECT * FROm user WHERE username="+username
-    with con:
-        cur = con.cursor()
+    with connection:
+        cur = connection.cursor()
         cur.execute(query)
         numrows = int(cur.rowcount)
         if numrows == 0:
