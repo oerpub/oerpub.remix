@@ -26,6 +26,7 @@ def main(global_config, **settings):
     config.add_route('google_oauth', '/google_oauth')
     config.add_route('oauth2callback', '/oauth2callback')
     config.add_route('updatecnx', '/updatecnx')
+    config.add_route('slideshow_preview', '/slideshow_preview')
 
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests

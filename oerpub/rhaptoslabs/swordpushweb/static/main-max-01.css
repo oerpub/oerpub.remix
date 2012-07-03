@@ -394,7 +394,7 @@ h1{
   margin: 0;
 }
 
-iframe{
+iframe#login-frame{
   height: 100%;
   border: 1px dotted #bbb;
 }

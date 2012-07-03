@@ -6,14 +6,13 @@ import traceback
 import libxml2
 import re
 from BeautifulSoup import BeautifulSoup
-import _mysql
 import MySQLdb as mdb
 from cStringIO import StringIO
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
-from pyramid.response import Response
+
 
 import formencode
 
@@ -1067,11 +1066,12 @@ def get_oauth_token_and_secret(username):
 def is_returning_google_user(username):
     connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')    
     query = "SELECT * FROM user WHERE username='"+username+"'"
+    print query
     with connection:
-        cur = connection.cursor()
-        cur.execute(query)
-        numrows = int(cur.rowcount)
-        print "NUM ROWS",numrows
+        cursor = connection.cursor()
+        cursor.execute(query)
+        numrows = int(cursor.rowcount)
+        connection.close()      
         if numrows == 0:
             return False
         else :
@@ -1083,6 +1083,8 @@ def return_slideshare_upload_form(request):
     check_login(request)
     config = load_config(request)
     session = request.session
+    if session.has_key('original-file-location'):
+        del session['original-file-location']
     form = Form(request, schema=ImporterSchema)
     response = {'form':FormRenderer(form)}
     validate_form = form.validate()
@@ -1118,23 +1120,23 @@ def return_slideshare_upload_form(request):
         upload_to_ss = form.data['upload_to_ss']
         username = session['username']
         if (upload_to_ss=="true"):
-            #slideshow_id = upload_to_slideshare("saketkc",original_filename)        
-            slideshow_id="123"
-            print "ss"
+            slideshow_id = upload_to_slideshare("saketkc",original_filename)
+            session['slideshow_id'] = slideshow_id
         if (upload_to_google == "true"):
             if is_returning_google_user(username):
                 oauth_token_and_secret = get_oauth_token_and_secret(username)
                 oauth_token = oauth_token_and_secret["oauth_token"]
-                oauth_secret = oauth_token_and_secret["oauth_secret"]
+                oauth_secret = oauth_token_and_secret["oauth_secret"]              
                 guploader = GooglePresentationUploader()
-                guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)               
-                print guploader
-                upload_to_gdocs = guploader.upload(original_filename)
-                #guploader.get_resource_id()
+                guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)
+                upload_to_gdocs = guploader.upload(original_filename)                
                 guploader.get_first_revision_feed()
                 guploader.publish_presentation_on_web()
-                resource_id = guploader.get_resource_id().split(':')[1]
-                form.data['upload'] = None            
+                resource_id = guploader.get_resource_id().split(':')[1]                
+                session['google-resource-id'] = resource_id    
+                form.data['upload'] = None
+            else:
+                session['original-file-path'] = original_filename
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
@@ -1146,13 +1148,11 @@ def return_slideshare_upload_form(request):
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")     
         session['userfilepath'] = zipped_filepath
-        
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)	
         username = session['username']    
         slideshare_details = get_details(slideshow_id)
         slideshare_download_url = get_slideshow_download_url(slideshare_details)
-        #config['metadata']['introductory_paragraphs']  = get_transcript(slideshare_details)
         session['transcript'] = get_transcript(slideshare_details)
         cnxml = """
 <document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
@@ -1235,11 +1235,45 @@ def return_slideshare_upload_form(request):
         data = soup.find("link",rel="edit")
         edit_iri = data['href']
         session['edit_iri'] = edit_iri
+        if session.has_key('original-file-location'):
+            raise HTTPFound(location=request.route_url('google_oauth'))    
         raise HTTPFound(location=request.route_url('updatecnx'))    
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
 
 @view_config(route_name='oauth2callback')
-def importer(request):
+def google_oauth_callback(request):
+    url = request.host_url + request.path_qs
+    url =  url.replace('%2F','/')
+    
+    if not request.session.has_key('saved_request_token'):
+        return HTTPFound(location = '/google_oauth')
+    oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
+    
+    oauth.authorize_request_token(request.session['saved_request_token'],url)
+    oauth.get_access_token()
+    session = request.session    
+    
+    print oauth.get_token_key()
+    print oauth.get_token_secret()        
+    
+    connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
+    oauth_token =  oauth.get_token_key()
+    oauth_secret = oauth.get_token_secret()    
+    query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_secret+"'"+")"     
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT oauth_token,oauth_secret FROM user WHERE username='"+username+"'")
+        connection.close()
+    guploader = GooglePresentationUploader()
+    guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)
+    upload_to_gdocs = guploader.upload(session['original-file-path'])
+    guploader.get_first_revision_feed()
+    guploader.publish_presentation_on_web()
+    resource_id = guploader.get_resource_id().split(':')[1]
+    session['google-resource-id'] = resource_id
+    if session.has_key('original-file-location'):
+        del session['original-file-location']
+    raise HTTPFound(location=request.route_url('updatecnx'))    
     """templatePath = 'templates/importer.pt'
     form = Form(request, schema=UploadSchema)
     config = load_config(request)
@@ -1289,7 +1323,7 @@ def importer(request):
 		return render_to_response(templatePath,response,request=request)
     response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
     return render_to_response(templatePath, response, request=request)"""
-    session = request.session
+    """session = request.session
     try:
         connection = _mysql.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')
         oauth_token =  request.GET.get('oauth_token')
@@ -1306,19 +1340,18 @@ def importer(request):
     finally:
     
         if connection:
-            connection.close()
+            connection.close()"""
+            
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
     session = request.session
-    username = session['username']
-    if (is_returning_google_user(username)):
-        return HTTPFound(location=request.route_url('slideshare_importer'))
+    username = session['username']    
     oauth = GoogleOAuth()
     oauth.set_oauth_callback_url()
     saved_request_token = oauth.get_oauth_token_from_google()
     request.session['saved_request_token'] = saved_request_token    
-    return HTTPFound(location=str(oauth2.get_authorization_url_from_google()))
+    return HTTPFound(location=str(oauth.get_authorization_url_from_google()))
 
 @view_config(route_name='updatecnx')
 def update_cnx_metadata(request):
@@ -1423,7 +1456,7 @@ def update_cnx_metadata(request):
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)        
-        return HTTPFound(location=request.route_url('slideshare_importer'))     
+        return HTTPFound(location=request.route_url('slideshow_preview'))     
     response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
@@ -1432,4 +1465,24 @@ def update_cnx_metadata(request):
         'subjects': subjects,
         'config': config,
     }    
+    return render_to_response(templatePath, response, request=request)
+
+@view_config(route_name='slideshow_preview')
+def slideshow_preview(request):
+    session = request.session
+    google_resource_id = ""
+    slideshare_id = ""
+    embed_google = False
+    embed_slideshare = False
+    if session.has_key('google-resource-id'):
+        google_resource_id = session['google-resource-id']
+    if session.has_key('slideshare_id'):
+        slideshare_id = session['slideshare-id']
+    if google_resource_id!="":
+        embed_google = True
+    if slideshare_id!="":
+        embed_slideshare = True
+    templatePath = "templates/google_ss_preview.pt"
+        
+    response = {"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare}
     return render_to_response(templatePath, response, request=request)
