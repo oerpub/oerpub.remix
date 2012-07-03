@@ -6,13 +6,14 @@ import traceback
 import libxml2
 import re
 from BeautifulSoup import BeautifulSoup
+import _mysql
 import MySQLdb as mdb
 from cStringIO import StringIO
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
-
+from pyramid.response import Response
 
 import formencode
 
@@ -1067,15 +1068,16 @@ def is_returning_google_user(username):
     connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')    
     query = "SELECT * FROM user WHERE username='"+username+"'"
     print query
+    numrows=0
     with connection:
         cursor = connection.cursor()
         cursor.execute(query)
         numrows = int(cursor.rowcount)
-        connection.close()      
-        if numrows == 0:
-            return False
-        else :
-            return True
+    connection.close()      
+    if numrows == 0:
+        return False
+    else :
+        return True
 
     
 @view_config(route_name='importer',renderer='templates/importer.pt')
@@ -1124,6 +1126,7 @@ def return_slideshare_upload_form(request):
             session['slideshow_id'] = slideshow_id
         if (upload_to_google == "true"):
             if is_returning_google_user(username):
+                print "RETURNING USER"
                 oauth_token_and_secret = get_oauth_token_and_secret(username)
                 oauth_token = oauth_token_and_secret["oauth_token"]
                 oauth_secret = oauth_token_and_secret["oauth_secret"]              
@@ -1134,9 +1137,13 @@ def return_slideshare_upload_form(request):
                 guploader.publish_presentation_on_web()
                 resource_id = guploader.get_resource_id().split(':')[1]                
                 session['google-resource-id'] = resource_id    
+                print "UPLOADING TO GOOGLE"
                 form.data['upload'] = None
             else:
+                print "NEW USER"
                 session['original-file-path'] = original_filename
+        else:
+            print "NO GOOGLE FOUND"
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
@@ -1195,8 +1202,7 @@ def return_slideshare_upload_form(request):
   <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
        Changes to the links section in the source will not be saved. -->
     <link-group type="supplemental">
-      <link url="Training_Authoring.ppt" strength="3">Download the original slides in PPT format</link>
-      <link url="http://cnx.org/content/col10151/latest/" strength="2">The Textbook: Learning to author in Connexions</link>
+      <link url="""+ "\"" + uploaded_filename + "\""+""" strength="3">Download the original slides in PPT format</link>      
       <link url="""+ "\"" +slideshare_download_url + "\"" +""" strength="2">SlideShare PPT Download Link</link>
     </link-group>
   <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
@@ -1262,13 +1268,13 @@ def google_oauth_callback(request):
     query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_secret+"'"+")"     
     with connection:
         cursor = connection.cursor()
-        cursor.execute("SELECT oauth_token,oauth_secret FROM user WHERE username='"+username+"'")
-        connection.close()
+        cursor.execute(query)
+    connection.close()
     guploader = GooglePresentationUploader()
     guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)
     upload_to_gdocs = guploader.upload(session['original-file-path'])
     guploader.get_first_revision_feed()
-    guploader.publish_presentation_on_web()
+    guploader.publish_presentation_on_web()    
     resource_id = guploader.get_resource_id().split(':')[1]
     session['google-resource-id'] = resource_id
     if session.has_key('original-file-location'):
@@ -1477,7 +1483,7 @@ def slideshow_preview(request):
     if session.has_key('google-resource-id'):
         google_resource_id = session['google-resource-id']
     if session.has_key('slideshare_id'):
-        slideshare_id = session['slideshare-id']
+        slideshare_id = session['slideshare_id']
     if google_resource_id!="":
         embed_google = True
     if slideshare_id!="":
