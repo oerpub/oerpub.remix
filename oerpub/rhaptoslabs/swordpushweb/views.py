@@ -1123,7 +1123,7 @@ def return_slideshare_upload_form(request):
         username = session['username']
         if (upload_to_ss=="true"):
             slideshow_id = upload_to_slideshare("saketkc",original_filename)
-            session['slideshow_id'] = slideshow_id
+            session['slideshare_id'] = slideshow_id
         if (upload_to_google == "true"):
             if is_returning_google_user(username):
                 print "RETURNING USER"
