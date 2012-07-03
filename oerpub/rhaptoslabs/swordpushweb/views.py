@@ -1241,7 +1241,7 @@ def return_slideshare_upload_form(request):
         data = soup.find("link",rel="edit")
         edit_iri = data['href']
         session['edit_iri'] = edit_iri
-        if session.has_key('original-file-location'):
+        if session.has_key('original-file-path'):
             raise HTTPFound(location=request.route_url('google_oauth'))    
         raise HTTPFound(location=request.route_url('updatecnx'))    
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
@@ -1249,19 +1249,13 @@ def return_slideshare_upload_form(request):
 @view_config(route_name='oauth2callback')
 def google_oauth_callback(request):
     url = request.host_url + request.path_qs
-    url =  url.replace('%2F','/')
-    
+    url =  url.replace('%2F','/')    
     if not request.session.has_key('saved_request_token'):
         return HTTPFound(location = '/google_oauth')
-    oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
-    
+    oauth = GoogleOAuth(request_token = request.session['saved_request_token'])    
     oauth.authorize_request_token(request.session['saved_request_token'],url)
     oauth.get_access_token()
-    session = request.session    
-    
-    print oauth.get_token_key()
-    print oauth.get_token_secret()        
-    
+    session = request.session 
     connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
     oauth_token =  oauth.get_token_key()
     oauth_secret = oauth.get_token_secret()    
@@ -1280,74 +1274,7 @@ def google_oauth_callback(request):
     if session.has_key('original-file-location'):
         del session['original-file-location']
     raise HTTPFound(location=request.route_url('updatecnx'))    
-    """templatePath = 'templates/importer.pt'
-    form = Form(request, schema=UploadSchema)
-    config = load_config(request)
-    field_list = [('upload', 'File')]
-    if not 'form.submitted' in request.POST:
-		url = request.host_url + request.path_qs
-		request.session['url'] = url.replace('%2F','/')
-
-    #if not request.session.has_key('url'):
-
-		#request.session['oauth_verifier'] = request.GET('oauth_verifier')
-
-    if form.validate():
-		oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
-		url = request.session['url'] #+'&oauth_token=' + request.session['oauth_token']
-		print url
-		oauth.authorize_request_token(request.session['saved_request_token'],url)
-		access_token = oauth.get_access_token()
-		guploader = GooglePresentationUploader()
-		guploader.authentincate_client_with_oauth2(oauth.get_token_key(),oauth.get_token_secret())
-		print oauth.get_token_secret()
-		print oauth.get_token_key()
-
-
-		original_filename = os.path.join(
-                    "/home/saket",
-                    form.data['upload'].filename.replace(os.sep, '_'))
-                saved_file = open(original_filename, 'wb')
-                input_file = form.data['upload'].file
-                shutil.copyfileobj(input_file, saved_file)
-                saved_file.close()
-                input_file.close()
-                upload_to_ss = upload_to_slideshare("saketkc",original_filename)
-                print guploader
-                upload_to_gdocs = guploader.upload(original_filename)
-                #guploader.get_resource_id()
-                guploader.get_first_revision_feed()
-                guploader.publish_presentation_on_web()
-                resource_id = guploader.get_resource_id().split(':')[1]
-                form.data['upload'] = None
-
-		templatePath = "templates/google_ss_preview.pt"
-		response = {"google_resource_id" : resource_id,}
-		return HTTPFound(location=request.route_url('updatecnx'))
-		
-
-		return render_to_response(templatePath,response,request=request)
-    response = {'form': FormRenderer(form),'field_list': field_list, 'config': config,}
-    return render_to_response(templatePath, response, request=request)"""
-    """session = request.session
-    try:
-        connection = _mysql.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')
-        oauth_token =  request.GET.get('oauth_token')
-        oauth_verifier = request.GET.get('oauth_verifier')        
-        query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_verifier+"'"+")"     
-        connection.query(query)
-        return HTTPFound(request.route_url('slideshare_importer'))
     
-    except _mysql.Error, e:
-  
-        print "Error %d: %s" % (e.args[0], e.args[1])
-        
-
-    finally:
-    
-        if connection:
-            connection.close()"""
-            
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
