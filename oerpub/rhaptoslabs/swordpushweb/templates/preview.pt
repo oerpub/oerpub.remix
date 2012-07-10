@@ -66,16 +66,8 @@
 
                 </div>
 
-                <script type="text/javascript">
-                    function ForcePreviewReload () {
-                        var src = jQuery('iframe#preview-frame.preview').attr('src');
-                        jQuery('iframe#preview-frame.preview').attr('src');
-                    }
-                </script>
-
-                <iframe class="preview fitted" id="preview-frame" src="${body_url}" id="preview_frame"
-                    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto"
-                    onload="ForcePreviewReload()">
+                <iframe class="preview fitted" id="preview-frame" src="#" preview_url="${body_url}" id="preview_frame"
+                    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
                 </iframe>
 
             </div>

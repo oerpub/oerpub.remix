@@ -40,7 +40,7 @@ def main(global_config, **settings):
     config.add_static_view(
         'transforms',
         'oerpub.rhaptoslabs.swordpushweb:transforms',
-        cache_max_age=3600)
+        cache_max_age=0)
 
     config.add_subscriber(
         '.subscribers.add_base_template',

@@ -50,10 +50,18 @@
                 var phwh = $("#pageheader-wrap").outerHeight();
                 var ma = $("#module-actions .advanced").outerWidth();
 
-                // Make the iframe fit exactly inside the remaining space
-                $("iframe.fitted").height(winh - headerh - wfnh - contentp - phwh + 5);
-                $("iframe.fitted").width($(window).width() - 53);
-                $("iframe.fitted").contents().find('body').addClass('preview');
+                var fittedframe = $("iframe.fitted");
+                if (fittedframe.length > 0) {
+                    // Make the iframe fit exactly inside the remaining space
+                    $(fittedframe).height(winh - headerh - wfnh - contentp - phwh + 5);
+                    $(fittedframe).width($(window).width() - 53);
+                    $(fittedframe).contents().find('body').addClass('preview');
+                    // if we have a preview_url, reload it
+                    var p_url = $(fittedframe).attr('preview_url');
+                    if (p_url.length > 0) {
+                        $(fittedframe).attr('src', p_url);
+                    }
+                } 
 
                 /* Give the page's header the correct top margin (since the elements above
                    it are in a fixed position)
