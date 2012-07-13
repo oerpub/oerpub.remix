@@ -31,6 +31,7 @@ import gdata.docs.client
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
+import urllib
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, show_slideshow,get_details,get_number_of_slides,get_download_link,get_slideshow_status,get_slideshow_download_url,get_transcript
@@ -1127,6 +1128,7 @@ def return_slideshare_upload_form(request):
         if (upload_to_google == "true"):
             if is_returning_google_user(username):
                 print "RETURNING USER"
+                redirect_to_google_oauth = False
                 oauth_token_and_secret = get_oauth_token_and_secret(username)
                 oauth_token = oauth_token_and_secret["oauth_token"]
                 oauth_secret = oauth_token_and_secret["oauth_secret"]              
@@ -1141,6 +1143,7 @@ def return_slideshare_upload_form(request):
                 form.data['upload'] = None
             else:
                 print "NEW USER"
+                redirect_to_google_oauth = True
                 session['original-file-path'] = original_filename
         else:
             print "NO GOOGLE FOUND"
@@ -1240,8 +1243,18 @@ def return_slideshare_upload_form(request):
         soup = BeautifulSoup(deposit_receipt.to_xml())
         data = soup.find("link",rel="edit")
         edit_iri = data['href']
-        session['edit_iri'] = edit_iri
-        if session.has_key('original-file-path'):
+        session['edit_iri'] = edit_iri        
+        creator = soup.find('dcterms:creator')
+        email = creator["oerdc:email"]
+        url = "http://connexions-oerpub.appspot.com/"
+		
+        post_values = {"username":username,"email":email,"slideshow_id":slideshow_id}
+        data = urllib.urlencode(post_values)
+        google_req = urllib2.Request(url, data)
+        google_response = urllib2.urlopen(google_req) 
+
+        #print deposit_receipt.metadata #.get("dcterms_title")
+        if redirect_to_google_oauth:
             raise HTTPFound(location=request.route_url('google_oauth'))    
         raise HTTPFound(location=request.route_url('updatecnx'))    
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
