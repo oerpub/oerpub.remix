@@ -6,7 +6,6 @@ import traceback
 import libxml2
 import re
 from BeautifulSoup import BeautifulSoup
-import _mysql
 import MySQLdb as mdb
 from cStringIO import StringIO
 from lxml import etree
@@ -14,12 +13,9 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
-
 import formencode
-
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
-
 from languages import languages
 from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
@@ -1429,6 +1425,27 @@ def slideshow_preview(request):
     if slideshare_id!="":
         embed_slideshare = True
     templatePath = "templates/google_ss_preview.pt"
+    if request.method=='POST':
+        all_post_data = request.POST.get('all_post_data')
+        i=1
+        cnxml="""<section id="test-section"><title>Test your knowledge</title>"""
+        for question,value in all_post_data:
+            options = value['options']
+            solution = value['correct']
+            optionlist=""
+            for option in options:
+                optionlist+="<item>"+option+"</item>"
+            cnxml+="""<exercise id="exercise-"""+str(i)+""""> <problem
+            id="problem-"""+str(i)+""""> <para id="para- """+str(i)+"""">
+            """+str(question)+"""<list id="option-list- """+str(i)+""""
+            list-type="enumerated" number-style="lower-alpha"
+            """+str(optionlist)+"""</list></para></problem>"""
+            cnxml+=""" <solution id="solution-"""+str(i)+"""" > <para
+            id="solution-para- """+str(i)+""""
+            >"""+solution+"""</para></solution></exercise>"""
+
         
+
+
     response = {"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare}
     return render_to_response(templatePath, response, request=request)
