@@ -1413,9 +1413,9 @@ def slideshow_preview(request):
         all_post_data = {"question1":{"options":option1,"solution":solution1}}
         i=1
         cnxml=session["cnxml"]+"""<section id="test-section"><title>Test your knowledge</title>"""
-        for question,value in all_post_data:
-            options = value['options']
-            solution = value['solution']
+        for question in all_post_data:
+            options = all_post_data[question]['options']
+            solution = all_post_data[question]['solution']
             optionlist=""
             for option in options:
                 optionlist+="<item>"+option+"</item>"
