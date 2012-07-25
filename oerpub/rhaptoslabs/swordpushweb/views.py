@@ -1457,7 +1457,7 @@ def slideshow_preview(request):
         email = creator["oerdc:email"]
         url = "http://connexions-oerpub.appspot.com/"
 		
-        post_values = {"username":username,"email":email,"slideshow_id":slideshow_id}
+        post_values = {"username":username,"email":email,"slideshow_id":slideshare_id}
         data = urllib.urlencode(post_values)
         google_req = urllib2.Request(url, data)
         google_response = urllib2.urlopen(google_req) 
