@@ -1453,6 +1453,7 @@ def slideshow_preview(request):
         edit_iri = data['href']
         session['edit_iri'] = edit_iri        
         creator = soup.find('dcterms:creator')
+        username = session['username'] 
         email = creator["oerdc:email"]
         url = "http://connexions-oerpub.appspot.com/"
 		
@@ -1460,6 +1461,7 @@ def slideshow_preview(request):
         data = urllib.urlencode(post_values)
         google_req = urllib2.Request(url, data)
         google_response = urllib2.urlopen(google_req) 
+        
         
             
 
