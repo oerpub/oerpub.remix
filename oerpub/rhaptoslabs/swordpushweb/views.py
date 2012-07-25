@@ -1408,7 +1408,7 @@ def slideshow_preview(request):
     templatePath = "templates/google_ss_preview.pt"
     if validate_form:
         question1 = request.POST.get('question1')
-        options1 = request.POST.get('options1').split()
+        option1 = request.POST.get('options1').split()
         solution1 = request.POST.get('solution1')
         all_post_data = {"question1":{"options":option1,"solution":solution1}}
         i=1
