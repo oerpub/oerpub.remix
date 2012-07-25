@@ -1216,14 +1216,11 @@ def return_slideshare_upload_form(request):
   <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
        Changes to the links section in the source will not be saved. -->
 </featured-links>"""
-"""
-<content>
-  <para id="intro-para-1">"""+form.data['introductory_paragraphs']+"""
-  
+"""<content>
+  <para id="intro 
   </para>
 </content>
 </document>"""
-        
         session['title'] = uploaded_filename.split(".")[0]
         metadata = {}
         metadata['dcterms:title'] = uploaded_filename.split(".")[0]
