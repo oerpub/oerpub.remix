@@ -1152,11 +1152,7 @@ def return_slideshare_upload_form(request):
                 session['original-file-path'] = original_filename
         else:
             print "NO GOOGLE FOUND"
-        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
-                                    user_name=session['username'],
-                                    user_pass=session['password'],
-                                    always_authenticate=True,
-                                    download_service_document=True)
+        
         #collections = [{'title': i.title, 'href': i.href}
         #                          for i in sword2cnx.get_workspaces(conn)]
         #session['collections'] = collections
@@ -1433,7 +1429,12 @@ def slideshow_preview(request):
         zipped_filepath = session['userfilepath']
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.writestr("index.cnxml",cnxml)
-        zip_archive.close()	   
+        zip_archive.close()
+        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)	   
         with open(zipped_filepath, 'rb') as zip_file:
             deposit_receipt = conn.create(
                 col_iri = workspaces[0][0],
