@@ -1409,7 +1409,7 @@ def slideshow_preview(request):
     if validate_form:
         question1 = request.POST.get('question1')
         options1 = request.POST.get('options1').split()
-        solution1 = request.POST.get('solutions1')
+        solution1 = request.POST.get('solution1')
         all_post_data = {"question1":{"options":option1,"solution":solution1}}
         i=1
         cnxml=session["cnxml"]+"""<section id="test-section"><title>Test your knowledge</title>"""
