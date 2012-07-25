@@ -1416,8 +1416,8 @@ def slideshow_preview(request):
             for option in options:
                 optionlist+="<item>"+option+"</item>"
             cnxml+="""<content><para id="introduction-1">Introduction goes here</para>
-            <exercise id="exercise-"""+str(i)+""""> <problem
-            id="problem-"""+str(i)+""""> <para id="para- """+str(i)+"""">
+            <exercise id="exercise-"""+str(i)+""""> <problem id="problem-"""+str(i)+""""> 
+            <para id="para- """+str(i)+"""">
             """+str(question)+"""<list id="option-list- """+str(i)+""""
             list-type="enumerated" number-style="lower-alpha"
             """+str(optionlist)+"""</list></para></problem>"""
@@ -1425,13 +1425,14 @@ def slideshow_preview(request):
             id="solution-para- """+str(i)+""""
             >"""+solution+"""</para></solution></exercise>"""
             i+=1
+        print cnxml
         metadata = session['metadata']
         cnxml += "</content></document>"
         workspaces = [(i['href'], i['title']) for i in session['collections']]        
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-        zip_archive.writestr("index.cnxml",session['cnxml'])#+"""<content><para id="introduction-1">Introduction goes here</para></content></document>""")
+        zip_archive.writestr("index.cnxml",cnxml)#+"""<content><para id="introduction-1">Introduction goes here</para></content></document>""")
         zip_archive.close()
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
