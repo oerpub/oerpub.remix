@@ -1106,6 +1106,7 @@ def return_slideshare_upload_form(request):
         else:
             return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': slideshow_id, 'download_link': download_link}
     if validate_form:
+		redirect_to_google_oauth = False
 
         ## Create a temp directory with the username and current timestamp for it to be unique
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
