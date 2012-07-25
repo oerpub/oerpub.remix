@@ -1415,7 +1415,7 @@ def slideshow_preview(request):
             optionlist=""
             for option in options:
                 optionlist+="<item>"+option+"</item>"
-            cnxml+="""<exercise id="exercise-"""+str(i)+""""> <problem
+            cnxml+="""<content><para id="introduction-1">Introduction goes here</para><exercise id="exercise-"""+str(i)+""""> <problem
             id="problem-"""+str(i)+""""> <para id="para- """+str(i)+"""">
             """+str(question)+"""<list id="option-list- """+str(i)+""""
             list-type="enumerated" number-style="lower-alpha"
@@ -1424,6 +1424,7 @@ def slideshow_preview(request):
             id="solution-para- """+str(i)+""""
             >"""+solution+"""</para></solution></exercise>"""
         metadata = session['metadata']
+        cnxml += "</content></document>"
         workspaces = [(i['href'], i['title']) for i in session['collections']]        
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
