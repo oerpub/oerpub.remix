@@ -1417,12 +1417,12 @@ def slideshow_preview(request):
                 optionlist+="<item>"+option+"</item>"
             cnxml+="""
             <exercise id="exercise-"""+str(i)+""""> <problem id="problem-"""+str(i)+""""> 
-            <para id="para- """+str(i)+"""">
-            """+str(question)+"""<list id="option-list- """+str(i)+""""
+            <para id="para-"""+str(i)+"""">
+            """+str(question)+"""<list id="option-list-"""+str(i)+""""
             list-type="enumerated" number-style="lower-alpha"
             """+str(optionlist)+"""</list></para></problem>"""
             cnxml+=""" <solution id="solution-"""+str(i)+"""" > <para
-            id="solution-para- """+str(i)+""""
+            id="solution-para-"""+str(i)+""""
             >"""+solution+"""</para></solution></exercise></section>"""
             i+=1
         print cnxml
