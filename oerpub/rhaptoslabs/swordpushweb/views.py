@@ -1169,6 +1169,11 @@ def return_slideshare_upload_form(request):
         slideshare_details = get_details(slideshow_id)
         slideshare_download_url = get_slideshow_download_url(slideshare_details)
         session['transcript'] = get_transcript(slideshare_details)
+        session['title'] = uploaded_filename.split(".")[0]
+        metadata = {}
+        metadata['dcterms:title'] = uploaded_filename.split(".")[0]
+        
+        
         cnxml = """
 <document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
   <title>TEST DOC</title>
@@ -1221,10 +1226,6 @@ def return_slideshare_upload_form(request):
   </para>
 </content>
 </document>"""
-        session['title'] = uploaded_filename.split(".")[0]
-        metadata = {}
-        metadata['dcterms:title'] = uploaded_filename.split(".")[0]
-        
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
