@@ -1431,7 +1431,7 @@ def slideshow_preview(request):
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-        zip_archive.writestr("index.cnxml",session['cnxml']+"""<content><para id="introduction-1">Introduction goes here</para></content></document>""")
+        zip_archive.writestr("index.cnxml",session['cnxml'])#+"""<content><para id="introduction-1">Introduction goes here</para></content></document>""")
         zip_archive.close()
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
