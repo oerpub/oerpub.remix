@@ -70,6 +70,30 @@
                         scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0" allowfullscreen>
                     </iframe>
                 </p>
+                ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
+                ${form.csrf_token()}
+                <span>
+                      <div class="formlabel">Question 1 </div>
+                      <div class="forminfo">Question 1</div>
+                      <div class="formfield">
+                          <input type="text" name="question1" id="question1">                          
+                      </div>                                         
+                      <div class="formlabel">Options 1 </div>
+                      <div class="forminfo">Options one on on line</div>
+                      <div class="formfield">
+                          <input type="text" name="options1" id="options1">                          
+                      </div>
+                      
+                      <div class="formlabel">Solution </div>
+                      <div class="forminfo">Solution</div>
+                      <div class="formfield">
+                          <input type="text" name="solutions1" id="solutions1">                          
+                      </div>
+                      <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
+
+                  
+                </span>
+                ${form.close()}
                 
                 
 

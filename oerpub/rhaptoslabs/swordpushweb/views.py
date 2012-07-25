@@ -192,6 +192,14 @@ class ImporterSchema(formencode.Schema):
     upload_to_ss = formencode.validators.String()
     upload_to_google = formencode.validators.String()
     introductory_paragraphs = formencode.validators.String()
+    
+class QuestionAnswerSchema(formencode.Schema):
+	allow_extra_fields = True
+	question1 = formencode.validators.String()
+	options1 = formencode.validators.String()
+	question2 = formencode.validators.String()
+	options2 = formencode.validators.String()
+	
 
 class ConversionError(Exception):
     def __init__(self, msg):
@@ -1155,7 +1163,8 @@ def return_slideshare_upload_form(request):
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")     
         session['userfilepath'] = zipped_filepath
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-        zip_archive.write(original_filename,uploaded_filename)	
+        zip_archive.write(original_filename,uploaded_filename)
+        zip_archive.close()	
         username = session['username']    
         slideshare_details = get_details(slideshow_id)
         slideshare_download_url = get_slideshow_download_url(slideshare_details)
@@ -1206,8 +1215,8 @@ def return_slideshare_upload_form(request):
     </link-group>
   <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
        Changes to the links section in the source will not be saved. -->
-</featured-links>
-
+</featured-links>"""
+"""
 <content>
   <para id="intro-para-1">"""+form.data['introductory_paragraphs']+"""
   
@@ -1222,37 +1231,15 @@ def return_slideshare_upload_form(request):
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
-        metadata_entry = sword2cnx.MetaData(metadata)
-
-        zip_archive.writestr("index.cnxml", cnxml)
-        zip_archive.close()	    
-        with open(zipped_filepath, 'rb') as zip_file:
-            deposit_receipt = conn.create(
-                col_iri = workspaces[0][0],
-                metadata_entry = metadata_entry,
-                payload = zip_file,
-                filename = 'upload.zip',
-                mimetype = 'application/zip',
-                packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                in_progress = True)
-        session['dr'] = deposit_receipt
-        soup = BeautifulSoup(deposit_receipt.to_xml())
-        data = soup.find("link",rel="edit")
-        edit_iri = data['href']
-        session['edit_iri'] = edit_iri        
-        creator = soup.find('dcterms:creator')
-        email = creator["oerdc:email"]
-        url = "http://connexions-oerpub.appspot.com/"
-		
-        post_values = {"username":username,"email":email,"slideshow_id":slideshow_id}
-        data = urllib.urlencode(post_values)
-        google_req = urllib2.Request(url, data)
-        google_response = urllib2.urlopen(google_req) 
+        session['metadata'] = metadata
+        session['cnxml'] = cnxml
+            
+        
 
         #print deposit_receipt.metadata #.get("dcterms_title")
         if redirect_to_google_oauth:
             raise HTTPFound(location=request.route_url('google_oauth'))    
-        raise HTTPFound(location=request.route_url('updatecnx'))    
+        raise HTTPFound(location=request.route_url('slideshow_preview'))    
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
 
 @view_config(route_name='oauth2callback')
@@ -1282,7 +1269,7 @@ def google_oauth_callback(request):
     session['google-resource-id'] = resource_id
     if session.has_key('original-file-location'):
         del session['original-file-location']
-    raise HTTPFound(location=request.route_url('updatecnx'))    
+    raise HTTPFound(location=request.route_url('slideshow_preview'))    
     
 
 @view_config(route_name='google_oauth')
@@ -1416,6 +1403,9 @@ def slideshow_preview(request):
     slideshare_id = ""
     embed_google = False
     embed_slideshare = False
+    form = Form(request, schema=QuestionAnswerSchema)    
+    validate_form = form.validate()
+    print form.all_errors()
     if session.has_key('google-resource-id'):
         google_resource_id = session['google-resource-id']
     if session.has_key('slideshare_id'):
@@ -1425,13 +1415,16 @@ def slideshow_preview(request):
     if slideshare_id!="":
         embed_slideshare = True
     templatePath = "templates/google_ss_preview.pt"
-    if request.method=='POST':
-        all_post_data = request.POST.get('all_post_data')
+    if validate_form:
+        question1 = request.POST.get('question1')
+        options1 = request.POST.get('options1').split()
+        solution1 = request.POST.get('solutions1')
+        all_post_data = {"question1":{"options":option1,"solution":solution1}}
         i=1
-        cnxml="""<section id="test-section"><title>Test your knowledge</title>"""
+        cnxml=session["cnxml"]+"""<section id="test-section"><title>Test your knowledge</title>"""
         for question,value in all_post_data:
             options = value['options']
-            solution = value['correct']
+            solution = value['solution']
             optionlist=""
             for option in options:
                 optionlist+="<item>"+option+"</item>"
@@ -1443,9 +1436,40 @@ def slideshow_preview(request):
             cnxml+=""" <solution id="solution-"""+str(i)+"""" > <para
             id="solution-para- """+str(i)+""""
             >"""+solution+"""</para></solution></exercise>"""
+        metadata = session['metadata']
+        workspaces = [(i['href'], i['title']) for i in session['collections']]        
+        metadata_entry = sword2cnx.MetaData(metadata)
+        zipped_filepath = session['userfilepath']
+        zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
+        zip_archive.writestr("index.cnxml",cnxml)
+        zip_archive.close()	   
+        with open(zipped_filepath, 'rb') as zip_file:
+            deposit_receipt = conn.create(
+                col_iri = workspaces[0][0],
+                metadata_entry = metadata_entry,
+                payload = zip_file,
+                filename = 'upload.zip',
+                mimetype = 'application/zip',
+                packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                in_progress = True)
+        session['dr'] = deposit_receipt
+        soup = BeautifulSoup(deposit_receipt.to_xml())
+        data = soup.find("link",rel="edit")
+        edit_iri = data['href']
+        session['edit_iri'] = edit_iri        
+        creator = soup.find('dcterms:creator')
+        email = creator["oerdc:email"]
+        url = "http://connexions-oerpub.appspot.com/"
+		
+        post_values = {"username":username,"email":email,"slideshow_id":slideshow_id}
+        data = urllib.urlencode(post_values)
+        google_req = urllib2.Request(url, data)
+        google_response = urllib2.urlopen(google_req) 
+        
+            
 
         
 
 
-    response = {"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare}
+    response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare}
     return render_to_response(templatePath, response, request=request)
