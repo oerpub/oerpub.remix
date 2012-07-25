@@ -1408,14 +1408,14 @@ def slideshow_preview(request):
         solution1 = request.POST.get('solution1')
         all_post_data = {"question1":{"options":option1,"solution":solution1}}
         i=1
-        cnxml=session["cnxml"]+"""<section id="test-section"><title>Test your knowledge</title>"""
+        cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
         for question in all_post_data:
             options = all_post_data[question]['options']
             solution = all_post_data[question]['solution']
             optionlist=""
             for option in options:
                 optionlist+="<item>"+option+"</item>"
-            cnxml+="""<content><para id="introduction-1">Introduction goes here</para>
+            cnxml+="""
             <exercise id="exercise-"""+str(i)+""""> <problem id="problem-"""+str(i)+""""> 
             <para id="para- """+str(i)+"""">
             """+str(question)+"""<list id="option-list- """+str(i)+""""
@@ -1423,7 +1423,7 @@ def slideshow_preview(request):
             """+str(optionlist)+"""</list></para></problem>"""
             cnxml+=""" <solution id="solution-"""+str(i)+"""" > <para
             id="solution-para- """+str(i)+""""
-            >"""+solution+"""</para></solution></exercise>"""
+            >"""+solution+"""</para></solution></exercise></section>"""
             i+=1
         print cnxml
         metadata = session['metadata']
