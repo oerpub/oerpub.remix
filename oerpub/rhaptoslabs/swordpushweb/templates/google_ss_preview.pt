@@ -87,7 +87,7 @@
                       <div class="formlabel">Solution </div>
                       <div class="forminfo">Solution</div>
                       <div class="formfield">
-                          <textare name="solutions1" id="solutions1"></textarea>                          
+                          <textarea name="solutions1" id="solutions1"></textarea>                          
                       </div>
                       <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
 
