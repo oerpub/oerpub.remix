@@ -81,13 +81,13 @@
                       <div class="formlabel">Options 1 </div>
                       <div class="forminfo">Options one on on line</div>
                       <div class="formfield">
-                          <input type="text" name="options1" id="options1">                          
+                          <textarea name="options1" id="options1"></textarea>                          
                       </div>
                       
                       <div class="formlabel">Solution </div>
                       <div class="forminfo">Solution</div>
                       <div class="formfield">
-                          <input type="text" name="solutions1" id="solutions1">                          
+                          <textare name="solutions1" id="solutions1"></textarea>                          
                       </div>
                       <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
 
