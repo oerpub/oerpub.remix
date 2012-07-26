@@ -31,7 +31,8 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from utils import escape_system, clean_cnxml, pretty_print_dict, load_config, save_config, add_directory_to_zip
+from utils import escape_system, clean_cnxml, pretty_print_dict, load_config
+from utils import save_config, add_directory_to_zip, update_zip_file
 import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 TESTING = False
@@ -698,8 +699,17 @@ def metadata_view(request):
     templatePath = 'templates/metadata.pt'
     session = request.session
     config = load_config(request)
+    
+    # first clear the session of any stale associated module paths
+    if 'associated_module' in session.keys():
+        del session['associated_module']
+    module = request.params.get('module', None)
+    if module is not None:
+        session['associated_module'] = module
 
     workspaces = [(i['href'], i['title']) for i in session['collections']]
+    if 'workspace' in request.params.keys():
+        session['selected_workspace'] = request.params['workspace']
     subjects = ["Arts",
                 "Business",
                 "Humanities",
@@ -836,6 +846,8 @@ def metadata_view(request):
 
             # Send zip file to Connexions through SWORD interface
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
+                if session.get('featured_links'):
+                    zip_file = update_zip_file(zip_file, request)
                 deposit_receipt = conn.create(
                     col_iri = form.data['workspace'],
                     metadata_entry = metadata_entry,
@@ -987,6 +999,7 @@ must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.952795292
         'form': FormRenderer(form),
         'field_list': field_list,
         'workspaces': workspaces,
+        'selected_workspace': session.get('selected_workspace', '#'),
         'languages': languages,
         'subjects': subjects,
         'config': config,
@@ -1048,5 +1061,26 @@ def admin_config_view(request):
                  ],
         'request': request,
         'config': config,
+    }
+    return response
+
+
+class ModuleAssociationSchema(formencode.Schema):
+    allow_extra_fields = True
+    module = formencode.validators.String()
+
+
+@view_config(
+    route_name='module_association', renderer='templates/module_association.pt')
+def module_association_view(request):
+    check_login(request)
+    config = load_config(request)
+    workspaces = [(i['href'], i['title']) for i in request.session['collections']]
+    form = Form(request, schema=ModuleAssociationSchema)
+    response = {'form': FormRenderer(form),
+                'workspaces': workspaces,
+                'modules': [],
+                'request': request,
+                'config': config,
     }
     return response
