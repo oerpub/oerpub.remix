@@ -181,3 +181,6 @@ def add_directory_to_zip(directory, zipFile, basePath=None):
             zipFile.write(pathToFile, arcname=pathToFile[basePathLength:])
         elif os.path.isdir(pathToFile):
             add_directory_to_zip(pathToFile[basePathLength:], zipFile, basePath=basePath)
+
+def update_zip_file(zip_file, request):
+    return zip_file
