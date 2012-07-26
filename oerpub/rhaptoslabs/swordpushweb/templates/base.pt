@@ -26,10 +26,10 @@
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/modernizr-custom.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/polyfiller.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/googlejsapi.js')}"></script>
-        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush-max-01.js')}"></script>
+        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cookie.js')}"></script>
 
-        <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main-max-01.css')}" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
         <!--[if IE 6]>
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
         <![endif]-->
@@ -124,16 +124,19 @@
             <div id="header-container">
 
                 <div id="header-functions">
-                    <div id="expertmode">
-                        <span id="basic-message" style="display: none;">
+                    <div id="expertmode" class="expert-activated">
+                        <span id="expand-advanced">
+                            «
+                        </span>
+                        <span id="basic-message" style="display: none; ">
                             <span class="link-like">Switch to advanced mode</span>
                         </span>
-                        <span id="advanced-message" style="display: none;">
+                        <span id="advanced-message" style="">
                             You are in advanced mode. 
                             <span class="link-like">Return to basic mode.</span>
                         </span>
-                        <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gear_orange_3.png')}" width="16" height="16"/>
                     </div>
+
                     <div id="status" tal:define="username request.session.username|nothing"
                         tal:condition="username">
                         <span id="user-id">You are logged in as: <strong tal:content="username">user name</strong></span>.

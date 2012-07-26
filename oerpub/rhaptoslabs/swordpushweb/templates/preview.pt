@@ -7,18 +7,21 @@
         <div id="workflownav-container">
             <div id="back-steps">
                 <input type="button" class="button"
-                value="&#171; Back: Choose document" id="back-to-chooser"
-                title="Return to the previous screen to choose a different document to convert"
+                value="&#171; Back: Return to start page"
+                id="back-to-chooser"
+                title="Return to the previous screen to choose a different import or editing option"
                 url="${request.route_url('choose')}"/>
             </div>
+
             <div id="forward-steps">
-                <input id="forward-to-metadata"
+                <input id="show-neworexisting"
                 class="button forward-button"
-                type="submit"
-                value="Next: Describe your module &#187;" 
-                url="${request.route_url('metadata')}"
-                title="Add/edit title and other information about the module"/>
+                type="button"
+                value="Next Step &#187;"
+                url="${request.route_url('module_association')}"
+                title="Select whether this will be used for a new module or to override the contents of an existing module">
             </div>
+
         </div>
     </div>
     </metal:workflownav>
@@ -31,23 +34,24 @@
                 <div id="pageheader-wrap">
 
                     <div id="module-actions">
-                        <span class="advanced">
-                            <h3>Module actions:</h3>
-                            <a class="button" id="edit-xml"
+                        <div class="advanced" style="display: block;">
+                            <h2 class="advanced-label">
+                                Advanced
+                            </h2>
+                            <strong>Module actions: </strong>
+                            <a id="download-copy"
+                                title="Save a ZIP file containing the module's XML and metadata to your local computer."
+                                href="#asdfaasdf"
+                                tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])">
+                                <span class="button">Download a copy</span>
+                            </a>
+                            <a id="edit-xml"
                                 title="Make changes to the module by editing its XML code."
                                 href="${request.route_url('cnxml')}">
-                                <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
-                                <span class="button-text">Edit XML</span>
+                                <span class="button">Edit XML</span>
                             </a>
-                            <a class="button"
-                                tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])"
-                                title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy">
-                                <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
-                                <span class="button-text">Download a copy</span>
-
-                            </a>
-                        </span>
-                    </div>
+                        </div>
+                    </div>                    
 
                     <div id="page-title">
                         <h1>
@@ -74,6 +78,38 @@
         </div>
     </div>
     ${form.end()}
+
+    <div id="neworexisting" style="display: none;">
+        <p>
+            <strong>Is this for a new module or will it override an existing one?</strong>
+        </p>
+        <div>
+            <span class="button submit-neworexisting" 
+                url="${request.route_url('metadata')}">New module</span>
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <div>
+                    This is an entirely new module. 
+                </div>
+            </div>
+            <div>
+                <span class="button submit-neworexisting" 
+                    url="${request.route_url('module_association')}">
+                    Override existing module
+                </span>
+                <div class="forminfo" style="margin: .5em 0 1em;">
+                    <div>
+                        Choose an existing module to apply your import to, replacing its contents.  
+                    </div>
+                </div>
+                <div class="headeraction" style="margin: 1.5em 0 0; text-align: center;">
+                    <div>
+                        <span class="button" id="cancel-neworexisting">Cancel</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </metal:content-slot>
 
     <metal:footer-slot fill-slot="footer-slot" />

@@ -4,12 +4,14 @@
 
             $(document).ready(function(){
                 $('.forward-button').removeAttr('disabled');
-                $('.forward-button').val("Finish: Upload to Connexions \u00bb");
+                $('.forward-button').val("Finish: Upload \u00bb");
                 $('#back-steps .button').removeAttr('disabled');
                 $("#formentry-title").removeClass("error");
                 $("#formentry-title .errortext").hide();
                 $("#formentry-ga").removeClass("error");
                 $("#formentry-ga .errortext").hide();
+                $("#workspace").
+                    attr("value", $("a#selected_workspace").attr("href"));
             });
 
         </script>
@@ -26,21 +28,48 @@
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
-                <input type="button" class="button" 
-                    value="&laquo; Back: Return to preview" id="back-to-chooser"
-                    url="${request.route_url('preview')}"
-                    title="Return to the module preview">
+                <input id="back-to-chooser"
+                    type="button"
+                    title="Return to the previous page"
+                    value="&laquo; Back"
+                    class="button"
+                    url="${request.route_url('preview')}">
             </div>
+
             <div id="forward-steps">
-                <span class="advanced" style="display: none; ">
-                    <span class="advanced-marker" title="Advanced mode feature">
-                        <img src="${images_url}/gear_orange_3.png" />
-                    </span>
-                    <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                <span id="uploading-to">
+                    Uploading to 
+
+                    <ul class="popMenu">
+                        <li class="popMenu">
+                            <a id="selected_workspace"
+                                href="#" class="popMenu"
+                                tal:attributes="href selected_workspace">
+                                <span class="workarea-choice">Personal Workspace</span>
+                                <img src="${images_url}/down-arrow-05.png"> 
+                            </a>
+
+                            <ul class="popOut" style="display: none; ">
+                                <li tal:repeat="ws workspaces">
+                                    <a href="#" 
+                                        tal:content="ws[1]"
+                                        tal:attributes="href ws[0]">
+                                        Personal Workspace
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    in Connexions
                 </span>
-                <input id="top-upload-to-cnx" type="submit" class="button forward-button"
-                value="Finish: Upload to Connexions &raquo;"
-                title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
+                
+                <input id="workspace" type="hidden" name="workspace">
+
+                <input id="top-upload-to-cnx" type="button" class="button forward-button"
+                    title="Click 'Finish' to add the module as edited to the designated work area. Further steps are required before the module can be published in the Connexions repository." 
+                    value="Finish: Upload &raquo;">
+
             </div>
         </div>
     </div>
@@ -54,31 +83,8 @@
 
                 <div id="pageheader-wrap">
 
-                    <div id="module-actions">
-                        <span class="advanced" style="display: none;">
-                            <a class="button"
-                                tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])"
-                                title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy">
-                                <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
-                                <span class="button-text">Download a copy</span>
-                            </a>
-                        </span>
-                    </div>
-
-                    <div id="page-title">
-                        <h1>
-                            Describe your module
-                        </h1>
-                    </div>
-
                     <div class="pleasewait" id="upload-wait" style="display: none;">      
                         Your module is being uploaded to Connexions. This may take a few moments.
-                    </div>
-
-                    <div id="page-description">
-                        <p class="forminfo">
-                            <span class="required">* = Required field</span>
-                        </p>
                     </div>
 
                 </div>
@@ -108,12 +114,23 @@
                     <div class="headeraction" style="float:right;margin-top:5px;"><span href="#" id="submit-roles" class="button">Done</span></div>
                 </div>
 
-
                 <div id="metadata">
                     <table cellspacing="0" cellpadding="2" border="0" width="100%">
                         <tbody>
                             <tr>
                                 <td width="50%" valign="top">
+                                    <div id="page-title">
+                                        <h1>
+                                            Describe your module
+                                        </h1>
+                                    </div>
+
+                                    <div id="page-description">
+                                        <p class="forminfo">
+                                            <span class="required">* = Required field</span>
+                                        </p>
+                                    </div>
+
                                     <div class="formentry" id="formentry-title">
                                         <div class="formlabel">Title <span style="color: rgb(204, 85, 102); font-weight: bold;">*</span></div>
                                         <div class="errortext" style="display: none;">
@@ -122,7 +139,7 @@
                                         <div class="forminfo">Enter the title of this module.</div>
                                         <div class="formfield">
                                             <input type="text" name="title" size="50"
-                                                value="${config['metadata']['title']}"/>
+                                            value="${config['metadata']['title']}"/>
                                         </div>
                                     </div>
                                     <div class="formentry">
@@ -148,6 +165,36 @@
                                     </div>
                                 </td>
                                 <td width="50%" valign="top">
+
+                                    <div id="module-actions">
+                                        <div class="advanced">
+                                            <h2 class="advanced-label">
+                                                Advanced
+                                            </h2>
+
+                                            <strong>Module actions: </strong>
+                                            <a 
+                                                title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy" 
+                                                href="#download" 
+                                                tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])"
+                                                style="color: black; text-decoration: none;">
+                                                <span class="button">Download a copy</span>
+                                            </a>
+                                            <div id="roles" class="formentry">
+                                                <span class="formlabel">Contributors</span>
+                                                <span>(<a href="#" id="edit-roles">edit</a>)</span>
+                                                <ul style="margin-top: 0pt; margin-bottom: 0.5em;">
+                                                    <li id="list-authors">Authors: <span>${config['metadata']['authors']}</span></li>
+                                                    <li id="list-maintainers">Maintainers: <span>${config['metadata']['maintainers']}</span></li>
+                                                    <li id="list-copyright">Copyright Holders: <span>${config['metadata']['copyright']}</span></li>
+                                                    <li id="list-editors">Editors: <span>${config['metadata']['editors']}</span></li>
+                                                    <li id="list-translators">Translators: <span>${config['metadata']['translators']}</span></li>
+                                                </ul>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
                                     <div class="formentry">
                                         <div class="formlabel">Language</div>
                                         <div class="forminfo">Select the primary language for this module.</div>
@@ -168,7 +215,7 @@
                                     <div class="formentry" id="formentry-ga">
                                         <div class="formlabel">
                                             <input type="checkbox" id="google_code_opener"
-                                                name="google_code_opener"/>
+                                            name="google_code_opener"/>
                                             Add optional Google Analytics Tracking Code
                                         </div>
                                         <div class="errortext" style="display: none;">
@@ -178,29 +225,45 @@
                                             <div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
                                             <div class="formfield">
                                                 <input type="text" name="google_code" size="40"
-                                                    value="${config['metadata']['google_code']}"/>
+                                                value="${config['metadata']['google_code']}"/>
                                             </div>
                                         </div>
                                     </div>
-                                    <div style="display: none;" class="formentry advanced" id="roles">
+
+                                    <div id="formentry-fl" class="formentry">
                                         <div class="formlabel">
-                                            <span style="padding: 0pt 0.3em;" title="Advanced mode feature" class="advanced-marker">
-                                                <img style="vertical-align: 0.2em;" src="${images_url}/gear_orange_3.png"/>
-                                            </span>
-                                            Contributors
+                                            <input id="show-featuredlinks-form"
+                                            type="checkbox"
+                                            title="Featured Links must each be removed individually"
+                                            checked="checked" name="fl_opener">
+                                            Add/edit optional Featured Links 
+                                            <a title="Opens in a new window"
+                                                id="show-featuredlinks-help"
+                                                style="font-size: .85em; font-weight: normal;"
+                                                href="#">
+                                                (what's this?)
+                                            </a>
                                         </div>
-                                        <ul style="margin-top: 0pt; margin-bottom: 0.5em;">
-                                            <li id="list-authors">Authors: <span>${config['metadata']['authors']}</span></li>
-                                            <li id="list-maintainers">Maintainers: <span>${config['metadata']['maintainers']}</span></li>
-                                            <li id="list-copyright">Copyright Holders: <span>${config['metadata']['copyright']}</span></li>
-                                            <li id="list-editors">Editors: <span>${config['metadata']['editors']}</span></li>
-                                            <li id="list-translators">Translators: <span>${config['metadata']['translators']}</span></li>
-                                        </ul>
-                                        <div>
-                                            <span class="button" id="edit-roles">Edit</span>
+
+                                        <div id="fl-field">
+
+                                            <p class="forminfo">
+                                                Make sure that all of your links are published and/or publicly available.
+                                            </p>
+
+                                            <table class="listing" id="featured-links-table">
+                                                <tbody></tbody>
+                                            </table>
+
+                                            <div>
+                                                <a class="button2" onclick="return false;" id="show-featuredlinks" href="#">
+                                                    + Create a new Featured Link
+                                                </a>
+                                            </div>
+
                                         </div>
-                                        <br/>
                                     </div>
+
                                 </td>
                             </tr>
                         </tbody>
@@ -210,6 +273,184 @@
         </div>
     </div>
     ${form.end()}
+
+    <div style="display: none;" id="featuredlinks">
+
+        <strong>
+            <span id="create-featuredlinks">
+                Create a new Featured Link for this module
+            </span>
+            <span id="edit-featuredlinks" style="display: none;">
+                Edit this Featured Link
+            </span>
+        </strong>
+
+        <div class="fl-controls">
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span>Link title</span>:
+                        </th>
+                        <td colspan="2">
+                            <div></div>
+                            <input id="create-fl-title"
+                                type="text"
+                                size="30" 
+                                name="title">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span>Type</span>:
+                        </th>
+                        <td colspan="2">
+                            <select id="create-fl-category" name="category">
+                                <option value="example">Example</option>
+                                <option value="prerequisite">Prerequisite</option>
+                                <option value="supplemental">Supplemental</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span>Strength</span>:
+                        </th>
+                        <td colspan="2">
+                            <select id="create-fl-strength" name="strength">
+                                <option value="3"> 3 : Strongly related link </option>
+                                <option value="2"> 2 : Related link </option>
+                                <option value="1"> 1 : Weakly related link </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td style="">
+                            <input id="create-fl-useurl"
+                                name="create-fl-useurlormodule"
+                                value="create-fl-useurl"
+                                type="radio"
+                                checked="checked"
+                                class="noborder">
+                        </td>
+                        <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                            <span>Enter either a URL ...</span>
+                        </th>
+                        <td colspan="2">
+                            <div></div>
+                            <input id="create-fl-url"
+                                name="create-fl-url"
+                                type="text"
+                                size="30">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="">
+                            <input id="create-fl-usemodule" 
+                                name="create-fl-useurlormodule"
+                                value="create-fl-usemodule" 
+                                type="radio"
+                                class="noborder">
+                        </td>
+                        <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                            <span>... or a Connexions ID</span>:
+                        </th>
+                        <td style="padding-bottom: 1em; padding-right: 0.5em;" colspan="2">
+                            <div></div>
+                            <input id="create-fl-cnxmoduleid"
+                                name="create-fl-cnxmoduleid"
+                                disabled="disabled" 
+                                type="text"
+                                size="8">
+                            <span style="padding: 0pt 0.25em; font-weight: bold;">
+                                <span>Version</span> 
+                                <span style="font-weight: normal;">(<span>optional</span>)</span>
+                            </span>:
+                            <input id="create-fl-cnxversion"
+                                name="create-fl-cnxversion"
+                                disabled="disabled" 
+                                type="text"
+                                size="3">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin: 0.5em 0px;">
+                <span id="submit-featuredlinks" class="button">Add New Link</span> 
+                <span id="cancel-featuredlinks" class="button">Cancel</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="featuredlinks-help" style="display: none;">
+
+        <div>
+            <span class="button" id="close-featuredlinks-help">Close X</span>
+        </div>
+
+        <strong>About Featured Links</strong>
+
+        <p>
+            "Featured Links" provide a way for authors to prominently display links in their modules.  
+            These can be links to example, supplemental, or prerequisite materials, such as other modules, outside resources, or files for downloading. 
+            They are featured in a special box in the upper-right-hand corner of the module when viewed online, as seen in this example:
+        </p>
+        <div style="text-align: center;">
+            <img src="${images_url}/featured-links-02.png"/>
+        </div>
+
+    </div>
+
+    <div id="fl-field-template" style="display: none">
+        <table class="listing" id="featured-links-table-template">
+            <tbody>
+                <tr class="edit-link-tr">
+                    <td class="edit-link-td" style="width: 100%;">
+                        <div class="edit-link-title">
+                            <img id="edit-link-strength-image"
+                                src="${images_url}/strength3.png">
+                            <span>Example text</span>
+                            <a href="#"
+                                title="Visit link in new window"
+                                class="icon" target="_blank">
+                                <img src="${images_url}/external-link.png">
+                            </a>
+                            <input class="edit-link-title" type="hidden"
+                                name="edit-link-title">
+                            <input class="edit-link-category" type="hidden"
+                                name="edit-link-category">
+                            <input class="edit-link-strength" type="hidden"
+                                name="edit-link-strength">
+                            <input class="edit-link-url" type="hidden"
+                                name="edit-link-url">
+                            <input class="edit-link-cnxmodule" type="hidden"
+                                name="edit-link-cnxmodule">
+                            <input class="edit-link-cnxversion" type="hidden"
+                                name="edit-link-cnxversion">
+                        </div>
+                    </td>
+                    <td nowrap="nowrap" class="link-edit-link">
+                        <a class="edit-link" href="#">
+                            Edit link
+                        </a>
+                    </td>
+                    <td nowrap="nowrap" id="example-id" class="link-edit-link">
+                        <a href="#" class="remove-link">
+                            Remove
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     </metal:content-slot>
 
