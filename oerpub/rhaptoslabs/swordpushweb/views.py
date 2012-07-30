@@ -5,6 +5,7 @@ import datetime
 import zipfile
 import traceback
 import libxml2
+import lxml
 import re
 from cStringIO import StringIO
 from lxml import etree
@@ -1076,10 +1077,43 @@ def module_association_view(request):
     check_login(request)
     config = load_config(request)
     workspaces = [(i['href'], i['title']) for i in request.session['collections']]
+    
+    conn = sword2cnx.Connection(request.session['service_document_url'],
+                                       user_name=request.session['username'],
+                                       user_pass=request.session['password'],
+                                       always_authenticate=True,
+                                       download_service_document=False)
+
+    workspace_to_get = request.session['collections'][0]['href']
+    print "Workspace url: " + workspace_to_get
+
+    xml = sword2cnx.get_module_list(conn, workspace_to_get)
+    tree = lxml.etree.XML(xml)
+    ns_dict = {'xmlns:sword': 'http://purl.org/net/sword/terms/',
+               'xmlns': 'http://www.w3.org/2005/Atom'}
+    elements =  tree.xpath('/xmlns:feed/xmlns:entry', namespaces=ns_dict)
+
+    modules = []
+    for element in elements:
+        title_element = element.xpath('./xmlns:title', namespaces=ns_dict)[0]
+        title = title_element.text
+
+        link_elements = element.xpath('./xmlns:link[@rel="edit-media"]',
+                                      namespaces=ns_dict
+                                     )
+        edit_link = link_elements[0].get('href')
+
+        path_elements = edit_link.split('/')
+        view_link = '/'.join(path_elements[:-2]) + '/latest'
+        path_elements.reverse()
+        uid = path_elements[2]
+
+        modules.append([uid, edit_link, title, view_link])
+
     form = Form(request, schema=ModuleAssociationSchema)
     response = {'form': FormRenderer(form),
                 'workspaces': workspaces,
-                'modules': [],
+                'modules': modules,
                 'request': request,
                 'config': config,
     }

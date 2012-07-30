@@ -157,30 +157,32 @@ ${form.csrf_token()}
                   </thead>
 
                   <tbody>
-                      <tr id="folder-contents-item-m33469" class="draggable odd">
+                      <tr tal:repeat="details modules"
+                          id="folder-contents-item-[uid]"
+                          tal:attributes="id string:${details[0]}"
+                          class="draggable odd">
+
                           <td style="text-align: center;" class="notDraggable checkCol">
-                              <input type="radio" value="/GroupWorkspaces/wg1438/m33469" name="module">
+                              <input type="radio" name="module"
+                                  value="/GroupWorkspaces/wg1438/m33469"
+                                  tal:attributes="value details[1]">
                           </td>
+
                           <td class="notDraggable">
-                              <span class="visualIcon contenttype-module">
+                              <span class="visualIcon contenttype-module"
+                                  tal:content="details[2]">
                                   Siyavula Connexions Training Manual for Educators
                               </span>
-                              <a target="_blank" href="http://cnx.org/content/m33469/latest/" class="review-module-link" title="Open the published module in a new window"><img src="${images_url}/external-link.png"></a></td>
-                          <td class="notDraggable">
+                              <a target="_blank" 
+                                  class="review-module-link" 
+                                  title="Open the published module in a new window"
+                                  href="http://cnx.org/content/m33469/latest/">
+                                  <img src="${images_url}/external-link.png">
+                              </a>
+                          </td>
+
+                          <td class="notDraggable" tal:content="details[0]">
                               m33469
-                          </td>
-                      </tr>
-                      <tr id="folder-contents-item-m33468" class="draggable even">
-                          <td style="text-align: center;" class="notDraggable checkCol">
-                              <input type="radio" value="/GroupWorkspaces/wg1438/m33468" name="module">
-                          </td>
-                          <td class="notDraggable">
-                              <span class="visualIcon contenttype-module">
-                                  Siyavula Connexions Training Manual for Trainers
-                              </span>
-                              <a target="_blank" href="http://cnx.org/content/m33468/latest/" class="review-module-link" title="Open the published module in a new window"><img src="${images_url}/external-link.png"></a></td>
-                          <td class="notDraggable">
-                              m33468
                           </td>
                       </tr>
                   </tbody>
