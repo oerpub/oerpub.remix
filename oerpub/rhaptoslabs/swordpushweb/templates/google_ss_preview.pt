@@ -18,19 +18,6 @@
             <div id="content">
                 <div id="pageheader-wrap">
 
-                    <div id="module-actions">
-                        <span class="advanced">
-                            <h3>Module actions:</h3>
-                            <a class="button" id="edit-xml"
-                                title="Make changes to the module by editing its XML code."
-                                href="${request.route_url('cnxml')}">
-                                
-                                <span class="button-text">Edit XML</span>
-                            </a>
-                            
-                        </span>
-                    </div>
-
                     <div id="page-title">
                         <h1>
                             Preview:
@@ -42,7 +29,18 @@
 
                     <div id="page-description">
                         <p class="forminfo">
-                            View below how the module will appear in Connexions.
+                          <p tal:condition="embed_google">
+                             View below the Google Presentation as uploaded to google Docs.
+                              <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
+                                frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+                      				</iframe>
+                          </p>
+                          <p tal:condition="embed_slideshare">
+                            <iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshare_id}" 
+                              width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" 
+                              scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0" allowfullscreen>
+                            </iframe>
+                          </p>
                         </p>
                     </div>
 
@@ -56,20 +54,8 @@
                 </script>
 
                 
-                <p tal:condition="embed_google">
                     
-                    <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
-					frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" 
-					webkitallowfullscreen="true">
-				</iframe>
                 
-                </p>
-                <p tal:condition="embed_slideshare">
-                    <iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshare_id}" 
-                        width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" 
-                        scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0" allowfullscreen>
-                    </iframe>
-                </p>
                 ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
                 ${form.csrf_token()}
                 <span>
