@@ -1020,7 +1020,6 @@ def admin_config_view(request):
     """
 
     check_login(request)
-    session = request.session
     subjects = ["Arts", "Business", "Humanities", "Mathematics and Statistics",
                 "Science and Technology", "Social Sciences"]
     form = Form(request, schema=ConfigSchema)
@@ -1152,7 +1151,7 @@ def return_slideshare_upload_form(request):
         #collections = [{'title': i.title, 'href': i.href}
         #                          for i in sword2cnx.get_workspaces(conn)]
         #session['collections'] = collections
-        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        #workspaces = [(i['href'], i['title']) for i in session['collections']]
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
         session['userfilepath'] = zipped_filepath
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
@@ -1258,7 +1257,7 @@ def google_oauth_callback(request):
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
     session = request.session
-    username = session['username']
+    #username = session['username']
     oauth = GoogleOAuth()
     oauth.set_oauth_callback_url()
     saved_request_token = oauth.get_oauth_token_from_google()
@@ -1453,7 +1452,7 @@ def slideshow_preview(request):
         data = urllib.urlencode(post_values)
         google_req = urllib2.Request(url, data)
         google_response = urllib2.urlopen(google_req)
-        return HTTPFound(location=request.route_url('slideshow_preview'))
+        return HTTPFound(location=request.route_url('updatecnx'))
 
 
     response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare}
