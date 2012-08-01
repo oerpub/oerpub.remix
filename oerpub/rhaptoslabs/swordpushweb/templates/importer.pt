@@ -11,11 +11,11 @@
         $('form#importform').submit();
         });        
         $('#import-to-ss').click(function(){
-          $('#slideshare-href').toggleClass("highlight-buttons");
+          $('#slideshare-href').addClass("highlight-buttons");
         });
 
         $('#import-to-google').click(function(){
-          $('#google-href').toggleClass("highlight-buttons");
+          $('#google-href').addClass("highlight-buttons");
         });
 
     });
