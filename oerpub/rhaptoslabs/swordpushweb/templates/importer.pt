@@ -8,7 +8,15 @@
         event.preventDefault();
         $('#import-submit').attr("disabled", true);
         showWaitMessage();
-        $('form#importform').submit();	
+        $('form#importform').submit();
+        $('#import-to-ss').click(function(){
+          $('#slideshare-href').toggleClasss("highlight");
+        });
+
+        $('#import-to-google').click(function(){
+          $('#sideshare-href').toggleClasss("highlight");
+        });
+
         });        
     });
     
@@ -54,11 +62,11 @@
               <ul id="create-new-list">
                 <li>
                     <div class="upload-form" id="choose-importer-box">                        
-                        <span class="label-text"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span>
-                        <input type="checkbox" id="import-to-ss" name="importer" value="google"/>
+                      <div style="float:left;"><input type="checkbox" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
+                      <div style="float:left"><span class="label-text"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
                         <br/><br/>
-                        <span class="label-text"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span>
-                        <input type="checkbox" id="import-to-google" name="importer" value="slideshare"/>
+                        <div style="float:left;"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <div style="float:left;"><span class="label-text"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
                         <br/><br/><br/><br/>
                         <div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
                         <br/><br/>
