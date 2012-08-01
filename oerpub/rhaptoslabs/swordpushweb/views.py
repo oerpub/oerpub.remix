@@ -1367,7 +1367,7 @@ def update_cnx_metadata(request):
                 del metadata[key]
         metadata_entry = sword2cnx.MetaData(metadata)
         add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
-        return HTTPFound(location=request.route_url('slideshow_preview'))
+        return HTTPFound(location=request.route_url('summary'))
     response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
@@ -1380,6 +1380,7 @@ def update_cnx_metadata(request):
 
 @view_config(route_name='slideshow_preview')
 def slideshow_preview(request):
+    check_login(request)
     session = request.session
     google_resource_id = ""
     slideshare_id = ""
