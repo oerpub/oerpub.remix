@@ -9,11 +9,11 @@
         $('#import-submit').attr("disabled", true);
         showWaitMessage();
         $('form#importform').submit();
-        $('#import-to-ss').click(function(){
+        $('#import-to-ss').change(function(){
           $('#slideshare-href').toggleClasss("highlight");
         });
 
-        $('#import-to-google').click(function(){
+        $('#import-to-google').change(function(){
           $('#sideshare-href').toggleClasss("highlight");
         });
 

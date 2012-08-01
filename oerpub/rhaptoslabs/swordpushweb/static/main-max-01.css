@@ -610,3 +610,8 @@ div.CodeMirror-lines {
 .highlight {
     font-weight: bold;
 }
+
+.highlight-buttons {
+   border:2px solid;
+   border-color: green;
+}
