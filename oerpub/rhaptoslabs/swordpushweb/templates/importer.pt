@@ -12,7 +12,6 @@
         });        
         $('#import-to-ss').click(function(){
           if($(this).is(":checked")){
-            alert("tst");
             $('#slideshare-href').removeClass("label-text");
             $('#slideshare-href').addClass("highlight-buttons");
 
@@ -27,7 +26,6 @@
 
         $('#import-to-google').click(function(){
           if($(this).is(":checked")){
-            alert("tst");
             $('#google-href').removeClass("label-text");
             $('#google-href').addClass("highlight-buttons");
 
