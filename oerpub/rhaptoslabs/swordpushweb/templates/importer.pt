@@ -11,13 +11,11 @@
         $('form#importform').submit();
         });        
         $('#import-to-ss').change(function(){
-          alert("Toggle");
-          $('#slideshare-href').toggleClasss("highlight-buttons");
+          $('#slideshare-href').toggleClass("highlight-buttons");
         });
 
         $('#import-to-google').click(function(){
-          alert("toggle2");
-          $('#google-href').toggleClasss("highlight-buttons");
+          $('#google-href').toggleClass("highlight-buttons");
         });
 
     });
@@ -64,11 +62,11 @@
               <ul id="create-new-list">
                 <li>
                     <div class="upload-form" id="choose-importer-box">                        
-                      <div><input type="checkbox" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
-                      <div><span class="label-text" id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
+                      <div class="left"><input type="checkbox" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
+                      <div class="left"><span class="label-text"><div id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></div></span></div>
                       <br/><br/><br/><br/><br/>
-                        <div><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
-                        <div><span class="label-text" id="google-href"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
+                        <div class="left"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <div class="left"><span class="label-text"><div id="google-href"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></div></span></div>
                         <br/><br/><br/><br/>
                         <div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
                         <br/><br/>
