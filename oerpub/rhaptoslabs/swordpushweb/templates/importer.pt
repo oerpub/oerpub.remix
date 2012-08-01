@@ -64,7 +64,7 @@
                     <div class="upload-form" id="choose-importer-box">                        
                       <div style="float:left;"><input type="checkbox" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
                       <div style="float:left"><span class="label-text"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
-                        <br/><br/>
+                      <br/><br/><br/><br/><br/>
                         <div style="float:left;"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
                         <div style="float:left;"><span class="label-text"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
                         <br/><br/><br/><br/>
