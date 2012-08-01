@@ -1441,6 +1441,7 @@ def slideshow_preview(request):
                 packaging = 'http://purl.org/net/sword/package/SimpleZip',
                 in_progress = True)
         session['dr'] = deposit_receipt
+        session['deposit_receipt'] = deposit_receipt
         soup = BeautifulSoup(deposit_receipt.to_xml())
         data = soup.find("link",rel="edit")
         edit_iri = data['href']
