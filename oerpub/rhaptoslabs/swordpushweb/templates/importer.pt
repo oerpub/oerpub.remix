@@ -9,6 +9,7 @@
         $('#import-submit').attr("disabled", true);
         showWaitMessage();
         $('form#importform').submit();
+        });        
         $('#import-to-ss').change(function(){
           $('#slideshare-href').toggleClasss("highlight");
         });
@@ -17,7 +18,6 @@
           $('#sideshare-href').toggleClasss("highlight");
         });
 
-        });        
     });
     
 </script>
