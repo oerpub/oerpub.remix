@@ -609,7 +609,7 @@ div.CodeMirror-lines {
     font-weight: bold;
 }
 
-.highlight-buttons {
+#create-new-list .highlight-buttons {
   padding: .4em .7em .5em;
   border: 5px solid #ff0;
   background-color: #fff;
