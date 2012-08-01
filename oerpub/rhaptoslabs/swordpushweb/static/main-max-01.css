@@ -244,10 +244,8 @@ label img{
 }
 
 div.left {
-    float: left;
-    clear: both;
-    padding : 4px;
-
+    float:left;
+    margin : 10px;
 }
 
 div.right {
@@ -612,5 +610,5 @@ div.CodeMirror-lines {
 }
 
 .highlight-buttons {
-   border: 2px solid #ff0;
+   border: 5px solid #ff0;
 }
