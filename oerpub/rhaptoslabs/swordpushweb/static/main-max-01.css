@@ -612,6 +612,5 @@ div.CodeMirror-lines {
 }
 
 .highlight-buttons {
-   border:2px solid;
-   border-color: green;
+   border: 2px solid #ff0;
 }
