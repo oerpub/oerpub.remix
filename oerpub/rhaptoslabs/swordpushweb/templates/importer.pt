@@ -11,11 +11,33 @@
         $('form#importform').submit();
         });        
         $('#import-to-ss').click(function(){
-          $('#slideshare-href').addClass("highlight-buttons");
+          if($(this).is(":checked")){
+            alert("tst");
+            $('#slideshare-href').removeClass("label-text");
+            $('#slideshare-href').addClass("highlight-buttons");
+
+          }
+          else{
+
+            $('#slideshare-href').addClass("label-text");
+            $('#slideshare-href').removeClass("highlight-buttons");
+          
+          }
         });
 
         $('#import-to-google').click(function(){
-          $('#google-href').addClass("highlight-buttons");
+          if($(this).is(":checked")){
+            alert("tst");
+            $('#google-href').removeClass("label-text");
+            $('#google-href').addClass("highlight-buttons");
+
+          }
+          else{
+
+            $('#google-href').addClass("label-text");
+            $('#google-href').removeClass("highlight-buttons");
+          
+          }
         });
 
     });
