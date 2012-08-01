@@ -11,11 +11,13 @@
         $('form#importform').submit();
         });        
         $('#import-to-ss').change(function(){
-          $('#slideshare-href').toggleClasss("highlight");
+          alert("Toggle");
+          $('#slideshare-href').toggleClasss("highlight-buttons");
         });
 
-        $('#import-to-google').change(function(){
-          $('#sideshare-href').toggleClasss("highlight");
+        $('#import-to-google').click(function(){
+          alert("toggle2");
+          $('#google-href').toggleClasss("highlight-buttons");
         });
 
     });
@@ -63,10 +65,10 @@
                 <li>
                     <div class="upload-form" id="choose-importer-box">                        
                       <div><input type="checkbox" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
-                      <div><span class="label-text"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
+                      <div><span class="label-text" id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
                       <br/><br/><br/><br/><br/>
-                        <div style="float:left;"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
-                        <div style="float:left;"><span class="label-text"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
+                        <div><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <div><span class="label-text" id="google-href"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
                         <br/><br/><br/><br/>
                         <div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
                         <br/><br/>
