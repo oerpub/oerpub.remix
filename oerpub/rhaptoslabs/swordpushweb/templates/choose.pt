@@ -107,11 +107,11 @@
                   <label>
                     <span style="visibility: visible;" class="or-bullet">or</span> 
                     <span class="label-text">
-                      Import your Presentations
+                      <img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong> OR <img src="${images_url}/slideshare.jpg"><strong>SlideShare Presentations</strong> 
                    </span>
                   </label>
                   <div class="upload-form">
-                    <a class="button"> Import Your Presentations </a>
+                    <a class="button" href="/importer"> Import Your Presentations </a>
                   </div>
                 </li>
 
