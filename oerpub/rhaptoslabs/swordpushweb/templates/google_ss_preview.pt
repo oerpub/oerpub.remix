@@ -104,7 +104,10 @@
                       <div class="forminfo">Solution</div>
                       <div class="formfield">
                           <textarea name="solution1" id="solution1"></textarea>                          
-                      </div>
+                        </div>
+                        
+                      <input class="button" id="add-more-questions"  value="Add More" type="button">
+
                       <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
 
                   
