@@ -111,7 +111,7 @@
                    </span>
                   </label>
                   <div class="upload-form">
-                    <a class="button" href="/importer"> Import Your Presentations </a>
+                    <input class="button" href="/importer" value="Import Your Presentations" onClick="location.href='/importer'">
                   </div>
                 </li>
 
