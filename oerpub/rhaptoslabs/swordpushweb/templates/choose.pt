@@ -102,7 +102,21 @@
                         placeholder="http://www.example.com" type="url" />
                     <input class="button" id="url-submit" name="url.submitted" value="Convert and preview &#187;" disabled="disabled" type="submit">
                   </div>
+                  </li>
+                <li>
+                  <label>
+                    <span style="visibility: visible;" class="or-bullet">or</span> 
+                    <span class="label-text">
+                      Import your Presentations
+                   </span>
+                  </label>
+                  <div class="upload-form">
+                    <a class="button"> Import Your Presentations </a>
+                  </div>
                 </li>
+
+
+
               </ul>
               ${form.end()}
             </div>
