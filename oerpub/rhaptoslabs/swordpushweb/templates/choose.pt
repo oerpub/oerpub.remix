@@ -107,7 +107,7 @@
                   <label>
                     <span style="visibility: visible;" class="or-bullet">or</span> 
                     <span class="label-text">
-                      <img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong> OR <img src="${images_url}/slideshare.jpg"><strong>SlideShare Presentations</strong> 
+                      <img src="${images_url}/google-presentations.png"><strong>Google Presentations</strong> OR <img src="${images_url}/slideshare.jpg"><strong>SlideShare Presentations</strong> 
                    </span>
                   </label>
                   <div class="upload-form">
