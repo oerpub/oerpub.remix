@@ -4,7 +4,7 @@
   function returnHTML(id){
     var html="<div class=\"formlabel\">Question "+id+" </div><div class=\"forminfo\">Question "+id+"</div>"+
                       "<div class=\"formfield\">"+
-                          "<input type=\"text\" name=\"question\""+ id+">" 
+                          "<input type=\"text\" name=\"question\""+id+">" 
                       +"</div>"+
                       "<div class=\"formlabel\">Options"+id+" </div>"+
                       "<div class=\"forminfo\">Options one on on line</div>"+
@@ -34,6 +34,9 @@
    
     <div id="workflownav-wrap">
         <div id="workflownav-container">
+			<div id="back-steps">
+              
+            </div>
             
         </div>
     </div>
