@@ -2,12 +2,25 @@
 
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
-  function returnHTML(id){
-     
-  }
+  	
+
+var nextSelectValue = 2;
+var newInput;
     $(document).ready(function(){
       $("#add-more-questions").click(function(){
-        alert(returnHTML(1))
+			var num     = $('#add-more-questions').length;
+            var newNum  = new Number(num + 1);
+            var questionId = $('#question-'+num);
+            var optionId = $('#options-'+num);
+            var solutionId = $('#solution-'+num);
+            
+            var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'input' + newNum);
+            var question = newQuestionBox.find(questionId).attr('name').replace(/\d+/, new String(newNum)));
+            var question = newQuestionBox.find(questionId).attr('id').replace(/\d+/, new String(newNum)));
+			$('#add-more-questions' + num).after(newQuestionBox);
+
+            
+
       });
     });
 
@@ -70,25 +83,28 @@
                 ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
                 ${form.csrf_token()}
                 <span>
+                <ul>
+					<li id="add-questions-area-1">
                       <div class="formlabel">Question 1 </div>
                       <div class="forminfo">Question 1</div>
                       <div class="formfield">
-                          <input type="text" name="question1" id="question1">                          
+                          <input type="text" name="question-1" id="question-1">                          
                       </div>                                         
                       <div class="formlabel">Options 1 </div>
                       <div class="forminfo">Options one on on line</div>
                       <div class="formfield">
-                          <textarea name="options1" id="options1"></textarea>                          
+                          <textarea name="options-1" id="options-1"></textarea>                          
                       </div>
                       
                       <div class="formlabel">Solution </div>
                       <div class="forminfo">Solution</div>
                       <div class="formfield">
-                          <textarea name="solution1" id="solution1"></textarea>                          
+                          <textarea name="solution-1" id="solution-1"></textarea>                          
                       </div>
                       <input class="button" id="add-more-questions" value="Add More Questions" type="button">
                       <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
-
+					</li>
+				</ul>
                   
                 </span>
                 ${form.end()}
