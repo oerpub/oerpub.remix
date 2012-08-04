@@ -11,12 +11,14 @@ var newInput;
 			var num     = $('#add-more-questions').length;
             var newNum  = new Number(num + 1);
             var questionId = $('#question-'+num);
+            console.log(questionId);
             var optionId = $('#options-'+num);
             var solutionId = $('#solution-'+num);
             
-            var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'input' + newNum);
+            var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
+            console.log(newQuestionBox);
             var question = newQuestionBox.find(questionId).attr('name').replace(/\d+/, new String(newNum));
-            var question = newQuestionBox.find(questionId).attr('id').replace(/\d+/, new String(newNum));
+            var option = newQuestionBox.find(questionId).attr('id').replace(/\d+/, new String(newNum));
 			$('#add-more-questions' + num).after(newQuestionBox);
 
             
