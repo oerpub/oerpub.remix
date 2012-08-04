@@ -1402,7 +1402,7 @@ def slideshow_preview(request):
 		for i in range(1,6):
 			form_question = request.POST.get('question-'+str(i))
 			form_options = request.POST.get('options-'+str(i)).split()
-			form_solution = request.POST.get('solution-'+str(i))			
+			form_solution = request.POST.get('solution-'+str(i))
 			all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
 			i=1
 			cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
@@ -1414,9 +1414,7 @@ def slideshow_preview(request):
 					optionlist=""
 					for option in options:
 						optionlist+="<item>"+option+"</item>"
-					cnxml+="""
-					<exercise id="exercise-"""+str(i)+"""">
-					<problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
+					cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
 					cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise></section>"""
 					i+=1
         metadata = session['metadata']
