@@ -1,11 +1,38 @@
 <metal:use use-macro="base">
+<metal:script-slot fill-slot="script-slot">
+<script type="text/javascript">
+  function returnHTML(id){
+    var html="<div class=\"formlabel\">Question "+id+" </div><div class=\"forminfo\">Question "+id+"</div>"+
+                      "<div class=\"formfield\">"+
+                          "<input type=\"text\" name=\"question\""+ id+">" 
+                      +"</div>"+
+                      "<div class=\"formlabel\">Options"+id+" </div>"+
+                      "<div class=\"forminfo\">Options one on on line</div>"+
+                      "<div class=\"formfield\">"+
+                          "<textarea name=\"options"+ id+"></textarea>"+                          
+                      "</div>"+
+                      
+                      "<div class=\"formlabel\">Solution </div>"+
+                      "<div class=\"forminfo\">Solution</div>"+
+                      "<div class=\"formfield\">"+
+                        "<textarea name=\"solution\">"+id+"</textarea>"+
+                        "</div>";
+                      return html;
+  }
+    $(document).ready(function(){
+      $("#add-more-questions").click(function(){
+        alert(returnHTML(1))
+      });
+    });
+
+</script>
+}    
+</metal:script-slot>
 
     <metal:workflownav fill-slot="workflownav">
    
     <div id="workflownav-wrap">
-        <div id="workflownav-container">           
-            
-        </div>
+        
     </div>
     </metal:workflownav>
 
