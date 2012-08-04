@@ -1399,32 +1399,34 @@ def slideshow_preview(request):
         embed_slideshare = True
     templatePath = "templates/google_ss_preview.pt"
     if validate_form:
-        question1 = request.POST.get('question1')
-        option1 = request.POST.get('options1').split()
-        solution1 = request.POST.get('solution1')
-        all_post_data = {"question1":{"options":option1,"solution":solution1,"question":question1}}
-        i=1
-        cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
-        for question in all_post_data:
-            options = all_post_data[question]['options']
-            solution = all_post_data[question]['solution']
-            asked_question = all_post_data[question]['question']
-            optionlist=""
-            for option in options:
-                optionlist+="<item>"+option+"</item>"
-            cnxml+="""
-            <exercise id="exercise-"""+str(i)+"""">
-            <problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
-            cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise></section>"""
-            i+=1
-        print cnxml
+		for i in range(1,6):
+			form_question = request.POST.get('question-'+str(i))
+			form_options = request.POST.get('options-'+str(i)).split()
+			form_solution = request.POST.get('solution-'+str(i))			
+			all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
+			i=1
+			cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
+			for question in all_post_data:
+				options = all_post_data[question]['options']
+				solution = all_post_data[question]['solution']
+				asked_question = all_post_data[question]['question']
+				if (asked_question is not ""):
+					optionlist=""
+					for option in options:
+						optionlist+="<item>"+option+"</item>"
+					cnxml+="""
+					<exercise id="exercise-"""+str(i)+"""">
+					<problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
+					cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise></section>"""
+					i+=1
+			
         metadata = session['metadata']
         cnxml += "</content></document>"
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-        zip_archive.writestr("index.cnxml",cnxml)#+"""<content><para id="introduction-1">Introduction goes here</para></content></document>""")
+        zip_archive.writestr("index.cnxml",cnxml)
         zip_archive.close()
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
