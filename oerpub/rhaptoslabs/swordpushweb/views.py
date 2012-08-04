@@ -1256,7 +1256,6 @@ def google_oauth_callback(request):
 
 @view_config(route_name='google_oauth')
 def authenticate_user_with_oauth(request):
-    session = request.session
     #username = session['username']
     oauth = GoogleOAuth()
     oauth.set_oauth_callback_url()
@@ -1399,24 +1398,24 @@ def slideshow_preview(request):
         embed_slideshare = True
     templatePath = "templates/google_ss_preview.pt"
     if validate_form:
-		for i in range(1,6):
-			form_question = request.POST.get('question-'+str(i))
-			form_options = request.POST.get('options-'+str(i)).split()
-			form_solution = request.POST.get('solution-'+str(i))
-			all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
-			i=1
-			cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
-			for question in all_post_data:
-				options = all_post_data[question]['options']
-				solution = all_post_data[question]['solution']
-				asked_question = all_post_data[question]['question']
-				if (asked_question is not ""):
-					optionlist=""
-					for option in options:
-						optionlist+="<item>"+option+"</item>"
-					cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
-					cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise></section>"""
-					i+=1
+        j=1
+        for i in range(1,6):
+            form_question = request.POST.get('question-'+str(i))
+            form_options = request.POST.get('options-'+str(i)).split()
+            form_solution = request.POST.get('solution-'+str(i))
+            all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
+            cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
+            for question in all_post_data:
+                options = all_post_data[question]['options']
+                solution = all_post_data[question]['solution']
+                asked_question = all_post_data[question]['question']
+                if asked_question is not "":
+                    optionlist=""
+                    for option in options:
+                        optionlist+="<item>"+option+"</item>"
+                    cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
+                    cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise></section>"""
+                    j+=1
         metadata = session['metadata']
         cnxml += "</content></document>"
         workspaces = [(i['href'], i['title']) for i in session['collections']]
