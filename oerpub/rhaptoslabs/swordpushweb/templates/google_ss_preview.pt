@@ -20,11 +20,11 @@ var newInput;
             var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
             var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
             
-            var replaceName = newQuestionBox.find(optionId).attr('name','question-'+newNum);
-            var replaceId = newQuestionBox.find(optionId).attr('id','question-'+newNum);
+            var replaceName = newQuestionBox.find(optionId).attr('name','options-'+newNum);
+            var replaceId = newQuestionBox.find(optionId).attr('id','options-'+newNum);
             
-            var replaceName = newQuestionBox.find(solutionId).attr('name','question-'+newNum);
-            var replaceId = newQuestionBox.find(solutionId).attr('id','question-'+newNum);
+            var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
+            var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
             
             
 			$('#add-questions-area-' + num).after(newQuestionBox);
