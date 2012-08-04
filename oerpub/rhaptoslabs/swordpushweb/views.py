@@ -1418,7 +1418,8 @@ def slideshow_preview(request):
                     cnxml+=""" <solution id="solution-"""+str(j)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
                     j+=1
         metadata = session['metadata']
-        cnxml += "</session></content></document>"
+        cnxml += "</section></content></document>"
+        print cnxml
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
