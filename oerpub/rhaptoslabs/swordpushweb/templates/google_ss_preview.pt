@@ -12,13 +12,21 @@ var newInput;
             var newNum  = new Number(num + 1);
             var questionId = '#question-'+num;
             console.log(questionId);
-            var optionId = $('#options-'+num);
-            var solutionId = $('#solution-'+num);
+            var optionId = '#options-'+num;
+            var solutionId = '#solution-'+num;
             
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
             
-            var question = newQuestionBox.find(questionId).attr('name').replace(/\d+/, new String(newNum));
-            var option = newQuestionBox.find(questionId).attr('id').replace(/\d+/, new String(newNum));
+            var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
+            var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
+            
+            var replaceName = newQuestionBox.find(optionId).attr('name','question-'+newNum);
+            var replaceId = newQuestionBox.find(optionId).attr('id','question-'+newNum);
+            
+            var replaceName = newQuestionBox.find(solutionId).attr('name','question-'+newNum);
+            var replaceId = newQuestionBox.find(solutionId).attr('id','question-'+newNum);
+            
+            
 			$('#add-questions-area-' + num).after(newQuestionBox);
 			
             
@@ -87,12 +95,12 @@ var newInput;
                 <span>
                 <ul id="all-questions">
 					<li id="add-questions-area-1">
-                      <div class="formlabel">Question 1 </div>
-                      <div class="forminfo">Question 1</div>
+                      <div class="formlabel">Question </div>
+                      <div class="forminfo">Question</div>
                       <div class="formfield">
                           <input type="text" name="question-1" id="question-1">                          
                       </div>                                         
-                      <div class="formlabel">Options 1 </div>
+                      <div class="formlabel">Options </div>
                       <div class="forminfo">Options one on on line</div>
                       <div class="formfield">
                           <textarea name="options-1" id="options-1"></textarea>                          
@@ -103,10 +111,11 @@ var newInput;
                       <div class="formfield">
                           <textarea name="solution-1" id="solution-1"></textarea>                          
                       </div>
-                      <input class="button" id="add-more-questions" value="Add More Questions" type="button">
-                      <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
+                      
 					</li>
 				</ul>
+				<input class="button" id="add-more-questions" value="Add More Questions" type="button">
+                <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
                   
                 </span>
                 ${form.end()}
