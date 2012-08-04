@@ -10,7 +10,7 @@ var newInput;
       $("#add-more-questions").click(function(){
 			var num     = $('#add-more-questions').length;
             var newNum  = new Number(num + 1);
-            var questionId = $('#question-'+num);
+            var questionId = '#question-'+num;
             console.log(questionId);
             var optionId = $('#options-'+num);
             var solutionId = $('#solution-'+num);
