@@ -1401,6 +1401,8 @@ def slideshow_preview(request):
         j=1
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
+            print form_question
+
             form_options = request.POST.get('options-'+str(i)).split()
             form_solution = request.POST.get('solution-'+str(i))
             all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
