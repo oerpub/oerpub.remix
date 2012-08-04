@@ -1402,16 +1402,15 @@ def slideshow_preview(request):
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
             print form_question
-
-            form_options = request.POST.get('options-'+str(i)).split()
-            form_solution = request.POST.get('solution-'+str(i))
-            all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
-            cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
-            for question in all_post_data:
-                options = all_post_data[question]['options']
-                solution = all_post_data[question]['solution']
-                asked_question = all_post_data[question]['question']
-                if asked_question is not "":
+            if form_question:
+                form_options = request.POST.get('options-'+str(i)).split()
+                form_solution = request.POST.get('solution-'+str(i))
+                all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
+                cnxml=session["cnxml"]+"""<content><para id="introduction-1">Introduction goes here</para><section id="test-section"><title>Test your knowledge</title>"""
+                for question in all_post_data:
+                    options = all_post_data[question]['options']
+                    solution = all_post_data[question]['solution']
+                    asked_question = all_post_data[question]['question']
                     optionlist=""
                     for option in options:
                         optionlist+="<item>"+option+"</item>"
