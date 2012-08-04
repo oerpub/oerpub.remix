@@ -3,10 +3,7 @@
     <metal:workflownav fill-slot="workflownav">
    
     <div id="workflownav-wrap">
-        <div id="workflownav-container">
-            <div id="back-steps">
-              
-            </div>
+        <div id="workflownav-container">           
             
         </div>
     </div>
@@ -30,15 +27,15 @@
                     <div id="page-description">
                         <p class="forminfo">
                           <p tal:condition="embed_google">
-                          View below the Presentation as uploaded to Google Docs<br/>
-                          <br/>.
-                              <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
+                          View below the Presentation as uploaded to Google Docs.
+                          <br/><br/>
+                            <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
                                 frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
-                      				</iframe>
+                      		</iframe>
                           </p>
                           <p tal:condition="embed_slideshare">
-                          View below the Presentation as uploaded to SlideShare.
-                          <br/><br/>
+							View below the Presentation as uploaded to SlideShare.
+							<br/><br/>
                             <iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshare_id}" 
                               width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" 
                               scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0" allowfullscreen>
@@ -78,6 +75,7 @@
                       <div class="formfield">
                           <textarea name="solution1" id="solution1"></textarea>                          
                       </div>
+                      <input class="button" id="add-more-questions" value="Add More Questions" type="button">
                       <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
 
                   
