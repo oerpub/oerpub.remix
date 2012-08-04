@@ -16,11 +16,11 @@ var newInput;
             var solutionId = $('#solution-'+num);
             
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
-            console.log(newQuestionBox);
+            
             var question = newQuestionBox.find(questionId).attr('name').replace(/\d+/, new String(newNum));
             var option = newQuestionBox.find(questionId).attr('id').replace(/\d+/, new String(newNum));
-			$('#add-more-questions' + num).after(newQuestionBox);
-
+			$('#add-questions-area-' + num).after(newQuestionBox);
+			
             
 
       });
@@ -85,7 +85,7 @@ var newInput;
                 ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
                 ${form.csrf_token()}
                 <span>
-                <ul>
+                <ul id="all-questions">
 					<li id="add-questions-area-1">
                       <div class="formlabel">Question 1 </div>
                       <div class="forminfo">Question 1</div>
