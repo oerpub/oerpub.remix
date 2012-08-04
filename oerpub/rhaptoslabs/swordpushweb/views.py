@@ -193,9 +193,9 @@ class ImporterSchema(formencode.Schema):
 
 class QuestionAnswerSchema(formencode.Schema):
 	allow_extra_fields = True
-	question1 = formencode.validators.String()
-	options1 = formencode.validators.String()
-	solution1 = formencode.validators.String()
+	#question1 = formencode.validators.String()
+	#options1 = formencode.validators.String()
+	#solution1 = formencode.validators.String()
 
 class ConversionError(Exception):
     def __init__(self, msg):
