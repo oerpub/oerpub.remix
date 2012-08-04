@@ -15,8 +15,8 @@ var newInput;
             var solutionId = $('#solution-'+num);
             
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'input' + newNum);
-            var question = newQuestionBox.find(questionId).attr('name').replace(/\d+/, new String(newNum)));
-            var question = newQuestionBox.find(questionId).attr('id').replace(/\d+/, new String(newNum)));
+            var question = newQuestionBox.find(questionId).attr('name').replace(/\d+/, new String(newNum));
+            var question = newQuestionBox.find(questionId).attr('id').replace(/\d+/, new String(newNum));
 			$('#add-more-questions' + num).after(newQuestionBox);
 
             
