@@ -189,7 +189,7 @@ class ImporterSchema(formencode.Schema):
     importer = formencode.validators.FieldStorageUploadConverter()
     upload_to_ss = formencode.validators.String()
     upload_to_google = formencode.validators.String()
-    introductory_paragraphs = formencode.validators.String()
+    #introductory_paragraphs = formencode.validators.String()
 
 class QuestionAnswerSchema(formencode.Schema):
 	allow_extra_fields = True
