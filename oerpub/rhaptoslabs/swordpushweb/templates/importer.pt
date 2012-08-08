@@ -70,12 +70,12 @@
 
             <div id="choose-upload">
               <h1>
-                Save your Presentations :                 
+                Choose where to run your Presentation :                 
               </h1>
               <p class="forminfo">
-                Choose one  or both of the following to deposit your presentations and  create a new module. The presentaions will
-                be uploaded to Connexions' Slideshare Account  or(and) your personal Google Docs account and to your Connexions account.
-                A metadata page will appear once the upload is complete for updating the metadata.
+                Your new Connexions module will show your slides interactively to readers. 
+                It will use either Connexions' Slideshare account or your personal Google Docs account to display the slides. 
+                Which would you prefer ?              
               </p>
 
               
@@ -104,13 +104,6 @@
                     <input type='hidden' name='upload_to_google' id='upload-to-google' value="false">
                     <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
                             
-                    <span>
-                      <div class="formlabel">Introductory paragraph</div>
-                      <div class="forminfo">A small intoduction for the slides</div>
-                      <div class="formfield">
-                          <textarea name="introductory_paragraphs" rows="6" cols="60"></textarea>
-                      </div>
-                    </span>
                   </div>   
                 </li>
               </ul>

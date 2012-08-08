@@ -2,13 +2,11 @@
 
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
-  	
-
-var nextSelectValue = 2;
-var newInput;
+    var nextSelectValue = 2;
+    var newInput;
     $(document).ready(function(){
       $("#add-more-questions").click(function(){
-			var num     = $('#add-more-questions').length;
+      			var num     = $('#add-more-questions').length;
             var newNum  = new Number(num + 1);
             var questionId = '#question-'+num;
             console.log(questionId);
@@ -25,9 +23,7 @@ var newInput;
             
             var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
             var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
-            
-            
-			$('#add-questions-area-' + num).after(newQuestionBox);
+           $('#add-questions-area-' + num).after(newQuestionBox);
 			
             
 
@@ -68,8 +64,8 @@ var newInput;
                       		</iframe>
                           </p>
                           <p tal:condition="embed_slideshare">
-							View below the Presentation as uploaded to SlideShare.
-							<br/><br/>
+	            						  View below the Presentation as uploaded to SlideShare.
+							               <br/><br/>
                             <iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshare_id}" 
                               width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" 
                               scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0" allowfullscreen>
@@ -86,35 +82,39 @@ var newInput;
                         jQuery('iframe#preview-frame.preview').attr('src', src);
                     }
                 </script>
-
-                
-                    
-                
                 ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
                 ${form.csrf_token()}
                 <span>
+                  <span>
+                    <div class="formlabel">Introductory paragraph</div>
+                    <div class="forminfo">A small intoduction for the slides</div>
+                    <div class="formfield">
+                      <textarea name="introductory_paragraphs" rows="6" cols="60"></textarea>
+                  </div>
+                </span>
+
                 <ul id="all-questions">
-					<li id="add-questions-area-1">
+        					<li id="add-questions-area-1">
                       <div class="formlabel">Question </div>
                       <div class="forminfo">Question</div>
                       <div class="formfield">
-                          <input type="text" name="question-1" id="question-1">                          
+                          <input type="text" size="50" name="question-1" id="question-1">                          
                       </div>                                         
                       <div class="formlabel">Options </div>
                       <div class="forminfo">Options one on on line</div>
                       <div class="formfield">
-                          <textarea name="options-1" id="options-1"></textarea>                          
+                          <textarea name="options-1" rows="5" cols="40" id="options-1"></textarea>                          
                       </div>
                       
                       <div class="formlabel">Solution </div>
                       <div class="forminfo">Solution</div>
                       <div class="formfield">
-                          <textarea name="solution-1" id="solution-1"></textarea>                          
+                          <textarea name="solution-1" rows="5" cols="40" id="solution-1"></textarea>                          
                       </div>
                       
-					</li>
-				</ul>
-				<input class="button" id="add-more-questions" value="Add More Questions" type="button">
+			          	</li>
+      				</ul>
+				        <input class="button" id="add-more-questions" value="Add More Questions" type="button">
                 <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
                   
                 </span>
