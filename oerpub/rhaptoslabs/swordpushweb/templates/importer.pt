@@ -92,6 +92,9 @@
                         <br/><br/><br/><br/><br/>
                         <div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
                         <br/><br/>
+                        <input type="hidden" id="upload-to-google" name="upload_to_google" value="false">
+                        <input type="hidden" id="upload-to-ss" name="upload_to_ss" value="true">
+                        
                     </div>
                 </li>
               </ul>
