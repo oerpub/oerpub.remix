@@ -312,7 +312,7 @@ $(document).ready(function() {
 
     $('input#upload-presentation').change(function(event){
         showWaitMessage();
-        $('form#uploadpresentationform').submit(); 
+        $('form#presentationform').submit(); 
     });
 
     $('input#url-submit').click(function(event){
