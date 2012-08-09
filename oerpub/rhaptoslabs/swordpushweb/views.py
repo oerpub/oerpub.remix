@@ -187,10 +187,15 @@ class UploadSchema(formencode.Schema):
 class ImporterSchema(formencode.Schema):
     allow_extra_fields = True
     importer = formencode.validators.FieldStorageUploadConverter()
+    #upload_to_ss = formencode.validators.String()
+    #upload_to_google = formencode.validators.String()
+    #introductory_paragraphs = formencode.validators.String()
+
+class ImporterChoiceSchema(formencode.Schema):
+    allow_extra_fields = True
     upload_to_ss = formencode.validators.String()
     upload_to_google = formencode.validators.String()
     #introductory_paragraphs = formencode.validators.String()
-
 class QuestionAnswerSchema(formencode.Schema):
 	allow_extra_fields = True
 	#question1 = formencode.validators.String()
@@ -307,10 +312,12 @@ def process_gdocs_resource(save_dir, gdocs_resource_id, gdocs_access_token=None)
 @view_config(route_name='choose')
 def choose_view(request):
     check_login(request)
+    session = request.session
 
     templatePath = 'templates/choose.pt'
 
     form = Form(request, schema=UploadSchema)
+    presentationform = Form(request, schema=ImporterSchema)
     field_list = [('upload', 'File')]
 
     # clear the session
@@ -544,8 +551,98 @@ FORM DATA
     # First view or errors
     response = {
         'form': FormRenderer(form),
+        'presentationform': FormRenderer(presentationform),
         'field_list': field_list,
     }
+    if presentationform.validate():
+
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        save_dir = os.path.join(
+            request.registry.settings['slideshare_import_dir'],
+            temp_dir_name
+        )
+        os.mkdir(save_dir)
+        uploaded_filename = form.data['importer'].filename.replace(os.sep, '_')
+        original_filename = os.path.join(save_dir, form.data['importer'].filename.replace(os.sep, '_'))
+        saved_file = open(original_filename, 'wb')
+        input_file = form.data['importer'].file
+        shutil.copyfileobj(input_file, saved_file)
+        saved_file.close()
+        input_file.close()
+        username = session['username']
+        #collections = [{'title': i.title, 'href': i.href}
+        #                          for i in sword2cnx.get_workspaces(conn)]
+        #session['collections'] = collections
+        #workspaces = [(i['href'], i['title']) for i in session['collections']]
+        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
+        session['userfilepath'] = zipped_filepath
+        zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
+        zip_archive.write(original_filename,uploaded_filename)
+        zip_archive.close()
+        username = session['username']
+        #slideshare_details = get_details(slideshow_id)
+        #slideshare_download_url = get_slideshow_download_url(slideshare_details)
+        #session['transcript'] = get_transcript(slideshare_details)
+        session['title'] = uploaded_filename.split(".")[0]
+        metadata = {}
+        metadata['dcterms:title'] = uploaded_filename.split(".")[0]
+        cnxml = """<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
+  <title>TEST DOC</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
+       Changes to the metadata section in the source will not be saved. -->
+  <md:repository>http://qa.cnx.org/content</md:repository>
+  <md:content-id>new</md:content-id>
+  <md:title>""</md:title>
+  <md:version>**new**</md:version>
+  <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
+  <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
+  <md:actors>
+    <md:person userid="""+"\""+username+"\""+""">
+      <md:firstname></md:firstname>
+      <md:surname></md:surname>
+      <md:fullname></md:fullname>
+      <md:email></md:email>
+    </md:person>
+  </md:actors>
+  <md:roles>
+    <md:role type="author">"""+username+"""</md:role>
+    <md:role type="maintainer">"""+username+"""</md:role>
+    <md:role type="licensor">"""+username+"""</md:role>
+  </md:roles>
+  <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
+  <!-- For information on license requirements for use or modification, see license url in the
+       above <md:license> element.
+       For information on formatting required attribution, see the URL:
+         CONTENT_URL/content_info#cnx_cite_header
+       where CONTENT_URL is the value provided above in the <md:content-url> element.
+  -->
+  <md:abstract/>
+  <md:language>en</md:language>
+  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
+       Changes to the metadata section in the source will not be saved. -->
+</metadata>
+<featured-links>
+  <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
+       Changes to the links section in the source will not be saved.
+    <link-group type="supplemental">
+      <link url="" strength="3">Download the original slides in PPT format</link>
+      <link url="" strength="2">SlideShare PPT Download Link</link>
+    </link-group>
+   WARNING! The 'featured-links' section is read only. Do not edit above.
+       Changes to the links section in the source will not be saved. -->
+</featured-links>"""
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        session['metadata'] = metadata
+        session['cnxml'] = cnxml
+        return HTTPFound(location=request.route_url('importer'), request=request)
+
+
+
+
     return render_to_response(templatePath, response, request=request)
 
 
@@ -1086,39 +1183,12 @@ def return_slideshare_upload_form(request):
     session = request.session
     if session.has_key('original-file-location'):
         del session['original-file-location']
-    form = Form(request, schema=ImporterSchema)
+    form = Form(request, schema=ImporterChoiceSchema)
     response = {'form':FormRenderer(form)}
     validate_form = form.validate()
     print form.all_errors()
-    if request.GET.get('slideshow_id'):
-        slideshow_id = request.GET.get('slideshow_id')
-        all_details = get_details(slideshow_id)
-        download_link = get_download_link(all_details)
-        response = get_slideshow_status(all_details)
-        if response == '0' or response == '1':
-            return {'form' : FormRenderer(form),'conversion_flag': True, 'oembed':False, 'slideshow_id': slideshow_id}
-        else:
-            return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': True, 'slideshow_id': slideshow_id, 'download_link': download_link}
     if validate_form:
-
-
-        ## Create a temp directory with the username and current timestamp for it to be unique
-        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        redirect_to_google_oauth = False
-        # TODO: This has a good chance of being unique, but even so..
-        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
-        save_dir = os.path.join(
-            request.registry.settings['slideshare_import_dir'],
-            temp_dir_name
-        )
-        os.mkdir(save_dir)
-        uploaded_filename = form.data['importer'].filename.replace(os.sep, '_')
-        original_filename = os.path.join(save_dir, form.data['importer'].filename.replace(os.sep, '_'))
-        saved_file = open(original_filename, 'wb')
-        input_file = form.data['importer'].file
-        shutil.copyfileobj(input_file, saved_file)
-        saved_file.close()
-        input_file.close()
+        original_filename = session['original_filename']
         upload_to_google = form.data['upload_to_google']
         upload_to_ss = form.data['upload_to_ss']
         username = session['username']
@@ -1140,67 +1210,18 @@ def return_slideshare_upload_form(request):
                 resource_id = guploader.get_resource_id().split(':')[1]
                 session['google-resource-id'] = resource_id
                 print "UPLOADING TO GOOGLE"
-                form.data['upload'] = None
             else:
                 print "NEW USER"
                 redirect_to_google_oauth = True
                 session['original-file-path'] = original_filename
         else:
             print "NO GOOGLE FOUND"
-
-        #collections = [{'title': i.title, 'href': i.href}
-        #                          for i in sword2cnx.get_workspaces(conn)]
-        #session['collections'] = collections
-        #workspaces = [(i['href'], i['title']) for i in session['collections']]
-        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
-        session['userfilepath'] = zipped_filepath
-        zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-        zip_archive.write(original_filename,uploaded_filename)
-        zip_archive.close()
         username = session['username']
+        uploaded_filename = session['uploaded_filename']
         slideshare_details = get_details(slideshow_id)
         slideshare_download_url = get_slideshow_download_url(slideshare_details)
         session['transcript'] = get_transcript(slideshare_details)
-        session['title'] = uploaded_filename.split(".")[0]
-        metadata = {}
-        metadata['dcterms:title'] = uploaded_filename.split(".")[0]
-        cnxml = """<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
-  <title>TEST DOC</title>
-<metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
-  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
-       Changes to the metadata section in the source will not be saved. -->
-  <md:repository>http://qa.cnx.org/content</md:repository>
-  <md:content-id>new</md:content-id>
-  <md:title>""</md:title>
-  <md:version>**new**</md:version>
-  <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
-  <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
-  <md:actors>
-    <md:person userid="""+"\""+username+"\""+""">
-      <md:firstname></md:firstname>
-      <md:surname></md:surname>
-      <md:fullname></md:fullname>
-      <md:email></md:email>
-    </md:person>
-  </md:actors>
-  <md:roles>
-    <md:role type="author">"""+username+"""</md:role>
-    <md:role type="maintainer">"""+username+"""</md:role>
-    <md:role type="licensor">"""+username+"""</md:role>
-  </md:roles>
-  <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
-  <!-- For information on license requirements for use or modification, see license url in the
-       above <md:license> element.
-       For information on formatting required attribution, see the URL:
-         CONTENT_URL/content_info#cnx_cite_header
-       where CONTENT_URL is the value provided above in the <md:content-url> element.
-  -->
-  <md:abstract/>
-  <md:language>en</md:language>
-  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
-       Changes to the metadata section in the source will not be saved. -->
-</metadata>
-<featured-links>
+        cnxml = """<featured-links>
   <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
        Changes to the links section in the source will not be saved. -->
     <link-group type="supplemental">
@@ -1210,11 +1231,7 @@ def return_slideshare_upload_form(request):
   <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
        Changes to the links section in the source will not be saved. -->
 </featured-links>"""
-        for key in metadata.keys():
-            if metadata[key] == '':
-                del metadata[key]
-        session['metadata'] = metadata
-        session['cnxml'] = cnxml
+        session['cnxml'] += cnxml
 
 
 
