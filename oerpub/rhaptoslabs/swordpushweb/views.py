@@ -1187,6 +1187,7 @@ def is_returning_google_user(username):
 def return_slideshare_upload_form(request):
     check_login(request)
     session = request.session
+    redirect_to_google_oauth = False
     if session.has_key('original-file-location'):
         del session['original-file-location']
     form = Form(request, schema=ImporterChoiceSchema)
