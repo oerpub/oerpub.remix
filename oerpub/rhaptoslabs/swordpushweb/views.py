@@ -1341,7 +1341,7 @@ def update_cnx_metadata(request):
                 v = v.strip()
                 if v:
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
-        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+        conn = sword2cnx.Connection("http://qa.cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
                                     always_authenticate=True,
@@ -1426,7 +1426,7 @@ def slideshow_preview(request):
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.writestr("index.cnxml",cnxml)
         zip_archive.close()
-        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+        conn = sword2cnx.Connection("http://qa.cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
                                     always_authenticate=True,
