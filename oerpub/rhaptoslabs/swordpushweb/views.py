@@ -580,6 +580,7 @@ FORM DATA
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)
         zip_archive.close()
+        session['original_filename'] = original_filename
         username = session['username']
         #slideshare_details = get_details(slideshow_id)
         #slideshare_download_url = get_slideshow_download_url(slideshare_details)
@@ -623,26 +624,22 @@ FORM DATA
   <!-- WARNING! The 'metadata' section is read only. Do not edit above.
        Changes to the metadata section in the source will not be saved. -->
 </metadata>
-<featured-links>
-  <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
+<!--<featured-links>
+   WARNING! The 'featured-links' section is read only. Do not edit below.
        Changes to the links section in the source will not be saved.
     <link-group type="supplemental">
       <link url="" strength="3">Download the original slides in PPT format</link>
       <link url="" strength="2">SlideShare PPT Download Link</link>
     </link-group>
    WARNING! The 'featured-links' section is read only. Do not edit above.
-       Changes to the links section in the source will not be saved. -->
-</featured-links>"""
+       Changes to the links section in the source will not be saved. 
+</featured-links>-->"""
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
         session['metadata'] = metadata
         session['cnxml'] = cnxml
         return HTTPFound(location=request.route_url('importer'), request=request)
-
-
-
-
     return render_to_response(templatePath, response, request=request)
 
 
@@ -654,7 +651,6 @@ class PreviewSchema(formencode.Schema):
 @view_config(route_name='preview', renderer='templates/preview.pt')
 def preview_view(request):
     check_login(request)
-
     defaults = {}
     defaults['title'] = request.session.get('title', '')
     form = Form(request,
@@ -1270,15 +1266,6 @@ def google_oauth_callback(request):
         del session['original-file-location']
     raise HTTPFound(location=request.route_url('slideshow_preview'))
 
-
-@view_config(route_name='google_oauth')
-def authenticate_user_with_oauth(request):
-    #username = session['username']
-    oauth = GoogleOAuth()
-    oauth.set_oauth_callback_url()
-    saved_request_token = oauth.get_oauth_token_from_google()
-    request.session['saved_request_token'] = saved_request_token
-    return HTTPFound(location=str(oauth.get_authorization_url_from_google()))
 
 @view_config(route_name='updatecnx')
 def update_cnx_metadata(request):

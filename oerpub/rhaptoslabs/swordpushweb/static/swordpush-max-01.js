@@ -320,8 +320,7 @@ $(document).ready(function() {
     });
     
     $('input#choose-importer').click(function(event){
-        $('#choose-importer-box').slideUp()
-        $('#file-browser').show().slideDown();
+		event.preventDefault();
         if ($('#import-to-google').is(':checked')) {
             $('input#upload-to-google').val("true");
         
@@ -330,8 +329,8 @@ $(document).ready(function() {
             $('input#upload-to-ss').val("true");
         
         } 
-        $('input#upload-to-ss').val("true");
-        $('input#upload-to-ss').val("true");
+        
+        $('form#importform').submit(); 
         
     });
     $('#file-browser').hide();

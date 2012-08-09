@@ -81,6 +81,8 @@
               
               <ul id="create-new-list">
                 <li>
+					${form.begin(request.route_url('importer'), id='importform')}
+					${form.csrf_token()}
                     <div class="upload-form" id="choose-importer-box">                        
                       <div class="left"><input type="checkbox" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
                       <div class="left"><span class="label-text" id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
@@ -91,20 +93,6 @@
                         <div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
                         <br/><br/>
                     </div>
-                </li>
-              
-              
-                <li id="file-browser">                  
-                  ${form.begin(request.route_url('importer'), multipart='multipart', id='importform')}
-                  ${form.csrf_token()}
-                  <div class="upload-form">          
-                    <input id="importer" name="importer"  type="file" style="background-color:white;width:401px;" /> <br/>
-                    
-                    <input type='hidden' name='upload_to_ss' id='upload-to-ss' value="false">
-                    <input type='hidden' name='upload_to_google' id='upload-to-google' value="false">
-                    <input class="button" id="import-submit" name="form.submitted" value="Import &#187;" type="submit">
-                            
-                  </div>   
                 </li>
               </ul>
               ${form.end()}
