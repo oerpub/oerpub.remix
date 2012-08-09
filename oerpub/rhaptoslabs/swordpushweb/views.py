@@ -555,6 +555,7 @@ FORM DATA
         'field_list': field_list,
     }
     if presentationform.validate():
+		print "Inside presentation form"
 
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
         temp_dir_name = '%s-%s' % (request.session['username'], now_string)
@@ -576,11 +577,13 @@ FORM DATA
         #session['collections'] = collections
         #workspaces = [(i['href'], i['title']) for i in session['collections']]
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
+        print "Ziiped filepath",zipped_filepath
         session['userfilepath'] = zipped_filepath
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)
         zip_archive.close()
         session['original_filename'] = original_filename
+        print "Original filename ",original_filename
         username = session['username']
         #slideshare_details = get_details(slideshow_id)
         #slideshare_download_url = get_slideshow_download_url(slideshare_details)
@@ -637,9 +640,11 @@ FORM DATA
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
+                
         session['metadata'] = metadata
+        print cnxml
         session['cnxml'] = cnxml
-        return HTTPFound(location=request.route_url('importer'), request=request)
+        raise HTTPFound(location=request.route_url('importer'))
     return render_to_response(templatePath, response, request=request)
 
 
