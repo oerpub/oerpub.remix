@@ -306,13 +306,11 @@ $(document).ready(function() {
     });
 
     $('input#presentation-submit').click(function(event){
-        //event.preventDefault();
-        alert("Sunmit form");
-        $('form#presentationform').submit(); 
-      //  $('input#upload-presentation').click();
+        event.preventDefault();
+        $('input#importer').click();
     });
 
-    $('input#upload-presentation').change(function(event){
+    $('input#importer').change(function(event){
         showWaitMessage();
         $('form#presentationform').submit(); 
     });
