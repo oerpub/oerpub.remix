@@ -1398,7 +1398,7 @@ def slideshow_preview(request):
         embed_slideshare = True
     templatePath = "templates/google_ss_preview.pt"
     if validate_form:
-        introductory_paragraphs = request.post('introductory_paragraphs')
+        introductory_paragraphs = request.POST.get('introductory_paragraphs')
         j=1
         cnxml=session["cnxml"]+"""<content><para id="introduction-1">"""+introductory_paragraphs+"""</para><para id="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355"></iframe></para>"""+"""<section id="test-section"><title>Test your knowledge</title>"""
         for i in range(1,6):
