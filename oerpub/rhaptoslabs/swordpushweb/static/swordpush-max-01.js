@@ -306,8 +306,10 @@ $(document).ready(function() {
     });
 
     $('input#presentation-submit').click(function(event){
-        event.preventDefault();
-        $('input#upload-presentation').click();
+        //event.preventDefault();
+        alert("Sunmit form");
+        $('form#presentationform').submit(); 
+      //  $('input#upload-presentation').click();
     });
 
     $('input#upload-presentation').change(function(event){
