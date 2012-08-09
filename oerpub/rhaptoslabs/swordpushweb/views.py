@@ -327,6 +327,9 @@ def choose_view(request):
         del request.session['title']
 
     # Check for successful form completion
+    print form.all_errors()
+    print presentationform.all_errors()
+
     if form.validate():
         print "NORMAL FORM"
         try: # Catch-all exception block
