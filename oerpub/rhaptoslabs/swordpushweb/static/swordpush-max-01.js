@@ -305,6 +305,16 @@ $(document).ready(function() {
         $('form#uploadform').submit(); 
     });
 
+    $('input#presentation-submit').click(function(event){
+        event.preventDefault();
+        $('input#upload-presentation').click();
+    });
+
+    $('input#upload-presentation').change(function(event){
+        showWaitMessage();
+        $('form#uploadpresentationform').submit(); 
+    });
+
     $('input#url-submit').click(function(event){
         showWaitMessage();
     });
