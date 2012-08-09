@@ -625,17 +625,7 @@ FORM DATA
   <md:language>en</md:language>
   <!-- WARNING! The 'metadata' section is read only. Do not edit above.
        Changes to the metadata section in the source will not be saved. -->
-</metadata>
-<!--<featured-links>
-   WARNING! The 'featured-links' section is read only. Do not edit below.
-       Changes to the links section in the source will not be saved.
-    <link-group type="supplemental">
-      <link url="" strength="3">Download the original slides in PPT format</link>
-      <link url="" strength="2">SlideShare PPT Download Link</link>
-    </link-group>
-   WARNING! The 'featured-links' section is read only. Do not edit above.
-       Changes to the links section in the source will not be saved.
-</featured-links>-->"""
+</metadata>"""
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
