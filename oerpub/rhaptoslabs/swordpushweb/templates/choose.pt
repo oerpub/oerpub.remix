@@ -104,8 +104,8 @@
                   </div>
                   </li>
               ${form.end()}
-              ${form.begin(request.route_url('importer'), multipart='multipart', id='presentationform')}
-              ${form.csrf_token()}
+              ${presentationform.begin(request.route_url('choose'), multipart='multipart', id='presentationform')}
+              ${presentationform.csrf_token()}
                 <li>
                   <label>
                     <span style="visibility: visible;" class="or-bullet">or</span> 
@@ -119,7 +119,7 @@
                     <!--<input class="button"  value="Import Your Presentations &#187;" onClick="location.href='/importer'" type="button">-->
                   </div>
                   </li>
-              ${form.end()}
+              ${presentationform.end()}
 
 
 
