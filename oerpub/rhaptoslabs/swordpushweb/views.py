@@ -549,14 +549,7 @@ FORM DATA
         return HTTPFound(location=request.route_url('preview'))
 
     # First view or errors
-    response = {
-        'form': FormRenderer(form),
-        'presentationform': FormRenderer(presentationform),
-        'field_list': field_list,
-    }
-    if presentationform.validate():
-		
-
+    elif presentationform.validate():
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
         print "Inside presentation form"
         temp_dir_name = '%s-%s' % (request.session['username'], now_string)
@@ -636,16 +629,22 @@ FORM DATA
       <link url="" strength="2">SlideShare PPT Download Link</link>
     </link-group>
    WARNING! The 'featured-links' section is read only. Do not edit above.
-       Changes to the links section in the source will not be saved. 
+       Changes to the links section in the source will not be saved.
 </featured-links>-->"""
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
-                
         session['metadata'] = metadata
         print cnxml
         session['cnxml'] = cnxml
         raise HTTPFound(location=request.route_url('importer'))
+    else:
+        print "NOTHING COME S HERE"
+    response = {
+        'form': FormRenderer(form),
+        'presentationform': FormRenderer(presentationform),
+        'field_list': field_list,
+    }
     return render_to_response(templatePath, response, request=request)
 
 
