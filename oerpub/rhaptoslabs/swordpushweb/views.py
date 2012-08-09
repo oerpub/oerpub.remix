@@ -580,6 +580,7 @@ FORM DATA
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.write(original_filename,uploaded_filename)
         zip_archive.close()
+        session['uploaded_filename'] = uploaded_filename
         session['original_filename'] = original_filename
         print "Original filename ",original_filename
         username = session['username']
