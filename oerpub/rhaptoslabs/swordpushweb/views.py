@@ -860,7 +860,7 @@ def metadata_view(request):
        xmlns:dcterms="http://purl.org/dc/terms/"
        xmlns:md="http://cnx.rice.edu/mdml"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+       xmlns:oerdc="http://qa.cnx.org/aboutus/technology/schemas/oerdc">
 
     <!-- SWORD deposit receipt -->
     <title>Word created with multipart</title>
@@ -1169,7 +1169,7 @@ def return_slideshare_upload_form(request):
 <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
   <!-- WARNING! The 'metadata' section is read only. Do not edit below.
        Changes to the metadata section in the source will not be saved. -->
-  <md:repository>http://cnx.org/content</md:repository>
+  <md:repository>http://qa.cnx.org/content</md:repository>
   <md:content-id>new</md:content-id>
   <md:title>""</md:title>
   <md:version>**new**</md:version>
@@ -1400,7 +1400,7 @@ def slideshow_preview(request):
     if validate_form:
         introductory_paragraphs = request.POST.get('introductory_paragraphs')
         j=1
-        cnxml=session["cnxml"]+"""<content><para id="introduction-1">"""+introductory_paragraphs+"""</para><para id="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355"></iframe></para>"""+"""<section id="test-section"><title>Test your knowledge</title>"""
+        cnxml=session["cnxml"]+"""<content><para id="introduction-1">"""+introductory_paragraphs+"""</para><media id="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media>"""+"""<section id="test-section"><title>Test your knowledge</title>"""
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
             print form_question
