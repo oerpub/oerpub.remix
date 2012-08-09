@@ -328,6 +328,7 @@ def choose_view(request):
 
     # Check for successful form completion
     if form.validate():
+        print "NORMAL FORM"
         try: # Catch-all exception block
             # Create a directory to do the conversions
             now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
