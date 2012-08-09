@@ -555,9 +555,10 @@ FORM DATA
         'field_list': field_list,
     }
     if presentationform.validate():
-		print "Inside presentation form"
+		
 
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        print "Inside presentation form"
         temp_dir_name = '%s-%s' % (request.session['username'], now_string)
         save_dir = os.path.join(
             request.registry.settings['slideshare_import_dir'],
