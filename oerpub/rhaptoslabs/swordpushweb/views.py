@@ -641,7 +641,7 @@ FORM DATA
         session['metadata'] = metadata
         print cnxml
         session['cnxml'] = cnxml
-        raise HTTPFound(location=request.route_url('importer'))
+        return HTTPFound(location=request.route_url('importer'))
     else:
         print "NOTHING COME S HERE"
     response = {
