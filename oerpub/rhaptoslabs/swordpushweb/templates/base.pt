@@ -173,6 +173,10 @@
         Main content goes here
         </metal:content>
         
+        <!--Hidden content like popups, modal forms, etc. go here.-->
+        <metal:hidden-slot define-slot="hidden-slot">
+        </metal:hidden-slot>
+
         <metal:footer-slot define-slot="footer-slot">
         <div id="footer">
             <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${images_url}/sf150.png" width="150"/></a>

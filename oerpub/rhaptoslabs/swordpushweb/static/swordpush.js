@@ -209,6 +209,19 @@ $(document).ready(function()
         }
     });
 
+    $("#choose-new-document, #back-to-preview").click(function(e){
+        return _doAction(confirmMsg3, e);
+    });
+
+    $("#start-from-beginning").click(function(e){
+        var target = $(this).attr('href');
+        if (!target) {
+            target = $(this).attr('url');
+        }
+        window.location = target;
+        return true;
+    });
+
     $("#top-upload-to-cnx, #bottom-upload-to-cnx").click(function(e){
         // reset the warnings
         $("#formentry-title").removeClass("error");
@@ -432,8 +445,7 @@ $(document).ready(function()
         }
 
         // then we add a new row with the changed values
-        template = $('#fl-field-template tr').first().clone();
-        addFeaturedLink(template);
+        addFeaturedLink();
 
         $.modal.close();
     });
@@ -621,7 +633,8 @@ function disableExpertMode(element){
      $(".advanced").hide();
 }
 
-function addFeaturedLink(template){
+function addFeaturedLink(){
+    template = $('#fl-field-template tr').first().clone();
     // get the new element title and clean the template
     title = $('input#create-fl-title').val();
     $('input#create-fl-title').removeAttr('value');

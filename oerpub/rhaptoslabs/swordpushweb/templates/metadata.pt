@@ -17,14 +17,8 @@
         </script>
     
     </metal:script-slot>    
+
     <metal:workflownav fill-slot="workflownav">
-    ${form.begin(request.route_url('metadata'), name="metadata_form")}
-    ${form.csrf_token()}
-
-    <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
-        <tal:hidden>${form.hidden(field)}</tal:hidden>
-    </tal:field>
-
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
@@ -64,8 +58,6 @@
                     in Connexions
                 </span>
                 
-                <input id="workspace" type="hidden" name="workspace">
-
                 <input id="top-upload-to-cnx" type="button" class="button forward-button"
                     title="Click 'Finish' to add the module as edited to the designated work area. Further steps are required before the module can be published in the Connexions repository." 
                     value="Finish: Upload &raquo;">
@@ -76,6 +68,15 @@
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
+    ${form.begin(request.route_url('metadata'), name="metadata_form")}
+    ${form.csrf_token()}
+
+    <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
+        <tal:hidden>${form.hidden(field)}</tal:hidden>
+    </tal:field>
+
+    <input id="workspace" type="hidden" name="workspace">
+
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
@@ -252,7 +253,13 @@
                                             </p>
 
                                             <table class="listing" id="featured-links-table">
-                                                <tbody></tbody>
+
+                                                <input type="hidden"
+                                                    name="__start__" value="featuredlinks:sequence" />
+                                                    <tbody>
+                                                    </tbody>
+                                                <input type="hidden" name="__end__" />
+
                                             </table>
 
                                             <div>
@@ -273,6 +280,59 @@
         </div>
     </div>
     ${form.end()}
+    </metal:content-slot>
+
+    <metal:hidden-slot fill-slot="hidden-slot">
+    <div id="fl-field-template" style="display: none">
+        <table class="listing" id="featured-links-table-template">
+            <tbody>
+                <tr class="edit-link-tr">
+                    <input type="hidden" name="__start__" value=":mapping" />
+                    <td class="edit-link-td" style="width: 100%;">
+                        <div class="edit-link-title">
+                            <img id="edit-link-strength-image"
+                                src="${images_url}/strength3.png">
+                            <span>Example text</span>
+                            <a href="#"
+                                title="Visit link in new window"
+                                class="icon" target="_blank">
+                                <img src="${images_url}/external-link.png">
+                            </a>
+
+                            <input type="hidden" name="fl_title"
+                                class="edit-link-title" />
+
+                            <input type="hidden" name="fl_category"
+                                class="edit-link-category" />
+                                
+                            <input type="hidden" name="fl_strength"
+                                class="edit-link-strength" />
+                                
+                            <input type="hidden" name="url"
+                                class="edit-link-url" />
+                            
+                            <input type="hidden" name="fl_cnxmodule"
+                                class="edit-link-cnxmodule" />
+                            
+                            <input type="hidden" name="fl_cnxversion"
+                                class="edit-link-cnxversion" />
+                        </div>
+                    </td>
+                    <td nowrap="nowrap" class="link-edit-link">
+                        <a class="edit-link" href="#">
+                            Edit link
+                        </a>
+                    </td>
+                    <td nowrap="nowrap" id="example-id" class="link-edit-link">
+                        <a href="#" class="remove-link">
+                            Remove
+                        </a>
+                    </td>
+                    <input type="hidden" name="__end__" />
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <div style="display: none;" id="featuredlinks">
 
@@ -409,49 +469,6 @@
 
     </div>
 
-    <div id="fl-field-template" style="display: none">
-        <table class="listing" id="featured-links-table-template">
-            <tbody>
-                <tr class="edit-link-tr">
-                    <td class="edit-link-td" style="width: 100%;">
-                        <div class="edit-link-title">
-                            <img id="edit-link-strength-image"
-                                src="${images_url}/strength3.png">
-                            <span>Example text</span>
-                            <a href="#"
-                                title="Visit link in new window"
-                                class="icon" target="_blank">
-                                <img src="${images_url}/external-link.png">
-                            </a>
-                            <input class="edit-link-title" type="hidden"
-                                name="edit-link-title">
-                            <input class="edit-link-category" type="hidden"
-                                name="edit-link-category">
-                            <input class="edit-link-strength" type="hidden"
-                                name="edit-link-strength">
-                            <input class="edit-link-url" type="hidden"
-                                name="edit-link-url">
-                            <input class="edit-link-cnxmodule" type="hidden"
-                                name="edit-link-cnxmodule">
-                            <input class="edit-link-cnxversion" type="hidden"
-                                name="edit-link-cnxversion">
-                        </div>
-                    </td>
-                    <td nowrap="nowrap" class="link-edit-link">
-                        <a class="edit-link" href="#">
-                            Edit link
-                        </a>
-                    </td>
-                    <td nowrap="nowrap" id="example-id" class="link-edit-link">
-                        <a href="#" class="remove-link">
-                            Remove
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    </metal:content-slot>
+    </metal:hidden-slot>
 
 </metal:use>

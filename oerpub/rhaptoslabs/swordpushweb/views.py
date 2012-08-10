@@ -8,6 +8,7 @@ import libxml2
 import lxml
 import re
 from cStringIO import StringIO
+import peppercorn
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -33,7 +34,9 @@ import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config
-from utils import save_config, add_directory_to_zip, update_zip_file
+from utils import save_config, add_directory_to_zip
+from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
+from utils import get_files_from_zipfile
 import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 TESTING = False
@@ -701,12 +704,9 @@ def metadata_view(request):
     session = request.session
     config = load_config(request)
     
-    # first clear the session of any stale associated module paths
-    if 'associated_module' in session.keys():
-        del session['associated_module']
     module = request.params.get('module', None)
     if module is not None:
-        session['associated_module'] = module
+        session['associated_module_url'] = module
 
     workspaces = [(i['href'], i['title']) for i in session['collections']]
     if 'workspace' in request.params.keys():
@@ -840,17 +840,28 @@ def metadata_view(request):
         if not TESTING:
             # Create a connection to the sword service
             conn = sword2cnx.Connection(session['service_document_url'],
-                                       user_name=session['username'],
-                                       user_pass=session['password'],
-                                       always_authenticate=True,
-                                       download_service_document=False)
+                                        user_name=session['username'],
+                                        user_pass=session['password'],
+                                        always_authenticate=True,
+                                        download_service_document=False)
 
             # Send zip file to Connexions through SWORD interface
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                if session.get('featured_links'):
-                    zip_file = update_zip_file(zip_file, request)
+                structure = peppercorn.parse(request.POST.items())
+                if structure.has_key('featuredlinks'):
+                    cnxml = get_cnxml_from_zipfile(zip_file)
+                    cnxml = add_featuredlinks_to_cnxml(cnxml, structure)
+                    files = get_files_from_zipfile(zip_file)
+                    save_cnxml(save_dir, cnxml, files)
+
+                url = session.get('associated_module_url',
+                                  form.data['workspace'])
+                # clear the session of any associated module paths after using it
+                if 'associated_module_url' in session.keys():
+                    del session['associated_module_url']
+
                 deposit_receipt = conn.create(
-                    col_iri = form.data['workspace'],
+                    col_iri = url,
                     metadata_entry = metadata_entry,
                     payload = zip_file,
                     filename = 'upload.zip',
@@ -1076,15 +1087,21 @@ class ModuleAssociationSchema(formencode.Schema):
 def module_association_view(request):
     check_login(request)
     config = load_config(request)
-    workspaces = [(i['href'], i['title']) for i in request.session['collections']]
-    
-    conn = sword2cnx.Connection(request.session['service_document_url'],
-                                       user_name=request.session['username'],
-                                       user_pass=request.session['password'],
-                                       always_authenticate=True,
-                                       download_service_document=False)
+    session = request.session
 
-    workspace_to_get = request.session['collections'][0]['href']
+    # clear the session of any stale associated module paths
+    if 'associated_module_url' in session.keys():
+        del session['associated_module_url']
+
+    workspaces = [(i['href'], i['title']) for i in session['collections']]
+    
+    conn = sword2cnx.Connection(session['service_document_url'],
+                                user_name = session['username'],
+                                user_pass = session['password'],
+                                always_authenticate=True,
+                                download_service_document=False)
+
+    workspace_to_get = session['collections'][0]['href']
     print "Workspace url: " + workspace_to_get
 
     xml = sword2cnx.get_module_list(conn, workspace_to_get)
@@ -1098,7 +1115,7 @@ def module_association_view(request):
         title_element = element.xpath('./xmlns:title', namespaces=ns_dict)[0]
         title = title_element.text
 
-        link_elements = element.xpath('./xmlns:link[@rel="edit-media"]',
+        link_elements = element.xpath('./xmlns:link[@rel="edit"]',
                                       namespaces=ns_dict
                                      )
         edit_link = link_elements[0].get('href')
