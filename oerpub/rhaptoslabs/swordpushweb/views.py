@@ -36,7 +36,7 @@ from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from utils import escape_system, clean_cnxml, pretty_print_dict, load_config
 from utils import save_config, add_directory_to_zip
 from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
-from utils import get_files_from_zipfile
+from utils import get_files_from_zipfile, build_featured_links
 import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 TESTING = False
@@ -704,7 +704,7 @@ def metadata_view(request):
     session = request.session
     config = load_config(request)
     
-    module = request.params.get('module', None)
+    module = request.POST.get('module', None)
     if module is not None:
         session['associated_module_url'] = module
 
@@ -849,10 +849,13 @@ def metadata_view(request):
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
                 structure = peppercorn.parse(request.POST.items())
                 if structure.has_key('featuredlinks'):
-                    cnxml = get_cnxml_from_zipfile(zip_file)
-                    cnxml = add_featuredlinks_to_cnxml(cnxml, structure)
-                    files = get_files_from_zipfile(zip_file)
-                    save_cnxml(save_dir, cnxml, files)
+                    featuredlinks = build_featured_links(structure)
+                    if featuredlinks:
+                        cnxml = get_cnxml_from_zipfile(zip_file)
+                        new_cnxml = add_featuredlinks_to_cnxml(cnxml,
+                                                               featuredlinks)
+                        files = get_files_from_zipfile(zip_file)
+                        save_cnxml(save_dir, new_cnxml, files)
 
                 url = session.get('associated_module_url',
                                   form.data['workspace'])

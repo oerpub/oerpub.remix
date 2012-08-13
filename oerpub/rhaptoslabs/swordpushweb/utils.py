@@ -192,9 +192,8 @@ def get_cnxml_from_zipfile(zip_file):
     return cnxml
 
 
-def add_featuredlinks_to_cnxml(cnxml, data):
+def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
     root = lxml.etree.fromstringlist(cnxml.readlines())
-    featuredlinks = build_featured_links(data)
     featuredlinks_element = lxml.etree.fromstringlist(featuredlinks)
     root.insert(1, featuredlinks_element) 
     return lxml.etree.tostring(root)
@@ -215,6 +214,9 @@ def get_files_from_zipfile(zip_file):
 
 
 def build_featured_links(data):
+    if data is None or len(data.get('featuredlinks')) < 1:
+        return ''
+
     # get featured links from data
     tmp_links = {}
     # first we organise the links by category
