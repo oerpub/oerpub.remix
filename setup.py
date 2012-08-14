@@ -16,6 +16,7 @@ requires = [
     'pycrypto==2.5',
     'Markdown',
     'peppercorn',
+    'z3c.batching',
     ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',

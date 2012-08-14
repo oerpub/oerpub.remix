@@ -52,7 +52,11 @@ ${form.csrf_token()}
 </metal:workflownav>
 
 <tal:body metal:fill-slot="content-slot"
-    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
+    b_size python:modules.size;
+    b_start python:modules.start + b_size;
+    previous_b_start python:modules.start - b_size;
+    ">
 <div id="ie6-container-wrap">
     <div id="container">
         <div id="content">
@@ -131,22 +135,38 @@ ${form.csrf_token()}
               <div class="listingBar">
 
                   <span class="previous">
-                      <span style="visibility: hidden;" class="inviz">
-                          « Previous <span>13</span>
+                      <a href="[url]?b_start=0"
+                          tal:condition="python:modules.previous"
+                          tal:attributes="href string:${request.route_url('module_association')}?b_start=${previous_b_start}">
+                          « Previous <span tal:content="b_size">13</span>
                           items
-                      </span>
-                  </span>
-
-                  <span class="next">
-                      <a href="http://cnx.org/GroupWorkspaces/wg1438/workspace_contents?b_start:int=100&amp;-C=">
-                          Next <span>13</span> items »
                       </a>
                   </span>
 
-                  [<span>1</span>]
+                  <span class="next">
+                      <a href="[url]?b_start=0"
+                          tal:condition="python:modules.next"
+                          tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}">
+                          Next <span tal:content="b_size">13</span> items »
+                      </a>
+                  </span>
 
-                  <a href="http://cnx.org/GroupWorkspaces/wg1438/workspace_contents?b_start:int=100&amp;-C=">2</a>
+                  <!-- list all the batches -->
+                  <tal:batch-list repeat="counter python:range(modules.total)">
+                  <a href="[url]?b_start=2"
+                      tal:condition="python:modules.index != counter"
+                      tal:define="b_start python:counter * modules.size"
+                      tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}"
+                      tal:content="counter +1">
+                      2
+                  </a>
+
+                  <span tal:condition="python:modules.index == counter">
+                      [<span tal:replace="counter +1">2</span>]
+                  </span>
+                  </tal:batch-list>
               </div>
+
               <table summary="Content listing" style="width: 100%; font-size: 1em;" class="listing" id="workarea-contents">
                   <thead>
                       <tr>
@@ -187,56 +207,42 @@ ${form.csrf_token()}
                       </tr>
                   </tbody>
               </table>
+
               <!-- Navigation -->
               <div class="listingBar">
 
                   <span class="previous">
-                      <span style="visibility: hidden;" class="inviz">
-
-                          «
-
-                          Previous
-                          <span>13</span>
-
+                      <a href="[url]?b_start=0"
+                          tal:condition="python:modules.previous"
+                          tal:attributes="href string:${request.route_url('module_association')}?b_start=${previous_b_start}">
+                          « Previous <span tal:content="b_size">13</span>
                           items
-
-
-                      </span>
+                      </a>
                   </span>
 
                   <span class="next">
-
-
-                      <a href="http://cnx.org/GroupWorkspaces/wg1438/workspace_contents?b_start:int=100&amp;-C=">
-
-                          Next
-                          <span>13</span>
-                          items
-
-                          »
+                      <a href="[url]?b_start=0"
+                          tal:condition="python:modules.next"
+                          tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}">
+                          Next <span tal:content="b_size">13</span> items »
                       </a>
-
-
                   </span>
+                  
+                  <!-- list all the batches -->
+                  <tal:batch-list repeat="counter python:range(modules.total)">
+                  <a href="[url]?b_start=2"
+                      tal:condition="python:modules.index != counter"
+                      tal:define="b_start python:counter * modules.size"
+                      tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}"
+                      tal:content="counter +1">
+                      2
+                  </a>
 
-                  [<span>1</span>]
-
-
-
-                  <a href="http://cnx.org/GroupWorkspaces/wg1438/workspace_contents?b_start:int=100&amp;-C=">2</a>
-                  <!--    
-                  <a href="http://cnx.org/GroupWorkspaces/wg1438/workspace_contents?b_start:int=100&amp;-C=">3</a>
-
-
-                  <a href="http://cnx.org/GroupWorkspaces/wg1438/workspace_contents?b_start:int=100&amp;-C=">4</a>
-
-                  <a href="http://cnx.org/GroupWorkspaces/wg1438/workspace_contents?b_start:int=100&amp;-C=">5</a>
-                  -->
-
+                  <span tal:condition="python:modules.index == counter">
+                      [<span tal:replace="counter +1">2</span>]
+                  </span>
+                  </tal:batch-list>
               </div>
-
-
-
 
           </div>
         </div>
