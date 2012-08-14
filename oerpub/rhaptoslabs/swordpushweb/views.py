@@ -1411,7 +1411,7 @@ def slideshow_preview(request):
             print form_question
             if form_question:
                 form_options = request.POST.get('options-'+str(i))
-                print form_options.split('/n')
+                print form_options.split('\r\n')
                 #.split()
                 form_solution = request.POST.get('solution-'+str(i))
                 all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
