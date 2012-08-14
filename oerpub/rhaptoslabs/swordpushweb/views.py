@@ -633,8 +633,6 @@ FORM DATA
         print cnxml
         session['cnxml'] = cnxml
         return HTTPFound(location=request.route_url('importer'))
-    else:
-        print "NOTHING COME S HERE"
     response = {
         'form': FormRenderer(form),
         'presentationform': FormRenderer(presentationform),
@@ -1408,11 +1406,8 @@ def slideshow_preview(request):
         cnxml=session["cnxml"]+"""<content><para id="introduction-1">"""+introductory_paragraphs+"""</para><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure>"""+"""<section id="test-section"><title>Test your knowledge</title>"""
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
-            print form_question
             if form_question:
-                form_options = request.POST.get('options-'+str(i))
-                print form_options.split('\r\n')
-                #.split()
+                form_options = request.POST.get('options-'+str(i)).split('\r\n')
                 form_solution = request.POST.get('solution-'+str(i))
                 all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
                 for question in all_post_data:
@@ -1427,7 +1422,6 @@ def slideshow_preview(request):
                     j+=1
         metadata = session['metadata']
         cnxml += "</section></content></document>"
-        print cnxml
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
