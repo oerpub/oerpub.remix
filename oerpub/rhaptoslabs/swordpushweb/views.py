@@ -28,7 +28,7 @@ import urllib2
 import urllib
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_download_link, get_slideshow_status, get_slideshow_download_url, get_transcript
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -1411,7 +1411,7 @@ def slideshow_preview(request):
             print form_question
             if form_question:
                 form_options = request.POST.get('options-'+str(i))
-                print form_options
+                print form_options.split('/n')
                 #.split()
                 form_solution = request.POST.get('solution-'+str(i))
                 all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
