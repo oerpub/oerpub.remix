@@ -1410,7 +1410,9 @@ def slideshow_preview(request):
             form_question = request.POST.get('question-'+str(i))
             print form_question
             if form_question:
-                form_options = request.POST.get('options-'+str(i)).split()
+                form_options = request.POST.get('options-'+str(i))
+                print form_options
+                #.split()
                 form_solution = request.POST.get('solution-'+str(i))
                 all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
                 for question in all_post_data:
