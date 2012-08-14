@@ -39,8 +39,9 @@ from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
 from utils import get_files_from_zipfile, build_featured_links
 import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
-TESTING = False
+from z3c.batching.batch import Batch
 
+TESTING = False
 
 def check_login(request, raise_exception=True):
     # Check if logged in
@@ -862,15 +863,26 @@ def metadata_view(request):
                 # clear the session of any associated module paths after using it
                 if 'associated_module_url' in session.keys():
                     del session['associated_module_url']
-
-                deposit_receipt = conn.create(
-                    col_iri = url,
-                    metadata_entry = metadata_entry,
-                    payload = zip_file,
-                    filename = 'upload.zip',
-                    mimetype = 'application/zip',
-                    packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                    in_progress = True)
+                    # this is an update not a create
+                    deposit_receipt = conn.update(
+                        metadata_entry = metadata_entry,
+                        payload = zip_file,
+                        filename = 'upload.zip',
+                        mimetype = 'application/zip',
+                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                        edit_iri = url,
+                        edit_media_iri = url + '/editmedia',
+                        metadata_relevant=False,
+                        in_progress=True)
+                else:
+                    deposit_receipt = conn.create(
+                        col_iri = url,
+                        metadata_entry = metadata_entry,
+                        payload = zip_file,
+                        filename = 'upload.zip',
+                        mimetype = 'application/zip',
+                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                        in_progress = True)
 
         # Remember to which workspace we submitted
         session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
@@ -1129,6 +1141,10 @@ def module_association_view(request):
         uid = path_elements[2]
 
         modules.append([uid, edit_link, title, view_link])
+
+    b_start = int(request.GET.get('b_start', '0'))
+    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
+    modules = Batch(modules, start=b_start, size=b_size)
 
     form = Form(request, schema=ModuleAssociationSchema)
     response = {'form': FormRenderer(form),
