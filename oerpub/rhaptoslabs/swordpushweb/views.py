@@ -28,7 +28,7 @@ import urllib2
 import urllib
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript, get_slideshow_status
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript, fetch_slideshow_status
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -1394,7 +1394,7 @@ def slideshow_preview(request):
         google_resource_id = session['google-resource-id']
     if session.has_key('slideshare_id'):
         slideshare_id = session['slideshare_id']
-        if get_slideshow_status(slideshare_id) == "2":
+        if fetch_slideshow_status(slideshare_id) == "2":
             not_converted = False
             show_iframe = True
 
