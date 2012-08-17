@@ -570,7 +570,7 @@ FORM DATA
         saved_file.close()
         input_file.close()
         username = session['username']
-        
+
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
         print "Ziiped filepath",zipped_filepath
         session['userfilepath'] = zipped_filepath
@@ -1184,7 +1184,7 @@ def return_slideshare_upload_form(request):
         upload_to_ss = form.data['upload_to_ss']
         username = session['username']
         if (upload_to_ss=="true"):
-            
+
             slideshow_id = upload_to_slideshare("saketkc",original_filename)
             session['slideshare_id'] = slideshow_id
         if (upload_to_google == "true"):
@@ -1397,9 +1397,9 @@ def slideshow_preview(request):
         if get_slideshow_status(slideshow_id) == "2":
             not_converted = False
             show_iframe = True
-        
-        
-        
+
+
+
     if google_resource_id!="":
         embed_google = True
     if slideshare_id!="":
@@ -1469,5 +1469,5 @@ def slideshow_preview(request):
         return HTTPFound(location=request.route_url('updatecnx'))
 
 
-    response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare, "not_converted": not_converted, "show_iframe":show_iframs}
+    response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare, "not_converted": not_converted, "show_iframe":show_iframe}
     return render_to_response(templatePath, response, request=request)
