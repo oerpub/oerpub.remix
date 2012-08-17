@@ -570,11 +570,7 @@ FORM DATA
         saved_file.close()
         input_file.close()
         username = session['username']
-        collections = [{'title': i.title, 'href': i.href}
-                                  for i in sword2cnx.get_workspaces(conn)]
-        session['collections'] = collections
-        workspaces = [(i['href'], i['title']) for i in session['collections']]
-        session['workspaces'] = workspaces
+        
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
         print "Ziiped filepath",zipped_filepath
         session['userfilepath'] = zipped_filepath
@@ -1442,6 +1438,11 @@ def slideshow_preview(request):
                                     user_pass=session['password'],
                                     always_authenticate=True,
                                     download_service_document=True)
+        collections = [{'title': i.title, 'href': i.href}
+                                  for i in sword2cnx.get_workspaces(conn)]
+        session['collections'] = collections
+        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        session['workspaces'] = workspaces
         with open(zipped_filepath, 'rb') as zip_file:
             deposit_receipt = conn.create(
                 col_iri = workspaces[0][0],
