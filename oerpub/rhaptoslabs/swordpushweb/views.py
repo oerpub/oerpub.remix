@@ -1394,7 +1394,7 @@ def slideshow_preview(request):
         google_resource_id = session['google-resource-id']
     if session.has_key('slideshare_id'):
         slideshare_id = session['slideshare_id']
-        if get_slideshow_status(slideshow_id) == "2":
+        if get_slideshow_status(slideshare_id) == "2":
             not_converted = False
             show_iframe = True
 
