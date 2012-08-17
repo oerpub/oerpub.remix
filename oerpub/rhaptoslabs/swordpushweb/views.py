@@ -28,7 +28,7 @@ import urllib2
 import urllib
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript, get_slideshow_status
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
 
@@ -570,10 +570,11 @@ FORM DATA
         saved_file.close()
         input_file.close()
         username = session['username']
-        #collections = [{'title': i.title, 'href': i.href}
-        #                          for i in sword2cnx.get_workspaces(conn)]
-        #session['collections'] = collections
-        #workspaces = [(i['href'], i['title']) for i in session['collections']]
+        collections = [{'title': i.title, 'href': i.href}
+                                  for i in sword2cnx.get_workspaces(conn)]
+        session['collections'] = collections
+        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        session['workspaces'] = workspaces
         zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
         print "Ziiped filepath",zipped_filepath
         session['userfilepath'] = zipped_filepath
@@ -595,7 +596,7 @@ FORM DATA
 <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
   <!-- WARNING! The 'metadata' section is read only. Do not edit below.
        Changes to the metadata section in the source will not be saved. -->
-  <md:repository>http://qa.cnx.org/content</md:repository>
+  <md:repository>http://cnx.org/content</md:repository>
   <md:content-id>new</md:content-id>
   <md:title>""</md:title>
   <md:version>**new**</md:version>
@@ -951,7 +952,7 @@ def metadata_view(request):
        xmlns:dcterms="http://purl.org/dc/terms/"
        xmlns:md="http://cnx.rice.edu/mdml"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:oerdc="http://qa.cnx.org/aboutus/technology/schemas/oerdc">
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
 
     <!-- SWORD deposit receipt -->
     <title>Word created with multipart</title>
@@ -1181,13 +1182,13 @@ def return_slideshare_upload_form(request):
     form = Form(request, schema=ImporterChoiceSchema)
     response = {'form':FormRenderer(form)}
     validate_form = form.validate()
-    print form.all_errors()
     if validate_form:
         original_filename = session['original_filename']
         upload_to_google = form.data['upload_to_google']
         upload_to_ss = form.data['upload_to_ss']
         username = session['username']
         if (upload_to_ss=="true"):
+            
             slideshow_id = upload_to_slideshare("saketkc",original_filename)
             session['slideshare_id'] = slideshow_id
         if (upload_to_google == "true"):
@@ -1344,7 +1345,7 @@ def update_cnx_metadata(request):
                 v = v.strip()
                 if v:
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
-        conn = sword2cnx.Connection("http://qa.cnx.org/sword/servicedocument",
+        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
                                     always_authenticate=True,
@@ -1388,6 +1389,8 @@ def slideshow_preview(request):
     slideshare_id = ""
     embed_google = False
     embed_slideshare = False
+    not_converted = True
+    show_iframe = False
     form = Form(request, schema=QuestionAnswerSchema)
     validate_form = form.validate()
     print form.all_errors()
@@ -1395,6 +1398,12 @@ def slideshow_preview(request):
         google_resource_id = session['google-resource-id']
     if session.has_key('slideshare_id'):
         slideshare_id = session['slideshare_id']
+        if get_slideshow_status(slideshow_id) == "2":
+            not_converted = False
+            show_iframe = True
+        
+        
+        
     if google_resource_id!="":
         embed_google = True
     if slideshare_id!="":
@@ -1428,7 +1437,7 @@ def slideshow_preview(request):
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.writestr("index.cnxml",cnxml)
         zip_archive.close()
-        conn = sword2cnx.Connection("http://qa.cnx.org/sword/servicedocument",
+        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
                                     user_name=session['username'],
                                     user_pass=session['password'],
                                     always_authenticate=True,
@@ -1459,5 +1468,5 @@ def slideshow_preview(request):
         return HTTPFound(location=request.route_url('updatecnx'))
 
 
-    response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare}
+    response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare, "not_converted": not_converted, "show_iframe":show_iframs}
     return render_to_response(templatePath, response, request=request)
