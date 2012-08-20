@@ -236,8 +236,8 @@ def save_cnxml(save_dir, cnxml, files):
     zip_archive = zipfile.ZipFile(ram, 'w')
     zip_archive.writestr('index.cnxml', cnxml)
     if not conversionerror:
-        save_and_backup_file(save_dir, 'index.xhtml', htmlpreview)
-        zip_archive.writestr('index.xhtml', htmlpreview)
+        save_and_backup_file(save_dir, 'index.html', htmlpreview)
+        zip_archive.writestr('index.html', htmlpreview)
     for filename, fileObj in files:
         zip_archive.writestr(filename, fileObj)
     zip_archive.close()
@@ -443,7 +443,7 @@ def choose_view(request):
 
                     # Convert the CNXML to XHTML for preview
                     html = cnxml_to_htmlpreview(cnxml)
-                    with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
+                    with open(os.path.join(save_dir, 'index.html'), 'w') as index:
                         index.write(html)
 
                     cnxml = clean_cnxml(cnxml)
@@ -574,7 +574,7 @@ def preview_view(request):
 
     body_filename = request.session.get('preview-no-cache')
     if body_filename is None:
-        body_filename = 'index.xhtml'
+        body_filename = 'index.html'
     else:
         del request.session['preview-no-cache']
 
@@ -597,7 +597,7 @@ def preview_header_view(request):
 @view_config(route_name='preview_body')
 def preview_body_view(request):
     return HTTPFound(
-        '%s%s/index.xhtml'% (
+        '%s%s/index.html'% (
             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
             request.session['upload_dir']),
         headers={'Cache-Control': 'max-age=0, must-revalidate, no-cache, no-store'},
