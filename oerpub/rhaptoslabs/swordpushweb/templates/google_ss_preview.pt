@@ -50,7 +50,8 @@
                 class="button forward-button"
                 name="form.submitted"
                 type="submit"
-                value="Next: Describe Your Presentation &#187;"                 
+                value="Next: Describe Your Presentation &#187;" 
+                url="${request.route_url('updatecnx')}"
                 title="Add/edit metadata"/>
             </div>
         </div>
