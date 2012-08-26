@@ -53,7 +53,7 @@
                 name="form.submitted"
                 type="submit"
                 value="Next: Describe Your Presentation &#187;" 
-                url="${request.route_url('updatecnx')}"
+                
                 title="Add/edit metadata"/>
             </div>
         </div>
@@ -97,9 +97,9 @@
 										  </p>
 										  <p tal:condition="not_converted">
 											<p>
-												Your slides are being uploaded to Slideshare (or Google Docs).
-												You will receive an email once they are ready. 
-												In the mean time, you can enhance it with an introduction and a quiz.
+												Your slides are being uploaded to Slideshare (or Google Docs).<br/>
+												You will receive an email once they are ready. <br/>
+												In the mean time, you can enhance it with an introduction and a quiz.<br/>
 											</p>
 											
 										  </p>
