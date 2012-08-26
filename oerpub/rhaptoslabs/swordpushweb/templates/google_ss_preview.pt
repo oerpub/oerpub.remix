@@ -35,7 +35,9 @@
 </metal:script-slot>
 
     <metal:workflownav fill-slot="workflownav">
-   
+   ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
+   ${form.csrf_token()}
+                
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
@@ -115,8 +117,6 @@
                         jQuery('iframe#preview-frame.preview').attr('src', src);
                     }
                 </script>
-                ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
-                ${form.csrf_token()}
                 <span>
                   <span>
                     <div class="formlabel">Introductory paragraph</div>
