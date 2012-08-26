@@ -110,7 +110,7 @@
                   <label>
                     <span style="visibility: visible;" class="or-bullet">or</span> 
                     <span class="label-text">
-                      <img src="${images_url}/google-presentations.png"><strong>Google Presentations</strong> OR <img src="${images_url}/slideshare.jpg"><strong>SlideShare Presentations</strong> 
+                      <img src="${images_url}/ms-powerpoint-logo.gif"><strong>Microsoft Presentations</strong> OR <img src="${images_url}/openoffice-presentation.png"><strong>OpenOffice Presentation</strong> 
                    </span>
                   </label>
                   <div class="upload-form">
