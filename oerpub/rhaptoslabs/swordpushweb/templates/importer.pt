@@ -13,11 +13,13 @@
         if($('#import-to-ss').is(":checked")){
             $('#slideshare-href').removeClass("label-text");
             $('#slideshare-href').addClass("highlight-buttons");
-
         
         }
         $('#import-to-ss').change(function(){
           if($(this).is(":checked")){
+           $('#google-href').addClass("label-text");
+            $('#google-href').removeClass("highlight-buttons");
+          
             $('#slideshare-href').removeClass("label-text");
             $('#slideshare-href').addClass("highlight-buttons");
 
@@ -32,6 +34,8 @@
 
         $('#import-to-google').change(function(){
           if($(this).is(":checked")){
+           $('#slideshare-href').addClass("label-text");
+            $('#slideshare-href').removeClass("highlight-buttons");
             $('#google-href').removeClass("label-text");
             $('#google-href').addClass("highlight-buttons");
 
