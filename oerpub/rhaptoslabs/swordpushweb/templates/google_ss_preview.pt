@@ -36,6 +36,25 @@
 
     <metal:workflownav fill-slot="workflownav">
    
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input type="button" class="button" 
+                    value="&laquo; Back: Choose Location" id="back-to-chooser"
+                    url="${request.route_url('importer')}"
+                    title="Return to the choose import option">
+            </div>
+           <div id="forward-steps">
+           
+                <input id="options-submit"
+                class="button forward-button"
+                name="form.submitted"
+                type="submit"
+                value="Next: Describe Your Presentation &#187;"                 
+                title="Add/edit metadata"/>
+            </div>
+        </div>
+    </div>
     
     </metal:workflownav>
 
@@ -47,7 +66,7 @@
 
                     <div id="page-title">
                         <h1>
-                            Preview:
+                            Enhance your presentation:
                             <span class="metatitle">
                                 
                             </span>
@@ -57,14 +76,14 @@
                     <div id="page-description">
                         <p class="forminfo">
                           <p tal:condition="embed_google">
-                          View below the Presentation as uploaded to Google Docs.
+                          Your uploaded Presentation as uploaded to Google Docs.
                           <br/><br/>
                             <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
                                 frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
                       		</iframe>
                           </p>
                           <p tal:condition="embed_slideshare">
-	            						  View below the Presentation as uploaded to SlideShare.
+	            						  Your uploaded Presentation as uploaded to SlideShare.
 							               <br/><br/>
 							               <p tal:condition="show_iframe">
 							               
@@ -74,8 +93,12 @@
 												</iframe>
 										  </p>
 										  <p tal:condition="not_converted">
-											<strong> Your uploaded sldeshow is queued for conversion by Slideshare
-											 You should receive an email once the slideshow upload is successful.</strong>
+											<p>
+												Your slides are being uploaded to Slideshare (or Google Docs).
+												You will receive an email once they are ready. 
+												In the mean time, you can enhance it with an introduction and a quiz.
+											</p>
+											
 										  </p>
 										  
 										  
@@ -96,18 +119,21 @@
                 <span>
                   <span>
                     <div class="formlabel">Introductory paragraph</div>
-                    <div class="forminfo">A small intoduction for the slides</div>
+                    <div class="forminfo">You can use the text box below to orient your readers before they start watching the presentation</div>
                     <div class="formfield">
-                      <textarea name="introductory_paragraphs" rows="6" cols="60"></textarea>
+                      <textarea name="introductory_paragraphs" rows="6" cols="100"></textarea>
                   </div>
                 </span>
 
                 <ul id="all-questions">
-        					<li id="add-questions-area-1">
+                <div class="formlabel">Add a Quiz</div>
+                <div class="forminfo">To help readers retain the important information from your slides, you can add a simple quiz below</div>
+                
+					<li id="add-questions-area-1">
                       <div class="formlabel">Question </div>
                       <div class="forminfo">Question</div>
                       <div class="formfield">
-                          <input type="text" size="50" name="question-1" id="question-1">                          
+                          <input type="text" size="100" name="question-1" id="question-1">                          
                       </div>                                         
                       <div class="formlabel">Options </div>
                       <div class="forminfo">Options one on on line</div>
@@ -124,7 +150,7 @@
 			          	</li>
       				</ul>
 				        <input class="button" id="add-more-questions" value="Add More Questions" type="button">
-                <input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">
+                <!--<input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">-->
                   
                 </span>
                 ${form.end()}

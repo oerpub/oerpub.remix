@@ -25,6 +25,13 @@
 
     <div id="workflownav-wrap">
         <div id="workflownav-container">
+        
+            <div id="back-steps">
+                <input type="button" class="button" 
+                    value="&laquo; Back: Enhance Your Presentation" id="back-to-chooser"
+                    url="${request.route_url('slideshow_preview')}"
+                    title="Return to the enhance your presentation">
+            </div>
             
             <div id="forward-steps">
                 <span class="advanced" style="display: none; ">
