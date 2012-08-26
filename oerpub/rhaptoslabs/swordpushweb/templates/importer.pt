@@ -45,7 +45,30 @@
 </metal:script-slot>
 
 
-<metal:workflownav fill-slot="workflownav" />
+
+<metal:workflownav fill-slot="workflownav">
+
+${form.begin(request.route_url('importer'), id='importform')}
+${form.csrf_token()}
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input type="button" class="button" 
+                    value="&laquo; Back: Choose Document" id="back-to-chooser"
+                    url="${request.route_url('choose')}"
+                    title="Return to the module preview">
+            </div>
+           <div id="forward-steps">
+                <input id="choose-importer"
+                class="button forward-button"
+                type="submit"
+                value="Next: Enhance Your Presentation &#187;" 
+                url="${request.route_url('metadata')}"
+                title="Add/edit title and other information about the module"/>
+            </div>
+        </div>
+    </div>
+    </metal:workflownav>
 
 <tal:body metal:fill-slot="content-slot"
     tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
@@ -81,16 +104,14 @@
               
               <ul id="create-new-list">
                 <li>
-					${form.begin(request.route_url('importer'), id='importform')}
-					${form.csrf_token()}
                     <div class="upload-form" id="choose-importer-box">                        
-                      <div class="left"><input type="checkbox" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
+                      <div class="left"><input type="radio" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
                       <div class="left"><span class="label-text" id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
                       <br/><br/><br/><br/><br/>
-                        <div class="left"><input type="checkbox" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <div class="left"><input type="radio" id="import-to-google" name="importer" value="slideshare"/></div>
                         <div class="left"><span class="label-text" id="google-href"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
                         <br/><br/><br/><br/><br/>
-                        <div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>
+                        <!--<div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>-->
                         <br/><br/>
                         <input type="hidden" id="upload-to-google" name="upload_to_google" value="false">
                         <input type="hidden" id="upload-to-ss" name="upload_to_ss" value="true">
