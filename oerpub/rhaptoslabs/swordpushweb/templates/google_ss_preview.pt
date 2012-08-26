@@ -125,9 +125,11 @@
                   </div>
                 </span>
 
-                <ul id="all-questions">
-                <div class="formlabel">Add a Quiz</div>
+         
+				<div class="formlabel">Add a Quiz</div>
                 <div class="forminfo">To help readers retain the important information from your slides, you can add a simple quiz below</div>
+                
+                <ul id="all-questions">
                 
 					<li id="add-questions-area-1">
                       <div class="formlabel">Question </div>
