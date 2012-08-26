@@ -10,7 +10,13 @@
         showWaitMessage();
         $('form#importform').submit();
         });        
-        $('#import-to-ss').click(function(){
+        if($('#import-to-ss').is(":checked")){
+            $('#slideshare-href').removeClass("label-text");
+            $('#slideshare-href').addClass("highlight-buttons");
+
+        
+        }
+        $('#import-to-ss').change(function(){
           if($(this).is(":checked")){
             $('#slideshare-href').removeClass("label-text");
             $('#slideshare-href').addClass("highlight-buttons");
@@ -24,7 +30,7 @@
           }
         });
 
-        $('#import-to-google').click(function(){
+        $('#import-to-google').change(function(){
           if($(this).is(":checked")){
             $('#google-href').removeClass("label-text");
             $('#google-href').addClass("highlight-buttons");
@@ -105,7 +111,7 @@ ${form.csrf_token()}
               <ul id="create-new-list">
                 <li>
                     <div class="upload-form" id="choose-importer-box">                        
-                      <div class="left"><input type="radio" id="import-to-ss" name="importer" value="google" style="float:left"/></div>
+                      <div class="left"><input type="radio" id="import-to-ss" name="importer" value="google" checked="yes" style="float:left"/></div>
                       <div class="left"><span class="label-text" id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
                       <br/><br/><br/><br/><br/>
                         <div class="left"><input type="radio" id="import-to-google" name="importer" value="slideshare"/></div>
