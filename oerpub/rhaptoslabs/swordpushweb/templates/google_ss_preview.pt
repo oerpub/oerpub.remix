@@ -69,7 +69,7 @@
 
                     <div id="page-title">
                         <h1>
-                            Enhance your presentation:
+                            Enhance your presentation
                             <span class="metatitle">
                                 
                             </span>
@@ -79,15 +79,14 @@
                     <div id="page-description">
                         <p class="forminfo">
                           <p tal:condition="embed_google">
-                          Your uploaded Presentation as uploaded to Google Docs.
+                          
                           <br/><br/>
                             <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
                                 frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
                       		</iframe>
                           </p>
                           <p tal:condition="embed_slideshare">
-	            						  Your uploaded Presentation as uploaded to SlideShare.
-							               <br/><br/>
+	            						   <br/><br/>
 							               <p tal:condition="show_iframe">
 							               
 												<iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshare_id}" 

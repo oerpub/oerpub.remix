@@ -103,7 +103,7 @@ ${form.csrf_token()}
 
             <div id="choose-upload">
               <h1>
-                Choose where to run your Presentation :                 
+                Choose where to run your presentation                
               </h1>
               <p class="forminfo">
                 Your new Connexions module will show your slides interactively to readers. 
