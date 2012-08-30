@@ -70,8 +70,10 @@
 
                 </div>
 
-                <iframe class="preview fitted" id="preview-frame" src="#" preview_url="${body_url}" id="preview_frame"
-                    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+                <iframe class="preview fitted" id="preview-frame" src="#"
+                        preview_url="${body_url}" id="preview_frame"
+                        frameborder="0" marginheight="0" marginwidth="0"
+                        noresize scrolling="auto">
                 </iframe>
 
             </div>
