@@ -596,14 +596,12 @@ def preview_header_view(request):
 
 @view_config(route_name='preview_body')
 def preview_body_view(request):
-    return HTTPFound(
-        '%s%s/index.html'% (
+    return render_to_response('templates/preview_inner.pt',
+        {'body': '%s%s/index.html'% (
             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
             request.session['upload_dir']),
-        headers={'Cache-Control': 'max-age=0, must-revalidate, no-cache, no-store'},
-        request=request
-    )
-
+        }, 
+        request=request)
 
 class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True

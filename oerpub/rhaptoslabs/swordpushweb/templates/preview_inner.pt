@@ -1,0 +1,21 @@
+<html>
+<head><title>Preview</title>
+    <!-- Aloha editor -->
+    <link rel="stylesheet" type="text/css" href="http://cdn.aloha-editor.org/latest/css/aloha.css" > <!-- xhtml workaround --></link>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.6.4.min.js')}"></script>
+    <script type="text/javascript" src="http://cdn.aloha-editor.org/latest/lib/require.js"> <!-- xhtml workaround --></script>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
+    <script type="text/javascript" src="http://cdn.aloha-editor.org/latest/lib/aloha.js" data-aloha-plugins="common/ui,common/format,common/highlighteditables,common/link"> <!-- xhtml workaround --></script>
+    <script type="text/javascript">
+        Aloha.ready(function(){
+            Aloha.jQuery.get('${body}', function(data){
+                Aloha.jQuery('#cnx_main').html(data).aloha();
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="cnx_main">
+<div style="text-align: center">Loading preview...</div>
+</div>
+</html>
