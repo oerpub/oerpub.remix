@@ -862,6 +862,7 @@ def metadata_view(request):
                 if 'associated_module_url' in session.keys():
                     del session['associated_module_url']
                     # this is an update not a create
+                    zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
                     deposit_receipt = conn.update(
                         metadata_entry = metadata_entry,
                         payload = zip_file,
@@ -872,6 +873,7 @@ def metadata_view(request):
                         edit_media_iri = url + '/editmedia',
                         metadata_relevant=False,
                         in_progress=True)
+                    zip_file.close()
                 else:
                     deposit_receipt = conn.create(
                         col_iri = url,
