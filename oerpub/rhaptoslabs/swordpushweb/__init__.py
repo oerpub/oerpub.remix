@@ -17,6 +17,7 @@ def main(global_config, **settings):
     config.add_route('preview', '/preview')
     config.add_route('preview_header', '/preview_header')
     config.add_route('preview_body', '/preview_body')
+    config.add_route('preview_save', '/preview_save')
     config.add_route('cnxml', '/cnxml')
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')

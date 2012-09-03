@@ -26,6 +26,7 @@ from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from rhaptos.cnxmlutils.validatecnxml import validate
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
+from oerpub.rhaptoslabs.cnxml2htmlpreview.html2cnxml import html_to_cnxml
 import gdata.gauth
 import gdata.docs.client
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
@@ -602,6 +603,27 @@ def preview_body_view(request):
             request.session['upload_dir']),
         }, 
         request=request)
+
+@view_config(route_name='preview_save')
+def preview_save(request):
+    check_login(request)
+    html = request.POST['html']
+    cnxml = None
+    try:
+        cnxml = html_to_cnxml(html)
+    except:
+        pass
+
+    saved = False
+    if cnxml is not None:
+        cnxml_filename = os.path.join(request.registry.settings['transform_dir'],
+            request.session['upload_dir'], 'index.cnxml')
+        # TODO save the cnxml back
+        saved = True
+
+    response = Response(json.dumps({'saved': saved}))
+    response.content_type = 'application/json'
+    return response
 
 class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True

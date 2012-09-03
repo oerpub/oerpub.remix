@@ -1,5 +1,20 @@
 <metal:use use-macro="base">
 
+    <metal:script fill-slot="script-slot">
+        <script type="text/javascript">
+        jQuery(function($){
+            $('#save-preview').on('click', function(e){
+                var html = $('#preview-frame').contents().find('#cnx_main').html();
+                $.post("${request.route_url('preview_save')}",
+                    {html: html}, function(data, statustext){
+                    alert('statustext');
+                });
+                return e.preventDefault();
+            });
+        });
+        </script>
+    </metal:script>
+
     <metal:workflownav fill-slot="workflownav">
     ${form.begin(request.route_url('metadata'), name="preview_form")}
     ${form.csrf_token()}
@@ -70,6 +85,7 @@
 
                 </div>
 
+                <button id="save-preview">Save</button>
                 <iframe class="preview fitted" id="preview-frame" src="#"
                         preview_url="${body_url}" id="preview_frame"
                         frameborder="0" marginheight="0" marginwidth="0"
