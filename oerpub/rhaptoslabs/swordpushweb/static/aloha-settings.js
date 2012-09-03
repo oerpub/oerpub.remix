@@ -5,6 +5,24 @@
     }
 
     Aloha.settings = {
-        jQuery: window.jQuery
+        jQuery: window.jQuery,
+        logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
+        errorhandling : true,
+
+        plugins: {
+            block: {
+                defaults : {
+                    '.default-block': {
+                    },
+                    'figure': {
+                        'aloha-block-type': 'EditableImageBlock'
+                    },
+                }
+            }
+        },
+        bundles: {
+            // Path for custom bundle relative from require.js path
+            user: '../demo/block'
+        }
     };
 })(window);
