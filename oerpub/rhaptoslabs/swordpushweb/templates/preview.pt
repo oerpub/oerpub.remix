@@ -3,11 +3,33 @@
     <metal:script fill-slot="script-slot">
         <script type="text/javascript">
         jQuery(function($){
+            /* If the user changes anything in the preview, make a note of
+               this so we can prompt him to save it. */
+            window.dirty = false;
+            $(document).on('preview-changed', function(){
+                window.dirty = true;
+                $('#save-preview').attr('disabled', null);
+            });
+
+            /* This is a little evil, we want our clickhandler to be called
+               first, before the one in swordpush.js where everything has
+               been dumped in one file, so we reverse the events list
+               to make ours come first. */
+            $('#show-neworexisting').on('click', function(e){
+                if(window.dirty){
+                    if(!confirm('You have unsaved changes. Continue?')){
+                        return e.preventDefault();
+                    }
+                }
+            }).data('events').click.reverse();
+
             $('#save-preview').on('click', function(e){
                 var html = $('#preview-frame').contents().find('#cnx_main').html();
                 $.post("${request.route_url('preview_save')}",
                     {html: html}, function(data, statustext){
-                    alert('statustext');
+                    window.dirty=false;
+                    $('#save-preview').attr('disabled', "1");
+                    alert(data.saved);
                 });
                 return e.preventDefault();
             });
@@ -85,7 +107,7 @@
 
                 </div>
 
-                <button id="save-preview">Save</button>
+                <button id="save-preview" disabled="1">Save</button>
                 <iframe class="preview fitted" id="preview-frame" src="#"
                         preview_url="${body_url}" id="preview_frame"
                         frameborder="0" marginheight="0" marginwidth="0"

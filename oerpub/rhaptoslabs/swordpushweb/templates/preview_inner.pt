@@ -46,6 +46,16 @@
         Aloha.ready(function(){
             Aloha.jQuery.get('${body}', function(data){
                 Aloha.jQuery('#cnx_main').html(data).aloha();
+                /* We bind to aloha-editable-activated, not perfect, but there
+                   is an annoying delay before aloha-smart-content-changed
+                   fires. */
+                Aloha.bind('aloha-editable-activated', function(){
+                    var ev = $.Event();
+                    ev.type='preview-changed';
+                    /* You have to use the jquery on the parent window
+                       otherwise it does not work. */
+                    parent.jQuery(window.parent.document).trigger(ev);
+                });
             });
         });
     </script>
