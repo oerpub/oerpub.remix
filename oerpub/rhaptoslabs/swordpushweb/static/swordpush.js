@@ -346,8 +346,10 @@ $(document).ready(function()
 
     // Show the "New or existing module?" overlay.
     $('#show-neworexisting').click(function(e) {
+        if(!e.isDefaultPrevented()){
+            $('#neworexisting').modal();
+        }
         e.preventDefault();
-        $('#neworexisting').modal();
     });
 
     // Hide the "New or existing module?" overlay.
