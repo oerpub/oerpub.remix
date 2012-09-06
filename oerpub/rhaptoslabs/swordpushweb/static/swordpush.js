@@ -391,7 +391,6 @@ $(document).ready(function()
 
     // Show the chosen workgroup as selected when it's been clicked
     $(".popOut li").has("a").click(function(e){
-      e.preventDefault();
       var popMenu = $(this).closest("li.popMenu");
       element = $(this).find("a");
       $('input#workspace').attr('value', $(element).attr('href'));
@@ -508,7 +507,19 @@ $(document).ready(function()
             $(".forward-button").removeAttr("disabled");
         }
     }); 
-
+    
+    $('.workspace-link').click(function(event) {
+        event.preventDefault();
+        var workspace_url = $(this).attr('href');
+        $.ajax({
+            url: 'modules_list',
+            cache: false,
+            dataType: 'html',
+            data: {'workspace': workspace_url},
+            success: updateModules,
+            error: showError,
+        });
+    });
 });
 
 function _doAction(message, event) {
@@ -742,4 +753,13 @@ function removeFeaturedLink(event) {
     } else {
         return false;
     }
+}
+
+function updateModules(data, textStatus, jqXHR) {
+    html = $(data);
+    $('div#modules-list').replaceWith(html);
+}
+
+function showError(jqXHR, textStatus, errorThrown) {
+    alert(textStatus);
 }
