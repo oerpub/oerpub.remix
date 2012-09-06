@@ -12,7 +12,7 @@ import peppercorn
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
-from pyramid.renderers import render_to_response
+from pyramid.renderers import render_to_response, get_renderer
 from pyramid.response import Response
 
 import formencode
@@ -1094,6 +1094,32 @@ def admin_config_view(request):
     return response
 
 
+def get_module_list(connection, workspace):
+    xml = sword2cnx.get_module_list(connection, workspace)
+    tree = lxml.etree.XML(xml)
+    ns_dict = {'xmlns:sword': 'http://purl.org/net/sword/terms/',
+               'xmlns': 'http://www.w3.org/2005/Atom'}
+    elements =  tree.xpath('/xmlns:feed/xmlns:entry', namespaces=ns_dict)
+
+    modules = []
+    for element in elements:
+        title_element = element.xpath('./xmlns:title', namespaces=ns_dict)[0]
+        title = title_element.text
+
+        link_elements = element.xpath('./xmlns:link[@rel="edit"]',
+                                      namespaces=ns_dict
+                                     )
+        edit_link = link_elements[0].get('href')
+
+        path_elements = edit_link.split('/')
+        view_link = '/'.join(path_elements[:-2]) + '/latest'
+        path_elements.reverse()
+        uid = path_elements[1]
+
+        modules.append([uid, edit_link, title, view_link])
+    return modules
+
+
 class ModuleAssociationSchema(formencode.Schema):
     allow_extra_fields = True
     module = formencode.validators.String()
@@ -1119,38 +1145,51 @@ def module_association_view(request):
                                 download_service_document=False)
 
     workspace_to_get = session['collections'][0]['href']
+    workspace_to_get = request.params.get('workspace', workspace_to_get)
     print "Workspace url: " + workspace_to_get
-
-    xml = sword2cnx.get_module_list(conn, workspace_to_get)
-    tree = lxml.etree.XML(xml)
-    ns_dict = {'xmlns:sword': 'http://purl.org/net/sword/terms/',
-               'xmlns': 'http://www.w3.org/2005/Atom'}
-    elements =  tree.xpath('/xmlns:feed/xmlns:entry', namespaces=ns_dict)
-
-    modules = []
-    for element in elements:
-        title_element = element.xpath('./xmlns:title', namespaces=ns_dict)[0]
-        title = title_element.text
-
-        link_elements = element.xpath('./xmlns:link[@rel="edit"]',
-                                      namespaces=ns_dict
-                                     )
-        edit_link = link_elements[0].get('href')
-
-        path_elements = edit_link.split('/')
-        view_link = '/'.join(path_elements[:-2]) + '/latest'
-        path_elements.reverse()
-        uid = path_elements[2]
-
-        modules.append([uid, edit_link, title, view_link])
+    
+    modules = get_module_list(conn, workspace_to_get)
 
     b_start = int(request.GET.get('b_start', '0'))
     b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
     modules = Batch(modules, start=b_start, size=b_size)
+    module_macros = get_renderer('templates/modules_list.pt').implementation()
 
     form = Form(request, schema=ModuleAssociationSchema)
     response = {'form': FormRenderer(form),
                 'workspaces': workspaces,
+                'selected_workspace': workspace_to_get,
+                'modules': modules,
+                'request': request,
+                'config': config,
+                'module_macros': module_macros,
+    }
+    return response
+
+
+@view_config(
+    route_name='modules_list', renderer="templates/modules_list.pt")
+def modules_list(request):
+    check_login(request)
+    config = load_config(request)
+    session = request.session
+
+    conn = sword2cnx.Connection(session['service_document_url'],
+                                user_name = session['username'],
+                                user_pass = session['password'],
+                                always_authenticate=True,
+                                download_service_document=False)
+
+    workspace_to_get = session['collections'][0]['href']
+    workspace_to_get = request.params.get('workspace', workspace_to_get)
+    print "Workspace url: " + workspace_to_get
+
+    modules = get_module_list(conn, workspace_to_get)
+    b_start = int(request.GET.get('b_start', '0'))
+    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
+    modules = Batch(modules, start=b_start, size=b_size)
+
+    response = {'selected_workspace': workspace_to_get,
                 'modules': modules,
                 'request': request,
                 'config': config,
