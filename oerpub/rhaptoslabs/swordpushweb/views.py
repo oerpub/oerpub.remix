@@ -5,6 +5,7 @@ import datetime
 import zipfile
 import traceback
 import json
+import logging
 import libxml2
 import lxml
 import re
@@ -42,6 +43,8 @@ from utils import get_files_from_zipfile, build_featured_links
 import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 from z3c.batching.batch import Batch
+
+logger = logging.getLogger('swordpushweb')
 
 TESTING = False
 
@@ -581,29 +584,12 @@ def preview_view(request):
         del request.session['preview-no-cache']
 
     return {
-        'header_url': request.route_url('preview_header'),
-        'body_url': request.route_url('preview_body'),
+        'body_url': '%s%s/index.html'% (
+                        request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                     request.session['upload_dir']),
         'form': FormRenderer(form),
     }
 
-
-@view_config(route_name='preview_header')
-def preview_header_view(request):
-    print('PREVIEW HEADER')
-    check_login(request)
-    templatePath = 'templates/%s/preview_header.pt'%(
-        ['novice','expert'][request.session.get('expert_mode', False)])
-    return render_to_response(templatePath, {}, request=request)
-
-
-@view_config(route_name='preview_body')
-def preview_body_view(request):
-    return render_to_response('templates/preview_inner.pt',
-        {'body': '%s%s/index.html'% (
-            request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-            request.session['upload_dir']),
-        }, 
-        request=request)
 
 @view_config(route_name='preview_save')
 def preview_save(request):
@@ -613,7 +599,7 @@ def preview_save(request):
     try:
         cnxml = html_to_cnxml(html)
     except:
-        pass
+        logging.warn(traceback.format_exc())
 
     saved = False
     if cnxml is not None:
