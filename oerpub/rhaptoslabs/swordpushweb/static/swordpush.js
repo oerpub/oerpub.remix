@@ -768,6 +768,8 @@ function onWorkspaceChange(event) {
 }
 
 function updateModules(data, textStatus, jqXHR) {
+    $('.forward-button').attr('disabled','disabled');
+
     html = $(data);
     $('div#modules-list').replaceWith(html);
 
