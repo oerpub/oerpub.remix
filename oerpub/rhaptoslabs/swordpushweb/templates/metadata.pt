@@ -236,7 +236,7 @@
                                             <input id="show-featuredlinks-form"
                                             type="checkbox"
                                             title="Featured Links must each be removed individually"
-                                            checked="checked" name="fl_opener">
+                                            name="fl_opener">
                                             Add/edit optional Featured Links 
                                             <a title="Opens in a new window"
                                                 id="show-featuredlinks-help"
