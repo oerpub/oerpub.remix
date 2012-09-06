@@ -489,37 +489,15 @@ $(document).ready(function()
     });
 
     // Row highlighting for the table containing workarea contents
-    $("#workarea-contents tbody tr").hover(function(){
-        $(this).addClass('hovered-row');
-    }, function(){
-        $(this).removeClass('hovered-row');
-    });
+    $("#workarea-contents tbody tr").hover(highlightOn, highlightOff);
 
     // In table containing workarea contents, allow a user to select anywhere
     // in the row in order to select the associated radio button.
     // Unless they're just cliking on the little icon that links to the module.
     // Also set that row's background color to be highlighted.
-    $("#workarea-contents tbody tr").click(function(e){
-        if( !$(e.target).is(".review-module-link, .review-module-link *") ) {
-            $(this).find("input[type='radio']").attr("checked","checked");
-            $("#workarea-contents tbody tr").removeClass("selected-row");
-            $(this).addClass("selected-row");
-            $(".forward-button").removeAttr("disabled");
-        }
-    }); 
+    $("#workarea-contents tbody tr").click(selectModuleRow);
     
-    $('.workspace-link').click(function(event) {
-        event.preventDefault();
-        var workspace_url = $(this).attr('href');
-        $.ajax({
-            url: 'modules_list',
-            cache: false,
-            dataType: 'html',
-            data: {'workspace': workspace_url},
-            success: updateModules,
-            error: showError,
-        });
-    });
+    $('.workspace-link').click(onWorkspaceChange);
 });
 
 function _doAction(message, event) {
@@ -755,11 +733,50 @@ function removeFeaturedLink(event) {
     }
 }
 
+function selectModuleRow(event) {
+    // In table containing workarea contents, allow a user to select anywhere
+    // in the row in order to select the associated radio button.
+    // Unless they're just cliking on the little icon that links to the module.
+    // Also set that row's background color to be highlighted.
+    if( !$(event.target).is(".review-module-link, .review-module-link *") ) {
+        $(this).find("input[type='radio']").attr("checked","checked");
+        $("#workarea-contents tbody tr").removeClass("selected-row");
+        $(this).addClass("selected-row");
+        $(".forward-button").removeAttr("disabled");
+    }
+}
+
+function highlightOn(event) {
+    $(this).addClass('hovered-row');
+}
+
+function highlightOff(event) {
+    $(this).removeClass('hovered-row');
+}
+
+function onWorkspaceChange(event) {
+    event.preventDefault();
+    var workspace_url = $(this).attr('href');
+    $.ajax({
+        url: 'modules_list',
+        cache: false,
+        dataType: 'html',
+        data: {'workspace': workspace_url},
+        success: updateModules,
+        error: showError,
+    });
+}
+
 function updateModules(data, textStatus, jqXHR) {
     html = $(data);
     $('div#modules-list').replaceWith(html);
+
+    $("#workarea-contents tbody tr").hover(highlightOn, highlightOff);
+    $("#workarea-contents tbody tr").click(selectModuleRow);
+    $('.workspace-link').click(onWorkspaceChange);
 }
 
 function showError(jqXHR, textStatus, errorThrown) {
     alert(textStatus);
 }
+
