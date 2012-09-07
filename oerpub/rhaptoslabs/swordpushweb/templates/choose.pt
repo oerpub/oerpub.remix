@@ -84,34 +84,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     value="Select and preview &#187;">
                             </div>
                         </li>
-                    </ul>
-<!--
-                      <div class="advanced" style="display: block;">
-                        <h2 class="advanced-label">
-                          Advanced
-                        </h2>
-                        <ul class="create-new-list">
-                        </ul>
-                      </div>-->
-
-                  </td>
-
-                  <td style="vertical-align: top; padding-right: 2em; display: none;">
-            <h3>Online editor</h3>
-                          <ul class="create-new-list">
-                            <li id="editor">
-                              <label>
-                                <span style="visibility: hidden;" class="or-bullet">or</span> 
-                                <span class="label-text">
-                                  <img src="helper_files/module_icon.gif"> <strong>Module editor</strong>
-                               </span>
-                              </label>
-                              <div class="upload-form">
-                                <input class="button" value="Edit a new or existing module &#187;" type="submit" id="show-neworexisting-2"
-            onclick="window.location = 'choose-module-11.html'; return false;"
-            >
-                              </div>
-                            </li>
                           <li id="url-importer">
                             <label>
                               <span style="visibility: visible;" class="or-bullet">or</span> 
@@ -148,6 +120,34 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
                             </div>
                           </li>
+                    </ul>
+<!--
+                      <div class="advanced" style="display: block;">
+                        <h2 class="advanced-label">
+                          Advanced
+                        </h2>
+                        <ul class="create-new-list">
+                        </ul>
+                      </div>-->
+
+                  </td>
+
+                  <td style="vertical-align: top; padding-right: 2em; display: none;">
+            <h3>Online editor</h3>
+                          <ul class="create-new-list">
+                            <li id="editor">
+                              <label>
+                                <span style="visibility: hidden;" class="or-bullet">or</span> 
+                                <span class="label-text">
+                                  <img src="helper_files/module_icon.gif"> <strong>Module editor</strong>
+                               </span>
+                              </label>
+                              <div class="upload-form">
+                                <input class="button" value="Edit a new or existing module &#187;" type="submit" id="show-neworexisting-2"
+            onclick="window.location = 'choose-module-11.html'; return false;"
+            >
+                              </div>
+                            </li>
                           </ul>
                   </td>
 
