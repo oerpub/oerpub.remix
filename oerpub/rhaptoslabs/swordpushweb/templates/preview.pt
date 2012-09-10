@@ -33,12 +33,18 @@
 
             $('#statusmessage').data('message')('Loading preview...');
             Aloha.jQuery.get('${body_url}', function(data){
-                Aloha.jQuery('#preview-block').html(data).aloha();
+                var $editable = Aloha.jQuery('#preview-block').html(data);
+
+                // Remove the pyramid debug toolbar from the preview
+                // if it exists. This code should do nothing in production
+                $editable.find('#pDebug').remove();
+                $editable.aloha();
 
                 // Bind a handler for the changed event, so we can save
                 // the document
                 Aloha.bind('aloha-smart-content-changed', function(){
                     var $body = $('<body />');
+                    $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
                     $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
                     $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
                     $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
