@@ -101,6 +101,7 @@
 
         </div>
     </div>
+    <div class="toolbar"></div>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
