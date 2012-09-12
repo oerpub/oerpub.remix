@@ -70,6 +70,10 @@ ${form.csrf_token()}
     
           <div id="page-description"></div>
 
+          <div class="pleasewait" id="upload-wait" style="display: none;">
+              Retrieving module list. This may take a few moments.
+          </div>
+
           <div class="forminfo" style="margin: -.5em 0 1.5em">
               Select the module below whose contents you are replacing.
           </div>

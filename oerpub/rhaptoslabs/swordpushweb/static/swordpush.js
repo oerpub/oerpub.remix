@@ -754,6 +754,8 @@ function highlightOff(event) {
 
 function onWorkspaceChange(event) {
     event.preventDefault();
+    showWaitMessage();
+
     var workspace_url = $(this).attr('href');
     $.ajax({
         url: 'modules_list',
@@ -774,6 +776,7 @@ function updateModules(data, textStatus, jqXHR) {
     $("#workarea-contents tbody tr").hover(highlightOn, highlightOff);
     $("#workarea-contents tbody tr").click(selectModuleRow);
     $('.workspace-link').click(onWorkspaceChange);
+    $('#upload-wait').slideUp('slow');
 }
 
 function showError(jqXHR, textStatus, errorThrown) {
