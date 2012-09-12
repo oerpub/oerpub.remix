@@ -17,7 +17,8 @@
                             common/paste,
                             extra/ribbon, 
                             extra/figure,
-                            extra/no-floating"> <!-- xhtml workaround --></script>
+                            extra/no-floating,
+                            common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
         <script type="text/javascript">
         Aloha.ready(function(){
@@ -32,12 +33,18 @@
 
             $('#statusmessage').data('message')('Loading preview...');
             Aloha.jQuery.get('${body_url}', function(data){
-                Aloha.jQuery('#preview-block').html(data).aloha();
+                var $editable = Aloha.jQuery('#preview-block').html(data);
+
+                // Remove the pyramid debug toolbar from the preview
+                // if it exists. This code should do nothing in production
+                $editable.find('#pDebug').remove();
+                $editable.aloha();
 
                 // Bind a handler for the changed event, so we can save
                 // the document
                 Aloha.bind('aloha-smart-content-changed', function(){
                     var $body = $('<body />');
+                    $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
                     $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
                     $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
                     $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
@@ -45,7 +52,9 @@
                     $body.attr('xmlns:bib',  'http://bibtexml.sf.net/');
                     $body.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
                     $body.attr('class', 'content');
-                    var html = $body.append($('#preview-block').html())
+
+                    var html = $body.append(
+                        Aloha.getEditableById('preview-block').getContents())
                         .get(0).outerHTML;
                     $.post("${request.route_url('preview_save')}",
                             {html: html}, function(data, statustext){

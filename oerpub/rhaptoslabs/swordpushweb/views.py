@@ -604,8 +604,11 @@ def preview_save(request):
     saved = False
     if cnxml is not None:
         cnxml_filename = os.path.join(request.registry.settings['transform_dir'],
-            request.session['upload_dir'], 'index.cnxml')
-        # TODO save the cnxml back
+            request.session['upload_dir'], 'index.cnxml.new')
+        # TODO save the cnxml back to the original filename
+        fp = open(cnxml_filename, 'w')
+        fp.write(cnxml)
+        fp.close()
         saved = True
 
     response = Response(json.dumps({'saved': saved}))
