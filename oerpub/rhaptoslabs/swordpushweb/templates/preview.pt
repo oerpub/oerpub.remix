@@ -61,7 +61,7 @@
                         if(data.saved){
                             $('#statusmessage').data('message')('Saved');
                         } else {
-                            $('#statusmessage').data('message')('Saving failed', 'error');
+                            $('#statusmessage').data('message')(data.error, 'error');
                         }
                     });
                 });

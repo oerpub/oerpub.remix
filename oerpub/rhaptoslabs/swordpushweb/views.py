@@ -602,16 +602,18 @@ def preview_save(request):
         logging.warn(traceback.format_exc())
 
     saved = False
+    error = None
     if cnxml is not None:
-        cnxml_filename = os.path.join(request.registry.settings['transform_dir'],
-            request.session['upload_dir'], 'index.cnxml.new')
-        # TODO save the cnxml back to the original filename
-        fp = open(cnxml_filename, 'w')
-        fp.write(cnxml)
-        fp.close()
-        saved = True
+        save_dir = os.path.join(request.registry.settings['transform_dir'],
+            request.session['upload_dir'])
 
-    response = Response(json.dumps({'saved': saved}))
+        try:
+            update_cnxml(save_dir, cnxml)
+            saved = True
+        except ConversionError as e:
+            error = e.msg
+
+    response = Response(json.dumps({'saved': saved, 'error': error}))
     response.content_type = 'application/json'
     return response
 
@@ -619,6 +621,22 @@ class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True
     cnxml = formencode.validators.String(not_empty=True)
 
+
+def update_cnxml(save_dir, cnxml):
+    # get the list of files from upload.zip if it exists
+    files = []
+    zip_filename = os.path.join(save_dir, 'upload.zip')
+    if os.path.exists(zip_filename):
+        zip_archive = zipfile.ZipFile(zip_filename, 'r')
+        for filename in zip_archive.namelist():
+            if filename == 'index.cnxml':
+                continue
+            fp = zip_archive.open(filename, 'r')
+            files.append((filename, fp.read()))
+            fp.close()
+
+    save_cnxml(save_dir, cnxml, files)
+    validate_cnxml(cnxml)
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
@@ -632,21 +650,8 @@ def cnxml_view(request):
     if 'cnxml' in request.POST and form.validate():
         cnxml = form.data['cnxml']
 
-        # get the list of files from upload.zip if it exists
-        files = []
-        zip_filename = os.path.join(save_dir, 'upload.zip')
-        if os.path.exists(zip_filename):
-            zip_archive = zipfile.ZipFile(zip_filename, 'r')
-            for filename in zip_archive.namelist():
-                if filename == 'index.cnxml':
-                    continue
-                fp = zip_archive.open(filename, 'r')
-                files.append((filename, fp.read()))
-                fp.close()
-
         try:
-            save_cnxml(save_dir, cnxml, files)
-            validate_cnxml(cnxml)
+            update_cnxml(save_dir, cnxml)
         except ConversionError as e:
             return render_conversionerror(request, e.msg)
 
