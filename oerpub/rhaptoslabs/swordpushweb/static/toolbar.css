@@ -124,6 +124,12 @@ input {
     background: url('icons/redo-01-disabled.png') 0 -10px;
 }
 
+.menu-bar
+{
+    /* TODO: Better would be not rendering it */
+    display:none;
+    visibility:hidden;
+}
 
 .tool-bar{
     background: #fefefe; /* Old browsers */
