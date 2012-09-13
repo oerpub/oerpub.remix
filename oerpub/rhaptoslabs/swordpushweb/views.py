@@ -214,6 +214,18 @@ def save_and_backup_file(save_dir, filename, content, mode='w'):
     f.write(content)
     f.close()
 
+def save_zip(save_dir, cnxml, html, files):
+    ram = StringIO()
+    zip_archive = zipfile.ZipFile(ram, 'w')
+    zip_archive.writestr('index.cnxml', cnxml)
+    if html is not None:
+        zip_archive.writestr('index.html', html)
+    for filename, fileObj in files:
+        zip_archive.writestr(filename, fileObj)
+    zip_archive.close()
+    zip_filename = os.path.join(save_dir, 'upload.zip')
+    save_and_backup_file(save_dir, zip_filename, ram.getvalue(), mode='wb')
+
 def save_cnxml(save_dir, cnxml, files):
     # write CNXML output
     save_and_backup_file(save_dir, 'index.cnxml', cnxml)
@@ -237,21 +249,12 @@ def save_cnxml(save_dir, cnxml, files):
     # Note that we cannot use zipfile as context manager, as that is only
     # available from python 2.7
     # TODO: Do a filesize check xxxx
-    ram = StringIO()
-    zip_archive = zipfile.ZipFile(ram, 'w')
-    zip_archive.writestr('index.cnxml', cnxml)
-    if not conversionerror:
+    if conversionerror is None:
         save_and_backup_file(save_dir, 'index.html', htmlpreview)
-        zip_archive.writestr('index.html', htmlpreview)
-    for filename, fileObj in files:
-        zip_archive.writestr(filename, fileObj)
-    zip_archive.close()
-
-    zip_filename = os.path.join(save_dir, 'upload.zip')
-    save_and_backup_file(save_dir, zip_filename, ram.getvalue(), mode='wb')
-
-    if conversionerror:
+        save_zip(save_dir, cnxml, htmlpreview, files)
         raise ConversionError(conversionerror)
+    else:
+        save_zip(save_dir, cnxml, None, files)
 
 def validate_cnxml(cnxml):
     valid, log = validate(cnxml, validator="jing")
@@ -596,22 +599,27 @@ def preview_save(request):
     check_login(request)
     html = request.POST['html']
     cnxml = None
+    saved = False
+    error = "Unknown error"
     try:
         cnxml = html_to_cnxml(html)
     except:
         logging.warn(traceback.format_exc())
 
-    saved = False
-    error = None
+    # TODO: validate the cnxml
+    try:
+        validate_cnxml(cnxml)
+    except ConversionError as e:
+        error = "CNXML Validation failed"
+
     if cnxml is not None:
         save_dir = os.path.join(request.registry.settings['transform_dir'],
             request.session['upload_dir'])
-
-        try:
-            update_cnxml(save_dir, cnxml)
-            saved = True
-        except ConversionError as e:
-            error = e.msg
+        save_and_backup_file(save_dir, 'index.cnxml', cnxml)
+        save_and_backup_file(save_dir, 'index.html', html)
+        files = get_zipped_files(save_dir)
+        save_zip(save_dir, cnxml, html, files)
+        saved = True
 
     response = Response(json.dumps({'saved': saved, 'error': error}))
     response.content_type = 'application/json'
@@ -621,8 +629,7 @@ class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True
     cnxml = formencode.validators.String(not_empty=True)
 
-
-def update_cnxml(save_dir, cnxml):
+def get_zipped_files(save_dir):
     # get the list of files from upload.zip if it exists
     files = []
     zip_filename = os.path.join(save_dir, 'upload.zip')
@@ -634,9 +641,7 @@ def update_cnxml(save_dir, cnxml):
             fp = zip_archive.open(filename, 'r')
             files.append((filename, fp.read()))
             fp.close()
-
-    save_cnxml(save_dir, cnxml, files)
-    validate_cnxml(cnxml)
+    return files
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
@@ -651,7 +656,9 @@ def cnxml_view(request):
         cnxml = form.data['cnxml']
 
         try:
-            update_cnxml(save_dir, cnxml)
+            files = get_zipped_files(save_dir)
+            save_cnxml(save_dir, cnxml, files)
+            validate_cnxml(cnxml)
         except ConversionError as e:
             return render_conversionerror(request, e.msg)
 
