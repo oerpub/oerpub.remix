@@ -48,6 +48,19 @@ logger = logging.getLogger('swordpushweb')
 
 TESTING = False
 
+def sync_upload(c):
+    def _sync(request, *args, **kwargs):
+
+        # TODO: Sync cnxml with html here
+        #save_dir = os.path.join(request.registry.settings['transform_dir'],
+        #    request.session['upload_dir'])
+        return c(request, *args, **kwargs)
+
+    _sync.__name__=c.__name__
+    _sync.__doc__=c.__doc__
+    return _sync
+        
+
 def check_login(request, raise_exception=True):
     # Check if logged in
     for key in ['username', 'password', 'service_document_url']:
@@ -570,6 +583,7 @@ class PreviewSchema(formencode.Schema):
 
 @view_config(route_name='preview', renderer='templates/preview.pt',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
+@sync_upload
 def preview_view(request):
     check_login(request)
     
@@ -644,6 +658,7 @@ def get_zipped_files(save_dir):
     return files
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
+@sync_upload
 def cnxml_view(request):
     check_login(request)
     form = Form(request, schema=CnxmlSchema)
@@ -717,6 +732,7 @@ class MetadataSchema(formencode.Schema):
 
 
 @view_config(route_name='metadata')
+@sync_upload
 def metadata_view(request):
     """
     Handle metadata adding and uploads
@@ -1149,6 +1165,7 @@ class ModuleAssociationSchema(formencode.Schema):
 
 @view_config(
     route_name='module_association', renderer='templates/module_association.pt')
+@sync_upload
 def module_association_view(request):
     check_login(request)
     config = load_config(request)
@@ -1220,6 +1237,7 @@ def modules_list(request):
 
 @view_config(route_name='download_zip',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
+@sync_upload
 def download_zip(request):
     check_login(request)
 
