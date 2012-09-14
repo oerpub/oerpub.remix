@@ -50,10 +50,35 @@ TESTING = False
 
 def sync_upload(c):
     def _sync(request, *args, **kwargs):
+        save_dir = os.path.join(request.registry.settings['transform_dir'],
+            request.session['upload_dir'])
 
-        # TODO: Sync cnxml with html here
-        #save_dir = os.path.join(request.registry.settings['transform_dir'],
-        #    request.session['upload_dir'])
+        # Check if index.html_ exist, if it does, then there is unconverted
+        # changes. Convert it to cnxml, update index.cnxml and upload.zip
+        fn = os.path.join(save_dir, 'index.html')
+        fn_ = fn + '_'
+        cnxml = None
+        if os.path.exists(fn_):
+            os.rename(fn, fn + '~') # Backup old file
+            os.rename(fn_, fn) # Move in the new html version
+
+            # Convert new html to cnxml
+            with open(fn, 'rt') as fp:
+                html = fp.read()
+            try:
+                cnxml = html_to_cnxml(html)
+            except Exception as e:
+                return render_conversionerror(request, str(e))
+
+            try:
+                validate_cnxml(cnxml)
+            except ConversionError as e:
+                return render_conversionerror(request, str(e))
+            else:
+                save_and_backup_file(save_dir, 'index.cnxml', cnxml)
+                files = get_zipped_files(save_dir)
+                save_zip(save_dir, cnxml, html, files)
+
         return c(request, *args, **kwargs)
 
     _sync.__name__=c.__name__
@@ -612,30 +637,15 @@ def preview_view(request):
 def preview_save(request):
     check_login(request)
     html = request.POST['html']
-    cnxml = None
-    saved = False
-    error = "Unknown error"
-    try:
-        cnxml = html_to_cnxml(html)
-    except:
-        logging.warn(traceback.format_exc())
 
-    # TODO: validate the cnxml
-    try:
-        validate_cnxml(cnxml)
-    except ConversionError as e:
-        error = "CNXML Validation failed"
+    save_dir = os.path.join(request.registry.settings['transform_dir'],
+        request.session['upload_dir'])
+    save_and_backup_file(save_dir, 'index.html_', html)
 
-    if cnxml is not None:
-        save_dir = os.path.join(request.registry.settings['transform_dir'],
-            request.session['upload_dir'])
-        save_and_backup_file(save_dir, 'index.cnxml', cnxml)
-        save_and_backup_file(save_dir, 'index.html', html)
-        files = get_zipped_files(save_dir)
-        save_zip(save_dir, cnxml, html, files)
-        saved = True
+    with open(os.path.join(save_dir, 'index.html_'), 'w') as fp:
+        fp.write(html)
 
-    response = Response(json.dumps({'saved': saved, 'error': error}))
+    response = Response(json.dumps({'saved': True, 'error': None}))
     response.content_type = 'application/json'
     return response
 
@@ -650,7 +660,7 @@ def get_zipped_files(save_dir):
     if os.path.exists(zip_filename):
         zip_archive = zipfile.ZipFile(zip_filename, 'r')
         for filename in zip_archive.namelist():
-            if filename == 'index.cnxml':
+            if filename in ('index.cnxml', 'index.html'):
                 continue
             fp = zip_archive.open(filename, 'r')
             files.append((filename, fp.read()))
