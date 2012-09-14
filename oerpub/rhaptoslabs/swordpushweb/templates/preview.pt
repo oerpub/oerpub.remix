@@ -11,6 +11,7 @@
                             common/format,
                             common/block,
                             user/blockdemo,
+                            common/list,
                             common/table,
                             common/highlighteditables,
                             common/image,
