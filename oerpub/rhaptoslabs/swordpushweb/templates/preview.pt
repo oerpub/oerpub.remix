@@ -120,7 +120,7 @@
                             <a id="download-copy"
                                 title="Save a ZIP file containing the module's XML and metadata to your local computer."
                                 href="#asdfaasdf"
-                                tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])">
+                                tal:attributes="href request.route_url('download_zip')">
                                 <span class="button">Download a copy</span>
                             </a>
                             <a id="edit-xml"
