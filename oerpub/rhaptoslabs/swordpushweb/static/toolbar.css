@@ -132,11 +132,37 @@ input {
 }
 
 .tool-bar{
-    outline: 0;
-    height: 33px;
-    width: 33px;
-    display: inline-block;
-    letter-spacing: normal;
-    word-spacing: normal;
-    background-position: -23px -66px;    
+  height: 42px;
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  background-color: #fff;
+  padding: 0 1em;
+  border-bottom: 1px solid #aaa;
+  position: relative;
+  z-index: 1;
+clear: both;
+  white-space: nowrap;
+position: fixed;
+width: 100%;
+z-index: 550;
+  box-shadow: 0 0 5px #bbb;
+  font-size: .9em;
+  font-family: tahoma,verdana,arial,helvetica,sans-serif;
+
+  /* following two are part of a hack learned from PatrikAkerstrand at http://stackoverflow.com/questions/5078239/how-to-remove-the-space-between-inline-block-elements */
+  letter-spacing: -.31em;
+  word-spacing: -.43em;   
 }
+
+#toolbar-bold a                   { background-position: -56px 0; }
+#toolbar-bold.disabled a          { background-position: -56px -33px; }
+#toolbar-bold.hovered a           { background-position: -56px -66px; }
+#toolbar-bold.selected a          { background-position: -56px -132px; }
+#toolbar-italics a                { background-position: -155px 0; }
+#toolbar-italics.disabled a       { background-position: -155px -33px; }
+#toolbar-italics.hovered a        { background-position: -155px -66px; }
+#toolbar-italics.selected a       { background-position: -155px -132px; }
+#toolbar-underline a              { background-position: -485px 0; }
+#toolbar-underline.disabled a     { background-position: -485px -33px; }
+#toolbar-underline.hovered a      { background-position: -485px -66px; }
+#toolbar-underline.selected a     { background-position: -485px -132px; }
