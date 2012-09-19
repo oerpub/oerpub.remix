@@ -290,9 +290,9 @@ def save_cnxml(save_dir, cnxml, files):
     if conversionerror is None:
         save_and_backup_file(save_dir, 'index.html', htmlpreview)
         save_zip(save_dir, cnxml, htmlpreview, files)
-        raise ConversionError(conversionerror)
     else:
         save_zip(save_dir, cnxml, None, files)
+        raise ConversionError(conversionerror)
 
 def validate_cnxml(cnxml):
     valid, log = validate(cnxml, validator="jing")
