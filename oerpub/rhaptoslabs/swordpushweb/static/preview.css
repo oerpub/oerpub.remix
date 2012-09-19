@@ -1,0 +1,24 @@
+.toolbar-container {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 1;
+}
+
+figure {
+    counter-increment: figure;
+}
+
+figure figcaption::before {
+    content: "Figure 1." counter(figure) " ";
+    font-weight: bold;
+}
+
+/* Hide aloha default toolbar */
+.aloha-table-wrapper div.aloha-wai-red {
+    background-image: none !important;
+}
+
+.aloha-toolbar {
+    display: none !important;
+}
