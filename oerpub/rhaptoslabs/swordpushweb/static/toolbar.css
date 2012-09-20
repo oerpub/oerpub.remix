@@ -126,9 +126,8 @@ input {
 
 .menu-bar
 {
-    /* TODO: Better would be not rendering it */
-    display:none;
-    visibility:hidden;
+    color: black;
+    min-height: 1em;
 }
 
 .tool-bar{
