@@ -84,13 +84,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     value="Select and preview &#187;">
                             </div>
                         </li>
-                    </ul>
-
-                      <div class="advanced" style="display: block;">
-                        <h2 class="advanced-label">
-                          Advanced
-                        </h2>
-                        <ul class="create-new-list">
                           <li id="url-importer">
                             <label>
                               <span style="visibility: visible;" class="or-bullet">or</span> 
@@ -112,6 +105,13 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                         
                           </li>
 
+                    </ul>
+
+                      <div class="advanced" style="display: block;">
+                        <h2 class="advanced-label">
+                          Advanced
+                        </h2>
+                        <ul class="create-new-list">
                           <li id="latex-zip-importer">
                             <label>
                               <span class="or-bullet">or</span> 
