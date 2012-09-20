@@ -626,8 +626,11 @@ def preview_view(request):
         del request.session['preview-no-cache']
 
     return {
+        'body_base': '%s%s/' % (
+                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                     request.session['upload_dir']),
         'body_url': '%s%s/index.html'% (
-                        request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
                      request.session['upload_dir']),
         'form': FormRenderer(form),
     }
