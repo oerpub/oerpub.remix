@@ -1,8 +1,9 @@
 .toolbar{
     position: fixed;
-   top: 100px;
-   width: 100%;
+    top: 100px;
+    width: 100%;
     z-index: 100;
+    color: black;
 }
 
 #sidebar {
@@ -126,8 +127,7 @@ input {
 
 .menu-bar
 {
-    color: black;
-    min-height: 1em;
+    min-height: 1em !important;
 }
 
 .tool-bar{
