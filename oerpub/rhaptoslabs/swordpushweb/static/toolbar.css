@@ -154,6 +154,17 @@ z-index: 550;
   word-spacing: -.43em;   
 }
 
+.toolbar-icon{
+  background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+  outline: 0;
+  height: 33px;
+  width: 33px;
+  display: inline-block;
+  letter-spacing: normal;
+  word-spacing: normal;
+  background-position: -23px -66px;
+}
+
 #toolbar-bold a                   { background-position: -56px 0; }
 #toolbar-bold.disabled a          { background-position: -56px -33px; }
 #toolbar-bold.hovered a           { background-position: -56px -66px; }

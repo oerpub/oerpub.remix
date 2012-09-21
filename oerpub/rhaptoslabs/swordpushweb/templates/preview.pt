@@ -6,7 +6,7 @@
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
-        data-aloha-plugins="extra/toolbar,
+        data-aloha-plugins="extra/toolbar-oerpub,
                             common/ui,
                             common/format,
                             common/block,
@@ -95,7 +95,25 @@
 
         </div>
     </div>
-    <div class="toolbar"></div>
+    
+    <div class="toolbar">
+        <!--
+        <div id="icon_set">
+          <span class="toolbar-function" id="toolbar-bold">
+            <a class="toolbar-icon" href="#" title="Bold (Ctrl + B)">
+            </a>
+          </span>
+          <span class="toolbar-function" id="toolbar-italics">
+            <a class="toolbar-icon" href="#" title="Italics (Ctrl + I)">
+            </a>
+          </span>
+          <span class="toolbar-function" id="toolbar-underline">
+            <a class="toolbar-icon" href="#" title="Underline (Ctrl + U)">
+            </a>
+          </span>
+        </div>
+        -->
+    </div>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
