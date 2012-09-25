@@ -8,18 +8,18 @@
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
-        data-aloha-plugins="extra/toolbar,
-                            common/ui,
+        data-aloha-plugins="common/ui,
+                            extra/ribbon, 
+                            extra/simpletoolbar,
                             common/format,
                             common/paste,
                             common/block,
                             user/blockdemo,
                             common/list,
-                            common/table,
+                            extra/table,
                             common/highlighteditables,
                             common/image,
                             common/paste,
-                            extra/ribbon, 
                             extra/figure,
                             extra/no-floating,
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
@@ -105,7 +105,9 @@
 
         </div>
     </div>
-    <div class="toolbar"></div>
+    <div class="toolbar-container">
+        <div class="toolbar"></div>
+    </div>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
