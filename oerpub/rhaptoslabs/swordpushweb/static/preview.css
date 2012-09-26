@@ -19,6 +19,6 @@ figure figcaption::before {
     background-image: none !important;
 }
 
-/*.aloha-toolbar {
+.aloha-toolbar {
     display: none !important;
-}*/
+}
