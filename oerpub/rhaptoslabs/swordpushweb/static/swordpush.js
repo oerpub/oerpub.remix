@@ -495,7 +495,7 @@ $(document).ready(function()
     // Also set that row's background color to be highlighted.
     $("#workarea-contents tbody tr").click(selectModuleRow);
     
-    $('.workspace-link').click(onWorkspaceChange);
+    $('div#workspace-list a.workspace-link').click(onWorkspaceChange);
 });
 
 function _doAction(message, event) {
@@ -775,7 +775,7 @@ function updateModules(data, textStatus, jqXHR) {
 
     $("#workarea-contents tbody tr").hover(highlightOn, highlightOff);
     $("#workarea-contents tbody tr").click(selectModuleRow);
-    $('.workspace-link').click(onWorkspaceChange);
+    $('div#workspace-list a.workspace-link').click(onWorkspaceChange);
     $('#upload-wait').slideUp('slow');
 }
 
