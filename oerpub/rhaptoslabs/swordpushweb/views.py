@@ -14,6 +14,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response, get_renderer
 from pyramid.response import Response
+from pyramid.decorator import reify
 
 import formencode
 
@@ -41,7 +42,12 @@ import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 from z3c.batching.batch import Batch
 
+from utils import check_login
+from helpers import BaseHelper 
+
+ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
 TESTING = False
+
 
 def check_login(request, raise_exception=True):
     # Check if logged in
@@ -565,6 +571,19 @@ class PreviewSchema(formencode.Schema):
 def preview_view(request):
     check_login(request)
     
+    session = request.session
+    module = request.params.get('module')
+    if module:
+        conn = sword2cnx.Connection(session['service_document_url'],
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=False)
+
+        # example: http://cnx.org/Members/user001/m17222/sword/editmedia
+        result = conn.get_resource(content_iri = module,
+                                   packaging = ZIP_PACKAGING) 
+        
     defaults = {}
     defaults['title'] = request.session.get('title', '')
     form = Form(request,
@@ -870,7 +889,7 @@ def metadata_view(request):
                         payload = zip_file,
                         filename = 'upload.zip',
                         mimetype = 'application/zip',
-                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                        packaging = ZIP_PACKAGING,
                         edit_iri = url,
                         edit_media_iri = url + '/editmedia',
                         metadata_relevant=False,
@@ -883,7 +902,7 @@ def metadata_view(request):
                         payload = zip_file,
                         filename = 'upload.zip',
                         mimetype = 'application/zip',
-                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                        packaging = ZIP_PACKAGING,
                         in_progress = True)
 
         # Remember to which workspace we submitted
@@ -1024,6 +1043,7 @@ must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.952795292
         # Go to the upload page
         return HTTPFound(location=request.route_url('summary'))
 
+    macros = get_renderer('templates/macros.pt').implementation()
     response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
@@ -1032,6 +1052,7 @@ must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.952795292
         'languages': languages,
         'subjects': subjects,
         'config': config,
+        'macros': macros,
     }
     return render_to_response(templatePath, response, request=request)
 
@@ -1125,73 +1146,114 @@ class ModuleAssociationSchema(formencode.Schema):
     module = formencode.validators.String()
 
 
-@view_config(
-    route_name='module_association', renderer='templates/module_association.pt')
-def module_association_view(request):
-    check_login(request)
-    config = load_config(request)
-    session = request.session
+class Module_Association_View(BaseHelper):
 
-    # clear the session of any stale associated module paths
-    if 'associated_module_url' in session.keys():
-        del session['associated_module_url']
+    @view_config(route_name='module_association',
+                 renderer='templates/module_association.pt')
+    def generate_html_view(self):
+        request = self.request
+        session = self.session
 
-    workspaces = [(i['href'], i['title']) for i in session['collections']]
-    
-    conn = sword2cnx.Connection(session['service_document_url'],
-                                user_name = session['username'],
-                                user_pass = session['password'],
-                                always_authenticate=True,
-                                download_service_document=False)
+        check_login(request)
+        config = load_config(request)
 
-    workspace_to_get = session['collections'][0]['href']
-    workspace_to_get = request.params.get('workspace', workspace_to_get)
-    print "Workspace url: " + workspace_to_get
-    
-    modules = get_module_list(conn, workspace_to_get)
+        # clear the session of any stale associated module paths
+        if 'associated_module_url' in session.keys():
+            del session['associated_module_url']
 
-    b_start = int(request.GET.get('b_start', '0'))
-    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
-    modules = Batch(modules, start=b_start, size=b_size)
-    module_macros = get_renderer('templates/modules_list.pt').implementation()
+        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        
+        conn = sword2cnx.Connection(session['service_document_url'],
+                                    user_name = session['username'],
+                                    user_pass = session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=False)
 
-    form = Form(request, schema=ModuleAssociationSchema)
-    response = {'form': FormRenderer(form),
-                'workspaces': workspaces,
-                'selected_workspace': workspace_to_get,
-                'modules': modules,
-                'request': request,
-                'config': config,
-                'module_macros': module_macros,
-    }
-    return response
+        workspace_to_get = session['collections'][0]['href']
+        workspace_to_get = request.params.get('workspace', workspace_to_get)
+        print "Workspace url: " + workspace_to_get
+        
+        modules = get_module_list(conn, workspace_to_get)
+
+        b_start = int(request.GET.get('b_start', '0'))
+        b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
+        modules = Batch(modules, start=b_start, size=b_size)
+        module_macros = get_renderer('templates/modules_list.pt').implementation()
+
+        form = Form(request, schema=ModuleAssociationSchema)
+        response = {'form': FormRenderer(form),
+                    'workspaces': workspaces,
+                    'selected_workspace': workspace_to_get,
+                    'modules': modules,
+                    'request': request,
+                    'config': config,
+                    'module_macros': module_macros,
+        }
+        return response
+
+    @reify
+    def macros(self):
+        return self.macro_renderer.implementation().macros
+
+    @reify
+    def workspace_list(self):
+        return self.macro_renderer.implementation().macros['workspace_list']
+
+    @reify
+    def workspace_popup(self):
+        return self.macro_renderer.implementation().macros['workspace_popup']
+
+    @reify
+    def modules_list(self):
+        return self.macro_renderer.implementation().macros['modules_list']
 
 
-@view_config(
-    route_name='modules_list', renderer="templates/modules_list.pt")
-def modules_list(request):
-    check_login(request)
-    config = load_config(request)
-    session = request.session
+class Modules_List_View(BaseHelper):
 
-    conn = sword2cnx.Connection(session['service_document_url'],
-                                user_name = session['username'],
-                                user_pass = session['password'],
-                                always_authenticate=True,
-                                download_service_document=False)
+    @view_config(
+        route_name='modules_list', renderer="templates/modules_list.pt")
+    def generate_html_view(self):
+        check_login(self.request)
+        config = load_config(self.request)
+        session = self.session
 
-    workspace_to_get = session['collections'][0]['href']
-    workspace_to_get = request.params.get('workspace', workspace_to_get)
-    print "Workspace url: " + workspace_to_get
+        conn = sword2cnx.Connection(session['service_document_url'],
+                                    user_name = session['username'],
+                                    user_pass = session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=False)
 
-    modules = get_module_list(conn, workspace_to_get)
-    b_start = int(request.GET.get('b_start', '0'))
-    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
-    modules = Batch(modules, start=b_start, size=b_size)
+        workspace_to_get = session['collections'][0]['href']
+        workspace_to_get = self.request.params.get('workspace',
+                                                   workspace_to_get)
+        print "Workspace url: " + workspace_to_get
 
-    response = {'selected_workspace': workspace_to_get,
-                'modules': modules,
-                'request': request,
-                'config': config,
-    }
-    return response
+        modules = get_module_list(conn, workspace_to_get)
+        b_start = int(self.request.GET.get('b_start', '0'))
+        b_size = int(self.request.GET.get('b_size', 
+                                          config.get('default_batch_size')))
+        modules = Batch(modules, start=b_start, size=b_size)
+
+        response = {'selected_workspace': workspace_to_get,
+                    'modules': modules,
+                    'request': self.request,
+                    'config': config,
+        }
+        return response
+
+    @reify
+    def modules_list(self):
+        return self.macro_renderer.implementation().macros['modules_list']
+
+
+class Choose_Module(Module_Association_View):
+
+    @view_config(
+        route_name='choose-module', renderer="templates/choose_module.pt")
+    def generate_html_view(self):
+        return super(Choose_Module, self).generate_html_view()
+
+    @reify
+    def content_macro(self):
+        return self.macro_renderer.implementation().macros['content_macro']
+        

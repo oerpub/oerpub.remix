@@ -21,9 +21,9 @@ def main(global_config, **settings):
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
     config.add_route('logout', '/logout')
-    config.add_route('change_workspace', '/change_workspace')
     config.add_route('module_association', '/module_association')
     config.add_route('modules_list', '/modules_list')
+    config.add_route('choose-module', '/choose-module')
     
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
