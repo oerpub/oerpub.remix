@@ -251,3 +251,14 @@ def build_featured_links(data):
 
     links.append(u'</featured-links>')
     return links
+
+
+def check_login(request, raise_exception=True):
+    # Check if logged in
+    for key in ['username', 'password', 'service_document_url']:
+        if not request.session.has_key(key):
+            if raise_exception:
+                raise HTTPFound(location=request.route_url('login'))
+            else:
+                return False
+    return True
