@@ -389,6 +389,7 @@ $(document).ready(function()
 
     // Show the chosen workgroup as selected when it's been clicked
     $(".popOut li").has("a").click(function(e){
+      e.preventDefault();
       var popMenu = $(this).closest("li.popMenu");
       element = $(this).find("a");
       $('input#workspace').attr('value', $(element).attr('href'));
@@ -740,6 +741,9 @@ function selectModuleRow(event) {
         $(this).find("input[type='radio']").attr("checked","checked");
         $("#workarea-contents tbody tr").removeClass("selected-row");
         $(this).addClass("selected-row");
+        module = $(this).find("input").val();
+        $("input#module").attr("value", module);
+        $("#workspace").attr("value", $("a#selected_workspace").attr('href'));
         $(".forward-button").removeAttr("disabled");
     }
 }
