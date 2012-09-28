@@ -718,19 +718,12 @@ def metadata_view(request):
     """
     Handle metadata adding and uploads
     """
-    print('INSIDE METADATA_VIEW')
     check_login(request)
     templatePath = 'templates/metadata.pt'
     session = request.session
     config = load_config(request)
     
-    module = request.POST.get('module', None)
-    if module is not None:
-        session['associated_module_url'] = module
-
     workspaces = [(i['href'], i['title']) for i in session['collections']]
-    if 'workspace' in request.params.keys():
-        session['selected_workspace'] = request.params['workspace']
     subjects = ["Arts",
                 "Business",
                 "Humanities",
@@ -877,11 +870,9 @@ def metadata_view(request):
                         files = get_files_from_zipfile(zip_file)
                         save_cnxml(save_dir, new_cnxml, files)
 
-                url = session.get('associated_module_url',
-                                  form.data['workspace'])
+                associated_module_url = request.POST.get('associated_module_url')
                 # clear the session of any associated module paths after using it
-                if 'associated_module_url' in session.keys():
-                    del session['associated_module_url']
+                if associated_module_url:
                     # this is an update not a create
                     zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
                     deposit_receipt = conn.update(
@@ -890,14 +881,14 @@ def metadata_view(request):
                         filename = 'upload.zip',
                         mimetype = 'application/zip',
                         packaging = ZIP_PACKAGING,
-                        edit_iri = url,
-                        edit_media_iri = url + '/editmedia',
+                        edit_iri = associated_module_url,
+                        edit_media_iri = associated_module_url + '/editmedia',
                         metadata_relevant=False,
                         in_progress=True)
                     zip_file.close()
                 else:
                     deposit_receipt = conn.create(
-                        col_iri = url,
+                        col_iri = form.data['workspace'],
                         metadata_entry = metadata_entry,
                         payload = zip_file,
                         filename = 'upload.zip',
@@ -1044,11 +1035,18 @@ must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.952795292
         return HTTPFound(location=request.route_url('summary'))
 
     macros = get_renderer('templates/macros.pt').implementation()
+    module_url = request.POST.get('module', None)
+    selected_workspace = request.POST.get('workspace', None)
+    first_workspace = selected_workspace or workspaces[0][0]
+    workspace_title = [w[1] for w in workspaces if w[0] == first_workspace][0]
     response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
         'workspaces': workspaces,
-        'selected_workspace': session.get('selected_workspace', '#'),
+        'first_workspace': first_workspace,
+        'selected_workspace': selected_workspace,
+        'workspace_title': workspace_title,
+        'module_url': module_url,
         'languages': languages,
         'subjects': subjects,
         'config': config,
@@ -1157,10 +1155,6 @@ class Module_Association_View(BaseHelper):
         check_login(request)
         config = load_config(request)
 
-        # clear the session of any stale associated module paths
-        if 'associated_module_url' in session.keys():
-            del session['associated_module_url']
-
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         
         conn = sword2cnx.Connection(session['service_document_url'],
@@ -1180,10 +1174,14 @@ class Module_Association_View(BaseHelper):
         modules = Batch(modules, start=b_start, size=b_size)
         module_macros = get_renderer('templates/modules_list.pt').implementation()
 
+        first_workspace = workspace_to_get or workspaces[0][0]
+        workspace_title = [w[1] for w in workspaces if w[0] == first_workspace][0]
         form = Form(request, schema=ModuleAssociationSchema)
         response = {'form': FormRenderer(form),
                     'workspaces': workspaces,
                     'selected_workspace': workspace_to_get,
+                    'first_workspace': first_workspace,
+                    'workspace_title': workspace_title,
                     'modules': modules,
                     'request': request,
                     'config': config,

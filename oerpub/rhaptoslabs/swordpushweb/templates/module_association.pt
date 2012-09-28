@@ -35,7 +35,9 @@ ${form.csrf_token()}
                 url="${request.route_url('preview')}">
         </div>
 
-        <input id="workspace" type="hidden" name="workspace">
+        <input id="workspace" type="hidden" name="workspace"
+            tal:attributes="value selected_workspace|string:">
+        <input id="module" type="hidden" name="module">
 
         <div id="forward-steps">
             <input type="submit"
@@ -66,46 +68,53 @@ ${form.csrf_token()}
                 <h1 style="margin-bottom: .7em;">
                   Which module are you making a new version of? 
                 </h1>
-          </div>
-    
-          <div id="page-description"></div>
+            </div>
 
-          <div class="pleasewait" id="upload-wait" style="display: none;">
-              Retrieving module list. This may take a few moments.
-          </div>
+            <div class="forminfo" style="margin: -.5em 0 1.5em">
+                Select the module below whose contents you are replacing.
+                <span style="font-size: .85em;">
+                    (<a href="#asdfasdf" id="not-finding-link">Not finding your module in any of your work areas?</a>)
+                </span>
+            </div>  
 
-          <div class="forminfo" style="margin: -.5em 0 1.5em">
-              Select the module below whose contents you are replacing.
-          </div>
+            <div id="not-finding" style="display: none;" class="existing">
+                <div style="margin: 0 0 .5em;">
+                    <div style="margin: 0 0 .5em;" class="forminfo">
+                        Enter the URL of a module to check it out to
 
-          <div>
-              <div class="workarea-contents-label">
-                  Showing contents of
-                  <ul class="popMenu">
-                      <li class="popMenu">
-                            <a id="selected_workspace" href="#" class="popMenu">
-                              <span class="workarea-choice">Personal Workspace</span>
-                              <img src="${images_url}/down-arrow-05.png"> 
-                          </a>
-                          <ul class="popOut">
-                              <li tal:repeat="ws workspaces">
-                                  <a href="#" class="workspace-link"
-                                      tal:content="ws[1]"
-                                      tal:attributes="href ws[0]">
-                                      Personal Workspace
-                                  </a>
-                              </li>
-                          </ul>
-                      </li>
-                  </ul>
-              </div>
-          </div>
+                        <div metal:use-macro="view.workspace_popup">
+                        </div>
+
+                    </div>
+                    <strong>Connexions URL of the module:</strong>
+                </div>
+                <input type="url" "="" onkeydown="if(event.keyCode == 
+                13){$('#file-submit').removeAttr('disabled');$('#file-submit').click();document.getElementById('url-submit').disabled=false;}" 
+                placeholder="http://cnx.org/content/m0000/latest/" style="width: 30em;" name="url_text" id="url_text"/>
+
+                <input type="submit" disabled="disabled" value="Next &#187;" name="url.submitted" id="url-submit" class="button"/>
+            </div>
+
+            <div id="page-description"></div>
+
+            <div class="pleasewait" id="upload-wait" style="display: none;">
+                Retrieving module list. This may take a few moments.
+            </div>
+            
+            <div id="workspace-list">
+                <div class="workarea-contents-label">
+                    Showing contents of
+                    <ul metal:use-macro="view.workspace_popup">
+                    </ul>
+                </div>
+            </div>
           
-          <!-- now the list of modules -->
-          <metal:modules use-macro="module_macros.macros['modules_list']" />
+            <!-- now the list of modules -->
+            <metal:modules use-macro="view.modules_list" />
 
         </div>
     </div>
+
 </div>
 ${form.end()}
 

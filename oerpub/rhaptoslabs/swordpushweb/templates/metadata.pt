@@ -55,7 +55,10 @@
         <tal:hidden>${form.hidden(field)}</tal:hidden>
     </tal:field>
 
-    <input id="workspace" type="hidden" name="workspace">
+    <input id="workspace" type="hidden" name="workspace"
+        tal:attributes="value selected_workspace|nothing">
+    <input id="module" type="hidden" name="associated_module_url"
+        tal:attributes="value module_url|nothing">
 
     <div id="ie6-container-wrap">
         <div id="container">
