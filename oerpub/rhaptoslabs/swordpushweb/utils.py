@@ -1,3 +1,11 @@
+import os
+import libxml2
+import libxslt
+import zipfile
+import lxml
+
+current_dir = os.path.dirname(__file__)
+
 def pretty_print_dict(x, indent=0):
     output = '{'
     indentString = '    ' * (indent+1)
@@ -42,11 +50,20 @@ def load_config(request):
 def escape_system(input_string):
     return '"' + input_string.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
-
+# Pretty CNXML printing with libxml2 because etree/lxml cannot do pretty printing semantic correct
 def clean_cnxml(iCnxml, iMaxColumns=80):
-    return iCnxml
+    xsl = os.path.join(current_dir, 'utils_pretty.xsl')
+    style_doc = libxml2.parseFile(xsl)
+    style = libxslt.parseStylesheetDoc(style_doc)
+    doc = libxml2.parseDoc(iCnxml)
+    result = style.applyStylesheet(doc, None)
+    pretty_cnxml = style.saveResultToString(result)
+    style.freeStylesheet()
+    doc.freeDoc()
+    result.freeDoc()
+    return pretty_cnxml
 
-#TODO Marvin: Needs rework! Destroys semantic of xml text nodes.
+#TODO Marvin: Destroys semantic of xml text nodes. Can be removed in the future.
 #http://code.google.com/p/oer-roadmap/issues/detail?id=138
 def clean_cnxml_old_before_bug_138(iCnxml, iMaxColumns=80):
     """
@@ -166,3 +183,71 @@ def add_directory_to_zip(directory, zipFile, basePath=None):
             zipFile.write(pathToFile, arcname=pathToFile[basePathLength:])
         elif os.path.isdir(pathToFile):
             add_directory_to_zip(pathToFile[basePathLength:], zipFile, basePath=basePath)
+
+
+def get_cnxml_from_zipfile(zip_file):
+    zf = zipfile.ZipFile(zip_file, 'r')
+    cnxml = zf.open('index.cnxml')
+    zf.close()
+    return cnxml
+
+
+def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
+    root = lxml.etree.fromstringlist(cnxml.readlines())
+    featuredlinks_element = lxml.etree.fromstringlist(featuredlinks)
+    root.insert(1, featuredlinks_element) 
+    return lxml.etree.tostring(root)
+
+
+def get_files_from_zipfile(zip_file):
+    files = []
+
+    zip_archive = zipfile.ZipFile(zip_file, 'r')
+    for filename in zip_archive.namelist():
+        if filename in ['index.cnxml', 'index.xhtml']:
+            continue
+        fp = zip_archive.open(filename, 'r')
+        files.append((filename, fp.read()))
+        fp.close()
+
+    return files
+
+
+def build_featured_links(data):
+    if data is None or len(data.get('featuredlinks')) < 1:
+        return ''
+
+    # get featured links from data
+    tmp_links = {}
+    # first we organise the links by category
+    for details in data['featuredlinks']:
+        category = details['fl_category']
+        tmp_list = tmp_links.get(category, [])
+        tmp_list.append(details)
+        tmp_links[category] = tmp_list
+
+    links = [u'<featured-links>']
+    for category, values in tmp_links.items():
+        links.append(u'<link-group type="%s">' %category)
+        
+        for details in values:
+            title = details['fl_title']
+            strength = details['fl_strength']
+            url = details['url']
+            cnxmodule = details['fl_cnxmodule']
+            cnxversion = details['fl_cnxversion']
+
+            link = ''
+            if url:
+                  link = u'<link url="%s" strength="%s">%s</link>' %(
+                      url, strength, title)
+            else:
+                  link = u'<link url="%s" strength="%s">%s</link>' %(
+                      url, strength, title)
+
+            links.append(link)
+
+        links.append(u'</link-group>')
+
+    links.append(u'</featured-links>')
+    return links

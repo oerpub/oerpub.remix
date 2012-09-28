@@ -4,14 +4,16 @@ import datetime
 import zipfile
 import traceback
 import libxml2
+import lxml
 import re
 from BeautifulSoup import BeautifulSoup
 import MySQLdb as mdb
 from cStringIO import StringIO
+import peppercorn
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
-from pyramid.renderers import render_to_response
+from pyramid.renderers import render_to_response, get_renderer
 import formencode
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
@@ -31,9 +33,15 @@ from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript, fetch_slideshow_status
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
 from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
+from utils import escape_system, clean_cnxml, pretty_print_dict, load_config
+from utils import save_config, add_directory_to_zip
+from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
+from utils import get_files_from_zipfile, build_featured_links
+import convert as JOD # Imports JOD convert script
+import jod_check #Imports script which checks to see if JOD is running
+from z3c.batching.batch import Batch
 
 TESTING = False
-
 
 def check_login(request, raise_exception=True):
     # Check if logged in
@@ -415,9 +423,9 @@ def choose_view(request):
             # Office, CNXML-ZIP or LaTeX-ZIP file
             else:
                 # Save the original file so that we can convert, plus keep it.
-                original_filename = os.path.join(
+                original_filename = str(os.path.join(
                     save_dir,
-                    form.data['upload'].filename.replace(os.sep, '_'))
+                    form.data['upload'].filename.replace(os.sep, '_')))
                 saved_file = open(original_filename, 'wb')
                 input_file = form.data['upload'].file
                 shutil.copyfileobj(input_file, saved_file)
@@ -479,22 +487,33 @@ def choose_view(request):
                 # OOo / MS Word Conversion
                 else:
                     # Convert from other office format to odt if needed
-                    odt_filename = original_filename
                     filename, extension = os.path.splitext(original_filename)
+	            odt_filename = str(filename) + '.odt'
+
                     if(extension != '.odt'):
-                        odt_filename= '%s.odt' % filename
-                        command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
-                        os.system(command)
+                        converter = JOD.DocumentConverterClient()
+                        # Checks to see if JOD is active on the machine. If it is the conversion occurs using JOD else it converts using OO headless
+                        if jod_check.check('office[0-9]'):
+                            try:
+                                converter.convert(original_filename, 'odt', filename + '.odt')
+                            except Exception as e:
+                                print e
+                        else:
+                            odt_filename= '%s.odt' % filename
+                            command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
+                            os.system(command)
                         try:
                             fp = open(odt_filename, 'r')
                             fp.close()
                         except IOError as io:
                             raise ConversionError("%s not found" %
                                                   original_filename)
+                    
                     # Convert and save all the resulting files.
 
                     tree, files, errors = transform(odt_filename)
                     cnxml = clean_cnxml(etree.tostring(tree))
+
                     save_cnxml(save_dir, cnxml, files.items())
 
                     # now validate with jing
@@ -505,7 +524,6 @@ def choose_view(request):
 
         except Exception:
             # Record traceback
-            print('Got Exception!!!')
             tb = traceback.format_exc()
             # Get software version from git
             try:
@@ -643,7 +661,8 @@ class PreviewSchema(formencode.Schema):
     title = formencode.validators.String()
 
 
-@view_config(route_name='preview', renderer='templates/preview.pt')
+@view_config(route_name='preview', renderer='templates/preview.pt',
+    http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
 def preview_view(request):
     check_login(request)
     defaults = {}
@@ -681,8 +700,7 @@ def preview_body_view(request):
         '%s%s/index.xhtml'% (
             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
             request.session['upload_dir']),
-        headers={'Cache-Control': 'max-age=0, must-revalidate',
-                 'Expires': 'Sun, 3 Dec 2000 00:00:00 GMT'},
+        headers={'Cache-Control': 'max-age=0, must-revalidate, no-cache, no-store'},
         request=request
     )
 
@@ -717,7 +735,6 @@ def cnxml_view(request):
                 fp.close()
 
         try:
-            cnxml = cnxml.encode('utf-8')
             save_cnxml(save_dir, cnxml, files)
             validate_cnxml(cnxml)
         except ConversionError as e:
@@ -787,8 +804,14 @@ def metadata_view(request):
     templatePath = 'templates/metadata.pt'
     session = request.session
     config = load_config(request)
+    
+    module = request.POST.get('module', None)
+    if module is not None:
+        session['associated_module_url'] = module
 
     workspaces = [(i['href'], i['title']) for i in session['collections']]
+    if 'workspace' in request.params.keys():
+        session['selected_workspace'] = request.params['workspace']
     subjects = ["Arts",
                 "Business",
                 "Humanities",
@@ -919,21 +942,50 @@ def metadata_view(request):
         if not TESTING:
             # Create a connection to the sword service
             conn = sword2cnx.Connection(session['service_document_url'],
-                                       user_name=session['username'],
-                                       user_pass=session['password'],
-                                       always_authenticate=True,
-                                       download_service_document=False)
+                                        user_name=session['username'],
+                                        user_pass=session['password'],
+                                        always_authenticate=True,
+                                        download_service_document=False)
 
             # Send zip file to Connexions through SWORD interface
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                deposit_receipt = conn.create(
-                    col_iri = form.data['workspace'],
-                    metadata_entry = metadata_entry,
-                    payload = zip_file,
-                    filename = 'upload.zip',
-                    mimetype = 'application/zip',
-                    packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                    in_progress = True)
+                structure = peppercorn.parse(request.POST.items())
+                if structure.has_key('featuredlinks'):
+                    featuredlinks = build_featured_links(structure)
+                    if featuredlinks:
+                        cnxml = get_cnxml_from_zipfile(zip_file)
+                        new_cnxml = add_featuredlinks_to_cnxml(cnxml,
+                                                               featuredlinks)
+                        files = get_files_from_zipfile(zip_file)
+                        save_cnxml(save_dir, new_cnxml, files)
+
+                url = session.get('associated_module_url',
+                                  form.data['workspace'])
+                # clear the session of any associated module paths after using it
+                if 'associated_module_url' in session.keys():
+                    del session['associated_module_url']
+                    # this is an update not a create
+                    zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
+                    deposit_receipt = conn.update(
+                        metadata_entry = metadata_entry,
+                        payload = zip_file,
+                        filename = 'upload.zip',
+                        mimetype = 'application/zip',
+                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                        edit_iri = url,
+                        edit_media_iri = url + '/editmedia',
+                        metadata_relevant=False,
+                        in_progress=True)
+                    zip_file.close()
+                else:
+                    deposit_receipt = conn.create(
+                        col_iri = url,
+                        metadata_entry = metadata_entry,
+                        payload = zip_file,
+                        filename = 'upload.zip',
+                        mimetype = 'application/zip',
+                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                        in_progress = True)
 
         # Remember to which workspace we submitted
         session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
@@ -1077,6 +1129,7 @@ must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.952795292
         'form': FormRenderer(form),
         'field_list': field_list,
         'workspaces': workspaces,
+        'selected_workspace': session.get('selected_workspace', '#'),
         'languages': languages,
         'subjects': subjects,
         'config': config,
@@ -1137,6 +1190,109 @@ def admin_config_view(request):
                  ],
         'request': request,
         'config': config,
+    }
+    return response
+
+
+def get_module_list(connection, workspace):
+    xml = sword2cnx.get_module_list(connection, workspace)
+    tree = lxml.etree.XML(xml)
+    ns_dict = {'xmlns:sword': 'http://purl.org/net/sword/terms/',
+               'xmlns': 'http://www.w3.org/2005/Atom'}
+    elements =  tree.xpath('/xmlns:feed/xmlns:entry', namespaces=ns_dict)
+
+    modules = []
+    for element in elements:
+        title_element = element.xpath('./xmlns:title', namespaces=ns_dict)[0]
+        title = title_element.text
+
+        link_elements = element.xpath('./xmlns:link[@rel="edit"]',
+                                      namespaces=ns_dict
+                                     )
+        edit_link = link_elements[0].get('href')
+
+        path_elements = edit_link.split('/')
+        view_link = '/'.join(path_elements[:-2]) + '/latest'
+        path_elements.reverse()
+        uid = path_elements[1]
+
+        modules.append([uid, edit_link, title, view_link])
+    return modules
+
+
+class ModuleAssociationSchema(formencode.Schema):
+    allow_extra_fields = True
+    module = formencode.validators.String()
+
+
+@view_config(
+    route_name='module_association', renderer='templates/module_association.pt')
+def module_association_view(request):
+    check_login(request)
+    config = load_config(request)
+    session = request.session
+
+    # clear the session of any stale associated module paths
+    if 'associated_module_url' in session.keys():
+        del session['associated_module_url']
+
+    workspaces = [(i['href'], i['title']) for i in session['collections']]
+    
+    conn = sword2cnx.Connection(session['service_document_url'],
+                                user_name = session['username'],
+                                user_pass = session['password'],
+                                always_authenticate=True,
+                                download_service_document=False)
+
+    workspace_to_get = session['collections'][0]['href']
+    workspace_to_get = request.params.get('workspace', workspace_to_get)
+    print "Workspace url: " + workspace_to_get
+    
+    modules = get_module_list(conn, workspace_to_get)
+
+    b_start = int(request.GET.get('b_start', '0'))
+    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
+    modules = Batch(modules, start=b_start, size=b_size)
+    module_macros = get_renderer('templates/modules_list.pt').implementation()
+
+    form = Form(request, schema=ModuleAssociationSchema)
+    response = {'form': FormRenderer(form),
+                'workspaces': workspaces,
+                'selected_workspace': workspace_to_get,
+                'modules': modules,
+                'request': request,
+                'config': config,
+                'module_macros': module_macros,
+    }
+    return response
+
+
+@view_config(
+    route_name='modules_list', renderer="templates/modules_list.pt")
+def modules_list(request):
+    check_login(request)
+    config = load_config(request)
+    session = request.session
+
+    conn = sword2cnx.Connection(session['service_document_url'],
+                                user_name = session['username'],
+                                user_pass = session['password'],
+                                always_authenticate=True,
+                                download_service_document=False)
+
+    workspace_to_get = session['collections'][0]['href']
+    workspace_to_get = request.params.get('workspace', workspace_to_get)
+    print "Workspace url: " + workspace_to_get
+
+    modules = get_module_list(conn, workspace_to_get)
+    b_start = int(request.GET.get('b_start', '0'))
+    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
+    modules = Batch(modules, start=b_start, size=b_size)
+
+    response = {'selected_workspace': workspace_to_get,
+                'modules': modules,
+                'request': request,
+                'config': config,
     }
     return response
 

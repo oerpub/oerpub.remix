@@ -24,6 +24,8 @@ def main(global_config, **settings):
     config.add_route('change_workspace', '/change_workspace')
     config.add_route('importer', '/importer')
     config.add_route('google_oauth', '/google_oauth')
+    config.add_route('module_association', '/module_association')
+    config.add_route('modules_list', '/modules_list')
     config.add_route('oauth2callback', '/oauth2callback')
     config.add_route('updatecnx', '/updatecnx')
     config.add_route('slideshow_preview', '/slideshow_preview')
@@ -45,7 +47,7 @@ def main(global_config, **settings):
     config.add_static_view(
         'transforms',
         'oerpub.rhaptoslabs.swordpushweb:transforms',
-        cache_max_age=3600)
+        cache_max_age=0)
 
     config.add_subscriber(
         '.subscribers.add_base_template',

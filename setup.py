@@ -17,11 +17,13 @@ requires = [
     'Markdown',
     'BeautifulSoup==3.2.1',
     'MySQL-python',
+    'peppercorn',
+    'z3c.batching',
 
     ]
 
 setup(name='oerpub.rhaptoslabs.swordpushweb',
-      version='0.1.3',
+      version='0.1.4',
       description='SwordPush',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

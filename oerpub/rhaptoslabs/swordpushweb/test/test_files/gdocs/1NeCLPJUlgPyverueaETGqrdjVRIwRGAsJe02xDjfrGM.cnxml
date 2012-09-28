@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>BUG (More Heading weirdness Content repeats)</title>
+  <content>
+    <para>
+      <newline/>
+    </para>
+    <section>
+      <title>Heading 2 or Heading 3</title>
+      <para>even some content here does not stop repeat. This bug was found in Fletcher Grade 6 Life and Living 7 when two Heading 3's were close together in a document.</para>
+      <para>
+        <newline/>
+      </para>
+    </section>
+    <section>
+      <title>Heading 2 or Heading 3 but must be the same one as above</title>
+      <para>repeated body content</para>
+    </section>
+  </content>
+</document>

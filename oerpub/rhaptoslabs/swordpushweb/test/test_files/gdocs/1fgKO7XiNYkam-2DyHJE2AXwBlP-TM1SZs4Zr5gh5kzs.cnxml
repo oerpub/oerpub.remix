@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" cnxml-version="0.7" module-id="new">
+  <title>BUG (Empty heading on image) Fletcher Gr 6_Life and Living 7</title>
+  <content>
+    <para>Unit 4.6: The Human Skeleton</para>
+    <para><emphasis effect="bold">Picture below has "Heading 2" style:</emphasis> Male skeleton <emphasis effect="bold">disappears along with everything down to the next Heading 2</emphasis>:</para>
+    <para>
+      <media>
+        <image mime-type="image/jpeg" src="gd-0001.jpg" height="265" width="353"/>
+      </media>
+    </para>
+    <para>
+      <emphasis effect="underline">
+        <link url="http://www.flickr.com/photos/bernhard_ungerer/2598557189/" window="new">http://www.flickr.com/photos/bernhard_ungerer/2598557189/</link>
+      </emphasis>
+    </para>
+    <para>Female skeleton:</para>
+    <para>
+      <media>
+        <image mime-type="image/jpeg" src="gd-0002.jpg" height="272" width="362"/>
+      </media>
+    </para>
+    <para>
+      <emphasis effect="underline">
+        <link url="http://www.flickr.com/photos/bernhard_ungerer/2598558747/" window="new">http://www.flickr.com/photos/bernhard_ungerer/2598558747/</link>
+      </emphasis>
+    </para>
+    <para>
+      <newline/>
+    </para>
+    <para>
+      <media>
+        <image mime-type="image/jpeg" src="gd-0003.jpg" height="368" width="276"/>
+      </media>
+    </para>
+    <para>
+      <emphasis effect="underline">
+        <link url="http://www.flickr.com/photos/elsie/6261583083/" window="new">http://www.flickr.com/photos/elsie/6261583083/</link>
+      </emphasis>
+    </para>
+    <para>
+      <newline/>
+    </para>
+    <section>
+      <title>The skull (Heading 2 -- this should show up)</title>
+      <para>* Is a collection of bones which encase the brain and give form to the head and face</para>
+      <para>* Protects the brain</para>
+      <para>
+        <media>
+          <image mime-type="image/jpeg" src="gd-0004.jpg" height="245" width="328"/>
+        </media>
+      </para>
+    </section>
+    <section>
+      <title>Questions (Another Heading 2, this repeats, but only if you don't have a Heading 3 above it. Weird).</title>
+      <para>1.]        How many bones are there in the human body?</para>
+      <para>2.]        What are the five major bones in the body?</para>
+      <para>3.]        How can we take care of our Skeletal System?</para>
+      <para>
+        <newline/>
+      </para>
+      <para>
+        <newline/>
+      </para>
+    </section>
+  </content>
+</document>

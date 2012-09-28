@@ -1,6 +1,7 @@
 {   
     "edit_history": ['Initial version',],
     "workspace_url": None,
+    "default_batch_size": 20,
     "service_document_url": u'http://cnx.org/sword/servicedocument',
     "login_url": u'http://cnx.org/login_form?came_from=nothing',
     "metadata": {

@@ -26,10 +26,10 @@
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/modernizr-custom.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/polyfiller.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/googlejsapi.js')}"></script>
-        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush-max-01.js')}"></script>
+        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cookie.js')}"></script>
 
-        <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main-max-01.css')}" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
         <!--[if IE 6]>
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
         <![endif]-->
@@ -50,10 +50,18 @@
                 var phwh = $("#pageheader-wrap").outerHeight();
                 var ma = $("#module-actions .advanced").outerWidth();
 
-                // Make the iframe fit exactly inside the remaining space
-                $("iframe.fitted").height(winh - headerh - wfnh - contentp - phwh + 5);
-                $("iframe.fitted").width($(window).width() - 53);
-                $("iframe.fitted").contents().find('body').addClass('preview');
+                var fittedframe = $("iframe.fitted");
+                if (fittedframe.length > 0) {
+                    // Make the iframe fit exactly inside the remaining space
+                    $(fittedframe).height(winh - headerh - wfnh - contentp - phwh + 5);
+                    $(fittedframe).width($(window).width() - 53);
+                    $(fittedframe).contents().find('body').addClass('preview');
+                    // if we have a preview_url, reload it
+                    var p_url = $(fittedframe).attr('preview_url');
+                    if (p_url.length > 0) {
+                        $(fittedframe).attr('src', p_url);
+                    }
+                } 
 
                 /* Give the page's header the correct top margin (since the elements above
                    it are in a fixed position)
@@ -116,16 +124,19 @@
             <div id="header-container">
 
                 <div id="header-functions">
-                    <div id="expertmode">
-                        <span id="basic-message" style="display: none;">
+                    <div id="expertmode" class="expert-activated">
+                        <span id="expand-advanced">
+                            «
+                        </span>
+                        <span id="basic-message" style="display: none; ">
                             <span class="link-like">Switch to advanced mode</span>
                         </span>
-                        <span id="advanced-message" style="display: none;">
+                        <span id="advanced-message" style="">
                             You are in advanced mode. 
                             <span class="link-like">Return to basic mode.</span>
                         </span>
-                        <img src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images/gear_orange_3.png')}" width="16" height="16"/>
                     </div>
+
                     <div id="status" tal:define="username request.session.username|nothing"
                         tal:condition="username">
                         <span id="user-id">You are logged in as: <strong tal:content="username">user name</strong></span>.
@@ -162,6 +173,10 @@
         Main content goes here
         </metal:content>
         
+        <!--Hidden content like popups, modal forms, etc. go here.-->
+        <metal:hidden-slot define-slot="hidden-slot">
+        </metal:hidden-slot>
+
         <metal:footer-slot define-slot="footer-slot">
         <div id="footer">
             <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="${images_url}/sf150.png" width="150"/></a>

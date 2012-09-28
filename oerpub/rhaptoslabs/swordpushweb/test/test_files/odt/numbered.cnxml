@@ -1,32 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns="http://cnx.rice.edu/cnxml" module-id="imported-from-openoffice" cnxml-version="0.7">
-  <title>
-Untitled Document
- </title>
+  <title>Untitled Document</title>
   <content>
     <list list-type="enumerated" number-style="arabic">
-      <item>
-This is number 1 in the numbered list test
-   </item>
-      <item>
-Number 2
-   </item>
-      <item>
-Number 3
-   </item>
+      <item>This is number 1 in the numbered list test</item>
+      <item>Number 2</item>
+      <item>Number 3</item>
     </list>
     <list list-type="enumerated" number-style="arabic">
-      <item>
-This number 4 should be 2 lines below the others
-   </item>
+      <item>This number 4 should be 2 lines below the others</item>
     </list>
-    <para>
-Separating text, two more lines down.
-  </para>
+    <para>Separating text, two more lines down.</para>
     <list list-type="enumerated" number-style="arabic">
-      <item>
-New list starting at number 1! One line down.
-   </item>
+      <item>New list starting at number 1! One line down.</item>
     </list>
   </content>
 </document>

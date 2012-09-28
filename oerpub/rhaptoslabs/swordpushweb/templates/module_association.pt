@@ -1,0 +1,118 @@
+<metal:use use-macro="base">
+
+<metal:script-slot fill-slot="script-slot">    
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            $('input[name="module"]').each(function(index) {
+                if ($(this).attr('checked') == 'checked') {
+                    $(this).closest('tr').addClass("selected-row");
+                    $('input.forward-button').removeAttr('disabled');
+                    return true;
+                }
+            });
+            
+            workspace = $("ul.popOut li a").first().attr('href');
+            $("#workspace").attr("value", workspace);
+        });
+
+    </script>
+
+</metal:script-slot>    
+
+<metal:workflownav fill-slot="workflownav">
+${form.begin(request.route_url('metadata'), name="metadata")}
+${form.csrf_token()}
+
+<div id="workflownav-wrap">
+    <div id="workflownav-container">
+        <div id="back-steps">
+            <input id="back-to-chooser"
+                type="button"
+                class="button"
+                value="&laquo; Back: Return to preview"
+                title="Return to the module preview"
+                url="${request.route_url('preview')}">
+        </div>
+
+        <input id="workspace" type="hidden" name="workspace">
+
+        <div id="forward-steps">
+            <input type="submit"
+                name="form.submitted"
+                disabled="disabled"
+                class="button forward-button" 
+                value="Next: Review module description &raquo;" 
+                url="${request.route_url('metadata')}"
+                title="Select a module below and then click 'Next' to edit the module's title and other metadata">
+
+        </div>
+    </div>
+</div>
+</metal:workflownav>
+
+<tal:body metal:fill-slot="content-slot"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
+    b_size python:modules.size;
+    b_start python:modules.start + b_size;
+    previous_b_start python:modules.start - b_size;
+    ">
+<div id="ie6-container-wrap">
+    <div id="container">
+        <div id="content">
+            <div id="pageheader-wrap"></div>
+            
+            <div id="page-title">
+                <h1 style="margin-bottom: .7em;">
+                  Which module are you making a new version of? 
+                </h1>
+          </div>
+    
+          <div id="page-description"></div>
+
+          <div class="pleasewait" id="upload-wait" style="display: none;">
+              Retrieving module list. This may take a few moments.
+          </div>
+
+          <div class="forminfo" style="margin: -.5em 0 1.5em">
+              Select the module below whose contents you are replacing.
+          </div>
+
+          <div>
+              <div class="workarea-contents-label">
+                  Showing contents of
+                  <ul class="popMenu">
+                      <li class="popMenu">
+                            <a id="selected_workspace" href="#" class="popMenu">
+                              <span class="workarea-choice">Personal Workspace</span>
+                              <img src="${images_url}/down-arrow-05.png"> 
+                          </a>
+                          <ul class="popOut">
+                              <li tal:repeat="ws workspaces">
+                                  <a href="#" class="workspace-link"
+                                      tal:content="ws[1]"
+                                      tal:attributes="href ws[0]">
+                                      Personal Workspace
+                                  </a>
+                              </li>
+                          </ul>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+          
+          <!-- now the list of modules -->
+          <metal:modules use-macro="module_macros.macros['modules_list']" />
+
+        </div>
+    </div>
+</div>
+${form.end()}
+
+<iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
+    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+</iframe>
+
+</tal:body>
+
+</metal:use>
