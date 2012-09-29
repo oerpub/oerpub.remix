@@ -129,7 +129,7 @@ $(document).ready(function()
 
     // A friendly message confirming that the upload is happening.
     // Max: added #url-submit and .forward-button (metadata page) too
-    $('#file-submit, #url-submit, #metadata .forward-button').click(function(e) {
+    $('#file-submit, #url-submit, #presentation-submit, #metadata .forward-button').click(function(e) {
         $('#upload-wait').center();
         $('#upload-wait').slideDown('slow');
     });
@@ -334,12 +334,21 @@ $(document).ready(function()
         event.preventDefault();
         $('input#upload').click();
     });
+    
+    $('input#presentation-submit').click(function(event){
+        event.preventDefault();
+        $('input#importer').click();
+    });
 
     $('input#upload').change(function(event){
         showWaitMessage();
         $('form#uploadform').submit(); 
     });
 
+    $('input#importer').change(function(event){
+        showWaitMessage();
+        $('form#presentationform').submit(); 
+    });
     $('input#url-submit').click(function(event){
         showWaitMessage();
     });
