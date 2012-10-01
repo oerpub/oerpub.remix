@@ -74,7 +74,8 @@
                         });
                     }
                 });
-                $('#statusmessage').data('message')('Preview loaded');
+                Aloha.jQuery('#preview-block').find('table,figure').alohaBlock();
+                Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
             });
         });
         </script>
