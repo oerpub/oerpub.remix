@@ -52,7 +52,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
                     <ul class="create-new-list">
 
-                        <li id="editor">
+                        <!-- li id="editor">
                             <label>
                                 <span style="visibility: hidden; display: none;" class="or-bullet">or</span> 
                                 <span class="label-text">
@@ -62,12 +62,12 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             <div class="upload-form" style="width: 556px; ">
                                 <input class="button" value="Edit a new or existing module »" type="submit" id="show-neworexisting">
                             </div>
-                        </li>
+                        </li -->
 
                         <li id="doc-importer">
-                            <div style="margin: 0 0 1em -1.5em;">
+                            <!-- div style="margin: 0 0 1em -1.5em;">
                                 <strong>Or use one of our importer tools:</strong>
-                            </div>                            
+                            </div -->                            
                             <label>
                                 <span style="visibility: hidden;" class="or-bullet">or</span> 
                                 <span class="label-text">
