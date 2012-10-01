@@ -165,6 +165,34 @@ z-index: 550;
   background-position: -23px -66px;
 }
 
+.menu-icon.aloha-icon-bold{ 
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -56px 0;
+}
+
+.menu-icon.aloha-icon-italic{ 
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -155px 0;
+}
+
+.menu-icon.aloha-icon-underline{ 
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -485px 0;
+}
+
+.menu-icon.aloha-icon-createTable{
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -452px 0;
+}
+
 #toolbar-bold a                   { background-position: -56px 0; }
 #toolbar-bold.disabled a          { background-position: -56px -33px; }
 #toolbar-bold.hovered a           { background-position: -56px -66px; }
