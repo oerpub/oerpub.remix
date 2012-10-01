@@ -17,7 +17,8 @@
                     'figure': {
                         'aloha-block-type': 'EditableImageBlock'
                     },
-                }
+                },
+                rootTags: ['span', 'div', 'table', 'figure']
             }
         },
         bundles: {
