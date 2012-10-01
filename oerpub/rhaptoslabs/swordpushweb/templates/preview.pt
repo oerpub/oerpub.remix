@@ -19,7 +19,6 @@
                             extra/table,
                             common/highlighteditables,
                             common/image,
-                            common/paste,
                             extra/figure,
                             extra/no-floating,
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
