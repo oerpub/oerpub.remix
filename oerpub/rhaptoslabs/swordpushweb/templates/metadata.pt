@@ -194,10 +194,7 @@
                                             line. Keywords are not displayed on the content, but
                                             are used behind the scenes to help people find it in
                                             searches.</div>
-                                        <div class="formfield">
-                                            <textarea name="keywords" rows="4" cols="40">
-                                                ${config['metadata']['keywords']}
-                                            </textarea>
+                                        <div class="formfield"><textarea name="keywords" rows="4" cols="40"></textarea>
                                         </div>
                                     </div>
                                     <div class="formentry" id="formentry-ga">
