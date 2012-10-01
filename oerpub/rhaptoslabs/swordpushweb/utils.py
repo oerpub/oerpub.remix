@@ -194,7 +194,8 @@ def get_cnxml_from_zipfile(zip_file):
 
 def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
     root = lxml.etree.fromstringlist(cnxml.readlines())
-    featuredlinks_element = lxml.etree.fromstringlist(featuredlinks)
+    featuredlinks = ''.join(featuredlinks)
+    featuredlinks_element = lxml.etree.fromstring(featuredlinks)
     root.insert(1, featuredlinks_element) 
     return lxml.etree.tostring(root)
 
