@@ -10,6 +10,12 @@
                 $("#formentry-title .errortext").hide();
                 $("#formentry-ga").removeClass("error");
                 $("#formentry-ga .errortext").hide();
+
+                $(".workspace-link").click(function(event) {
+                    event.preventDefault();
+                    href = $(this).attr("href");
+                    $("#selected_workspace").attr("href", href);
+                });
             });
 
         </script>
@@ -54,7 +60,7 @@
     </tal:field>
 
     <input id="workspace" type="hidden" name="workspace"
-        tal:attributes="value first_workspace">
+        tal:attributes="value selected_workspace">
     <input id="module" type="hidden" name="associated_module_url"
         tal:attributes="value module_url|nothing">
 

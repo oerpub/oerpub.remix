@@ -189,7 +189,7 @@
 <ul class="popMenu">
     <li class="popMenu">
         <a id="selected_workspace" href="#" class="popMenu"
-            tal:attributes="href selected_workspace | first_workspace">
+            tal:attributes="href selected_workspace">
             <span class="workarea-choice" tal:content="workspace_title">Personal Workspace</span>
             <img tal:condition="not:module_url" src="${images_url}/down-arrow-05.png"> 
         </a>

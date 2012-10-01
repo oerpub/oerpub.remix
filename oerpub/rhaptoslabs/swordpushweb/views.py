@@ -1037,13 +1037,12 @@ must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.952795292
     macros = get_renderer('templates/macros.pt').implementation()
     module_url = request.POST.get('module', None)
     selected_workspace = request.POST.get('workspace', None)
-    first_workspace = selected_workspace or workspaces[0][0]
-    workspace_title = [w[1] for w in workspaces if w[0] == first_workspace][0]
+    selected_workspace = selected_workspace or workspaces[0][0]
+    workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
     response =  {
         'form': FormRenderer(form),
         'field_list': field_list,
         'workspaces': workspaces,
-        'first_workspace': first_workspace,
         'selected_workspace': selected_workspace,
         'workspace_title': workspace_title,
         'module_url': module_url,
@@ -1155,32 +1154,27 @@ class Module_Association_View(BaseHelper):
         check_login(request)
         config = load_config(request)
 
-        workspaces = [(i['href'], i['title']) for i in session['collections']]
-        
         conn = sword2cnx.Connection(session['service_document_url'],
                                     user_name = session['username'],
                                     user_pass = session['password'],
                                     always_authenticate=True,
                                     download_service_document=False)
 
-        workspace_to_get = session['collections'][0]['href']
-        workspace_to_get = request.params.get('workspace', workspace_to_get)
-        print "Workspace url: " + workspace_to_get
-        
-        modules = get_module_list(conn, workspace_to_get)
+        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        selected_workspace = request.params.get('workspace', workspaces[0][0])
+        workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
 
         b_start = int(request.GET.get('b_start', '0'))
         b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
+
+        modules = get_module_list(conn, selected_workspace)
         modules = Batch(modules, start=b_start, size=b_size)
         module_macros = get_renderer('templates/modules_list.pt').implementation()
 
-        first_workspace = workspace_to_get or workspaces[0][0]
-        workspace_title = [w[1] for w in workspaces if w[0] == first_workspace][0]
         form = Form(request, schema=ModuleAssociationSchema)
         response = {'form': FormRenderer(form),
                     'workspaces': workspaces,
-                    'selected_workspace': workspace_to_get,
-                    'first_workspace': first_workspace,
+                    'selected_workspace': selected_workspace,
                     'workspace_title': workspace_title,
                     'modules': modules,
                     'request': request,
@@ -1221,18 +1215,18 @@ class Modules_List_View(BaseHelper):
                                     always_authenticate=True,
                                     download_service_document=False)
 
-        workspace_to_get = session['collections'][0]['href']
-        workspace_to_get = self.request.params.get('workspace',
-                                                   workspace_to_get)
-        print "Workspace url: " + workspace_to_get
+        selected_workspace = session['collections'][0]['href']
+        selected_workspace = self.request.params.get('workspace',
+                                                     selected_workspace)
+        print "Workspace url: " + selected_workspace
 
-        modules = get_module_list(conn, workspace_to_get)
+        modules = get_module_list(conn, selected_workspace)
         b_start = int(self.request.GET.get('b_start', '0'))
         b_size = int(self.request.GET.get('b_size', 
                                           config.get('default_batch_size')))
         modules = Batch(modules, start=b_start, size=b_size)
 
-        response = {'selected_workspace': workspace_to_get,
+        response = {'selected_workspace': selected_workspace,
                     'modules': modules,
                     'request': self.request,
                     'config': config,
