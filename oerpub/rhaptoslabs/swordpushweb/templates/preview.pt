@@ -24,8 +24,16 @@
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
         <script type="text/javascript">
-        Aloha.ready(function(){
+        requirejs.onError = function(err){
+            console.log(err.requireType);
+            if (err.requireType === 'timeout') {
+                console.log('modules: ' + err.requireModules);
+            }
 
+            throw err;
+        };
+
+        Aloha.ready(function(){
             var statusarea = $('#statusmessage');
             statusarea.data('message', function(message, type) {
                 type = type || 'info';
@@ -74,7 +82,6 @@
                         });
                     }
                 });
-                Aloha.jQuery('#preview-block').find('table,figure').alohaBlock();
                 Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
             });
         });

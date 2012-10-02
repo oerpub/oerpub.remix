@@ -16,9 +16,10 @@
                     },
                     'figure': {
                         'aloha-block-type': 'EditableImageBlock'
-                    },
+                    }
                 },
-                rootTags: ['span', 'div', 'table', 'figure']
+                rootTags: ['span', 'div', 'figure'],
+                dragdrop: "1"
             }
         },
         bundles: {
