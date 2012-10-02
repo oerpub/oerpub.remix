@@ -1,11 +1,7 @@
-.toolbar-container {
+.toolbar{
     position: fixed;
-}
-
-.toolbar {
-    position: relative;
-    /* top: 100px; */
-    width: 100%; 
+    top: 100px;
+    width: 100%;
     z-index: 100;
 }
 
