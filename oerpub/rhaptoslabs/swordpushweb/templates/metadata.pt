@@ -379,7 +379,6 @@
                                 name="create-fl-useurlormodule"
                                 value="create-fl-useurl"
                                 type="radio"
-                                checked="checked"
                                 class="noborder">
                         </td>
                         <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
