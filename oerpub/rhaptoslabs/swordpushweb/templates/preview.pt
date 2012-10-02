@@ -9,7 +9,6 @@
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
         data-aloha-plugins="common/ui,
-                            extra/ribbon, 
                             extra/simpletoolbar,
                             common/format,
                             common/paste,
@@ -20,7 +19,6 @@
                             common/highlighteditables,
                             common/image,
                             extra/figure,
-                            extra/no-floating,
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
         <script type="text/javascript">
