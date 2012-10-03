@@ -16,6 +16,8 @@
                     href = $(this).attr("href");
                     $("#selected_workspace").attr("href", href);
                 });
+
+                $("#fl-field").hide();
             });
 
         </script>
@@ -257,7 +259,7 @@
 
                                             </table>
 
-                                            <div>
+                                            <div id="create-featured-link">
                                                 <a class="button2" onclick="return false;" id="show-featuredlinks" href="#">
                                                     + Create a new Featured Link
                                                 </a>
