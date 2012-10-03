@@ -957,7 +957,7 @@ class Metadata_View(BaseHelper):
         return metadata.get('dcterms_subject', [])
 
     def get_summary(self, metadata):
-        return metadata.get('summary', '')
+        return metadata.get('dcterms_abstract', '')
 
     def get_authors(self, metadata):
         return metadata.get('authors', '')
