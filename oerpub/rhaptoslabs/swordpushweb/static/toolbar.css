@@ -1,9 +1,5 @@
-.toolbar-container {
+.toolbar{
     position: fixed;
-}
-
-.toolbar {
-    position: relative;
     top: 100px;
     width: 100%;
     z-index: 100;
@@ -25,7 +21,6 @@
     margin: 180px 25px 0 250px;
     min-height: 100%;
     padding: 30px;
-
 }
 
 
@@ -129,35 +124,77 @@ input {
     background: url('icons/redo-01-disabled.png') 0 -10px;
 }
 
-.menu-bar
-{
-    min-height: 1em !important;
+.tool-bar{
+    height: 42px;
+    background-repeat: repeat-x;
+    background-position: 0 0;
+    background-color: #fff;
+    padding: 0 1em;
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    z-index: 1;
+    clear: both;
+    white-space: nowrap;
+    position: fixed;
+    width: 100%;
+    z-index: 550;
+    box-shadow: 0 0 5px #bbb;
+    font-size: .9em;
+    font-family: tahoma,verdana,arial,helvetica,sans-serif;
+
+    /* following two are part of a hack learned from PatrikAkerstrand at http://stackoverflow.com/questions/5078239/how-to-remove-the-space-between-inline-block-elements */
+    letter-spacing: -.31em;
+    word-spacing: -.43em;   
 }
 
-.tool-bar{
-    background: #fefefe; /* Old browsers */
-    /* IE9 SVG, needs conditional override of 'filter' to 'none' */
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZlZmVmZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkNGQ1ZDUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top,  #fefefe 0%, #d4d5d5 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fefefe), color-stop(100%,#d4d5d5)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #fefefe 0%,#d4d5d5 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #fefefe 0%,#d4d5d5 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #fefefe 0%,#d4d5d5 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #fefefe 0%,#d4d5d5 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fefefe', endColorstr='#d4d5d5',GradientType=0 ); /* IE6-8 */
-/*
-    background-color: #FFFFFF;
-    background-image: url("toolbar/toolbar-bg-01.png");
-    background-position: 0 0;
-    background-repeat: repeat-x;*/
-    border-bottom: 1px solid #AAAAAA;
-    clear: both;
-    /*padding: 10px 1em 0;*/
-    height: 32px;
-    padding:5px 0;
-    /*padding-top: 5px;*/
-    /*position: fixed;*/
-    /*width: 100%;*/
-    /*z-index: 100;*/
-    /*top: 0;*/
+.toolbar-icon{
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    outline: 0;
+    height: 33px;
+    width: 33px;
+    display: inline-block;
+    letter-spacing: normal;
+    word-spacing: normal;
+    background-position: -23px -66px;
 }
+
+.menu-icon.aloha-icon-bold{ 
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -56px 0;
+}
+
+.menu-icon.aloha-icon-italic{ 
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -155px 0;
+}
+
+.menu-icon.aloha-icon-underline{ 
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -485px 0;
+}
+
+.menu-icon.aloha-icon-createTable{
+    width: 32px;
+    height: 32px;
+    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
+    background-position: -452px 0;
+}
+
+#toolbar-bold a                   { background-position: -56px 0; }
+#toolbar-bold.disabled a          { background-position: -56px -33px; }
+#toolbar-bold.hovered a           { background-position: -56px -66px; }
+#toolbar-bold.selected a          { background-position: -56px -132px; }
+#toolbar-italics a                { background-position: -155px 0; }
+#toolbar-italics.disabled a       { background-position: -155px -33px; }
+#toolbar-italics.hovered a        { background-position: -155px -66px; }
+#toolbar-italics.selected a       { background-position: -155px -132px; }
+#toolbar-underline a              { background-position: -485px 0; }
+#toolbar-underline.disabled a     { background-position: -485px -33px; }
+#toolbar-underline.hovered a      { background-position: -485px -66px; }
+#toolbar-underline.selected a     { background-position: -485px -132px; }
