@@ -37,7 +37,7 @@
             <div id="forward-steps">
                 <span id="uploading-to">
                     Uploading to 
-                    <ul metal:use-macro="macros['workspace_popup']">
+                    <ul metal:use-macro="view.workspace_popup">
                     </ul>
                     in Connexions
                 </span>
@@ -127,7 +127,7 @@
                                         <div class="forminfo">Enter the title of this module.</div>
                                         <div class="formfield">
                                             <input type="text" name="title" size="50"
-                                            value="${config['metadata']['title']}"/>
+                                            value="${view.get_title(metadata, session)}"/>
                                         </div>
                                     </div>
                                     <div class="formentry">
@@ -137,8 +137,13 @@
                                             <tbody>
                                                 <tr tal:repeat="row python:range(3)">
                                                     <td tal:repeat="column python:range(2)">
-                                                        <input type="checkbox" name="subject" tal:attributes="value subjects[row+column*3]; checked (subjects[row+column*3] in config['metadata']['subject'])"/>
-                                                        <span class="formlabel" tal:content="subjects[row+column*3]">Subject</span>
+                                                        <input type="checkbox" name="subject"
+                                                            tal:define="subject subjects[row+column*3];
+                                                                        current_subjects python:view.get_subjects(metadata)"
+                                                            tal:attributes="value subject;
+                                                                            checked (subject in current_subjects)"/>
+                                                        <span class="formlabel"
+                                                            tal:content="subjects[row+column*3]">Subject</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -148,7 +153,7 @@
                                         <div class="formlabel">Summary</div>
                                         <div class="forminfo">Enter a summary of the module.</div>
                                         <div class="formfield">
-                                            <textarea name="summary" rows="6" cols="60">${config['metadata']['summary']}</textarea>
+                                            <textarea name="summary" rows="6" cols="60">${view.get_summary(metadata)}</textarea>
                                         </div>
                                     </div>
                                 </td>
@@ -172,11 +177,11 @@
                                                 <span class="formlabel">Contributors</span>
                                                 <span>(<a href="#" id="edit-roles">edit</a>)</span>
                                                 <ul style="margin-top: 0pt; margin-bottom: 0.5em;">
-                                                    <li id="list-authors">Authors: <span>${config['metadata']['authors']}</span></li>
-                                                    <li id="list-maintainers">Maintainers: <span>${config['metadata']['maintainers']}</span></li>
-                                                    <li id="list-copyright">Copyright Holders: <span>${config['metadata']['copyright']}</span></li>
-                                                    <li id="list-editors">Editors: <span>${config['metadata']['editors']}</span></li>
-                                                    <li id="list-translators">Translators: <span>${config['metadata']['translators']}</span></li>
+                                                    <li id="list-authors">Authors: <span>${view.get_authors(metadata)}</span></li>
+                                                    <li id="list-maintainers">Maintainers: <span>${view.get_maintainers(metadata)}</span></li>
+                                                    <li id="list-copyright">Copyright Holders: <span>${view.get_copyright_holders(metadata)}</span></li>
+                                                    <li id="list-editors">Editors: <span>${view.get_editors(metadata)}</span></li>
+                                                    <li id="list-translators">Translators: <span>${view.get_translators(metadata)}</span></li>
                                                 </ul>
                                             </div>
 
@@ -186,7 +191,7 @@
                                     <div class="formentry">
                                         <div class="formlabel">Language</div>
                                         <div class="forminfo">Select the primary language for this module.</div>
-                                        <div class="formfield">${form.select("language", languages, selected_value=config['metadata']['language'])}</div>
+                                        <div class="formfield">${form.select("language", languages, selected_value=view.get_language(metadata))}</div>
                                     </div>
                                     <div class="formentry">
                                         <div class="formlabel">Keywords (one per line)</div>
@@ -194,13 +199,19 @@
                                             line. Keywords are not displayed on the content, but
                                             are used behind the scenes to help people find it in
                                             searches.</div>
-                                        <div class="formfield"><textarea name="keywords" rows="4" cols="40"></textarea>
+                                        <div class="formfield"><textarea name="keywords" rows="4" cols="40" tal:attributes="value python:view.get_keywords(metadata)"></textarea>
                                         </div>
                                     </div>
-                                    <div class="formentry" id="formentry-ga">
+                                    <div class="formentry" id="formentry-ga"
+                                        tal:define="google_code python:view.get_google_code(metadata);">
                                         <div class="formlabel">
-                                            <input type="checkbox" id="google_code_opener"
-                                            name="google_code_opener"/>
+                                            <input tal:condition="google_code"
+                                                checked="checked"
+                                                type="checkbox" id="google_code_opener"
+                                                name="google_code_opener"/>
+                                            <input tal:condition="not:google_code"
+                                                type="checkbox" id="google_code_opener"
+                                                name="google_code_opener"/>
                                             Add optional Google Analytics Tracking Code
                                         </div>
                                         <div class="errortext" style="display: none;">
@@ -210,7 +221,7 @@
                                             <div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
                                             <div class="formfield">
                                                 <input type="text" name="google_code" size="40"
-                                                value="${config['metadata']['google_code']}"/>
+                                                value="${google_code}"/>
                                             </div>
                                         </div>
                                     </div>

@@ -4,6 +4,9 @@ import libxslt
 import zipfile
 import lxml
 
+from sword2.deposit_receipt import Deposit_Receipt
+from oerpub.rhaptoslabs import sword2cnx
+
 current_dir = os.path.dirname(__file__)
 
 def pretty_print_dict(x, indent=0):
@@ -263,3 +266,19 @@ def check_login(request, raise_exception=True):
             else:
                 return False
     return True
+
+
+def get_connection(session):
+    conn = sword2cnx.Connection(session['service_document_url'],
+                                user_name=session['username'],
+                                user_pass=session['password'],
+                                always_authenticate=True,
+                                download_service_document=False)
+    return conn
+
+
+def get_metadata_from_repo(session, module_url):
+    conn = get_connection(session)
+    resource = conn.get_resource(content_iri = module_url)
+    deposit_receipt = Deposit_Receipt(xml_deposit_receipt = resource.content)
+    return deposit_receipt.metadata

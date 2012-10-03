@@ -3,6 +3,7 @@ from pyramid.decorator import reify
 
 
 from utils import check_login as utils_check_login
+from utils import get_connection as utils_get_connection
 
 class BaseHelper(object):
 
@@ -13,6 +14,9 @@ class BaseHelper(object):
 
     def check_login(self, raise_exception=True):
         return utils_check_login(self.request, raise_exception)
+
+    def get_connection(self):
+        return utils_get_connection(self.session)
 
     @reify
     def base(self):
