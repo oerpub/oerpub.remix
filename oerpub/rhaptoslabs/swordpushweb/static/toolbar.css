@@ -113,17 +113,6 @@ input {
     padding: 0;
 }
 
-.menu-icon.aloha-icon-undo{
-    height: 20px;
-    width: 33px;
-    background: url('icons/undo-01-disabled.png') 0 -10px;
-}
-.menu-icon.aloha-icon-redo{
-    height: 20px;
-    width: 33px;
-    background: url('icons/redo-01-disabled.png') 0 -10px;
-}
-
 .tool-bar{
     height: 42px;
     background-repeat: repeat-x;
@@ -141,49 +130,6 @@ input {
     box-shadow: 0 0 5px #bbb;
     font-size: .9em;
     font-family: tahoma,verdana,arial,helvetica,sans-serif;
-
-    /* following two are part of a hack learned from PatrikAkerstrand at http://stackoverflow.com/questions/5078239/how-to-remove-the-space-between-inline-block-elements */
-    letter-spacing: -.31em;
-    word-spacing: -.43em;   
-}
-
-.toolbar-icon{
-    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
-    outline: 0;
-    height: 33px;
-    width: 33px;
-    display: inline-block;
-    letter-spacing: normal;
-    word-spacing: normal;
-    background-position: -23px -66px;
-}
-
-.menu-icon.aloha-icon-bold{ 
-    width: 32px;
-    height: 32px;
-    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
-    background-position: -56px 0;
-}
-
-.menu-icon.aloha-icon-italic{ 
-    width: 32px;
-    height: 32px;
-    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
-    background-position: -155px 0;
-}
-
-.menu-icon.aloha-icon-underline{ 
-    width: 32px;
-    height: 32px;
-    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
-    background-position: -485px 0;
-}
-
-.menu-icon.aloha-icon-createTable{
-    width: 32px;
-    height: 32px;
-    background-image: url(http://mountainbunker.org/~maxwell/oerpub/editor-ideas/toolbar/toolbar-sprite-02.png);
-    background-position: -452px 0;
 }
 
 #toolbar-bold a                   { background-position: -56px 0; }
