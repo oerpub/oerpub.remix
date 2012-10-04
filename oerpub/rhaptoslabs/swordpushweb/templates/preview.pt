@@ -19,18 +19,11 @@
                             common/highlighteditables,
                             common/image,
                             extra/figure,
+                            common/undo,
+                            extra/undobutton,
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
         <script type="text/javascript">
-        requirejs.onError = function(err){
-            console.log(err.requireType);
-            if (err.requireType === 'timeout') {
-                console.log('modules: ' + err.requireModules);
-            }
-
-            throw err;
-        };
-
         Aloha.ready(function(){
             var statusarea = $('#statusmessage');
             statusarea.data('message', function(message, type) {
