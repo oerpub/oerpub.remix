@@ -10,6 +10,9 @@
         errorhandling : true,
 
         plugins: {
+            format: {
+                config : ['b', 'i', 'u', 'p', 'sub', 'sup', 'h1', 'h2', 'h3']
+            },
             block: {
                 defaults : {
                     '.default-block': {
