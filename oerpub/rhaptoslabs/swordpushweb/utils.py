@@ -4,6 +4,9 @@ import libxslt
 import zipfile
 import lxml
 
+from sword2.deposit_receipt import Deposit_Receipt
+from oerpub.rhaptoslabs import sword2cnx
+
 current_dir = os.path.dirname(__file__)
 
 def pretty_print_dict(x, indent=0):
@@ -194,7 +197,8 @@ def get_cnxml_from_zipfile(zip_file):
 
 def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
     root = lxml.etree.fromstringlist(cnxml.readlines())
-    featuredlinks_element = lxml.etree.fromstringlist(featuredlinks)
+    featuredlinks = ''.join(featuredlinks)
+    featuredlinks_element = lxml.etree.fromstring(featuredlinks)
     root.insert(1, featuredlinks_element) 
     return lxml.etree.tostring(root)
 
@@ -251,3 +255,30 @@ def build_featured_links(data):
 
     links.append(u'</featured-links>')
     return links
+
+
+def check_login(request, raise_exception=True):
+    # Check if logged in
+    for key in ['username', 'password', 'service_document_url']:
+        if not request.session.has_key(key):
+            if raise_exception:
+                raise HTTPFound(location=request.route_url('login'))
+            else:
+                return False
+    return True
+
+
+def get_connection(session):
+    conn = sword2cnx.Connection(session['service_document_url'],
+                                user_name=session['username'],
+                                user_pass=session['password'],
+                                always_authenticate=True,
+                                download_service_document=False)
+    return conn
+
+
+def get_metadata_from_repo(session, module_url):
+    conn = get_connection(session)
+    resource = conn.get_resource(content_iri = module_url)
+    deposit_receipt = Deposit_Receipt(xml_deposit_receipt = resource.content)
+    return deposit_receipt.metadata

@@ -14,6 +14,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response, get_renderer
+from pyramid.decorator import reify
 import formencode
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
@@ -41,7 +42,13 @@ import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 from z3c.batching.batch import Batch
 
+from utils import check_login, get_metadata_from_repo
+from helpers import BaseHelper 
+
+ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
 TESTING = False
+CWD = os.getcwd()
+
 
 def check_login(request, raise_exception=True):
     # Check if logged in
@@ -665,6 +672,19 @@ class PreviewSchema(formencode.Schema):
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
 def preview_view(request):
     check_login(request)
+    session = request.session
+    module = request.params.get('module')
+    if module:
+        conn = sword2cnx.Connection(session['service_document_url'],
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=False)
+
+        # example: http://cnx.org/Members/user001/m17222/sword/editmedia
+        result = conn.get_resource(content_iri = module,
+                                   packaging = ZIP_PACKAGING) 
+        
     defaults = {}
     defaults['title'] = request.session.get('title', '')
     form = Form(request,
@@ -771,372 +791,6 @@ def summary_view(request):
     return render_to_response(templatePath, response, request=request)
 
 
-class MetadataSchema(formencode.Schema):
-    allow_extra_fields = True
-    title = formencode.validators.String(not_empty=True)
-    keep_title = formencode.validators.Bool()
-    summary = formencode.validators.String()
-    keep_summary = formencode.validators.Bool()
-    keywords = formencode.validators.String()
-    keep_keywords = formencode.validators.Bool()
-    subject = formencode.validators.Set()
-    keep_subject = formencode.validators.Bool()
-    language = formencode.validators.String(not_empty=True)
-    keep_language = formencode.validators.Bool()
-    google_code = formencode.validators.String()
-    keep_google_code = formencode.validators.Bool()
-    workspace = formencode.validators.String(not_empty=True)
-    keep_workspace = formencode.validators.Bool()
-    authors = formencode.validators.String(not_empty=True)
-    maintainers = formencode.validators.String(not_empty=True)
-    copyright = formencode.validators.String(not_empty=True)
-    editors = formencode.validators.String()
-    translators = formencode.validators.String()
-
-
-@view_config(route_name='metadata')
-def metadata_view(request):
-    """
-    Handle metadata adding and uploads
-    """
-    print('INSIDE METADATA_VIEW')
-    check_login(request)
-    templatePath = 'templates/metadata.pt'
-    session = request.session
-    config = load_config(request)
-    
-    module = request.POST.get('module', None)
-    if module is not None:
-        session['associated_module_url'] = module
-
-    workspaces = [(i['href'], i['title']) for i in session['collections']]
-    if 'workspace' in request.params.keys():
-        session['selected_workspace'] = request.params['workspace']
-    subjects = ["Arts",
-                "Business",
-                "Humanities",
-                "Mathematics and Statistics",
-                "Science and Technology",
-                "Social Sciences",
-                ]
-    # The roles fields are comma-separated strings. This makes the javascript
-    # easier on the client side, and is easy to parse. The fields are hidden,
-    # and the values will be user ids, which should not have commas in them.
-    field_list = [
-                  ['authors', 'authors', {'type': 'hidden'}],
-                  ['maintainers', 'maintainers', {'type': 'hidden'}],
-                  ['copyright', 'copyright', {'type': 'hidden'}],
-                  ['editors', 'editors', {'type': 'hidden'}],
-                  ['translators', 'translators', {'type': 'hidden'}],
-                  ['title', 'Title', {'type': 'text'}],
-                  ['summary', 'Summary', {'type': 'textarea'}],
-                  ['keywords', 'Keywords (One per line)', {'type': 'textarea'}],
-                  ['subject', 'Subject', {'type': 'checkbox',
-                                          'values': subjects}],
-                  ['language', 'Language', {'type': 'select',
-                                            'values': languages,
-                                            'selected_value': 'en'}],
-                  ['google_code', 'Google Analytics Code', {'type': 'text'}],
-                  ['workspace', 'Workspace', {'type': 'select',
-                                            'values': workspaces}],
-                  ]
-    remember_fields = [field[0] for field in field_list[5:]]
-
-    # Get remembered fields from the session
-    defaults = {}
-    for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
-        defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
-        config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
-
-    # Get remembered title from the session
-    if 'title' in session:
-        print('TITLE '+session['title']+' in session')
-        defaults['title'] = session['title']
-        config['metadata']['title'] = session['title']
-
-    """
-    for field_name in remember_fields:
-        if field_name in session:
-            defaults[field_name] = session[field_name]
-            defaults['keep_%s' % field_name] = True
-    """
-
-    form = Form(request,
-                schema=MetadataSchema,
-                defaults=defaults
-                )
-
-    # Check for successful form completion
-    if form.validate():
-        print form.data
-
-        # Persist the values that should be persisted in the session, and
-        # delete the others.
-        for field_name in remember_fields:
-            if form.data['keep_%s' % field_name]:
-                session[field_name] = form.data[field_name]
-            else:
-                if field_name in session:
-                    del(session[field_name])
-
-        # Reconstruct the path to the saved files
-        save_dir = os.path.join(
-            request.registry.settings['transform_dir'],
-            session['upload_dir']
-            )
-
-        # Create the metadata entry
-        metadata = {}
-
-        # Title
-
-        if(form.data['title']):
-            print('FORM_DATA')
-        else:
-            print('SESSION_FILENAME')
-
-        metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
-                                    else session['filename']
-
-        # Summary
-        metadata['dcterms:abstract'] = form.data['summary'].strip()
-
-        # Language
-        metadata['dcterms:language'] = form.data['language']
-
-        # Subjects
-        metadata['oerdc:oer-subject'] = form.data['subject']
-
-        # Keywords
-        metadata['dcterms:subject'] = [i.strip() for i in
-                                       form.data['keywords'].splitlines()
-                                       if i.strip()]
-
-        # Google Analytics code
-        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
-
-        # Standard change description
-        metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
-
-        # Build metadata entry object
-        for key in metadata.keys():
-            if metadata[key] == '':
-                del metadata[key]
-        metadata_entry = sword2cnx.MetaData(metadata)
-
-        # Add role tags
-        role_metadata = {}
-        role_mappings = {'authors': 'dcterms:creator',
-                         'maintainers': 'oerdc:maintainer',
-                         'copyright': 'dcterms:rightsHolder',
-                         'editors': 'oerdc:editor',
-                         'translators': 'oerdc:translator'}
-        for k, v in role_mappings.items():
-            role_metadata[v] = form.data[k].split(',')
-        for key, value in role_metadata.iteritems():
-            for v in value:
-                v = v.strip()
-                if v:
-                    metadata_entry.add_field(key, '', {'oerdc:id': v})
-
-        if not TESTING:
-            # Create a connection to the sword service
-            conn = sword2cnx.Connection(session['service_document_url'],
-                                        user_name=session['username'],
-                                        user_pass=session['password'],
-                                        always_authenticate=True,
-                                        download_service_document=False)
-
-            # Send zip file to Connexions through SWORD interface
-            with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                structure = peppercorn.parse(request.POST.items())
-                if structure.has_key('featuredlinks'):
-                    featuredlinks = build_featured_links(structure)
-                    if featuredlinks:
-                        cnxml = get_cnxml_from_zipfile(zip_file)
-                        new_cnxml = add_featuredlinks_to_cnxml(cnxml,
-                                                               featuredlinks)
-                        files = get_files_from_zipfile(zip_file)
-                        save_cnxml(save_dir, new_cnxml, files)
-
-                url = session.get('associated_module_url',
-                                  form.data['workspace'])
-                # clear the session of any associated module paths after using it
-                if 'associated_module_url' in session.keys():
-                    del session['associated_module_url']
-                    # this is an update not a create
-                    zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
-                    deposit_receipt = conn.update(
-                        metadata_entry = metadata_entry,
-                        payload = zip_file,
-                        filename = 'upload.zip',
-                        mimetype = 'application/zip',
-                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                        edit_iri = url,
-                        edit_media_iri = url + '/editmedia',
-                        metadata_relevant=False,
-                        in_progress=True)
-                    zip_file.close()
-                else:
-                    deposit_receipt = conn.create(
-                        col_iri = url,
-                        metadata_entry = metadata_entry,
-                        payload = zip_file,
-                        filename = 'upload.zip',
-                        mimetype = 'application/zip',
-                        packaging = 'http://purl.org/net/sword/package/SimpleZip',
-                        in_progress = True)
-
-        # Remember to which workspace we submitted
-        session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
-
-        if not TESTING:
-            # The deposit receipt cannot be pickled, so we pickle the xml
-            session['deposit_receipt'] = deposit_receipt.to_xml()
-        else:
-            session['deposit_receipt'] = """<?xml version="1.0" encoding="utf-8"?>
-<entry xmlns="http://www.w3.org/2005/Atom"
-       xmlns:sword="http://purl.org/net/sword/"
-       xmlns:dcterms="http://purl.org/dc/terms/"
-       xmlns:md="http://cnx.rice.edu/mdml"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
-
-    <!-- SWORD deposit receipt -->
-    <title>Word created with multipart</title>
-    <id>module.2011-10-06.9527952926</id>
-    <updated>2011/10/06 15:29:15.879 Universal</updated>
-    <summary type="text">A bit of summary.</summary>
-    <generator uri="rhaptos.swordservice.plone" version="1.0"> uri:"rhaptos.swordservice.plone" version:"1.0"</generator>
-
-    <!-- The metadata begins -->
-    <dcterms:identifier xsi:type="dcterms:URI">http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926</dcterms:identifier>
-    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier>
-    <dcterms:identifier xsi:type="oerdc:ContentId">module.2011-10-06.9527952926</dcterms:identifier>
-    <dcterms:title>Word created with multipart</dcterms:title>
-    <dcterms:created>2011/10/06 15:29:12.821 Universal</dcterms:created>
-    <dcterms:modified>2011/10/06 15:29:15.879 Universal</dcterms:modified>
-    <dcterms:creator oerdc:id="user1"
-                     oerdc:email="useremail1@localhost.net"
-                     oerdc:pending="False">firstname1 lastname1</dcterms:creator>
-    <dcterms:creator oerdc:id="roche"
-                     oerdc:email="roche@upfrontsystems.co.za"
-                     oerdc:pending="True">Roche Compaan</dcterms:creator>
-    <dcterms:creator oerdc:id="user2"
-                     oerdc:email="useremail2@localhost.net"
-                     oerdc:pending="True">firstname2 lastname2</dcterms:creator>
-    <oerdc:maintainer oerdc:id="user1"
-                      oerdc:email="useremail1@localhost.net"
-                      oerdc:pending="False">firstname1 lastname1</oerdc:maintainer>
-    <oerdc:maintainer oerdc:id="roche"
-                      oerdc:email="roche@upfrontsystems.co.za"
-                      oerdc:pending="True">Roche Compaan</oerdc:maintainer>
-    <dcterms:rightsHolder oerdc:id="roche"
-                          oerdc:email="roche@upfrontsystems.co.za"
-                          oerdc:pending="True">Roche Compaan</dcterms:rightsHolder>
-    <dcterms:rightsHolder oerdc:id="user2"
-                          oerdc:email="useremail2@localhost.net"
-                          oerdc:pending="True">firstname2 lastname2</dcterms:rightsHolder>
-    <oerdc:translator oerdc:id="user85"
-                      oerdc:email="dcwill@rice.edu"
-                      oerdc:pending="True">Daniel Williamson</oerdc:translator>
-    <oerdc:editor oerdc:id="user3"
-                  oerdc:email="useremail3@localhost.net"
-                  oerdc:pending="True">firstname3 lastname3</oerdc:editor>
-    <!-- CNX-Supported but not in MDML -->
-    <oerdc:descriptionOfChanges>
-        This is brand new.
-    </oerdc:descriptionOfChanges>
-    <oerdc:oer-subject>Arts</oerdc:oer-subject>
-    <dcterms:subject xsi:type="oerdc:Subject">Arts</dcterms:subject>
-    <dcterms:subject>music</dcterms:subject>
-    <dcterms:subject>passion</dcterms:subject>
-    <dcterms:abstract>A bit of summary.</dcterms:abstract>
-    <dcterms:language xsi:type="ISO639-1">es</dcterms:language>
-    <dcterms:license xsi:type="dcterms:URI"></dcterms:license>
-    <sword:treatment>
-        Module 'Word created with multipart' was imported via the SWORD API.
-        You can <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view">preview your module here</a> to see what it will look like once it is published.
-
-        The current description of the changes you have made for this version of the module: This is brand new.
-
-
-
-        Publication requirements:
-
-            1. Author (firstname1 lastname1, account:user1), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
-
-
-            2. Author (Roche Compaan, account:roche), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
-
-
-            3. Author (firstname2 lastname2, account:user2), will need to <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_publish">sign the license here.</a>
-
-
-            4. You cannot publish with pending role requests. Contributor, Roche Compaan (account:roche),
-must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=roche">agree to thw pending requests</a>.
-
-
-            5. You cannot publish with pending role requests. Contributor, Daniel Williamson (account:user85),
-must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user85">agree to thw pending requests</a>.
-
-
-            6. You cannot publish with pending role requests. Contributor, firstname2 lastname2 (account:user2),
-must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user2">agree to thw pending requests</a>.
-
-
-            7. You cannot publish with pending role requests. Contributor, firstname3 lastname3 (account:user3),
-must <a href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/collaborations?user=user3">agree to thw pending requests</a>.
-
-
-    </sword:treatment>
-    <!-- For all UNPUBLISHED modules -->
-    <link rel="alternate"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=html"/>
-    <content type="application/zip"
-             src="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/editmedia"/>
-    <link rel="edit-media"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/editmedia"/>
-    <link rel="edit"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword"/>
-    <link rel="http://purl.org/net/sword/terms/add"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword"/>
-    <link rel="http://purl.org/net/sword/terms/statement"
-          type="application/atom+xml;type=feed"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/sword/statement.atom"/>
-    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
-    <link rel="http://purl.org/net/sword/terms/derivedResource"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=html"/>
-    <link rel="http://purl.org/net/sword/terms/derivedResource"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/"/>
-    <link rel="http://purl.org/net/sword/terms/derivedResource"
-          type="application/pdf"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_view?format=pdf"/>
-    <link rel="http://purl.org/net/sword/terms/derivedResource"
-          type="application/zip"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_export?format=zip"/>
-    <link rel="http://purl.org/net/sword/terms/derivedResource"
-          type="application/xml"
-          href="http://50.57.120.10:8080/Members/user1/module.2011-10-06.9527952926/module_export?format=plain"/>
-    <!-- END for all UNPUBLISHED modules -->
-</entry>
-"""
-
-        # Go to the upload page
-        return HTTPFound(location=request.route_url('summary'))
-
-    response =  {
-        'form': FormRenderer(form),
-        'field_list': field_list,
-        'workspaces': workspaces,
-        'selected_workspace': session.get('selected_workspace', '#'),
-        'languages': languages,
-        'subjects': subjects,
-        'config': config,
-    }
-    return render_to_response(templatePath, response, request=request)
-
-
 class ConfigSchema(formencode.Schema):
     allow_extra_fields = True
     service_document_url = formencode.validators.URL(add_http=True)
@@ -1161,6 +815,7 @@ def admin_config_view(request):
     """
 
     check_login(request)
+    session = request.session
     subjects = ["Arts", "Business", "Humanities", "Mathematics and Statistics",
                 "Science and Technology", "Social Sciences"]
     form = Form(request, schema=ConfigSchema)
@@ -1220,82 +875,396 @@ def get_module_list(connection, workspace):
     return modules
 
 
+class MetadataSchema(formencode.Schema):
+    allow_extra_fields = True
+    title = formencode.validators.String(not_empty=True)
+    keep_title = formencode.validators.Bool()
+    summary = formencode.validators.String()
+    keep_summary = formencode.validators.Bool()
+    keywords = formencode.validators.String()
+    keep_keywords = formencode.validators.Bool()
+    subject = formencode.validators.Set()
+    keep_subject = formencode.validators.Bool()
+    language = formencode.validators.String(not_empty=True)
+    keep_language = formencode.validators.Bool()
+    google_code = formencode.validators.String()
+    keep_google_code = formencode.validators.Bool()
+    workspace = formencode.validators.String(not_empty=True)
+    keep_workspace = formencode.validators.Bool()
+    authors = formencode.validators.String(not_empty=True)
+    maintainers = formencode.validators.String(not_empty=True)
+    copyright = formencode.validators.String(not_empty=True)
+    editors = formencode.validators.String()
+    translators = formencode.validators.String()
+
+
+class Metadata_View(BaseHelper):
+    
+    def __init__(self, request):
+        super(Metadata_View, self).__init__(request)
+        self.check_login()
+        self.templatePath = 'templates/metadata.pt'
+        self.config = load_config(request)
+        self.workspaces = \
+            [(i['href'], i['title']) for i in self.session['collections']]
+
+        self.subjects = ["Arts",
+                         "Business",
+                         "Humanities",
+                         "Mathematics and Statistics",
+                         "Science and Technology",
+                         "Social Sciences",
+                         ]
+
+        # The roles fields are comma-separated strings. This makes the javascript
+        # easier on the client side, and is easy to parse. The fields are hidden,
+        # and the values will be user ids, which should not have commas in them.
+        self.field_list = [
+            ['authors', 'authors', {'type': 'hidden'}],
+            ['maintainers', 'maintainers', {'type': 'hidden'}],
+            ['copyright', 'copyright', {'type': 'hidden'}],
+            ['editors', 'editors', {'type': 'hidden'}],
+            ['translators', 'translators', {'type': 'hidden'}],
+            ['title', 'Title', {'type': 'text'}],
+            ['summary', 'Summary', {'type': 'textarea'}],
+            ['keywords', 'Keywords (One per line)', {'type': 'textarea'}],
+            ['subject', 'Subject', {'type': 'checkbox',
+                                    'values': self.subjects}],
+            ['language', 'Language', {'type': 'select',
+                                      'values': languages,
+                                      'selected_value': 'en'}],
+            ['google_code', 'Google Analytics Code', {'type': 'text'}],
+            ['workspace', 'Workspace', {'type': 'select',
+                                      'values': self.workspaces}],
+        ]
+
+        self.remember_fields = [field[0] for field in self.field_list[5:]]
+
+        # Get remembered fields from the session
+        self.defaults = {}
+        for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
+            self.defaults[role] = ','.join(self.config['metadata'][role]).replace('_USER_', self.session['username'])
+            self.config['metadata'][role] = ', '.join(self.config['metadata'][role]).replace('_USER_', self.session['username'])
+
+        # Get remembered title from the session    
+        if 'title' in self.session:
+            self.defaults['title'] = self.session['title']
+            self.config['metadata']['title'] = self.session['title']
+        print form.data
+
+    def update_session(self, session, remember_fields, form):        
+        # Persist the values that should be persisted in the session, and
+        # delete the others.
+        for field_name in remember_fields:
+            if form.data['keep_%s' % field_name]:
+                session[field_name] = form.data[field_name]
+            else:
+                if field_name in session:
+                    del(session[field_name])
+        return session
+    
+    def get_metadata_entry(self, form, session):
+        metadata = {}
+        metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
+                                    else session['filename']
+
+        # Summary
+        metadata['dcterms:abstract'] = form.data['summary'].strip()
+
+        # Language
+        metadata['dcterms:language'] = form.data['language']
+
+        # Subjects
+        metadata['oerdc:oer-subject'] = form.data['subject']
+
+        # Keywords
+        metadata['dcterms:subject'] = [i.strip() for i in
+                                       form.data['keywords'].splitlines()
+                                       if i.strip()]
+
+        # Google Analytics code
+        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
+
+        # Standard change description
+        metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
+
+        # Build metadata entry object
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        metadata_entry = sword2cnx.MetaData(metadata)
+
+        # Add role tags
+        role_metadata = {}
+        role_mappings = {'authors': 'dcterms:creator',
+                         'maintainers': 'oerdc:maintainer',
+                         'copyright': 'dcterms:rightsHolder',
+                         'editors': 'oerdc:editor',
+                         'translators': 'oerdc:translator'}
+        for k, v in role_mappings.items():
+            role_metadata[v] = form.data[k].split(',')
+        for key, value in role_metadata.iteritems():
+            for v in value:
+                v = v.strip()
+                if v:
+                    metadata_entry.add_field(key, '', {'oerdc:id': v})
+        return metadata_entry 
+
+    def add_featured_links(self, request, zip_file):
+        structure = peppercorn.parse(request.POST.items())
+        if structure.has_key('featuredlinks'):
+            featuredlinks = build_featured_links(structure)
+            if featuredlinks:
+                cnxml = get_cnxml_from_zipfile(zip_file)
+                new_cnxml = add_featuredlinks_to_cnxml(cnxml,
+                                                       featuredlinks)
+                files = get_files_from_zipfile(zip_file)
+                save_cnxml(save_dir, new_cnxml, files)
+
+    def update_module(self, save_dir, connection, metadata, module_url):
+        zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
+        deposit_receipt = connection.update(
+            metadata_entry = metadata,
+            payload = zip_file,
+            filename = 'upload.zip',
+            mimetype = 'application/zip',
+            packaging = ZIP_PACKAGING,
+            edit_iri = module_url,
+            edit_media_iri = module_url + '/editmedia',
+            metadata_relevant=False,
+            in_progress=True)
+        zip_file.close()
+        return deposit_receipt
+
+    def create_module(self, form, connection, metadata, zip_file): 
+        deposit_receipt = connection.create(
+            col_iri = form.data['workspace'],
+            metadata_entry = metadata,
+            payload = zip_file,
+            filename = 'upload.zip',
+            mimetype = 'application/zip',
+            packaging = ZIP_PACKAGING,
+            in_progress = True)
+        return deposit_receipt
+
+    @reify
+    def workspace_popup(self):
+        return self.macro_renderer.implementation().macros['workspace_popup']
+
+    def get_title(self, metadata, session):
+        return metadata.get('dcterms_title', session.get('title', ''))
+
+    def get_subjects(self, metadata):
+        return metadata.get('dcterms_subject', [])
+
+    def get_summary(self, metadata):
+        return metadata.get('dcterms_abstract', '')
+
+    def get_authors(self, metadata):
+        return metadata.get('authors', '')
+
+    def get_maintainers(self, metadata):
+        return metadata.get('maintainers', '')
+
+    def get_copyright_holders(self, metadata):
+        return metadata.get('copyright', '')
+
+    def get_editors(self, metadata):
+        return metadata.get('editors', '')
+
+    def get_translators(self, metadata):
+        return metadata.get('translators', '')
+    
+    def get_language(self, metadata):
+        return metadata.get('language', '')
+
+    def get_keywords(self, metadata):
+        return metadata.get('keywords', '')
+
+    def get_google_code(self, metadata):
+        return metadata.get('google_code', '')
+
+    @view_config(route_name='metadata')
+    def generate_html_view(self):
+        """
+        Handle metadata adding and uploads
+        """
+        session = self.session
+        request = self.request
+        config = self.config
+        workspaces = self.workspaces
+        subjects = self.subjects
+        field_list = self.field_list
+        remember_fields = self.remember_fields
+        defaults = self.defaults
+
+        form = Form(request,
+                    schema=MetadataSchema,
+                    defaults=defaults
+                   )
+
+        # Check for successful form completion
+        if form.validate():
+            self.update_session(session, remember_fields, form)
+
+            # Reconstruct the path to the saved files
+            save_dir = os.path.join(
+                request.registry.settings['transform_dir'],
+                session['upload_dir']
+            )
+
+            # Create the metadata entry
+            metadata_entry = self.get_metadata_entry(form, session)
+
+            # Create a connection to the sword service
+            conn = self.get_connection()
+
+            # Send zip file to Connexions through SWORD interface
+            with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
+                self.add_featured_links(request, zip_file)
+                associated_module_url = request.POST.get('associated_module_url')
+                if associated_module_url:
+                    # this is an update not a create
+                    deposit_receipt = self.update_module(save_dir,
+                                                         conn,
+                                                         metadata_entry,
+                                                         associated_module_url)
+                else:
+                    deposit_receipt = self.create_module(form,
+                                                         conn,
+                                                         metadata_entry,
+                                                         zip_file)
+
+            # Remember to which workspace we submitted
+            session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
+
+            # The deposit receipt cannot be pickled, so we pickle the xml
+            session['deposit_receipt'] = deposit_receipt.to_xml()
+
+            # Go to the upload page
+            return HTTPFound(location=request.route_url('summary'))
+
+        module_url = request.POST.get('module', None)
+        metadata = config['metadata']
+        if module_url:
+            metadata.update(get_metadata_from_repo(session, module_url))
+        selected_workspace = request.POST.get('workspace', None)
+        selected_workspace = selected_workspace or workspaces[0][0]
+        workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
+        response =  {
+            'form': FormRenderer(form),
+            'field_list': field_list,
+            'workspaces': workspaces,
+            'selected_workspace': selected_workspace,
+            'workspace_title': workspace_title,
+            'module_url': module_url,
+            'languages': languages,
+            'subjects': subjects,
+            'config': config,
+            'macros': self.macro_renderer,
+            'metadata': metadata,
+            'session': session,
+            'view': self,
+        }
+        return render_to_response(self.templatePath, response, request=request)
+
+
 class ModuleAssociationSchema(formencode.Schema):
     allow_extra_fields = True
     module = formencode.validators.String()
 
 
-@view_config(
-    route_name='module_association', renderer='templates/module_association.pt')
-def module_association_view(request):
-    check_login(request)
-    config = load_config(request)
-    session = request.session
+class Module_Association_View(BaseHelper):
 
-    # clear the session of any stale associated module paths
-    if 'associated_module_url' in session.keys():
-        del session['associated_module_url']
+    @view_config(route_name='module_association',
+                 renderer='templates/module_association.pt')
+    def generate_html_view(self):
+        request = self.request
 
-    workspaces = [(i['href'], i['title']) for i in session['collections']]
-    
-    conn = sword2cnx.Connection(session['service_document_url'],
-                                user_name = session['username'],
-                                user_pass = session['password'],
-                                always_authenticate=True,
-                                download_service_document=False)
+        self.check_login()
+        config = load_config(request)
+        conn = self.get_connection()
 
-    workspace_to_get = session['collections'][0]['href']
-    workspace_to_get = request.params.get('workspace', workspace_to_get)
-    print "Workspace url: " + workspace_to_get
-    
-    modules = get_module_list(conn, workspace_to_get)
+        workspaces = [
+            (i['href'], i['title']) for i in self.session['collections']
+        ]
+        selected_workspace = request.params.get('workspace', workspaces[0][0])
+        workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
 
-    b_start = int(request.GET.get('b_start', '0'))
-    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
-    modules = Batch(modules, start=b_start, size=b_size)
-    module_macros = get_renderer('templates/modules_list.pt').implementation()
+        b_start = int(request.GET.get('b_start', '0'))
+        b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
 
-    form = Form(request, schema=ModuleAssociationSchema)
-    response = {'form': FormRenderer(form),
-                'workspaces': workspaces,
-                'selected_workspace': workspace_to_get,
-                'modules': modules,
-                'request': request,
-                'config': config,
-                'module_macros': module_macros,
-    }
-    return response
+        modules = get_module_list(conn, selected_workspace)
+        modules = Batch(modules, start=b_start, size=b_size)
+        module_macros = get_renderer('templates/modules_list.pt').implementation()
+
+        form = Form(request, schema=ModuleAssociationSchema)
+        response = {'form': FormRenderer(form),
+                    'workspaces': workspaces,
+                    'selected_workspace': selected_workspace,
+                    'workspace_title': workspace_title,
+                    'modules': modules,
+                    'request': request,
+                    'config': config,
+                    'module_macros': module_macros,
+        }
+        return response
+
+    @reify
+    def macros(self):
+        return self.macro_renderer.implementation().macros
+
+    @reify
+    def workspace_list(self):
+        return self.macro_renderer.implementation().macros['workspace_list']
+
+    @reify
+    def workspace_popup(self):
+        return self.macro_renderer.implementation().macros['workspace_popup']
+
+    @reify
+    def modules_list(self):
+        return self.macro_renderer.implementation().macros['modules_list']
 
 
-@view_config(
-    route_name='modules_list', renderer="templates/modules_list.pt")
-def modules_list(request):
-    check_login(request)
-    config = load_config(request)
-    session = request.session
+class Modules_List_View(BaseHelper):
 
-    conn = sword2cnx.Connection(session['service_document_url'],
-                                user_name = session['username'],
-                                user_pass = session['password'],
-                                always_authenticate=True,
-                                download_service_document=False)
+    @view_config(
+        route_name='modules_list', renderer="templates/modules_list.pt")
+    def generate_html_view(self):
+        check_login(self.request)
+        config = load_config(self.request)
+        conn = self.get_connection()
 
-    workspace_to_get = session['collections'][0]['href']
-    workspace_to_get = request.params.get('workspace', workspace_to_get)
-    print "Workspace url: " + workspace_to_get
+        selected_workspace = self.session['collections'][0]['href']
+        selected_workspace = self.request.params.get('workspace',
+                                                     selected_workspace)
+        print "Workspace url: " + selected_workspace
 
-    modules = get_module_list(conn, workspace_to_get)
-    b_start = int(request.GET.get('b_start', '0'))
-    b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
-    modules = Batch(modules, start=b_start, size=b_size)
+        modules = get_module_list(conn, selected_workspace)
+        b_start = int(self.request.GET.get('b_start', '0'))
+        b_size = int(self.request.GET.get('b_size', 
+                                          config.get('default_batch_size')))
+        modules = Batch(modules, start=b_start, size=b_size)
 
-    response = {'selected_workspace': workspace_to_get,
-                'modules': modules,
-                'request': request,
-                'config': config,
-    }
-    return response
+        response = {'selected_workspace': selected_workspace,
+                    'modules': modules,
+                    'request': self.request,
+                    'config': config,
+        }
+        return response
 
+    @reify
+    def modules_list(self):
+        return self.macro_renderer.implementation().macros['modules_list']
+
+
+class Choose_Module(Module_Association_View):
+
+    @view_config(
+        route_name='choose-module', renderer="templates/choose_module.pt")
+    def generate_html_view(self):
+        return super(Choose_Module, self).generate_html_view()
 
 def get_oauth_token_and_secret(username):
     try:

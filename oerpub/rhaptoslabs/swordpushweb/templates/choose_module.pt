@@ -1,0 +1,70 @@
+<metal:use use-macro="base">
+
+<metal:script-slot fill-slot="script-slot">    
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            $('input[name="module"]').each(function(index) {
+                if ($(this).attr('checked') == 'checked') {
+                    $(this).closest('tr').addClass("selected-row");
+                    $('input.forward-button').removeAttr('disabled');
+                    return true;
+                }
+            });
+            
+            workspace = $("ul.popOut li a").first().attr('href');
+            $("#workspace").attr("value", workspace);
+        });
+
+    </script>
+
+</metal:script-slot>    
+
+<metal:workflownav fill-slot="workflownav">
+${form.begin(request.route_url('preview'), name="preview")}
+${form.csrf_token()}
+
+<div id="workflownav-wrap">
+    <div id="workflownav-container">
+        <div id="back-steps">
+            <input id="back-to-chooser"
+                type="button"
+                class="button"
+                value="&laquo; Back: Return to start page"
+                title="Return to the initial page"
+                url="${request.route_url('choose')}">
+        </div>
+
+        <input id="workspace" type="hidden" name="workspace">
+
+        <div id="forward-steps">
+            <input type="submit"
+                name="form.submitted"
+                disabled="disabled"
+                class="button forward-button" 
+                value="Next: Edit selected module &raquo;" 
+                url="${request.route_url('preview')}"
+                title="Select a module below and then click 'Next' to start editing it">
+
+        </div>
+    </div>
+</div>
+</metal:workflownav>
+
+<tal:body metal:fill-slot="content-slot">
+
+<metal:content use-macro="view.content_macro">
+    <metal:page_title fill-slot="page_title">
+    Which module are you making a new version of? 
+    </metal:page_title>
+</metal:content>
+
+${form.end()}
+
+<iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
+    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+</iframe>
+
+</tal:body>
+
+</metal:use>

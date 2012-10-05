@@ -21,12 +21,12 @@ def main(global_config, **settings):
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
     config.add_route('logout', '/logout')
-    config.add_route('change_workspace', '/change_workspace')
     config.add_route('importer', '/importer')
     config.add_route('google_oauth', '/google_oauth')
     config.add_route('module_association', '/module_association')
     config.add_route('modules_list', '/modules_list')
     config.add_route('oauth2callback', '/oauth2callback')
+    config.add_route('choose-module', '/choose-module')
     config.add_route('updatecnx', '/updatecnx')
     config.add_route('slideshow_preview', '/slideshow_preview')
 

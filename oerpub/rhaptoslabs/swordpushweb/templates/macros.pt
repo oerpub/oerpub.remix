@@ -1,0 +1,208 @@
+<metal:content_macro define-macro="content_macro">
+<div id="ie6-container-wrap">
+    <div id="container">
+        <div id="content">
+            <div id="pageheader-wrap"></div>
+            
+            <div id="page-title">
+                <h1 style="margin-bottom: .7em;">
+                    <span metal:define-slot="page_title">
+                        Page title... replace
+                    </span>
+                </h1>
+            </div>
+
+            <div class="forminfo" style="margin: -.5em 0 1.5em">
+                Select the module below whose contents you are replacing.
+                <span style="font-size: .85em;">
+                    (<a href="#asdfasdf" id="not-finding-link">Not finding your module in any of your work areas?</a>)
+                </span>
+            </div>  
+
+            <div id="not-finding" style="display: none;" class="existing">
+                <div style="margin: 0 0 .5em;">
+                    <div style="margin: 0 0 .5em;" class="forminfo">
+                        Enter the URL of a module to check it out to
+
+                        <div metal:use-macro="view.workspace_popup">
+                        </div>
+
+                    </div>
+                    <strong>Connexions URL of the module:</strong>
+                </div>
+                <input type="url" "="" onkeydown="if(event.keyCode == 
+                13){$('#file-submit').removeAttr('disabled');$('#file-submit').click();document.getElementById('url-submit').disabled=false;}" 
+                placeholder="http://cnx.org/content/m0000/latest/" style="width: 30em;" name="url_text" id="url_text"/>
+
+                <input type="submit" disabled="disabled" value="Next &#187;" name="url.submitted" id="url-submit" class="button"/>
+            </div>
+
+            <div id="page-description"></div>
+
+            <div class="pleasewait" id="upload-wait" style="display: none;">
+                Retrieving module list. This may take a few moments.
+            </div>
+            
+            <div id="workspace-list">
+                <div class="workarea-contents-label">
+                    Showing contents of
+                    <ul metal:use-macro="view.workspace_popup">
+                    </ul>
+                </div>
+            </div>
+          
+            <!-- now the list of modules -->
+            <metal:modules use-macro="view.modules_list" />
+
+        </div>
+    </div>
+
+</div>
+</metal:content_macro>
+
+<metal:modules_list define-macro="modules_list"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
+                b_size python:modules.size;
+                b_start python:modules.start + b_size;
+                previous_b_start python:modules.start - b_size;">
+
+    <div id="modules-list">
+        <!-- Navigation -->
+        <div class="listingBar">
+
+            <span class="previous">
+                <a href="[url]?b_start=0"
+                    tal:condition="python:modules.previous"
+                    tal:attributes="href string:${request.route_url('module_association')}?b_start=${previous_b_start}&workspace=${selected_workspace}">
+                    « Previous <span tal:content="b_size">13</span>
+                    items
+                </a>
+            </span>
+
+            <span class="next">
+                <a href="[url]?b_start=0"
+                    tal:condition="python:modules.next"
+                    tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}&workspace=${selected_workspace}">
+                    Next <span tal:content="b_size">13</span> items »
+                </a>
+            </span>
+
+            <!-- list all the batches -->
+            <tal:batch-list repeat="counter python:range(modules.total)">
+            <a href="[url]?b_start=2"
+                tal:condition="python:modules.index != counter"
+                tal:define="b_start python:counter * modules.size"
+                tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}&workspace=${selected_workspace}"
+                tal:content="counter +1">
+                2
+            </a>
+
+            <span tal:condition="python:modules.index == counter">
+                [<span tal:replace="counter +1">2</span>]
+            </span>
+            </tal:batch-list>
+        </div>
+
+        <table summary="Content listing" style="width: 100%; font-size: 1em;" class="listing" id="workarea-contents">
+            <thead>
+                <tr>
+                    <th class="nosort">&nbsp;</th>
+                    <th style="white-space: nowrap;"> Module title </th>
+                    <th style="white-space: nowrap;"> Module ID </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr tal:repeat="details modules"
+                    id="folder-contents-item-[uid]"
+                    tal:attributes="id string:${details[0]}"
+                    class="draggable odd">
+
+                    <td style="text-align: center;" class="notDraggable checkCol">
+                        <input type="radio" name="module"
+                        value="/GroupWorkspaces/wg1438/m33469"
+                        tal:attributes="value details[1]">
+                    </td>
+
+                    <td class="notDraggable">
+                        <span class="visualIcon contenttype-module"
+                            tal:content="details[2]">
+                            Siyavula Connexions Training Manual for Educators
+                        </span>
+                        <a target="_blank" 
+                            class="review-module-link" 
+                            title="Open the published module in a new window"
+                            href="http://cnx.org/content/m33469/latest/">
+                            <img src="${images_url}/external-link.png">
+                        </a>
+                    </td>
+
+                    <td class="notDraggable" tal:content="details[0]">
+                        m33469
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Navigation -->
+        <div class="listingBar">
+
+            <span class="previous">
+                <a href="[url]?b_start=0"
+                    tal:condition="python:modules.previous"
+                    tal:attributes="href string:${request.route_url('module_association')}?b_start=${previous_b_start}&workspace=${selected_workspace}">
+                    « Previous <span tal:content="b_size">13</span>
+                    items
+                </a>
+            </span>
+
+            <span class="next">
+                <a href="[url]?b_start=0"
+                    tal:condition="python:modules.next"
+                    tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}&workspace=${selected_workspace}">
+                    Next <span tal:content="b_size">13</span> items »
+                </a>
+            </span>
+
+            <!-- list all the batches -->
+            <tal:batch-list repeat="counter python:range(modules.total)">
+            <a href="[url]?b_start=2"
+                tal:condition="python:modules.index != counter"
+                tal:define="b_start python:counter * modules.size"
+                tal:attributes="href string:${request.route_url('module_association')}?b_start=${b_start}&workspace=${selected_workspace}"
+                tal:content="counter +1">
+                2
+            </a>
+
+            <span tal:condition="python:modules.index == counter">
+                [<span tal:replace="counter +1">2</span>]
+            </span>
+            </tal:batch-list>
+        </div>
+    </div>
+    
+</metal:modules_list>
+
+<metal:workspace_popup define-macro="workspace_popup"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
+                module_url module_url|nothing;">
+<ul class="popMenu">
+    <li class="popMenu">
+        <a id="selected_workspace" href="#" class="popMenu"
+            tal:attributes="href selected_workspace">
+            <span class="workarea-choice" tal:content="workspace_title">Personal Workspace</span>
+            <img tal:condition="not:module_url" src="${images_url}/down-arrow-05.png"> 
+        </a>
+        
+        <ul class="popOut" tal:condition="not:module_url">
+            <li tal:repeat="ws workspaces">
+                <a href="#" class="workspace-link"
+                    tal:content="ws[1]"
+                    tal:attributes="href ws[0]">
+                    Personal Workspace
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>
+</metal:workspace_popup>
