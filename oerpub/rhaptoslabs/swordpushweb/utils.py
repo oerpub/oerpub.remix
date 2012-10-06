@@ -4,6 +4,8 @@ import libxslt
 import zipfile
 import lxml
 
+from pyramid.httpexceptions import HTTPFound
+
 from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 
