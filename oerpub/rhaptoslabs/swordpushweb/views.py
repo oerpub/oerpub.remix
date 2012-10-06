@@ -33,9 +33,8 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript, fetch_slideshow_status
 from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
-from utils import escape_system, clean_cnxml, load_config, save_config, add_directory_to_zip
-from utils import escape_system, clean_cnxml, pretty_print_dict, load_config
-from utils import save_config, add_directory_to_zip
+from utils import load_config, save_config, add_directory_to_zip
+from utils import escape_system, clean_cnxml
 from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
 from utils import get_files_from_zipfile, build_featured_links
 import convert as JOD # Imports JOD convert script
@@ -48,17 +47,6 @@ from helpers import BaseHelper
 ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
 TESTING = False
 CWD = os.getcwd()
-
-
-def check_login(request, raise_exception=True):
-    # Check if logged in
-    for key in ['username', 'password', 'service_document_url']:
-        if not request.session.has_key(key):
-            if raise_exception:
-                raise HTTPFound(location=request.route_url('login'))
-            else:
-                return False
-    return True
 
 
 class LoginSchema(formencode.Schema):
@@ -815,7 +803,6 @@ def admin_config_view(request):
     """
 
     check_login(request)
-    session = request.session
     subjects = ["Arts", "Business", "Humanities", "Mathematics and Statistics",
                 "Science and Technology", "Social Sciences"]
     form = Form(request, schema=ConfigSchema)
@@ -950,7 +937,6 @@ class Metadata_View(BaseHelper):
         if 'title' in self.session:
             self.defaults['title'] = self.session['title']
             self.config['metadata']['title'] = self.session['title']
-        print form.data
 
     def update_session(self, session, remember_fields, form):        
         # Persist the values that should be persisted in the session, and
