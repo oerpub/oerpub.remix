@@ -1,5 +1,4 @@
 import os
-import sys
 import shutil
 import datetime
 import zipfile
@@ -9,11 +8,11 @@ import lxml
 import re
 from cStringIO import StringIO
 import peppercorn
+import codecs
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response, get_renderer
-from pyramid.response import Response
 from pyramid.decorator import reify
 
 import formencode
@@ -22,7 +21,6 @@ from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
 
 from languages import languages
-from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
 from rhaptos.cnxmlutils.validatecnxml import validate
@@ -67,7 +65,6 @@ class LoginSchema(formencode.Schema):
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.NotEmpty()
 
-
 @view_config(route_name='login')
 def login_view(request):
     """
@@ -82,9 +79,9 @@ def login_view(request):
         ('username',),
         ('password',),
     ]
-    
+
     session = request.session
-    
+
     # validate the form in order to compute all errors
     valid_form = form.validate()
     request['errors'] = form.all_errors()
@@ -227,12 +224,12 @@ def save_cnxml(save_dir, cnxml, files):
         f.write(content)
         f.close()
 
-    # we generate the preview and save the error 
+    # we generate the preview and save the error
     conversionerror = None
     try:
         htmlpreview = cnxml_to_htmlpreview(cnxml)
     except libxml2.parserError:
-        conversionerror = traceback.format_exc()     
+        conversionerror = traceback.format_exc()
 
     # Zip up all the files. This is done now, since we have all the files
     # available, and it also allows us to post a simple download link.
@@ -350,7 +347,7 @@ def choose_view(request):
 
                 form.data['gdocs_resource_id'] = None
                 form.data['gdocs_access_token'] = None
-                
+
                 (request.session['title'], request.session['filename']) = \
                     process_gdocs_resource(save_dir, \
                                            gdocs_resource_id, \
@@ -373,7 +370,7 @@ def choose_view(request):
                         process_gdocs_resource(save_dir, "document:" + gdocs_resource_id)
                 else:
                     # download html:
-                    #html = urllib2.urlopen(url).read() 
+                    #html = urllib2.urlopen(url).read()
                     # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
                     import_opener = urllib2.build_opener()
                     import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
@@ -381,7 +378,7 @@ def choose_view(request):
                         import_request = import_opener.open(url)
                         html = import_request.read()
 
-                        # transformation            
+                        # transformation
                         cnxml, objects, html_title = htmlsoup_to_cnxml(
                         html, bDownloadImages=True, base_or_source_url=url)
                         request.session['title'] = html_title
@@ -422,7 +419,7 @@ def choose_view(request):
                 try:
                     zip_archive = zipfile.ZipFile(original_filename, 'r')
                     is_zip_archive = ('index.cnxml' in zip_archive.namelist())
-                    
+
                     # Do we have a latex file?
                     if not is_zip_archive:
                         # incoming latex.zip must contain a latex.tex file, where "latex" is the base name.
@@ -455,7 +452,7 @@ def choose_view(request):
 
                     cnxml = clean_cnxml(cnxml)
                     validate_cnxml(cnxml)
-                
+
                 # LaTeX
                 elif is_latex_archive:
                     f = open(original_filename)
@@ -877,7 +874,7 @@ class Metadata_View(BaseHelper):
         metadata['oerdc:oer-subject'] = form.data['subject']
 
         # Keywords
-        metadata['dcterms:subject'] = [i.strip() for i in 
+        metadata['dcterms:subject'] = [i.strip() for i in
                                        form.data['keywords'].splitlines()
                                        if i.strip()]
 
