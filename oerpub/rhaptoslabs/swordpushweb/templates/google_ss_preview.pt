@@ -10,6 +10,9 @@
 		var choiceNumber = $(this).attr("name").split("-")[2];
 		alert(questionNumber);
 		alert(choiceNumber);
+		var table = "#table-"+questionNumber;
+		$('#my_table > tbody > tr').eq(choiceNumber-1).after("<td>TESTTTT</td>");
+
 		//var newNum = new Number(questionNumber+1);
 		 
 		
@@ -153,10 +156,18 @@
                       </div>                                         
                       <div class="formlabel">Answer</div>
                       <div class="forminfo">Answers</div>
-                      <div class="formfield">
-                          <input name="question-1-option-1" class="options" size="100">
-                      </div>
-                      <input type="button" class="add-more-choices" name="Add more Choices" value="Add more Choices">
+                      <table id="table-question-1">
+                      <tr>
+						<td>
+                          <input name="answer-1-1" id="answer-1-1" class="answer-1" class="options" size="100">
+                        </td>
+                        <td>
+                          <input type="radio" name="radio-1-1" id="radio-1-1">
+                        </td>
+                       </tr>
+                       </table> 
+                      
+                      <input type="button" class="add-more-choices" name="Add More Choices" value="Add more Choices" id="question-1">
                       
                       
                       <!--<div class="formlabel">Solution </div>
