@@ -13,7 +13,7 @@
 		var choiceNumber = $(id).length;
 		alert(questionNumber);
 		alert(choiceNumber);
-		var table = "#table-"+questionNumber;
+		var table = "#table-question-"+questionNumber;
 		$(table+" > tbody > tr").eq(choiceNumber-1).after("<td>TESTTTT</td>");
 
 		//var newNum = new Number(questionNumber+1);
@@ -141,7 +141,7 @@
                     <div class="formlabel">Introductory paragraph</div>
                     <div class="forminfo">You can use the text box below to orient your readers before they start watching the presentation</div>
                     <div class="formfield">
-                      <textarea name="introductory_paragraphs" rows="6" cols="400"></textarea>
+                      <textarea name="introductory_paragraphs" rows="6" cols="150"></textarea>
                   </div>
                 </span>
 
