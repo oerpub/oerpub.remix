@@ -8,9 +8,10 @@
 	  $(".add-more-choices").click(function(){
 		var questionNumber = $(this).id.split("-")[1];
 		var choiceNumber = $(this).attr("name").split("-")[2];
-		
-		var newNum = new Number(questionNumber+1);
-		var optionNumber = 
+		alert(questionNumber);
+		alert(choiceNumber);
+		//var newNum = new Number(questionNumber+1);
+		 
 		
 		
 		
@@ -153,7 +154,7 @@
                       <div class="formlabel">Answer</div>
                       <div class="forminfo">Answers</div>
                       <div class="formfield">
-                          <input name="question-1-option-1" class="options">
+                          <input name="question-1-option-1" class="options" size="100">
                       </div>
                       <input type="button" class="add-more-choices" name="Add more Choices" value="Add more Choices">
                       
