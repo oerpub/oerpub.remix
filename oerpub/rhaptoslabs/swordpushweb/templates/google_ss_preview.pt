@@ -6,10 +6,10 @@
     var newInput;
     $(document).ready(function(){
 	  $(".add-more-choices").click(function(e){
-	  alert(e);
+	  alert($(this));
 	  
-		var questionNumber = e.id.split("-")[1];
-		var choiceNumber = e.attr("name").split("-")[2];
+		//var questionNumber = $(this).id.split("-")[1];
+		var choiceNumber = $(this).attr("name").split("-")[2];
 		alert(questionNumber);
 		alert(choiceNumber);
 		var table = "#table-"+questionNumber;
