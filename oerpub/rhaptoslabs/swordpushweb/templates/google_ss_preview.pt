@@ -5,8 +5,21 @@
     var nextSelectValue = 2;
     var newInput;
     $(document).ready(function(){
+	  $(".add-more-choices").click(function(){
+		var questionNumber = $(this).id.split("-")[1];
+		var choiceNumber = $(this).attr("name").split("-")[2];
+		
+		var newNum = new Number(questionNumber+1);
+		var optionNumber = 
+		
+		
+		
+		
+	  });
       $("#add-more-questions").click(function(){
-      			var num     = $('#add-more-questions').length;
+      
+			
+      		var num     = $('#add-more-questions').length;
             var newNum  = new Number(num + 1);
             var questionId = '#question-'+num;
             console.log(questionId);
@@ -121,7 +134,7 @@
                     <div class="formlabel">Introductory paragraph</div>
                     <div class="forminfo">You can use the text box below to orient your readers before they start watching the presentation</div>
                     <div class="formfield">
-                      <textarea name="introductory_paragraphs" rows="6" cols="100"></textarea>
+                      <textarea name="introductory_paragraphs" rows="6" cols="400"></textarea>
                   </div>
                 </span>
 
@@ -132,22 +145,24 @@
                 <ul id="all-questions">
                 
 					<li id="add-questions-area-1">
-                      <div class="formlabel">Question </div>
-                      <div class="forminfo">Question</div>
+                      <div class="formlabel">Add a Question</div>
+                      <div class="forminfo">QAdd a Question</div>
                       <div class="formfield">
                           <input type="text" size="100" name="question-1" id="question-1">                          
                       </div>                                         
-                      <div class="formlabel">Options </div>
-                      <div class="forminfo">Options one on on line</div>
+                      <div class="formlabel">Answer</div>
+                      <div class="forminfo">Answers</div>
                       <div class="formfield">
-                          <textarea name="options-1" rows="5" cols="40" id="options-1"></textarea>                          
+                          <input name="question-1-option-1" class="options">
                       </div>
+                      <input type="button" class="add-more-choices" name="Add more Choices" value="Add more Choices">
                       
-                      <div class="formlabel">Solution </div>
+                      
+                      <!--<div class="formlabel">Solution </div>
                       <div class="forminfo">Solution</div>
                       <div class="formfield">
                           <textarea name="solution-1" rows="5" cols="40" id="solution-1"></textarea>                          
-                      </div>
+                      </div>-->
                       
 			          	</li>
       				</ul>
