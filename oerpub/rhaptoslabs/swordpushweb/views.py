@@ -10,6 +10,7 @@ from BeautifulSoup import BeautifulSoup
 import MySQLdb as mdb
 from cStringIO import StringIO
 import peppercorn
+import codecs
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
