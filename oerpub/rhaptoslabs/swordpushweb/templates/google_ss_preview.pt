@@ -14,7 +14,7 @@
 		alert(questionNumber);
 		alert(choiceNumber);
 		var table = "#table-"+questionNumber;
-		$('#my_table > tbody > tr').eq(choiceNumber-1).after("<td>TESTTTT</td>");
+		$(table+" > tbody > tr").eq(choiceNumber-1).after("<td>TESTTTT</td>");
 
 		//var newNum = new Number(questionNumber+1);
 		 
