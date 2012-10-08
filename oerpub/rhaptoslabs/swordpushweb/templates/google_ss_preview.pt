@@ -9,7 +9,8 @@
 	  
 	  
 		var questionNumber = $(this).attr("id").split("-")[1];
-		var choiceNumber = $(this).attr("name").split("-")[2];
+		var id = ".answer-"+questionNumber;
+		var choiceNumber = $(id).length;
 		alert(questionNumber);
 		alert(choiceNumber);
 		var table = "#table-"+questionNumber;
