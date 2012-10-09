@@ -30,16 +30,19 @@
       $("#add-more-questions").click(function(){
       
 			
-      		var num     = $('#add-more-questions').length;
+      		var num     = $('.all-questions').length;
             var newNum  = new Number(num + 1);
             var questionId = '#question-'+num;
             var questiontableDiv = "#table-question-"+num;
             alert(questiontableDiv);
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
             newQuestionBox.find(questiontableDiv).remove().end();
+            newQuestionBox.find(".add-more-choices").remove().end();
             newNum = new String(newNum);
             var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"'  size='100'></td></tr></table> ";
             newQuestionBox.append(newTable);
+            var newChoiceBox= "<input type='button' class='add-more-choices' name='Add More Choices' value='Add more Choices' id='question-"+newNum+"'>";
+            newQuestionBox.append(newChoiceBox);
             var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
             var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
             
@@ -156,7 +159,7 @@
                 
                 <ul id="all-questions">
                 
-					<li id="add-questions-area-1">
+					<li id="add-questions-area-1" class="all-questions">
 					
                       <div class="formlabel">Add a Question</div>
                       <div class="forminfo">Add a Question</div>
