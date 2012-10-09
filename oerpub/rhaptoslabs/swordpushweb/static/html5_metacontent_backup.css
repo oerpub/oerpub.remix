@@ -238,7 +238,7 @@ font-family: tahoma, verdana, arial, helvetica, sans-serif;
 
 /* ===== content actions bar at top ===== */
 
-#cnx_course_header, .title{
+#cnx_course_header, #cnx_module_header{
   clear: both;
 }
 
@@ -527,17 +527,17 @@ font-family: tahoma, verdana, arial, helvetica, sans-serif;
 
 /* ====== module header ===== */
 
-.title{
+#cnx_module_header{
   border-bottom: 1px solid #fc0;
   margin-bottom: 1em;
 }
 
-* html .title{ height: 1%; }
-*+html .title{ height: 1%; }
+* html #cnx_module_header{ height: 1%; }
+*+html #cnx_module_header{ height: 1%; }
 
-.title{
+#cnx_module_header h1{
   color: #e70;
-  padding: 0 0 .4em;
+  margin: 0 0 .4em;
   font-size: 2.3em;
   font-weight: normal;
 }
