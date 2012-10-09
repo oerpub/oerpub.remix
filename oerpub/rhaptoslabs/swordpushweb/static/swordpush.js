@@ -528,7 +528,6 @@ $(window).resize(function(){
     var headerh = $("#header-container").outerHeight();
     var wfnh = $("#workflownav-wrap").outerHeight();
     var eh = $("#errors-wrap").outerHeight();
-    var tbh = 54px;// $(".tool-bar").outerHeight();
     var contentp = parseInt($("#content").css("paddingTop"));
     var contentp = contentp + parseInt($("#content").css("paddingBottom"));
     var phwh = $("#pageheader-wrap").outerHeight();
@@ -542,7 +541,7 @@ $(window).resize(function(){
     /* Give the page's header the correct top margin (since the elements above
        it are in a fixed position)
        */
-    $("#content").css({'margin-top': headerh + wfnh + eh + tbh})
+    $("#content").css({'margin-top': headerh + wfnh + eh})
 
   // Truncate the title if it gets too long
   if ($("iframe").length != 0) {
