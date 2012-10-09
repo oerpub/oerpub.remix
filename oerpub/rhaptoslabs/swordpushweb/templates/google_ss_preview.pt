@@ -16,7 +16,7 @@
 		$("#radio-"+questionNumber+"-"+choiceNumber).css({"visibility":"visible"});
 		var table = "#table-question-"+questionNumber;
 		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
-		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"' id='radio-"+questionNumber+"-"+newChoice+"' >Correct</td>";
+		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"' id='radio-"+questionNumber+"-"+newChoice+"' value='answer-'"+questionNumber+"-"+newChoice+"'>Correct</td>";
 		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
 		$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
  
@@ -35,7 +35,7 @@
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
             newQuestionBox.remove("#table-question-"+num);
             newNum = new String(newNum);
-            var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+" class='options-1' size='100'></td></tr></table> ";
+            var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"  size='100'></td></tr></table> ";
             newQuestionBox.append(newTable);
             var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
             var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
@@ -164,10 +164,10 @@
                       <table id="table-question-1">
                       <tr>
 						<td>
-                          <input name="answer-1-1" class="answer-1" class="options-1" size="100">
+                          <input name="answer-1-1" class="answer-1"  size="100">
                         </td>
                         <td>
-                          <input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1" style="visibility:hidden" class="options-1">Correct
+                          <input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1" style="visibility:hidden" >Correct
                         </td>
                        </tr>
                        </table> 
