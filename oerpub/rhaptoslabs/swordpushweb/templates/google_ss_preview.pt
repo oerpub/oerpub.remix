@@ -35,7 +35,7 @@
             var questiontableDiv = "#table-question-"+num;
             alert(questiontableDiv);
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
-            newQuestionBox.remove(questiontableDiv);
+            newQuestionBox.find(questiontableDiv).remove().end();
             newNum = new String(newNum);
             var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"'  size='100'></td></tr></table> ";
             newQuestionBox.append(newTable);
@@ -145,7 +145,7 @@
                     <div class="formlabel">Introductory paragraph</div>
                     <div class="forminfo">You can use the text box below to orient your readers before they start watching the presentation</div>
                     <div class="formfield">
-                      <textarea name="introductory_paragraphs" rows="6" cols="150"></textarea>
+                      <textarea name="introductory_paragraphs" rows="6" cols="100"></textarea>
                   </div>
                 </span>
 
@@ -170,7 +170,7 @@
                           <input name="answer-1-1" class="answer-1"  size="100">
                         </td>
                         <td>
-                          <input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1" style="visibility:hidden" >Correct
+                          <input type='radio' name='radio-1' id='radio-1-1' value='answer-1-1' style='visibility:hidden'>Correct
                         </td>
                        </tr>
                        </table> 
