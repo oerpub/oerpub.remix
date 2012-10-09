@@ -291,7 +291,7 @@ class Metadata(dict):
 
     fields = {'dcterms:title':        types.StringType,
               'dcterms:abstract':     types.StringType,
-              'language':             types.StringType,
+              'dcterms:language':     types.StringType,
               'google_code':          types.StringType,}
     
     contributor_fields = {'dcterms:creator':      types.ListType,
@@ -346,7 +346,6 @@ class Metadata(dict):
             self[name] = value
 
     def _get_value_from_raw(self, name, ftype, dom, namespaces):
-        print 'Finding %s' % name
         value = ''
         elements = dom.findall(name, namespaces=namespaces)
         if elements:
