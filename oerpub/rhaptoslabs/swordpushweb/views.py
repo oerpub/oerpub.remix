@@ -48,17 +48,6 @@ TESTING = False
 CWD = os.getcwd()
 
 
-def check_login(request, raise_exception=True):
-    # Check if logged in
-    for key in ['username', 'password', 'service_document_url']:
-        if not request.session.has_key(key):
-            if raise_exception:
-                raise HTTPFound(location=request.route_url('login'))
-            else:
-                return False
-    return True
-
-
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     service_document_url = formencode.validators.String(not_empty=True)
@@ -948,34 +937,47 @@ class Metadata_View(BaseHelper):
         return self.macro_renderer.implementation().macros['workspace_popup']
 
     def get_title(self, metadata, session):
-        return metadata.get('dcterms_title', session.get('title', ''))
+        return metadata.get('dcterms:title', session.get('title', ''))
 
     def get_subjects(self, metadata):
-        return metadata.get('dcterms_subject', [])
+        return metadata.get('subjects', [])
 
     def get_summary(self, metadata):
-        return metadata.get('dcterms_abstract', '')
+        return metadata.get('dcterms:abstract', '')
 
     def get_authors(self, metadata):
-        return metadata.get('authors', '')
+        return self.get_contributors('creator', metadata)
 
     def get_maintainers(self, metadata):
-        return metadata.get('maintainers', '')
+        return self.get_contributors('maintainer', metadata)
 
     def get_copyright_holders(self, metadata):
-        return metadata.get('copyright', '')
+        return self.get_contributors('rightsHolder', metadata)
 
     def get_editors(self, metadata):
-        return metadata.get('editors', '')
+        return self.get_contributors('editor', metadata)
 
     def get_translators(self, metadata):
-        return metadata.get('translators', '')
+        return self.get_contributors('translator', metadata)
     
+    def get_contributors(self, role, metadata):
+        delimeter = ', '
+        val = metadata.get('dcterms:%s' % role, '')
+        if val:
+            val = delimeter.join(val)
+        else:
+            val = ''
+        return val
+
     def get_language(self, metadata):
         return metadata.get('language', '')
 
     def get_keywords(self, metadata):
-        return metadata.get('keywords', '')
+        delimeter = '\n'
+        val = metadata.get('keywords', '')
+        if val:
+            val = delimeter.join(val) 
+        return val
 
     def get_google_code(self, metadata):
         return metadata.get('google_code', '')
@@ -1063,7 +1065,6 @@ class Metadata_View(BaseHelper):
             'view': self,
         }
         return render_to_response(self.templatePath, response, request=request)
-
 
 class ModuleAssociationSchema(formencode.Schema):
     allow_extra_fields = True

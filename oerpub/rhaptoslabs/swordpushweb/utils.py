@@ -1,8 +1,11 @@
+import types
 import os
 import libxml2
 import libxslt
 import zipfile
 import lxml
+
+from pyramid.httpexceptions import HTTPFound
 
 from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
@@ -280,5 +283,93 @@ def get_connection(session):
 def get_metadata_from_repo(session, module_url):
     conn = get_connection(session)
     resource = conn.get_resource(content_iri = module_url)
-    deposit_receipt = Deposit_Receipt(xml_deposit_receipt = resource.content)
-    return deposit_receipt.metadata
+    metadata = Metadata(resource.content)
+    return metadata
+
+
+class Metadata(dict):
+
+    fields = {'dcterms:title':        types.StringType,
+              'dcterms:abstract':     types.StringType,
+              'language':             types.StringType,
+              'google_code':          types.StringType,}
+    
+    contributor_fields = {'dcterms:creator':      types.ListType,
+                          'dcterms:maintainer':   types.ListType,
+                          'dcterms:rightsHolder': types.ListType,
+                          'dcterms:editor':       types.ListType,
+                          'dcterms:translator':   types.ListType,}
+
+    namespaces = {'sword'   : 'http://purl.org/net/sword/',
+                  'dcterms' : 'http://purl.org/dc/terms/',
+                  'md'      : 'http://cnx.rice.edu/mdml',
+                  'xsi'     : 'http://www.w3.org/2001/XMLSchema-instance',
+                  'oerdc'   : 'http://cnx.org/aboutus/technology/schemas/oerdc',}
+
+    def __init__(self, xml_deposit_receipt):
+        """
+        """
+        self.raw_data = xml_deposit_receipt
+        self.dom = lxml.etree.fromstring(self.raw_data)
+        self._parse_metadata()
+    
+    def _parse_metadata(self):
+        for name, ftype in self.fields.items():
+            value = self._get_value_from_raw(name,
+                                             ftype,
+                                             self.dom,
+                                             self.namespaces)
+            self[name] = value
+
+        self._parse_subjects_and_keywords()
+        self._parse_contributors()
+
+    def _parse_subjects_and_keywords(self):
+        """ We have to do this, because subjects and keywords are marshalled
+            in the same basic element. The only thing distinguishing them is
+            the xsi:type.
+        """
+        elements = self.dom.findall('dcterms:subject',
+                                    namespaces=self.namespaces)
+        self._get_subjects(elements)
+        self._get_keywords(elements)
+
+    def _parse_contributors(self):
+        for name, ftype in self.contributor_fields.items():
+            value  = []
+            elements = self.dom.findall(name, namespaces=self.namespaces)
+            for e in elements:
+                tmp_key = '{%s}id' % self.namespaces['oerdc']
+                tmp_val = e.attrib.get(tmp_key, '')
+                if tmp_val:
+                    value.append(tmp_val)
+            self[name] = value
+
+    def _get_value_from_raw(self, name, ftype, dom, namespaces):
+        print 'Finding %s' % name
+        value = ''
+        elements = dom.findall(name, namespaces=namespaces)
+        if elements:
+            if ftype == types.ListType:
+                value = []
+                for e in elements:
+                    value.append(e.text)
+            else:
+                value = elements[0].text
+        return value
+
+    def _get_keywords(self, elements):
+        value = []
+        elements = [e for e in elements if not e.attrib]
+        if elements:
+            for e in elements:
+                value.append(e.text)
+        self['keywords'] = value
+
+    def _get_subjects(self, elements):
+        value = []
+        elements = [e for e in elements if e.attrib]
+        if elements:
+            for e in elements:
+                value.append(e.text)
+        self['subjects'] = value
