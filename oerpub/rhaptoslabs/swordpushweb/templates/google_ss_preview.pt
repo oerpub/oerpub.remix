@@ -11,7 +11,7 @@
 		var questionNumber = $(this).attr("id").split("-")[1];
 		var id = ".answer-"+questionNumber;
 		var choiceNumber = $(id).length;
-		<input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1">
+		
 		var table = "#table-question-"+questionNumber;
 		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"'  </td>";
 		$(table+" > tbody > tr").eq(choiceNumber-1).after(radioButton);
