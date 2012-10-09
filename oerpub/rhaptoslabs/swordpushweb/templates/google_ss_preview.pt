@@ -13,7 +13,8 @@
 		var choiceNumber = $(id).length;
 		<input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1">
 		var table = "#table-question-"+questionNumber;
-		$(table+" > tbody > tr").eq(choiceNumber-1).after("<td><input type=\"radio\" name=\"radio-"+questionNumber+"\"  </td>");
+		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"'  </td>";
+		$(table+" > tbody > tr").eq(choiceNumber-1).after(radioButton);
 
 		//var newNum = new Number(questionNumber+1);
 		 
@@ -28,14 +29,13 @@
       		var num     = $('#add-more-questions').length;
             var newNum  = new Number(num + 1);
             var questionId = '#question-'+num;
-            console.log(questionId);
-            var optionId = '#options-'+num;
-            var solutionId = '#solution-'+num;
             
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
             newQuestionBox.remove("#table-question-"+new String(num));
-            //var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
-            //var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
+            var newTable = "<table id='table-question-"+newNum+"'"><tr><td><input name='answer-"+newNum+"-1' id='answer-1-1' class='answer-"+newNum+" class='options-1' size='100'></td></td></tr></table> ";
+            newQuestionBox.append(newTable);
+            var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
+            var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
             
             //var replaceName = newQuestionBox.find(optionId).attr('name','options-'+newNum);
             //var replaceId = newQuestionBox.find(optionId).attr('id','options-'+newNum);
