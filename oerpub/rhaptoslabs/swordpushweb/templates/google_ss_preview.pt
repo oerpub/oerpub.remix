@@ -17,7 +17,7 @@
 		var table = "#table-question-"+questionNumber;
 		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
 		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"'  </td>";
-		var html = "<td><input name="+ newName +"id="+newName+"class='answer-'+questionNumber+"' class='options-1' size='100'>"+radioButton;
+		var html = "<td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton;
 		$(table+" > tbody > tr").eq(choiceNumber).after(html);
 
 		//var newNum = new Number(questionNumber+1);
