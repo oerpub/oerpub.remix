@@ -11,10 +11,14 @@
 		var questionNumber = $(this).attr("id").split("-")[1];
 		var id = ".answer-"+questionNumber;
 		var choiceNumber = $(id).length;
+		var newchoice = new Number(choiceNumber+1);
+		newChoice = new String(newchoice);
 		
 		var table = "#table-question-"+questionNumber;
+		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
 		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"'  </td>";
-		$(table+" > tbody > tr").eq(choiceNumber-1).after(radioButton);
+		var html = "<td><input name="+ newName +"id="+newName+"class='answer-'+questionNumber+"' class='options-1' size='100'>"+radioButton;
+		$(table+" > tbody > tr").eq(choiceNumber).after(html);
 
 		//var newNum = new Number(questionNumber+1);
 		 
