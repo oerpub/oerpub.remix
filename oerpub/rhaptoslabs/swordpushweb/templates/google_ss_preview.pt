@@ -20,7 +20,7 @@
 		var table = "#table-question-"+questionNumber;
 		var tableLastRow = table+" tr:last"
 		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
-		var radioName = "radio-"+questionNumber;
+		var radioName = "radio-1";//+new String(questionNumber);
 		var radioValue = "answer-"+questionNumber;
 		
 		
@@ -40,7 +40,7 @@
 		
 		
 	  });
-      $("#add-more-questions").click(function(){
+      $("#add-more-questions").live("click", function(){
       
 			
       		var num     = $('.all-questions').length;
