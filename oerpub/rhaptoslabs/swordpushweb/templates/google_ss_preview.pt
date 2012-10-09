@@ -13,15 +13,13 @@
 		var choiceNumber = $(id).length;
 		var newchoice = new Number(choiceNumber+1);
 		newChoice = new String(newchoice);
-		
+		$("#radio-"+questionNumber+"-"+choiceNumber).css({"visibility":"visible"});
 		var table = "#table-question-"+questionNumber;
 		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
-		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"'  </td>";
-		var html = "<td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton;
+		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"' id='radio-"+questionNumber+"-"+newChoice+"' </td>";
+		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
 		$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
-
-		//var newNum = new Number(questionNumber+1);
-		 
+ 
 		
 		
 		
@@ -169,7 +167,7 @@
                           <input name="answer-1-1" class="answer-1" class="options-1" size="100">
                         </td>
                         <td>
-                          <input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1" style="visibility:hidden" class="options-1">
+                          <input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1" style="visibility:hidden" class="options-1">Correct
                         </td>
                        </tr>
                        </table> 
