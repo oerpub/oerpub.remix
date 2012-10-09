@@ -16,7 +16,8 @@
 		$("#radio-"+questionNumber+"-"+choiceNumber).css({"visibility":"visible"});
 		var table = "#table-question-"+questionNumber;
 		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
-		var radioButton = "<td><input type='radio' name='radio-"+questionNumber+"' id='radio-"+questionNumber+"-"+newChoice+"' value='answer-'"+questionNumber+"-"+newChoice+"'>Correct</td>";
+		radioName = "'radio-"+questionNumber+"'";
+		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+"'>Correct</td>";
 		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
 		$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
  
@@ -31,11 +32,12 @@
       		var num     = $('#add-more-questions').length;
             var newNum  = new Number(num + 1);
             var questionId = '#question-'+num;
-            
+            var questiontableDiv = "#table-question-"+num;
+            alert(questiontableDiv);
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
-            newQuestionBox.remove("#table-question-"+num);
+            newQuestionBox.remove(questiontableDiv);
             newNum = new String(newNum);
-            var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"  size='100'></td></tr></table> ";
+            var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"'  size='100'></td></tr></table> ";
             newQuestionBox.append(newTable);
             var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
             var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
@@ -154,6 +156,7 @@
                 <ul id="all-questions">
                 
 					<li id="add-questions-area-1">
+					
                       <div class="formlabel">Add a Question</div>
                       <div class="forminfo">Add a Question</div>
                       <div class="formfield">
