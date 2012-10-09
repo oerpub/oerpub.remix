@@ -970,7 +970,6 @@ class Metadata_View(BaseHelper):
         return val
 
     def get_language(self, metadata):
-        import pdb;pdb.set_trace()
         return metadata.get('dcterms:language', '')
 
     def get_keywords(self, metadata):
