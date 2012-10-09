@@ -2,10 +2,12 @@
 
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
+</script>
+<script type="text/javascript">
     var nextSelectValue = 2;
     var newInput;
     $(document).ready(function(){
-	  $(".add-more-choices").click(function(e){
+	  $(".add-more-choices").on("click", function(e){
 	  
 	  
 		var questionNumber = $(this).attr("id").split("-")[1];
@@ -16,12 +18,22 @@
 		newChoice = new String(newchoice);
 		$("#radio-"+questionNumber+"-"+choiceNumber).css({"visibility":"visible"});
 		var table = "#table-question-"+questionNumber;
+		var tableLastRow = table+" tr:last"
 		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
-		radioName = "'radio-"+questionNumber+"'";
+		var radioName = "radio-"+questionNumber;
+		var radioValue = "answer-"+questionNumber;
+		
+		
+     //   var radio = $('<input>').attr({
+       //     type: 'radio', name: radioName, value: radioValue
+        //});
+   //     $(':radio:last-child', '#abc').after(radio).after('option 3 ');
+   
+
 		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+"'>Correct</td>";
 		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
 		//$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
-		$(html).appendTo(table);
+		$(tableLastRow).after(html);
  
 		
 		
