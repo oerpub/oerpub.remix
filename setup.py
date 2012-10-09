@@ -19,6 +19,16 @@ requires = [
     'z3c.batching',
     ]
 
+tests_requires = requires.extend(
+    ['gdata',
+     'libxml2-python',
+     'oerpub.rhaptoslabs.sword2cnx',
+     'oerpub.rhaptoslabs.latex2cnxml',
+     'oerpub.rhaptoslabs.html_gdocs2cnxml',
+     'oerpub.rhaptoslabs.cnxml2htmlpreview',
+    ]
+)
+
 setup(name='oerpub.rhaptoslabs.swordpushweb',
       version='0.1.4',
       description='SwordPush',
@@ -37,7 +47,7 @@ setup(name='oerpub.rhaptoslabs.swordpushweb',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
+      tests_require=tests_requires,
       test_suite="swordpush",
       entry_points = """\
       [paste.app_factory]
