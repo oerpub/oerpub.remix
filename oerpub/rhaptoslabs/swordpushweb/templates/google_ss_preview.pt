@@ -32,7 +32,7 @@
             
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
             newQuestionBox.remove("#table-question-"+new String(num));
-            var newTable = "<table id='table-question-"+newNum+"'"><tr><td><input name='answer-"+newNum+"-1' id='answer-1-1' class='answer-"+newNum+" class='options-1' size='100'></td></td></tr></table> ";
+            var newTable = "<table id='table-question-"+newNum+"'"><tr><td><input name='answer-"+newNum+"-1' id='answer-1-1' class='answer-"+newNum+" class='options-1' size='100'></td></tr></table> ";
             newQuestionBox.append(newTable);
             var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
             var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
