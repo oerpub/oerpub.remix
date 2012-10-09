@@ -11,10 +11,9 @@
 		var questionNumber = $(this).attr("id").split("-")[1];
 		var id = ".answer-"+questionNumber;
 		var choiceNumber = $(id).length;
-		alert(questionNumber);
-		alert(choiceNumber);
+		<input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1">
 		var table = "#table-question-"+questionNumber;
-		$(table+" > tbody > tr").eq(choiceNumber-1).after("<td>TESTTTT</td>");
+		$(table+" > tbody > tr").eq(choiceNumber-1).after("<td><input type=\"radio\" name=\"radio-"+questionNumber+"\"  </td>");
 
 		//var newNum = new Number(questionNumber+1);
 		 
@@ -34,15 +33,15 @@
             var solutionId = '#solution-'+num;
             
             var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
+            newQuestionBox.remove("#table-question-"+new String(num));
+            //var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
+            //var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
             
-            var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
-            var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
+            //var replaceName = newQuestionBox.find(optionId).attr('name','options-'+newNum);
+            //var replaceId = newQuestionBox.find(optionId).attr('id','options-'+newNum);
             
-            var replaceName = newQuestionBox.find(optionId).attr('name','options-'+newNum);
-            var replaceId = newQuestionBox.find(optionId).attr('id','options-'+newNum);
-            
-            var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
-            var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
+            //var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
+            //var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
            $('#add-questions-area-' + num).after(newQuestionBox);
 			
             
@@ -153,7 +152,7 @@
                 
 					<li id="add-questions-area-1">
                       <div class="formlabel">Add a Question</div>
-                      <div class="forminfo">QAdd a Question</div>
+                      <div class="forminfo">Add a Question</div>
                       <div class="formfield">
                           <input type="text" size="100" name="question-1" id="question-1">                          
                       </div>                                         
@@ -162,10 +161,10 @@
                       <table id="table-question-1">
                       <tr>
 						<td>
-                          <input name="answer-1-1" id="answer-1-1" class="answer-1" class="options" size="100">
+                          <input name="answer-1-1" id="answer-1-1" class="answer-1" class="options-1" size="100">
                         </td>
                         <td>
-                          <input type="radio" name="radio-1-1" id="radio-1-1">
+                          <input type="radio" name="radio-1" id="radio-1-1" value="answer-1-1" class="options-1">
                         </td>
                        </tr>
                        </table> 
