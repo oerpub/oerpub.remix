@@ -946,23 +946,23 @@ class Metadata_View(BaseHelper):
         return metadata.get('dcterms:abstract', '')
 
     def get_authors(self, metadata):
-        return self.get_contributors('creator', metadata)
+        return self.get_contributors('dcterms:creator', metadata)
 
     def get_maintainers(self, metadata):
-        return self.get_contributors('maintainer', metadata)
+        return self.get_contributors('oerdc:maintainer', metadata)
 
     def get_copyright_holders(self, metadata):
-        return self.get_contributors('rightsHolder', metadata)
+        return self.get_contributors('dcterms:rightsHolder', metadata)
 
     def get_editors(self, metadata):
-        return self.get_contributors('editor', metadata)
+        return self.get_contributors('oerdc:editor', metadata)
 
     def get_translators(self, metadata):
-        return self.get_contributors('translator', metadata)
+        return self.get_contributors('oerdc:translator', metadata)
     
     def get_contributors(self, role, metadata):
         delimeter = ', '
-        val = metadata.get('dcterms:%s' % role, '')
+        val = metadata.get(role, '')
         if val:
             val = delimeter.join(val)
         else:
@@ -970,7 +970,6 @@ class Metadata_View(BaseHelper):
         return val
 
     def get_language(self, metadata):
-        import pdb;pdb.set_trace()
         return metadata.get('dcterms:language', '')
 
     def get_keywords(self, metadata):

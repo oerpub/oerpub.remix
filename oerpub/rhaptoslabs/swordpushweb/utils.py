@@ -295,10 +295,10 @@ class Metadata(dict):
               'google_code':          types.StringType,}
     
     contributor_fields = {'dcterms:creator':      types.ListType,
-                          'dcterms:maintainer':   types.ListType,
+                          'oerdc:maintainer':     types.ListType,
                           'dcterms:rightsHolder': types.ListType,
-                          'dcterms:editor':       types.ListType,
-                          'dcterms:translator':   types.ListType,}
+                          'oerdc:translator':     types.ListType,
+                          'oerdc:editor':         types.ListType,}
 
     namespaces = {'sword'   : 'http://purl.org/net/sword/',
                   'dcterms' : 'http://purl.org/dc/terms/',
