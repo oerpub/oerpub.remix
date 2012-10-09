@@ -9,7 +9,15 @@ def main(global_config, **settings):
 
     config = Configurator(settings=settings,
                           session_factory = my_session_factory)
+    
+    add_routes(config)
+    add_static_resources(config)
 
+    config.scan()
+    return config.make_wsgi_app()
+
+
+def add_routes(config):
     config.add_route('admin_config', '/config')
     config.add_route('login', '/')
     config.add_route('cnxlogin', '/cnxlogin')
@@ -29,6 +37,8 @@ def main(global_config, **settings):
     # before this one, as it will, by default, catch all requests
     config.add_route('catchall_static', '/preview_css/*subpath', 'oerpub.rhaptoslabs.swordpushweb.static.static_view')
 
+
+def add_static_resources(config):
     config.add_static_view(
         'static',
         'oerpub.rhaptoslabs.swordpushweb:static',
@@ -47,7 +57,3 @@ def main(global_config, **settings):
     config.add_subscriber(
         '.subscribers.add_base_template',
         'pyramid.events.BeforeRender')
-
-    config.scan()
-
-    return config.make_wsgi_app()
