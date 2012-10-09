@@ -27,7 +27,7 @@
    
 if (newChoice =="2"){
 		
-		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-1"+"' value='answer-"+questionNumber+"-1"+"' class='answer-"+questionNumber+"' >Correct</td>";
+		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-1"+"' value='answer-"+questionNumber+"-1"+"' class='answer-"+questionNumber+"' checked>Correct</td>";
 		$(tableLastRow).append(radioButton);
 }
 
