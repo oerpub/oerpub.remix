@@ -37,7 +37,7 @@
 
             $('#statusmessage').data('message')('Loading preview...');
             Aloha.jQuery.get('${body_url}', function(data){
-                var $editable = Aloha.jQuery('#preview-block').html(data);
+                var $editable = Aloha.jQuery('#canvas').html(data);
 
                 // Remove the pyramid debug toolbar from the preview
                 // if it exists. This code should do nothing in production
@@ -47,7 +47,7 @@
                 // Bind a handler for the changed event, so we can save
                 // the document
                 Aloha.bind('aloha-smart-content-changed', function(){
-                    var editor = Aloha.getEditableById('preview-block');
+                    var editor = Aloha.getEditableById('canvas');
                     if(editor.isModified()){
                         // Unmodified, to avoid another concurrent save from
                         // firing while this one is still ongoing.
@@ -115,6 +115,7 @@
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
+            <div id="artboard">
                 <div id="pageheader-wrap">
 
                     <div id="module-actions">
@@ -135,7 +136,7 @@
                                 <span class="button">Edit XML</span>
                             </a>
                         </div>
-                    </div>                    
+                    </div>
 
                     <div id="page-title">
                         <h1>
@@ -155,8 +156,11 @@
                 </div>
 
                 <div id="statusmessage"></div>
-                <div id="preview-block">
+                <div id="editor">
+                    <div id="canvas">
+                    </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
