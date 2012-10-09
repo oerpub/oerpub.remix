@@ -11,6 +11,7 @@
 		var questionNumber = $(this).attr("id").split("-")[1];
 		var id = ".answer-"+questionNumber;
 		var choiceNumber = $(id).length;
+		console.log("Choice number"+ choiceNumber);;
 		var newchoice = new Number(choiceNumber+1);
 		newChoice = new String(newchoice);
 		$("#radio-"+questionNumber+"-"+choiceNumber).css({"visibility":"visible"});
@@ -39,7 +40,8 @@
             newQuestionBox.find(questiontableDiv).remove().end();
             newQuestionBox.find(".add-more-choices").remove().end();
             newNum = new String(newNum);
-            var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"'  size='100'></td></tr></table> ";
+            
+            var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"'  size='100'></td><td><input type='radio' name='radio-1' id='radio-"+newNum+"-1' value='answer-"+newNum+"-1' style='visibility:hidden'>Correct</td></tr></table> ";
             newQuestionBox.append(newTable);
             var newChoiceBox= "<input type='button' class='add-more-choices' name='Add More Choices' value='Add more Choices' id='question-"+newNum+"'>";
             newQuestionBox.append(newChoiceBox);
