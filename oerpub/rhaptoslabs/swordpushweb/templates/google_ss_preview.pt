@@ -32,8 +32,8 @@
 
 		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+"' >Correct</td>";
 		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
-		//$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
-		$(tableLastRow).after(html).create('trigger');
+		$(table+" > tbody > tr > td").eq(1).after("html");
+		//$(tableLastRow).after(html).create('trigger');
  
 		
 		
