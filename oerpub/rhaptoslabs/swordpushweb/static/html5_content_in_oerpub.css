@@ -37,9 +37,8 @@
 
 /* ========== section & section headers ========== */
 
-.section-header{
+.section h1, .section h2, .section h3, .section h4, .section h4, .section h5, .section h6{
   color: #369;
-  margin: .5em 0 0;
   padding: 0 0 .1em;
   border: 0 solid #369;
   border-bottom-width: 1px;
@@ -50,21 +49,13 @@
   line-height: 1.5em;
 }
 
-.section .section .section-header{
+.section .section h1, .section .section h2, .section .section h3, .section .section h4, .section .section h4, .section .section h5, .section .section h6{
   border: 0 solid #369;
   border-left-width: 1px;
   border-bottom-width: 1px;
   font-size: 1.05em;
   padding: 0 0 .1em .4em;
   letter-spacing: 0;
-}
-
-.section{
-  margin: 2em 0;
-}
-
-.section .section{
-  margin: 1.75em 0 1.75em 3em;
 }
 
 .example .section-header, .proof .section-header, .problem 
