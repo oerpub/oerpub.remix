@@ -25,19 +25,6 @@
                             extra/undobutton,
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
-        <!-- add latest MathJax from cdn.mathjax.org -->
-        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
-          MathJax.Hub.Config({
-                extensions: ["mml2jax.js"],
-                menuSettings: {zoom:"Click"},
-                "HTML-CSS": {scale:110},
-                jax: ["input/MathML","output/HTML-CSS"]
-            });
-            if(location.href.split("#").length != 1) {
-            MathJax.Hub.Register.StartupHook("End", function() {location.href = location.href; });
-            }
-        </script>
-
         <script type="text/javascript">
         Aloha.ready(function(){
             var statusarea = $('#statusmessage');
