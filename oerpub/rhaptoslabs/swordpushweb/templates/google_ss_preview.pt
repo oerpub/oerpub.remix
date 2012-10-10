@@ -7,7 +7,7 @@
     var nextSelectValue = 2;
     var newInput;
     $(document).ready(function(){
-	  $(".add-more-choices").live("click", function(e){
+	  $(".add-more-choices").delegate("click", function(e){
 	  
 	  
 		var questionNumber = $(this).attr("id").split("-")[1];
@@ -43,7 +43,7 @@ if (newChoice =="2"){
 		
 		
 	  });
-      $("#add-more-questions").live("click", function(){
+      $("#add-more-questions").delegate("click", function(){
       
 			
       		var num     = $('.all-questions').length;
@@ -125,11 +125,12 @@ if (newChoice =="2"){
                         <p class="forminfo">
                           <p tal:condition="embed_google">
                           
-                          <br/><br/>
-                            <iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
-                                frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
-                      		</iframe>
-                          </p>
+							<br/><br/>
+								<iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
+									frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+								</iframe>
+						  </p>
+                          
                           <p tal:condition="embed_slideshare">
 	            						   <br/><br/>
 							               <p tal:condition="show_iframe">
@@ -145,11 +146,8 @@ if (newChoice =="2"){
 												You will receive an email once they are ready. <br/>
 												In the mean time, you can enhance it with an introduction and a quiz.<br/>
 											</p>
-											
 										  </p>
-										  
-										  
-                          </p>
+                           </p>
                         </p>
                     </div>
 
@@ -185,30 +183,21 @@ if (newChoice =="2"){
                       </div>                                         
                       <div class="formlabel">Answer</div>
                       <div class="forminfo">Answers</div>
-                      <table id="table-question-1">
-                      <tr>
-						<td>
-                          <input name="answer-1-1" class="answer-1"  size="100">
-                        </td>
-                        <!--<td>
-                          <input type='radio' name='radio-1' id='radio-1-1' value='answer-1-1' style='visibility:hidden'>Correct
-                        </td>-->
-                       </tr>
-                       </table> 
+						<table id="table-question-1">
+							<tr>
+								<td>
+									<input name="answer-1-1" class="answer-1"  size="100">
+								</td>
+							</tr>
+                         </table> 
                       
                       <input type="button" class="add-more-choices" name="Add More Choices" value="Add more Choices" id="question-1">
                       
                       
-                      <!--<div class="formlabel">Solution </div>
-                      <div class="forminfo">Solution</div>
-                      <div class="formfield">
-                          <textarea name="solution-1" rows="5" cols="40" id="solution-1"></textarea>                          
-                      </div>-->
-                      
 			          	</li>
       				</ul>
 				        <input class="button" id="add-more-questions" value="Add More Questions" type="button">
-                <!--<input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">-->
+                
                   
                 </span>
                 ${form.end()}
