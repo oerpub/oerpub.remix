@@ -1525,7 +1525,22 @@ def slideshow_preview(request):
             form_question = request.POST.get('question-'+str(i))
             if form_question:
                 form_options = request.POST.get('options-'+str(i)).split('\r\n')
-                form_solution = request.POST.get('solution-'+str(i))
+                form_radio_answer = request.POST.get('radio-'+str(i)) #this give us something like 'answer-1-1'. so our solution is this
+                solution = request.POST.get(form_radio_answer)
+                form_all_answers=[]
+                for j in range(1,10):
+					try:
+						form_all_answers[j-1] = request.POST.get('answer-'+str(i)+'-'+str(j))
+					except:
+						break
+				itemlist = ""
+				for item in form_all_answers:
+					itemlist += "<item>" + item + "</item>"
+				cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
+				cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
+				
+					
+				"""form_solution = request.POST.get('solution-'+str(i))
                 all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
                 for question in all_post_data:
                     options = all_post_data[question]['options']
@@ -1534,9 +1549,10 @@ def slideshow_preview(request):
                     optionlist=""
                     for option in options:
                         optionlist+="<item>"+option+"</item>"
-                    cnxml+="""<exercise id="exercise-"""+str(j)+""""><problem id="problem-"""+str(j)+""""><para id="para-"""+str(j)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
-                    cnxml+=""" <solution id="solution-"""+str(j)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
-                    j+=1
+                    """
+                    #cnxml+="""<exercise id="exercise-"""+str(j)+""""><problem id="problem-"""+str(j)+""""><para id="para-"""+str(j)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
+                    #cnxml+=""" <solution id="solution-"""+str(j)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
+                    #j+=1
         metadata = session['metadata']
         cnxml += "</section></content></document>"
         workspaces = [(i['href'], i['title']) for i in session['collections']]
