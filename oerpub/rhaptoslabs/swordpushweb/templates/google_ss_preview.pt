@@ -7,7 +7,7 @@
     var nextSelectValue = 2;
     var newInput;
     $(document).ready(function(){
-	  $(".add-more-choices").delegate("click", function(e){
+	  $(".add-more-choices").click(function(e){
 	  
 	  
 		var questionNumber = $(this).attr("id").split("-")[1];
@@ -43,7 +43,7 @@ if (newChoice =="2"){
 		
 		
 	  });
-      $("#add-more-questions").delegate("click", function(){
+      $("#add-more-questions").click(function(){
       
 			
       		var num     = $('.all-questions').length;
