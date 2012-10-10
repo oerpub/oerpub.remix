@@ -1543,8 +1543,8 @@ def slideshow_preview(request):
 					cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
                 else:
                     print "ELESE CONDUITION OF radio"
-					solution = request.POST.get('answer-'+str(i)+'-1')
-					cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""</para></problem>"""
+                    solution = request.POST.get('answer-'+str(i)+'-1')
+                    cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""</para></problem>"""
                 print "FORM RADIO ANSWER",form_radio_answer
                 print "SOLUTION", solution
                 cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise>"""
