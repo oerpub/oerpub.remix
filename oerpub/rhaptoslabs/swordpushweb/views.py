@@ -1,4 +1,5 @@
 import os
+import types
 import shutil
 import datetime
 import zipfile
@@ -795,6 +796,12 @@ class Metadata_View(BaseHelper):
         self.workspaces = \
             [(i['href'], i['title']) for i in self.session['collections']]
 
+        self.role_mappings = {'authors': 'dcterms:creator',
+                              'maintainers': 'oerdc:maintainer',
+                              'copyright': 'dcterms:rightsHolder',
+                              'editors': 'oerdc:editor',
+                              'translators': 'oerdc:translator'}
+
         self.subjects = ["Arts",
                          "Business",
                          "Humanities",
@@ -879,12 +886,7 @@ class Metadata_View(BaseHelper):
 
         # Add role tags
         role_metadata = {}
-        role_mappings = {'authors': 'dcterms:creator',
-                         'maintainers': 'oerdc:maintainer',
-                         'copyright': 'dcterms:rightsHolder',
-                         'editors': 'oerdc:editor',
-                         'translators': 'oerdc:translator'}
-        for k, v in role_mappings.items():
+        for k, v in self.role_mappings.items():
             role_metadata[v] = form.data[k].split(',')
         for key, value in role_metadata.iteritems():
             for v in value:
@@ -968,12 +970,17 @@ class Metadata_View(BaseHelper):
     
     def get_contributors(self, role, metadata):
         delimeter = ','
-        val = metadata.get(role, '')
-        if val:
+        default = self.get_default(role)
+        val = metadata.get(role, default)
+        if isinstance(val, types.ListType):
             val = delimeter.join(val)
-        else:
-            val = ''
         return val
+
+    def get_default(self, role):
+        for k, v in self.role_mappings.items():
+            if v == role:
+                break
+        return self.defaults.get(k, [])
 
     def get_language(self, metadata):
         return metadata.get('dcterms:language', '')
