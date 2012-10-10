@@ -7,7 +7,7 @@
     var nextSelectValue = 2;
     var newInput;
     $(document).ready(function(){
-	  $(".add-more-choices").click(function(e){
+	  $(".add-more-choices").live("click", function(e){
 	  
 	  
 		var questionNumber = $(this).attr("id").split("-")[1];
@@ -28,7 +28,7 @@
 if (newChoice =="2"){
 		
 		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-1"+"' value='answer-"+questionNumber+"-1"+"' class='answer-"+questionNumber+"' checked>Correct</td>";
-		$(tableLastRow).append(radioButton);
+		$(radioButton).appendTo(tableLastRow);
 }
 
 		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+ "class='answer-"+questionNumber+"' >Correct</td>";
@@ -43,7 +43,7 @@ if (newChoice =="2"){
 		
 		
 	  });
-      $("#add-more-questions").click(function(){
+      $("#add-more-questions").live("click", function(){
       
 			
       		var num     = $('.all-questions').length;
