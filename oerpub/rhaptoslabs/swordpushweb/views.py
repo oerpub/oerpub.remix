@@ -1528,6 +1528,8 @@ def slideshow_preview(request):
                 #form_options = request.POST.get('options-'+str(i)).split('\r\n')
                 form_radio_answer = request.POST.get('radio-'+str(i)) #this give us something like 'answer-1-1'. so our solution is this
                 form_all_answers=[]
+                print "QUESTION",form_question
+                print "OPTION1 ",request.POST.get('answer-'+str(i)+'-1')
                 for j in range(1,10):
 					try:
 						form_all_answers[j-1] = request.POST.get('answer-'+str(i)+'-'+str(j))
@@ -1540,6 +1542,7 @@ def slideshow_preview(request):
 						itemlist += "<item>" + item + "</item>"
 					cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
 				else:
+					print "ELESE CONDUITION OF radio"
 					solution = request.POST.get('answer-'+str(i)+'-1')
 					cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""</para></problem>"""
                 print "FORM RADIO ANSWER",form_radio_answer
