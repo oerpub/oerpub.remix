@@ -35,8 +35,8 @@ if (newChoice =="2"){
 		
 		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
 		//$(tableLastRow).append(
-		//$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
-		$(tableLastRow).after(html);
+		$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
+		//$(tableLastRow).after(html);
  
 		
 		
