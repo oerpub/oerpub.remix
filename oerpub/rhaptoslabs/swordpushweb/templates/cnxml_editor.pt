@@ -84,7 +84,7 @@ ${form.csrf_token()}
 ${form.end()}
 
 <script>
-    var editor = CodeMirror.fromTextArea(document.getElementById("cnxml"), {mode: {name: "xmlpure"}, lineWrapping: true, lineNumbers: true});
+    var editor = CodeMirror.fromTextArea(document.getElementById("cnxml"), {mode: {name: "xmlpure"}, lineWrapping: true});
 
     $('#undo-button').click(function(event) {
         editor.undo();     
