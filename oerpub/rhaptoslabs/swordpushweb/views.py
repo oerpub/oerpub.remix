@@ -1540,7 +1540,7 @@ def slideshow_preview(request):
                 cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
 				
 					
-				"""form_solution = request.POST.get('solution-'+str(i))
+                """form_solution = request.POST.get('solution-'+str(i))
                 all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
                 for question in all_post_data:
                     options = all_post_data[question]['options']
@@ -1548,8 +1548,7 @@ def slideshow_preview(request):
                     asked_question = all_post_data[question]['question']
                     optionlist=""
                     for option in options:
-                        optionlist+="<item>"+option+"</item>"
-                    """
+                        optionlist+="<item>"+option+"</item>"""
                     #cnxml+="""<exercise id="exercise-"""+str(j)+""""><problem id="problem-"""+str(j)+""""><para id="para-"""+str(j)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
                     #cnxml+=""" <solution id="solution-"""+str(j)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
                     #j+=1
