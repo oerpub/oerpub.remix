@@ -99,7 +99,7 @@ if (newChoice =="2"){
                 type="submit"
                 value="Next: Describe Your Presentation &#187;" 
                 
-                title="Add/edit metadata"/>
+                title="Describe Your Presentation"/>
             </div>
         </div>
     </div>
