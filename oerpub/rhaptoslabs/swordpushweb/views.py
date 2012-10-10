@@ -989,7 +989,7 @@ class Metadata_View(BaseHelper):
     def get_keywords(self, metadata):
         delimeter = '\n'
         val = metadata.get('keywords', '')
-        if val:
+        if isinstance(val, types.ListType):
             val = delimeter.join(val) 
         return val
 
