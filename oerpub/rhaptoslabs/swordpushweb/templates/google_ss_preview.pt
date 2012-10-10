@@ -23,6 +23,7 @@
             
             var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
             var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
+            console.log($('form[name="optionsform"] $add-questions-area-1').html());
            $('form[name="optionsform"]  #add-questions-area-' + num).after(newQuestionBox);
 			
             
@@ -155,7 +156,7 @@
                 <!--<input class="button" id="options-submit" name="form.submitted" value="Upload to Cnx" type="submit">-->
                   
                 </span>
-                ${form.end()}
+                
                 
                 
 
