@@ -52,7 +52,7 @@
                 <input id="options-submit"
                 class="button forward-button"
                 name="form.submitted"
-                type="submit"
+                
                 value="Next: Describe Your Presentation &#187;" 
                 
                 title="Add/edit metadata"/>
