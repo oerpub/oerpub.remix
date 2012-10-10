@@ -629,6 +629,10 @@ def cnxml_view(request):
     if 'cnxml' in request.POST and form.validate():
         cnxml = form.data['cnxml']
 
+        # Keep sure we use the standard python ascii string and encode Unicode to xml character mappings
+        if isinstance(cnxml, unicode):
+            cnxml = cnxml.encode('ascii', 'xmlcharrefreplace')        
+
         # get the list of files from upload.zip if it exists
         files = []
         zip_filename = os.path.join(save_dir, 'upload.zip')
