@@ -983,7 +983,8 @@ class Metadata_View(BaseHelper):
         return self.defaults.get(k, [])
 
     def get_language(self, metadata):
-        return metadata.get('dcterms:language', '')
+        default = self.defaults.get('language')
+        return metadata.get('dcterms:language', default)
 
     def get_keywords(self, metadata):
         delimeter = '\n'
@@ -1068,6 +1069,9 @@ class Metadata_View(BaseHelper):
                 self.config['metadata'][role] = ', '.join(
                     self.config['metadata'][role]).replace(
                         '_USER_', self.session['username'])
+                
+                self.defaults['language'] = \
+                    self.config['metadata'].get('language', u'en')
 
         selected_workspace = request.POST.get('workspace', None)
         selected_workspace = selected_workspace or workspaces[0][0]
