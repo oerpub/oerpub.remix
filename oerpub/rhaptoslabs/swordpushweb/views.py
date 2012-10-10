@@ -682,6 +682,10 @@ def cnxml_view(request):
     # Check for successful form completion
     if 'cnxml' in request.POST and form.validate():
         cnxml = form.data['cnxml']
+        
+        # Keep sure we use the standard python ascii string and encode Unicode to xml character mappings
+        if isinstance(cnxml, unicode):
+            cnxml = cnxml.encode('ascii', 'xmlcharrefreplace')
 
         try:
             files = get_zipped_files(save_dir)
