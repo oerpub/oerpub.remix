@@ -359,7 +359,7 @@ $(document).ready(function()
         $('#neworexisting').modal();
     });
 
-	${'#options-submit').click(function(e){
+	$('#options-submit').click(function(e){
 		$('form#optionsform').submit(); 
 	});
     // Hide the "New or existing module?" overlay.
