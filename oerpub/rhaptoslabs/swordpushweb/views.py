@@ -791,6 +791,7 @@ class Metadata_View(BaseHelper):
         self.check_login()
         self.templatePath = 'templates/metadata.pt'
         self.config = load_config(request)
+        self.metadata = self.config['metadata']
         self.workspaces = \
             [(i['href'], i['title']) for i in self.session['collections']]
 
@@ -828,9 +829,6 @@ class Metadata_View(BaseHelper):
 
         # Get remembered fields from the session
         self.defaults = {}
-        for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
-            self.defaults[role] = ','.join(self.config['metadata'][role]).replace('_USER_', self.session['username'])
-            self.config['metadata'][role] = ', '.join(self.config['metadata'][role]).replace('_USER_', self.session['username'])
 
         # Get remembered title from the session    
         if 'title' in self.session:
@@ -895,7 +893,7 @@ class Metadata_View(BaseHelper):
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
         return metadata_entry 
 
-    def add_featured_links(self, request, zip_file):
+    def add_featured_links(self, request, zip_file, save_dir):
         structure = peppercorn.parse(request.POST.items())
         if structure.has_key('featuredlinks'):
             featuredlinks = build_featured_links(structure)
@@ -944,24 +942,32 @@ class Metadata_View(BaseHelper):
 
     def get_summary(self, metadata):
         return metadata.get('dcterms:abstract', '')
+    
+    def get_values(self, field):
+        return getattr(self, field)
 
-    def get_authors(self, metadata):
-        return self.get_contributors('dcterms:creator', metadata)
+    @reify
+    def authors(self):
+        return self.get_contributors('dcterms:creator', self.metadata)
 
-    def get_maintainers(self, metadata):
-        return self.get_contributors('oerdc:maintainer', metadata)
+    @reify
+    def maintainers(self):
+        return self.get_contributors('oerdc:maintainer', self.metadata)
 
-    def get_copyright_holders(self, metadata):
-        return self.get_contributors('dcterms:rightsHolder', metadata)
+    @reify
+    def copyright(self):
+        return self.get_contributors('dcterms:rightsHolder', self.metadata)
 
-    def get_editors(self, metadata):
-        return self.get_contributors('oerdc:editor', metadata)
+    @reify
+    def editors(self):
+        return self.get_contributors('oerdc:editor', self.metadata)
 
-    def get_translators(self, metadata):
-        return self.get_contributors('oerdc:translator', metadata)
+    @reify
+    def translators(self):
+        return self.get_contributors('oerdc:translator', self.metadata)
     
     def get_contributors(self, role, metadata):
-        delimeter = ', '
+        delimeter = ','
         val = metadata.get(role, '')
         if val:
             val = delimeter.join(val)
@@ -1019,7 +1025,7 @@ class Metadata_View(BaseHelper):
 
             # Send zip file to Connexions through SWORD interface
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                self.add_featured_links(request, zip_file)
+                self.add_featured_links(request, zip_file, save_dir)
                 associated_module_url = request.POST.get('associated_module_url')
                 if associated_module_url:
                     # this is an update not a create
@@ -1046,6 +1052,16 @@ class Metadata_View(BaseHelper):
         metadata = config['metadata']
         if module_url:
             metadata.update(get_metadata_from_repo(session, module_url))
+        else:
+            for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
+                self.defaults[role] = ','.join(
+                    self.config['metadata'][role]).replace(
+                        '_USER_', self.session['username'])
+
+                self.config['metadata'][role] = ', '.join(
+                    self.config['metadata'][role]).replace(
+                        '_USER_', self.session['username'])
+
         selected_workspace = request.POST.get('workspace', None)
         selected_workspace = selected_workspace or workspaces[0][0]
         workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]

@@ -240,17 +240,20 @@ def build_featured_links(data):
         for details in values:
             title = details['fl_title']
             strength = details['fl_strength']
-            url = details['url']
-            cnxmodule = details['fl_cnxmodule']
-            cnxversion = details['fl_cnxversion']
+            url = details.get('url', '')
+            module = details.get('fl_cnxmodule', '')
 
             link = ''
             if url:
-                  link = u'<link url="%s" strength="%s">%s</link>' %(
-                      url, strength, title)
-            else:
-                  link = u'<link url="%s" strength="%s">%s</link>' %(
-                      url, strength, title)
+                link = u'<link url="%s" strength="%s">%s</link>' %(
+                    url, strength, title)
+            elif module:
+                base = 'http://cnx.org/content'
+                cnxversion = details.get('fl_cnxversion')
+                if not cnxversion:
+                    cnxversion = 'latest'
+                link = u'<link url="%s/%s/%s/" strength="%s">%s</link>' %(
+                    base, module, cnxversion, strength, title)
 
             links.append(link)
 
