@@ -1532,9 +1532,9 @@ def slideshow_preview(request):
                 for j in range(1,10):
 					try:
                         print "OPTION ",request.POST.get('answer-'+str(i)+'-'+str(j))
-						form_all_answers = request.POST.get('answer-'+str(i)+'-'+str(j))
-						if form_all_answers:
-							itemlist +="<item>" + form_all_answers+"</item>"
+                        form_all_answers = request.POST.get('answer-'+str(i)+'-'+str(j))
+                        if form_all_answers:
+                            itemlist +="<item>" + form_all_answers+"</item>"
                         
 					except:
 						print "No element found"
