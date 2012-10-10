@@ -58,7 +58,7 @@
     ${form.csrf_token()}
 
     <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
-        <tal:hidden>${form.hidden(field)}</tal:hidden>
+        <tal:hidden>${form.hidden(field, value=view.get_values(field))}</tal:hidden>
     </tal:field>
 
     <input id="workspace" type="hidden" name="workspace"
@@ -179,11 +179,11 @@
                                                 <span class="formlabel">Contributors</span>
                                                 <span>(<a href="#" id="edit-roles">edit</a>)</span>
                                                 <ul style="margin-top: 0pt; margin-bottom: 0.5em;">
-                                                    <li id="list-authors">Authors: <span>${view.get_authors(metadata)}</span></li>
-                                                    <li id="list-maintainers">Maintainers: <span>${view.get_maintainers(metadata)}</span></li>
-                                                    <li id="list-copyright">Copyright Holders: <span>${view.get_copyright_holders(metadata)}</span></li>
-                                                    <li id="list-editors">Editors: <span>${view.get_editors(metadata)}</span></li>
-                                                    <li id="list-translators">Translators: <span>${view.get_translators(metadata)}</span></li>
+                                                    <li id="list-authors">Authors: <span>${view.authors}</span></li>
+                                                    <li id="list-maintainers">Maintainers: <span>${view.maintainers}</span></li>
+                                                    <li id="list-copyright">Copyright Holders: <span>${view.copyright}</span></li>
+                                                    <li id="list-editors">Editors: <span>${view.editors}</span></li>
+                                                    <li id="list-translators">Translators: <span>${view.translators}</span></li>
                                                 </ul>
                                             </div>
 
@@ -201,7 +201,8 @@
                                             line. Keywords are not displayed on the content, but
                                             are used behind the scenes to help people find it in
                                             searches.</div>
-                                        <div class="formfield"><textarea name="keywords" rows="4" cols="40" tal:attributes="value python:view.get_keywords(metadata)"></textarea>
+                                        <div class="formfield">
+                                            <textarea name="keywords" rows="4" cols="40"><span tal:replace="python:view.get_keywords(metadata)"/></textarea>
                                         </div>
                                     </div>
                                     <div class="formentry" id="formentry-ga"

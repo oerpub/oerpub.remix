@@ -72,9 +72,9 @@ ${form.csrf_token()}
 
             <div class="forminfo" style="margin: -.5em 0 1.5em">
                 Select the module below whose contents you are replacing.
-                <span style="font-size: .85em;">
+                <!--span style="font-size: .85em;">
                     (<a href="#asdfasdf" id="not-finding-link">Not finding your module in any of your work areas?</a>)
-                </span>
+                </span-->
             </div>  
 
             <div id="not-finding" style="display: none;" class="existing">

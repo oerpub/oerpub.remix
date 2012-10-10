@@ -1,4 +1,5 @@
 import os
+import types
 import shutil
 import datetime
 import zipfile
@@ -731,6 +732,10 @@ def cnxml_view(request):
     if 'cnxml' in request.POST and form.validate():
         cnxml = form.data['cnxml']
 
+        # Keep sure we use the standard python ascii string and encode Unicode to xml character mappings
+        if isinstance(cnxml, unicode):
+            cnxml = cnxml.encode('ascii', 'xmlcharrefreplace')        
+
         # get the list of files from upload.zip if it exists
         files = []
         zip_filename = os.path.join(save_dir, 'upload.zip')
@@ -893,8 +898,15 @@ class Metadata_View(BaseHelper):
         self.check_login()
         self.templatePath = 'templates/metadata.pt'
         self.config = load_config(request)
+        self.metadata = self.config['metadata']
         self.workspaces = \
             [(i['href'], i['title']) for i in self.session['collections']]
+
+        self.role_mappings = {'authors': 'dcterms:creator',
+                              'maintainers': 'oerdc:maintainer',
+                              'copyright': 'dcterms:rightsHolder',
+                              'editors': 'oerdc:editor',
+                              'translators': 'oerdc:translator'}
 
         self.subjects = ["Arts",
                          "Business",
@@ -930,9 +942,6 @@ class Metadata_View(BaseHelper):
 
         # Get remembered fields from the session
         self.defaults = {}
-        for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
-            self.defaults[role] = ','.join(self.config['metadata'][role]).replace('_USER_', self.session['username'])
-            self.config['metadata'][role] = ', '.join(self.config['metadata'][role]).replace('_USER_', self.session['username'])
 
         # Get remembered title from the session    
         if 'title' in self.session:
@@ -983,12 +992,7 @@ class Metadata_View(BaseHelper):
 
         # Add role tags
         role_metadata = {}
-        role_mappings = {'authors': 'dcterms:creator',
-                         'maintainers': 'oerdc:maintainer',
-                         'copyright': 'dcterms:rightsHolder',
-                         'editors': 'oerdc:editor',
-                         'translators': 'oerdc:translator'}
-        for k, v in role_mappings.items():
+        for k, v in self.role_mappings.items():
             role_metadata[v] = form.data[k].split(',')
         for key, value in role_metadata.iteritems():
             for v in value:
@@ -997,7 +1001,7 @@ class Metadata_View(BaseHelper):
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
         return metadata_entry 
 
-    def add_featured_links(self, request, zip_file):
+    def add_featured_links(self, request, zip_file, save_dir):
         structure = peppercorn.parse(request.POST.items())
         if structure.has_key('featuredlinks'):
             featuredlinks = build_featured_links(structure)
@@ -1039,37 +1043,64 @@ class Metadata_View(BaseHelper):
         return self.macro_renderer.implementation().macros['workspace_popup']
 
     def get_title(self, metadata, session):
-        return metadata.get('dcterms_title', session.get('title', ''))
+        return metadata.get('dcterms:title', session.get('title', ''))
 
     def get_subjects(self, metadata):
-        return metadata.get('dcterms_subject', [])
+        return metadata.get('subjects', [])
 
     def get_summary(self, metadata):
-        return metadata.get('dcterms_abstract', '')
-
-    def get_authors(self, metadata):
-        return metadata.get('authors', '')
-
-    def get_maintainers(self, metadata):
-        return metadata.get('maintainers', '')
-
-    def get_copyright_holders(self, metadata):
-        return metadata.get('copyright', '')
-
-    def get_editors(self, metadata):
-        return metadata.get('editors', '')
-
-    def get_translators(self, metadata):
-        return metadata.get('translators', '')
+        return metadata.get('dcterms:abstract', '')
     
+    def get_values(self, field):
+        return getattr(self, field)
+
+    @reify
+    def authors(self):
+        return self.get_contributors('dcterms:creator', self.metadata)
+
+    @reify
+    def maintainers(self):
+        return self.get_contributors('oerdc:maintainer', self.metadata)
+
+    @reify
+    def copyright(self):
+        return self.get_contributors('dcterms:rightsHolder', self.metadata)
+
+    @reify
+    def editors(self):
+        return self.get_contributors('oerdc:editor', self.metadata)
+
+    @reify
+    def translators(self):
+        return self.get_contributors('oerdc:translator', self.metadata)
+    
+    def get_contributors(self, role, metadata):
+        delimeter = ','
+        default = self.get_default(role)
+        val = metadata.get(role, default)
+        if isinstance(val, types.ListType):
+            val = delimeter.join(val)
+        return val
+
+    def get_default(self, role):
+        for k, v in self.role_mappings.items():
+            if v == role:
+                break
+        return self.defaults.get(k, [])
+
     def get_language(self, metadata):
-        return metadata.get('language', '')
+        default = self.defaults.get('language')
+        return metadata.get('dcterms:language', default)
 
     def get_keywords(self, metadata):
-        return metadata.get('keywords', '')
+        delimeter = '\n'
+        val = metadata.get('keywords', '')
+        if isinstance(val, types.ListType):
+            val = delimeter.join(val) 
+        return val
 
     def get_google_code(self, metadata):
-        return metadata.get('google_code', '')
+        return metadata.get('oerdc:analyticsCode', '')
 
     @view_config(route_name='metadata')
     def generate_html_view(self):
@@ -1108,7 +1139,7 @@ class Metadata_View(BaseHelper):
 
             # Send zip file to Connexions through SWORD interface
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                self.add_featured_links(request, zip_file)
+                self.add_featured_links(request, zip_file, save_dir)
                 associated_module_url = request.POST.get('associated_module_url')
                 if associated_module_url:
                     # this is an update not a create
@@ -1135,6 +1166,19 @@ class Metadata_View(BaseHelper):
         metadata = config['metadata']
         if module_url:
             metadata.update(get_metadata_from_repo(session, module_url))
+        else:
+            for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
+                self.defaults[role] = ','.join(
+                    self.config['metadata'][role]).replace(
+                        '_USER_', self.session['username'])
+
+                self.config['metadata'][role] = ', '.join(
+                    self.config['metadata'][role]).replace(
+                        '_USER_', self.session['username'])
+                
+                self.defaults['language'] = \
+                    self.config['metadata'].get('language', u'en')
+
         selected_workspace = request.POST.get('workspace', None)
         selected_workspace = selected_workspace or workspaces[0][0]
         workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
@@ -1154,7 +1198,6 @@ class Metadata_View(BaseHelper):
             'view': self,
         }
         return render_to_response(self.templatePath, response, request=request)
-
 
 class ModuleAssociationSchema(formencode.Schema):
     allow_extra_fields = True
