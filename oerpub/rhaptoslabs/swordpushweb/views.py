@@ -1524,7 +1524,7 @@ def slideshow_preview(request):
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
             if form_question:
-                form_options = request.POST.get('options-'+str(i)).split('\r\n')
+                #form_options = request.POST.get('options-'+str(i)).split('\r\n')
                 form_radio_answer = request.POST.get('radio-'+str(i)) #this give us something like 'answer-1-1'. so our solution is this
                 solution = request.POST.get(form_radio_answer)
                 form_all_answers=[]
