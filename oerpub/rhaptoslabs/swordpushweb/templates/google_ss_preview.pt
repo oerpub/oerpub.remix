@@ -31,7 +31,7 @@ if (newChoice =="2"){
 		$(radioButton).appendTo(tableLastRow);
 }
 
-		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+ "class='answer-"+questionNumber+"' >Correct</td>";
+		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+ "' class='answer-"+questionNumber+"' >Correct</td>";
 		
 		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
 		//$(tableLastRow).append(
