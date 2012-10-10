@@ -1533,11 +1533,11 @@ def slideshow_preview(request):
 						form_all_answers[j-1] = request.POST.get('answer-'+str(i)+'-'+str(j))
 					except:
 						break
-				itemlist = ""
-				for item in form_all_answers:
-					itemlist += "<item>" + item + "</item>"
-				cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
-				cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
+                itemlist = ""
+                for item in form_all_answers:
+                    itemlist += "<item>" + item + "</item>"
+                cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
+                cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
 				
 					
 				"""form_solution = request.POST.get('solution-'+str(i))
