@@ -1527,6 +1527,8 @@ def slideshow_preview(request):
                 #form_options = request.POST.get('options-'+str(i)).split('\r\n')
                 form_radio_answer = request.POST.get('radio-'+str(i)) #this give us something like 'answer-1-1'. so our solution is this
                 solution = request.POST.get(form_radio_answer)
+                print "FORM RADIO ANSWER",form_radio_answer
+                print "SOLUTION", solution
                 form_all_answers=[]
                 for j in range(1,10):
 					try:
@@ -1536,8 +1538,8 @@ def slideshow_preview(request):
                 itemlist = ""
                 for item in form_all_answers:
                     itemlist += "<item>" + item + "</item>"
-                cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
-                cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
+                cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
+                cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise>"""
 				
 					
                 """form_solution = request.POST.get('solution-'+str(i))
