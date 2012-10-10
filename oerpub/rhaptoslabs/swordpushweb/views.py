@@ -986,7 +986,7 @@ class Metadata_View(BaseHelper):
         return val
 
     def get_google_code(self, metadata):
-        return metadata.get('google_code', '')
+        return metadata.get('oerdc:analyticsCode', '')
 
     @view_config(route_name='metadata')
     def generate_html_view(self):

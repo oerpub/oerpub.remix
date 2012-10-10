@@ -295,7 +295,7 @@ class Metadata(dict):
     fields = {'dcterms:title':        types.StringType,
               'dcterms:abstract':     types.StringType,
               'dcterms:language':     types.StringType,
-              'google_code':          types.StringType,}
+              'oerdc:analyticsCode':  types.StringType,}
     
     contributor_fields = {'dcterms:creator':      types.ListType,
                           'oerdc:maintainer':     types.ListType,
