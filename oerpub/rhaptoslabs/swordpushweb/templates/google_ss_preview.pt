@@ -23,7 +23,7 @@
             
             var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
             var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
-           $('#add-questions-area-' + num).after(newQuestionBox);
+           $('optionsform #add-questions-area-' + num).after(newQuestionBox);
 			
             
 
@@ -35,7 +35,7 @@
 </metal:script-slot>
 
     <metal:workflownav fill-slot="workflownav">
-   ${form.begin(request.route_url('slideshow_preview'), id='optionsform')}
+   ${form.begin(request.route_url('slideshow_preview'), id='optionsform',name='optionsform')}
    ${form.csrf_token()}
                 
     <div id="workflownav-wrap">
