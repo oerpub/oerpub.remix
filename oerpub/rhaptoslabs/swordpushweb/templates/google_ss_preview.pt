@@ -23,7 +23,7 @@
             
             var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
             var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
-           $('optionsform #add-questions-area-' + num).after(newQuestionBox);
+           $('form[name="optionsform"]  #add-questions-area-' + num).after(newQuestionBox);
 			
             
 
