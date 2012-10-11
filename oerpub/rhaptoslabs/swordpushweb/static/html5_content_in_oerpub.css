@@ -5,11 +5,6 @@
 
 /* =========== headers =========== */
 
-#canvas h2, #canvas h3, #canvas h4, #canvas h5, #canvas h6, #canvas dl, #canvas dt, #canvas dd{
-  font-size: 1em;
-  margin: 0;
-}
-
 #canvas .section-header{
   font-size: 1.5em;
 }
@@ -37,7 +32,7 @@
 
 /* ========== section & section headers ========== */
 
-#canvas h1, #canvas h2, #canvas h3, #canvas h4, #canvas h4, #canvas h5, #canvas h6{
+#canvas h1{
   color: #369;
   padding: 0 0 .1em;
   border: 0 solid #369;
@@ -45,6 +40,19 @@
   border-right-width: 1px;
   font-weight: bold;
   font-size: 1.5em;
+  letter-spacing: -1px;
+  line-height: 1.5em;
+}
+
+#canvas h2, #canvas h3, #canvas h4, #canvas h5, #canvas h6, #canvas dl, #canvas dt, #canvas dd{
+  color: #369;
+  padding: 0 0 .1em;
+  border: 0 solid #369;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+  font-weight: bold;
+  font-size: 1em;
+  margin: 0;
   letter-spacing: -1px;
   line-height: 1.5em;
 }
