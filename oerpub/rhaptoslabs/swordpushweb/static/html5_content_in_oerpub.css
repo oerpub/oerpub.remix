@@ -37,6 +37,7 @@
 
 /* ========== section & section headers ========== */
 
+h1, h2, h3, h4, h5, h6,
 .section h1, .section h2, .section h3, .section h4, .section h4, .section h5, .section h6{
   color: #369;
   padding: 0 0 .1em;
