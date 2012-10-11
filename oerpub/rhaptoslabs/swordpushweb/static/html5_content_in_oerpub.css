@@ -37,8 +37,7 @@
 
 /* ========== section & section headers ========== */
 
-h1, h2, h3, h4, h5, h6,
-.section h1, .section h2, .section h3, .section h4, .section h4, .section h5, .section h6{
+#canvas h1, #canvas h2, #canvas h3, #canvas h4, #canvas h4, #canvas h5, #canvas h6{
   color: #369;
   padding: 0 0 .1em;
   border: 0 solid #369;
