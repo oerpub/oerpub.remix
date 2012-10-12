@@ -10,6 +10,9 @@
         errorhandling : true,
 
         plugins: {
+            genericbutton: {
+                buttons: [{'id': 'saveButton', 'title': 'Save', 'event': 'swordpushweb.save' }]
+            },
             format: {
                 config : ['b', 'i', 'u', 'p', 'sub', 'sup', 'h1', 'h2', 'h3']
             },

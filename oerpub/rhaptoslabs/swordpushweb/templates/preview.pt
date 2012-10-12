@@ -23,10 +23,49 @@
                             extra/figure,
                             common/undo,
                             extra/undobutton,
+                            extra/genericbutton,
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
         <script type="text/javascript">
         Aloha.ready(function(){
+            function savePreview(){
+                var editor = Aloha.getEditableById('preview-block');
+                if(editor.isModified()){
+                    // setUnmodified, to avoid another concurrent save from
+                    // firing while this one is still ongoing.
+                    editor.setUnmodified();
+
+                    var $body = $('<body />');
+                    $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
+                    $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
+                    $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
+                    $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
+                    $body.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
+                    $body.attr('xmlns:bib',  'http://bibtexml.sf.net/');
+                    $body.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
+                    $body.attr('class', 'content');
+
+                    var html = $body.append(editor.getContents())
+                        .get(0).outerHTML;
+                    $.post("${request.route_url('preview_save')}",
+                            {html: html}, function(data, statustext){
+                        if(data.saved){
+                            $('#statusmessage').data('message')('Saved');
+                        } else {
+                            $('#statusmessage').data('message')(data.error, 'error');
+                        }
+                    });
+                }
+            }
+
+            // Attach save handler to Save button
+            Aloha.require(['PubSub'], function(PubSub) {
+                PubSub.sub('swordpushweb.save', function(){
+                    savePreview();
+                });
+            });
+
+            // Set up status message area
             var statusarea = $('#statusmessage');
             statusarea.data('message', function(message, type) {
                 type = type || 'info';
@@ -35,6 +74,7 @@
                     .delay(1500).fadeOut(800, function() { $(this).remove(); });
             });
 
+            // Fetch the preview
             $('#statusmessage').data('message')('Loading preview...');
             Aloha.jQuery.get('${body_url}', function(data){
                 var $editable = Aloha.jQuery('#preview-block').html(data);
@@ -46,35 +86,7 @@
 
                 // Bind a handler for the changed event, so we can save
                 // the document
-                Aloha.bind('aloha-smart-content-changed', function(){
-                    var editor = Aloha.getEditableById('preview-block');
-                    if(editor.isModified()){
-                        // Unmodified, to avoid another concurrent save from
-                        // firing while this one is still ongoing.
-                        editor.setUnmodified();
-
-                        var $body = $('<body />');
-                        $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
-                        $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
-                        $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
-                        $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
-                        $body.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
-                        $body.attr('xmlns:bib',  'http://bibtexml.sf.net/');
-                        $body.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
-                        $body.attr('class', 'content');
-
-                        var html = $body.append(editor.getContents())
-                            .get(0).outerHTML;
-                        $.post("${request.route_url('preview_save')}",
-                                {html: html}, function(data, statustext){
-                            if(data.saved){
-                                $('#statusmessage').data('message')('Saved');
-                            } else {
-                                $('#statusmessage').data('message')(data.error, 'error');
-                            }
-                        });
-                    }
-                });
+                Aloha.bind('aloha-smart-content-changed', savePreview);
                 Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
             });
         });
