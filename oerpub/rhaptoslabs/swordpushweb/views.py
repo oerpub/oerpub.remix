@@ -840,7 +840,6 @@ class MetadataSchema(formencode.Schema):
 
 
 class Metadata_View(BaseHelper):
-@sync_upload
     
     def __init__(self, request):
         super(Metadata_View, self).__init__(request)
@@ -1173,7 +1172,6 @@ class ModuleAssociationSchema(formencode.Schema):
 
 
 class Module_Association_View(BaseHelper):
-@sync_upload
 
     @view_config(route_name='module_association',
                  renderer='templates/module_association.pt')
