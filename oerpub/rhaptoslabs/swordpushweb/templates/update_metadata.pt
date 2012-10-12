@@ -34,7 +34,7 @@
             </div>
             
             <div id="forward-steps">
-                <span class="advanced" style="display: none; ">
+                <span class="popupmenu">
                     <span class="advanced-marker" title="Advanced mode feature">
                         <img src="${images_url}/gear_orange_3.png" />
                     </span>
