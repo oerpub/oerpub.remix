@@ -9,7 +9,15 @@ def main(global_config, **settings):
 
     config = Configurator(settings=settings,
                           session_factory = my_session_factory)
+    
+    add_routes(config)
+    add_static_resources(config)
 
+    config.scan()
+    return config.make_wsgi_app()
+
+
+def add_routes(config):
     config.add_route('admin_config', '/config')
     config.add_route('login', '/')
     config.add_route('cnxlogin', '/cnxlogin')
@@ -20,15 +28,17 @@ def main(global_config, **settings):
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
     config.add_route('logout', '/logout')
-    config.add_route('change_workspace', '/change_workspace')
     config.add_route('module_association', '/module_association')
     config.add_route('modules_list', '/modules_list')
     config.add_route('download_zip', '/download_zip')
+    config.add_route('choose-module', '/choose-module')
     
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
     config.add_route('catchall_static', '/preview_css/*subpath', 'oerpub.rhaptoslabs.swordpushweb.static.static_view')
 
+
+def add_static_resources(config):
     config.add_static_view(
         'static',
         'oerpub.rhaptoslabs.swordpushweb:static',
@@ -47,7 +57,3 @@ def main(global_config, **settings):
     config.add_subscriber(
         '.subscribers.add_base_template',
         'pyramid.events.BeforeRender')
-
-    config.scan()
-
-    return config.make_wsgi_app()
