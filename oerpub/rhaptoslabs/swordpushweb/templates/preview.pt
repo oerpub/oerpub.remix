@@ -28,66 +28,80 @@
 
         <script type="text/javascript">
         Aloha.ready(function(){
-            function savePreview(){
-                var editor = Aloha.getEditableById('canvas');
-                if(editor.isModified()){
-                    // setUnmodified, to avoid another concurrent save from
-                    // firing while this one is still ongoing.
-                    editor.setUnmodified();
+            Aloha.require(['genericbutton/genericbutton-plugin'], function(GenericButton){
+                // Save button is disabled until something is changed
+                GenericButton.getButtons()["saveButton"].enable(false);
 
-                    var $body = $('<body />');
-                    $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
-                    $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
-                    $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
-                    $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
-                    $body.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
-                    $body.attr('xmlns:bib',  'http://bibtexml.sf.net/');
-                    $body.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
-                    $body.attr('class', 'content');
+                function savePreview(){
+                    var editor = Aloha.getEditableById('canvas');
+                    if(editor.isModified()){
+                        // setUnmodified, to avoid another concurrent save from
+                        // firing while this one is still ongoing.
+                        editor.setUnmodified();
 
-                    var html = $body.append(editor.getContents())
-                        .get(0).outerHTML;
-                    $.post("${request.route_url('preview_save')}",
-                            {html: html}, function(data, statustext){
-                        if(data.saved){
-                            $('#statusmessage').data('message')('Saved');
-                        } else {
-                            $('#statusmessage').data('message')(data.error, 'error');
+                        var $body = $('<body />');
+                        $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
+                        $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
+                        $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
+                        $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
+                        $body.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
+                        $body.attr('xmlns:bib',  'http://bibtexml.sf.net/');
+                        $body.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
+                        $body.attr('class', 'content');
+
+                        var html = $body.append(editor.getContents())
+                            .get(0).outerHTML;
+                        $.post("${request.route_url('preview_save')}",
+                                {html: html}, function(data, statustext){
+                            if(data.saved){
+                                $('#statusmessage').data('message')('Saved');
+                                GenericButton.getButtons()["saveButton"].enable(false);
+                            } else {
+                                $('#statusmessage').data('message')(data.error, 'error');
+                            }
+                        });
+                    }
+                }
+
+                // Attach save handler to Save button
+                Aloha.require(['PubSub'], function(PubSub) {
+                    PubSub.sub('swordpushweb.save', function(){
+                        savePreview();
+                    });
+                });
+
+                // Set up status message area
+                var statusarea = $('#statusmessage');
+                statusarea.data('message', function(message, type) {
+                    type = type || 'info';
+                    $("<div />", {'class': type, text: message}).hide()
+                        .appendTo(statusarea).center().fadeIn(700)
+                        .delay(1500).fadeOut(800, function() { $(this).remove(); });
+                });
+
+                // Fetch the preview
+                $('#statusmessage').data('message')('Loading preview...');
+                Aloha.jQuery.get('${body_url}', function(data){
+                    var $editable = Aloha.jQuery('#canvas').html(data);
+
+                    // Remove the pyramid debug toolbar from the preview
+                    // if it exists. This code should do nothing in production
+                    $editable.find('#pDebug').remove();
+                    $editable.aloha();
+
+                    // Auto-save periodically. This only does anything if
+                    // editor.isModified().
+                    window.setInterval(savePreview, 30000);
+
+                    // Bind a handler for the changed event
+                    var editor = Aloha.getEditableById('canvas');
+                    Aloha.bind('aloha-smart-content-changed', function(){
+                        if(editor.isModified()){
+                            GenericButton.getButtons()["saveButton"].enable(true);
                         }
                     });
-                }
-            }
-
-            // Attach save handler to Save button
-            Aloha.require(['PubSub'], function(PubSub) {
-                PubSub.sub('swordpushweb.save', function(){
-                    savePreview();
+                    Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
                 });
-            });
-
-            // Set up status message area
-            var statusarea = $('#statusmessage');
-            statusarea.data('message', function(message, type) {
-                type = type || 'info';
-                $("<div />", {'class': type, text: message}).hide()
-                    .appendTo(statusarea).center().fadeIn(700)
-                    .delay(1500).fadeOut(800, function() { $(this).remove(); });
-            });
-
-            // Fetch the preview
-            $('#statusmessage').data('message')('Loading preview...');
-            Aloha.jQuery.get('${body_url}', function(data){
-                var $editable = Aloha.jQuery('#canvas').html(data);
-
-                // Remove the pyramid debug toolbar from the preview
-                // if it exists. This code should do nothing in production
-                $editable.find('#pDebug').remove();
-                $editable.aloha();
-
-                // Bind a handler for the changed event, so we can save
-                // the document
-                Aloha.bind('aloha-smart-content-changed', savePreview);
-                Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
             });
         });
         </script>
