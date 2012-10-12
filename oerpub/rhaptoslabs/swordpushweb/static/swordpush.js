@@ -353,6 +353,18 @@ $(document).ready(function()
         showWaitMessage();
     });
 
+    $('input#choose-importer').click(function(event){
+        event.preventDefault();
+        if ($('#import-to-google').is(':checked')) {
+            $('input#upload-to-google').val("true");
+        
+        } 
+        if ($('#import-to-ss').is(':checked')) {
+            $('input#upload-to-ss').val("true");
+    } 
+        
+    });
+
     // Show the "New or existing module?" overlay.
     $('#show-neworexisting').click(function(e) {
         e.preventDefault();

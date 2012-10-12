@@ -118,13 +118,13 @@ ${form.csrf_token()}
               </p>
 
               
-              <ul id="create-new-list">
+              <ul class="create-new-list">
                 <li>
                     <div class="upload-form" id="choose-importer-box">                        
                       <div class="left"><input type="radio" id="import-to-ss" name="importer" value="google" checked="yes" style="float:left"/></div>
                       <div class="left"><span class="label-text" id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
                       <br/><br/><br/><br/><br/>
-                        <div class="left"><input type="radio" id="import-to-google" name="importer" value="slideshare"/></div>
+                        <div class="left"><input type="radio" id="import-to-google" name="importer" value="slideshare" style="float:left"/></div>
                         <div class="left"><span class="label-text" id="google-href"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
                         <br/><br/><br/><br/><br/>
                         <!--<div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>-->
