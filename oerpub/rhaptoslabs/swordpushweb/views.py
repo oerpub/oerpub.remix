@@ -245,6 +245,8 @@ class ConversionError(Exception):
 def save_and_backup_file(save_dir, filename, content, mode='w'):
     """ save a file, but first make a backup if the file exists
     """
+    if isinstance(content, unicode):
+        content = content.encode('ascii', 'xmlcharrefreplace')
     filename = os.path.join(save_dir, filename)
     if os.path.exists(filename):
         os.rename(filename, filename + '~')
@@ -640,6 +642,8 @@ def preview_view(request):
 def preview_save(request):
     check_login(request)
     html = request.POST['html']
+    if isinstance(html, unicode):
+        html = html.encode('ascii', 'xmlcharrefreplace')        
 
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
