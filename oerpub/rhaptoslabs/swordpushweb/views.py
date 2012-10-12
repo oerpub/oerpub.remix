@@ -16,6 +16,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response, get_renderer
+from pyramid.response import Response
 from pyramid.decorator import reify
 
 import formencode
