@@ -28,7 +28,8 @@
 
         <script type="text/javascript">
         Aloha.ready(function(){
-            Aloha.require(['genericbutton/genericbutton-plugin'], function(GenericButton){
+            Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'],
+                    function(PubSub, GenericButton){
                 // Save button is disabled until something is changed
                 GenericButton.getButtons()["saveButton"].enable(false);
 
@@ -64,10 +65,8 @@
                 }
 
                 // Attach save handler to Save button
-                Aloha.require(['PubSub'], function(PubSub) {
-                    PubSub.sub('swordpushweb.save', function(){
-                        savePreview();
-                    });
+                PubSub.sub('swordpushweb.save', function(){
+                    savePreview();
                 });
 
                 // Set up status message area
