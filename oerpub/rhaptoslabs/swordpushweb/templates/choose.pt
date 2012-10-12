@@ -119,25 +119,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                         
                           </li>
                           
-                          <li>
-                            ${form.end()}
-							${presentationform.begin(request.route_url('choose'), multipart='multipart', id='presentationform')}
-							${presentationform.csrf_token()}
-                
-							 <label>
-								<span style="visibility: visible;" class="or-bullet">or</span> 
-								<span class="label-text">
-									<img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> or <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp OpenOffice</strong> 
-								</span>
-							  </label>
-							  <div class="upload-form">
-								<input class="button" id="presentation-submit" name="form.submitted" value="Choose Presentation and preview &#187;" type="submit">
-								<input id="importer" name="importer" style="visibility: hidden;" type="file" />
-								<!--<input class="button"  value="Import Your Presentations &#187;" onClick="location.href='/importer'" type="button">-->
-							  </div>		
-							  ${presentationform.end()}
-						</li>
-
                     </ul>
                      
             ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
@@ -148,6 +129,24 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                           Advanced
                         </h2>
                         <ul class="create-new-list">
+                          <li>
+                              ${form.end()}
+                              ${presentationform.begin(request.route_url('choose'), multipart='multipart', id='presentationform')}
+                              ${presentationform.csrf_token()}
+                              
+                             <label>
+                               <span style="visibility: visible;" class="or-bullet">or</span> 
+                               <span class="label-text">
+                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> or <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp OpenOffice</strong> 
+                                </span>
+                              </label>
+                              <div class="upload-form">
+                              <input class="button" id="presentation-submit" name="form.submitted" value="Choose Presentation and preview &#187;" type="submit">
+                              <input id="importer" name="importer" style="visibility: hidden;" type="file" />
+                              <!--<input class="button"  value="Import Your Presentations &#187;" onClick="location.href='/importer'" type="button">-->
+                              </div>    
+                              ${presentationform.end()}
+                          </li>                          
                           <li id="latex-zip-importer">
                             <label>
                               <span class="or-bullet">or</span>
