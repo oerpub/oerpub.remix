@@ -33,18 +33,19 @@ from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from utils import escape_system, clean_cnxml, pretty_print_dict, load_config
+from utils import escape_system, clean_cnxml, load_config
 from utils import save_config, add_directory_to_zip
 from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
 from utils import get_files_from_zipfile, build_featured_links
+from utils import create_module_in_2_steps
 import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 from z3c.batching.batch import Batch
 
 from utils import check_login, get_metadata_from_repo
+from utils import ZIP_PACKAGING
 from helpers import BaseHelper 
 
-ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
 TESTING = False
 CWD = os.getcwd()
 
@@ -927,6 +928,12 @@ class Metadata_View(BaseHelper):
                 save_cnxml(save_dir, new_cnxml, files)
         return featuredlinks
 
+    def create_module_with_atompub_xml(self, conn, collection_iri, entry):
+        dr = conn.create(col_iri = collection_iri,
+                         metadata_entry = entry,
+                         in_progress = True)
+        return dr
+
     def update_module(self, save_dir, connection, metadata, module_url):
         zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
         deposit_receipt = connection.update(
@@ -1060,15 +1067,20 @@ class Metadata_View(BaseHelper):
                 associated_module_url = request.POST.get('associated_module_url')
                 if associated_module_url:
                     # this is an update not a create
-                    deposit_receipt = self.update_module(save_dir,
-                                                         conn,
-                                                         metadata_entry,
-                                                         associated_module_url)
+                    deposit_receipt = self.update_module(
+                        save_dir, conn, metadata_entry, associated_module_url)
                 else:
-                    deposit_receipt = self.create_module(form,
-                                                         conn,
-                                                         metadata_entry,
-                                                         zip_file)
+                    # this is a workaround until I can determine why the 
+                    # featured links don't upload correcly with a multipart
+                    # upload during module creation. See redmine issue 40
+                    # TODO:
+                    # Fix me properly!
+                    if self.featured_links:
+                        deposit_receipt = create_module_in_2_steps(
+                            form, conn, metadata_entry, zip_file, save_dir)
+                    else:
+                        deposit_receipt = self.create_module(
+                            form, conn, metadata_entry, zip_file)
 
             # Remember to which workspace we submitted
             session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
