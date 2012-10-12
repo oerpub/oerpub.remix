@@ -860,7 +860,7 @@ def get_module_list(connection, workspace):
         edit_link = link_elements[0].get('href')
 
         path_elements = edit_link.split('/')
-        view_link = '/'.join(path_elements[:-2]) + '/latest'
+        view_link = '/'.join(path_elements[:-1])
         path_elements.reverse()
         uid = path_elements[1]
 
@@ -999,7 +999,23 @@ class Metadata_View(BaseHelper):
                 v = v.strip()
                 if v:
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
+
         return metadata_entry 
+
+    def get_raw_featured_links(self, request):
+        data = peppercorn.parse(request.POST.items())
+        if data is None or len(data.get('featuredlinks')) < 1:
+            return []
+
+        # get featured links from data
+        tmp_links = {}
+        # first we organise the links by category
+        for details in data['featuredlinks']:
+            category = details['fl_category']
+            tmp_list = tmp_links.get(category, [])
+            tmp_list.append(details)
+            tmp_links[category] = tmp_list
+        return tmp_list
 
     def add_featured_links(self, request, zip_file, save_dir):
         structure = peppercorn.parse(request.POST.items())
@@ -1011,6 +1027,7 @@ class Metadata_View(BaseHelper):
                                                        featuredlinks)
                 files = get_files_from_zipfile(zip_file)
                 save_cnxml(save_dir, new_cnxml, files)
+        return featuredlinks
 
     def update_module(self, save_dir, connection, metadata, module_url):
         zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
@@ -1131,15 +1148,17 @@ class Metadata_View(BaseHelper):
                 session['upload_dir']
             )
 
-            # Create the metadata entry
-            metadata_entry = self.get_metadata_entry(form, session)
-
             # Create a connection to the sword service
             conn = self.get_connection()
 
             # Send zip file to Connexions through SWORD interface
             with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                self.add_featured_links(request, zip_file, save_dir)
+                # Create the metadata entry
+                metadata_entry = self.get_metadata_entry(form, session)
+                self.featured_links = self.add_featured_links(request,
+                                                              zip_file,
+                                                              save_dir)
+
                 associated_module_url = request.POST.get('associated_module_url')
                 if associated_module_url:
                     # this is an update not a create

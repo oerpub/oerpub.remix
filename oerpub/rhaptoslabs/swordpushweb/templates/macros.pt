@@ -132,7 +132,8 @@
                         <a target="_blank" 
                             class="review-module-link" 
                             title="Open the published module in a new window"
-                            href="http://cnx.org/content/m33469/latest/">
+                            href="http://cnx.org/content/m33469/latest/"
+                            tal:attributes="href details[3]">
                             <img src="${images_url}/external-link.png">
                         </a>
                     </td>
