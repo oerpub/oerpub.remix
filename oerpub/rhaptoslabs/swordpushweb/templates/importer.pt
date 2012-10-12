@@ -3,7 +3,13 @@
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
 
-    $(document).ready(function(){    	
+    $(document).ready(function(){
+
+        // deactivate expert mode from now on
+        if ($("#expertmode").hasClass("expert-activated")) {
+          $("#expertmode").click();
+        }
+
         $('input#import-submit').click(function(event){
         event.preventDefault();
         $('#import-submit').attr("disabled", true);
