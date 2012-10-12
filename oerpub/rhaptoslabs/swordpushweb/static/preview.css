@@ -15,3 +15,31 @@ figure figcaption::before {
 .aloha-toolbar {
     display: none !important;
 }
+
+#page-title {
+    display: none !important;
+}
+
+#page-description {
+    display: none !important;
+}    
+
+#artboard {
+    margin-top: 54px;
+    background-color: #CCC;
+}
+
+#content {
+    padding: 1em 1em;
+    background-color: #CCC;
+}
+
+#module-actions {
+    margin-top: -13px;
+    position: relative;
+    z-index:1;
+}
+
+#statusmessage {
+    height: 0em;
+}

@@ -5,6 +5,11 @@
 
 /* =========== headers =========== */
 
+#canvas h2, #canvas h3, #canvas h4, #canvas h5, #canvas h6, #canvas dl, #canvas dt, #canvas dd{
+  font-size: 1em;
+  margin: 0;
+}
+
 #canvas .section-header{
   font-size: 1.5em;
 }
@@ -32,8 +37,9 @@
 
 /* ========== section & section headers ========== */
 
-#canvas h1{
+.section-header{
   color: #369;
+  margin: .5em 0 0;
   padding: 0 0 .1em;
   border: 0 solid #369;
   border-bottom-width: 1px;
@@ -44,26 +50,21 @@
   line-height: 1.5em;
 }
 
-#canvas h2, #canvas h3, #canvas h4, #canvas h5, #canvas h6, #canvas dl, #canvas dt, #canvas dd{
-  color: #369;
-  padding: 0 0 .1em;
-  border: 0 solid #369;
-  border-bottom-width: 1px;
-  border-right-width: 1px;
-  font-weight: bold;
-  font-size: 1em;
-  margin: 0;
-  letter-spacing: -1px;
-  line-height: 1.5em;
-}
-
-.section .section h1, .section .section h2, .section .section h3, .section .section h4, .section .section h4, .section .section h5, .section .section h6{
+.section .section .section-header{
   border: 0 solid #369;
   border-left-width: 1px;
   border-bottom-width: 1px;
   font-size: 1.05em;
   padding: 0 0 .1em .4em;
   letter-spacing: 0;
+}
+
+.section{
+  margin: 2em 0;
+}
+
+.section .section{
+  margin: 1.75em 0 1.75em 3em;
 }
 
 .example .section-header, .proof .section-header, .problem 

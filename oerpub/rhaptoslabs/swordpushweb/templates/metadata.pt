@@ -10,8 +10,13 @@
                 $("#formentry-title .errortext").hide();
                 $("#formentry-ga").removeClass("error");
                 $("#formentry-ga .errortext").hide();
-                $("#workspace").
-                    attr("value", $("a#selected_workspace").attr("href"));
+
+                $(".workspace-link").click(function(event) {
+                    event.preventDefault();
+                    href = $(this).attr("href");
+                    $("#selected_workspace").attr("href", href);
+                });
+                                
             });
 
         </script>
@@ -75,7 +80,8 @@
         <tal:hidden>${form.hidden(field)}</tal:hidden>
     </tal:field>
 
-    <input id="workspace" type="hidden" name="workspace">
+    <input id="workspace" type="hidden" name="workspace"
+        tal:attributes="value selected_workspace">
 
     <div id="ie6-container-wrap">
         <div id="container">
@@ -177,7 +183,7 @@
                                             <a 
                                                 title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy" 
                                                 href="#download" 
-                                                tal:attributes="href request.route_url('download_zip')">
+                                                tal:attributes="href request.route_url('download_zip')"
                                                 style="color: black; text-decoration: none;">
                                                 <span class="button">Download a copy</span>
                                             </a>
