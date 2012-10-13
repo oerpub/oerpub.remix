@@ -46,45 +46,7 @@ from z3c.batching.batch import Batch
 
 logger = logging.getLogger('swordpushweb')
 
-TESTING = False
-
-def sync_upload(c):
-    def _sync(request, *args, **kwargs):
-        save_dir = os.path.join(request.registry.settings['transform_dir'],
-            request.session['upload_dir'])
-
-        # Check if index.html_ exist, if it does, then there is unconverted
-        # changes. Convert it to cnxml, update index.cnxml and upload.zip
-        fn = os.path.join(save_dir, 'index.html')
-        fn_ = fn + '_'
-        cnxml = None
-        if os.path.exists(fn_):
-            os.rename(fn, fn + '~') # Backup old file
-            os.rename(fn_, fn) # Move in the new html version
-
-            # Convert new html to cnxml
-            with open(fn, 'rt') as fp:
-                html = fp.read()
-            try:
-                cnxml = html_to_cnxml(html)
-            except Exception as e:
-                return render_conversionerror(request, str(e))
-
-            try:
-                validate_cnxml(cnxml)
-            except ConversionError as e:
-                return render_conversionerror(request, str(e))
-            else:
-                save_and_backup_file(save_dir, 'index.cnxml', cnxml)
-                files = get_zipped_files(save_dir)
-                save_zip(save_dir, cnxml, html, files)
-
-        return c(request, *args, **kwargs)
-
-    _sync.__name__=c.__name__
-    _sync.__doc__=c.__doc__
-    return _sync
-        
+TESTING = False      
 
 def check_login(request, raise_exception=True):
     # Check if logged in
@@ -610,7 +572,6 @@ class PreviewSchema(formencode.Schema):
 
 @view_config(route_name='preview', renderer='templates/preview.pt',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
-@sync_upload
 def preview_view(request):
     check_login(request)
     
@@ -649,10 +610,38 @@ def preview_save(request):
         request.session['upload_dir'])
     save_and_backup_file(save_dir, 'index.html_', html)
 
-    with open(os.path.join(save_dir, 'index.html_'), 'w') as fp:
-        fp.write(html)
+    # Backup old file
+    fn = os.path.join(save_dir, 'index.html')
+    os.rename(fn, fn + '~')
 
-    response = Response(json.dumps({'saved': True, 'error': None}))
+    # Save new html file from preview area
+    fp = open(os.path.join(save_dir, 'index.html'), 'w')
+    fp.write(html)
+    #fp.flush()
+    fp.close()
+
+    conversionerror = ''
+
+    #transform preview html to cnxml
+    try:
+        cnxml = html_to_cnxml(html)
+        import pdb;pdb.set_trace()
+    except Exception as e:
+        #return render_conversionerror(request, str(e))
+        conversionerror = str(e)
+
+    try:
+        validate_cnxml(cnxml)
+    except ConversionError as e:
+        #return render_conversionerror(request, str(e))
+        conversionerror = str(e)
+    else:
+        save_and_backup_file(save_dir, 'index.cnxml', cnxml)
+        files = get_zipped_files(save_dir)
+        save_zip(save_dir, cnxml, html, files)
+
+
+    response = Response(json.dumps({'saved': True, 'error': conversionerror}))
     response.content_type = 'application/json'
     return response
 
@@ -675,7 +664,6 @@ def get_zipped_files(save_dir):
     return files
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
-@sync_upload
 def cnxml_view(request):
     check_login(request)
     form = Form(request, schema=CnxmlSchema)
@@ -753,7 +741,6 @@ class MetadataSchema(formencode.Schema):
 
 
 @view_config(route_name='metadata')
-@sync_upload
 def metadata_view(request):
     """
     Handle metadata adding and uploads
@@ -1186,7 +1173,6 @@ class ModuleAssociationSchema(formencode.Schema):
 
 @view_config(
     route_name='module_association', renderer='templates/module_association.pt')
-@sync_upload
 def module_association_view(request):
     check_login(request)
     config = load_config(request)
@@ -1258,7 +1244,6 @@ def modules_list(request):
 
 @view_config(route_name='download_zip',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
-@sync_upload
 def download_zip(request):
     check_login(request)
 
