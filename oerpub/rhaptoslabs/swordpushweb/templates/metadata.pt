@@ -250,14 +250,7 @@
                                                 Make sure that all of your links are published and/or publicly available.
                                             </p>
 
-                                            <table class="listing" id="featured-links-table">
-
-                                                <input type="hidden"
-                                                    name="__start__" value="featuredlinks:sequence" />
-                                                    <tbody>
-                                                    </tbody>
-                                                <input type="hidden" name="__end__" />
-
+                                            <table metal:use-macro="view.featured_links_table">
                                             </table>
 
                                             <div id="create-featured-link">
