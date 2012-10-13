@@ -236,12 +236,22 @@
                                     </div>
 
                                     <div id="formentry-fl" class="formentry">
-                                        <div class="formlabel">
+                                        <div class="formlabel"
+                                            tal:define="checked view.show_featured_links_form()">
+
                                             <input id="show-featuredlinks-form"
-                                            tal:attributes="checked view.show_featured_links_form()"
+                                            tal:condition="checked"
+                                            checked="checked"
                                             type="checkbox"
                                             title="Featured Links must each be removed individually"
                                             name="fl_opener">
+
+                                            <input id="show-featuredlinks-form"
+                                            tal:condition="not:checked"
+                                            type="checkbox"
+                                            title="Featured Links must each be removed individually"
+                                            name="fl_opener">
+
                                             Add/edit optional Featured Links 
                                             <a title="Opens in a new window"
                                                 id="show-featuredlinks-help"
