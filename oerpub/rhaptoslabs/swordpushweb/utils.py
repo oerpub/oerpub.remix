@@ -4,13 +4,34 @@ import libxml2
 import libxslt
 import zipfile
 import lxml
+import logging
 
 from pyramid.httpexceptions import HTTPFound
 
-from sword2.deposit_receipt import Deposit_Receipt
 from oerpub.rhaptoslabs import sword2cnx
 
 current_dir = os.path.dirname(__file__)
+ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
+log = logging.getLogger('utils')
+
+def create_module_in_2_steps(form, connection, metadata_entry, zip_file, save_dir):
+    zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
+    data = zip_file.read()
+    deposit_receipt = connection.create(
+        col_iri = form.data['workspace'],
+        payload = data,
+        filename = 'upload.zip',
+        mimetype = 'application/zip',
+        packaging = ZIP_PACKAGING,
+        in_progress = True)
+
+    deposit_receipt = connection.update(metadata_entry = metadata_entry,
+                                        filename = 'upload.zip',
+                                        dr = deposit_receipt,
+                                        in_progress=True)
+    
+    zip_file.close()
+    return deposit_receipt
 
 def pretty_print_dict(x, indent=0):
     output = '{'
