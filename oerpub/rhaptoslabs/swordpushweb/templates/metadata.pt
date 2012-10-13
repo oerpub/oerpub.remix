@@ -18,6 +18,12 @@
                 });
 
                 $("#fl-field").hide();
+                $('.edit-link').click(editFeaturedLink);
+                $('.remove-link').click(removeFeaturedLink);
+
+                if ($('table#featured-links-table tr').length > 0) {
+                    $("#formentry-fl .formlabel").click();
+                }
             });
 
         </script>
@@ -232,6 +238,7 @@
                                     <div id="formentry-fl" class="formentry">
                                         <div class="formlabel">
                                             <input id="show-featuredlinks-form"
+                                            tal:attributes="checked view.show_featured_links_form()"
                                             type="checkbox"
                                             title="Featured Links must each be removed individually"
                                             name="fl_opener">

@@ -798,6 +798,7 @@ class Metadata_View(BaseHelper):
         self.templatePath = 'templates/metadata.pt'
         self.config = load_config(request)
         self.metadata = self.config['metadata']
+        self.featured_links = []
         self.workspaces = \
             [(i['href'], i['title']) for i in self.session['collections']]
 
@@ -971,6 +972,9 @@ class Metadata_View(BaseHelper):
     @reify
     def featured_links_table(self):
         return self.macro_renderer.implementation().macros['featured_links_table']
+
+    def show_featured_links_form(self):
+        return self.metadata.get('featured_link_groups', '') and 'checked' or ''
 
     def get_title(self, metadata, session):
         return metadata.get('dcterms:title', session.get('title', ''))
