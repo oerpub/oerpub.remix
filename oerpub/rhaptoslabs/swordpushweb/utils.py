@@ -1,9 +1,11 @@
+import cStringIO
 import types
 import os
 import libxml2
 import libxslt
 import zipfile
 import lxml
+import pycurl
 import logging
 
 from pyramid.httpexceptions import HTTPFound
@@ -12,6 +14,15 @@ from oerpub.rhaptoslabs import sword2cnx
 
 current_dir = os.path.dirname(__file__)
 ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
+
+NAMESPACES = {'sword'   : 'http://purl.org/net/sword/',
+              'dcterms' : 'http://purl.org/dc/terms/',
+              'md'      : 'http://cnx.rice.edu/mdml',
+              'xsi'     : 'http://www.w3.org/2001/XMLSchema-instance',
+              'oerdc'   : 'http://cnx.org/aboutus/technology/schemas/oerdc',
+              'cnxml'   : 'http://cnx.rice.edu/cnxml',
+              }
+
 log = logging.getLogger('utils')
 
 def create_module_in_2_steps(form, connection, metadata_entry, zip_file, save_dir):
@@ -304,10 +315,10 @@ def get_connection(session):
     return conn
 
 
-def get_metadata_from_repo(session, module_url):
+def get_metadata_from_repo(session, module_url, user, password):
     conn = get_connection(session)
     resource = conn.get_resource(content_iri = module_url)
-    metadata = Metadata(resource.content)
+    metadata = Metadata(resource.content, module_url, user, password)
     return metadata
 
 
@@ -324,25 +335,26 @@ class Metadata(dict):
                           'oerdc:translator':     types.ListType,
                           'oerdc:editor':         types.ListType,}
 
-    namespaces = {'sword'   : 'http://purl.org/net/sword/',
-                  'dcterms' : 'http://purl.org/dc/terms/',
-                  'md'      : 'http://cnx.rice.edu/mdml',
-                  'xsi'     : 'http://www.w3.org/2001/XMLSchema-instance',
-                  'oerdc'   : 'http://cnx.org/aboutus/technology/schemas/oerdc',}
-
-    def __init__(self, xml_deposit_receipt):
+    def __init__(self, xml_deposit_receipt, module_url, user, password):
         """
         """
+        self.encoding = 'utf-8'
         self.raw_data = xml_deposit_receipt
         self.dom = lxml.etree.fromstring(self.raw_data)
         self._parse_metadata()
+        self.url = self._module_export_url(module_url)
+        self.cnxml = self._fetch_cnxml(self.url,
+                                       user.encode(self.encoding),
+                                       password.encode(self.encoding))
+        if self.cnxml:
+            self._parse_featured_link_groups(self.cnxml)
     
     def _parse_metadata(self):
         for name, ftype in self.fields.items():
             value = self._get_value_from_raw(name,
                                              ftype,
                                              self.dom,
-                                             self.namespaces)
+                                             NAMESPACES)
             self[name] = value
 
         self._parse_subjects_and_keywords()
@@ -353,21 +365,28 @@ class Metadata(dict):
             in the same basic element. The only thing distinguishing them is
             the xsi:type.
         """
-        elements = self.dom.findall('dcterms:subject',
-                                    namespaces=self.namespaces)
+        elements = self.dom.findall('dcterms:subject', namespaces=NAMESPACES)
         self._get_subjects(elements)
         self._get_keywords(elements)
 
     def _parse_contributors(self):
         for name, ftype in self.contributor_fields.items():
             value  = []
-            elements = self.dom.findall(name, namespaces=self.namespaces)
+            elements = self.dom.findall(name, namespaces=NAMESPACES)
             for e in elements:
-                tmp_key = '{%s}id' % self.namespaces['oerdc']
+                tmp_key = '{%s}id' % NAMESPACES['oerdc']
                 tmp_val = e.attrib.get(tmp_key, '')
                 if tmp_val:
                     value.append(tmp_val)
             self[name] = value
+
+    def _parse_featured_link_groups(self, cnxml):
+        dom = lxml.etree.fromstring(cnxml)
+        links = []
+        for e in dom.xpath('//cnxml:link-group', namespaces=NAMESPACES):
+            group = FeaturedLinkGroup(e)
+            links.append(group)
+        self['featured_link_groups'] = links
 
     def _get_value_from_raw(self, name, ftype, dom, namespaces):
         value = ''
@@ -396,3 +415,68 @@ class Metadata(dict):
             for e in elements:
                 value.append(e.text)
         self['subjects'] = value
+
+    def _module_export_url(self, url):
+        module_url = '/'.join(url.split('/')[:-1])
+        module_url = '%s/module_export' % module_url
+        return (module_url).encode(self.encoding)
+
+    def _fetch_cnxml(self, url, user, password):
+        buff = cStringIO.StringIO()
+        pc = pycurl.Curl()
+        pc.setopt(pc.WRITEFUNCTION, buff.write)
+        pc.setopt(pc.URL, url)
+        pc.setopt(pc.USERPWD, '%s:%s' % (user, password))
+        pc.setopt(pc.POSTFIELDS, 'format=plain')
+        pc.perform()
+
+        if pc.getinfo(pc.HTTP_CODE) == 200:
+            result = buff.getvalue()
+        else:
+            result = ''
+        return result
+
+class FeaturedLinkGroup(object):
+    
+    def __init__(self, element):
+        self.element = element
+        self.group_type = self.parse_group_type(self.element)
+        self.links = self.parse_links(self.element)
+
+    def parse_group_type(self, element):
+        return element.attrib['type']
+
+    def parse_links(self, element):
+        links = []
+        for e in element.xpath('cnxml:link', namespaces=NAMESPACES):
+            links.append(FeaturedLink(e, self.group_type))
+        return links
+    
+class FeaturedLink(object):
+    def __init__(self, element, category):
+        self.element = element
+        self.category = category
+        self.title = self.parse_title(self.element)
+        self.url = self.parse_url(self.element)
+        self.strength = self.parse_strength(self.element)
+        self.module = self.parse_module(self.element)
+        self.cnxversion = self.parse_cnxversion(self.element)
+    
+    def parse_title(self, element):
+        return element.text
+
+    def parse_url(self, element):
+        prefix = 'http://'
+        url = element.attrib.get('url', '')
+        if url and not url.startswith(prefix):
+            url = '%s%s' % (prefix, url)
+        return url
+
+    def parse_strength(self, element):
+        return element.attrib['strength']
+
+    def parse_module(self, element):
+        return element.attrib.get('module', '')
+
+    def parse_cnxversion(self, element):
+        return element.attrib.get('cnxversion', '')
