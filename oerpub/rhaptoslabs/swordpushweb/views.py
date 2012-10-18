@@ -9,6 +9,7 @@ import logging
 import libxml2
 import lxml
 import re
+import mimetypes
 from cStringIO import StringIO
 import peppercorn
 from lxml import etree
@@ -1234,3 +1235,30 @@ def download_zip(request):
     res.last_modified = datetime.datetime.utcfromtimestamp(
         stat.st_mtime).strftime('%a, %d %b %Y %H:%M:%S GMT')
     return res
+
+@view_config(route_name='upload_dnd')
+def upload_dnd(request):
+    check_login(request)
+
+    save_dir = os.path.join(request.registry.settings['transform_dir'],
+        request.session['upload_dir'])
+
+    # Get the uploaded payload
+    blk = request.body_file.read()
+
+    # Tie expression to start of string, to make it cheap. This makes the
+    # assumption that our data will always be base64. If this ever turns out
+    # to be a bad assumption, better parsing of the data uri will be needed.
+    datare = re.compile('^data:([^;,]*)([^,]*),')
+    match = datare.match(blk)
+    assert match is not None, "upload not in datauri scheme"
+
+    mtype = match.group(1)
+    ext = mimetypes.guess_extension(mtype) or ''
+    fn = datetime.datetime.now().strftime('%s') + ext
+    with open(os.path.join(save_dir, fn), 'w') as fp:
+        fp.write(blk[match.end():].decode('base64'))
+
+    response = Response(json.dumps({'url': fn}))
+    response.content_type = 'application/json'
+    return response

@@ -24,6 +24,7 @@ def main(global_config, **settings):
     config.add_route('module_association', '/module_association')
     config.add_route('modules_list', '/modules_list')
     config.add_route('download_zip', '/download_zip')
+    config.add_route('upload_dnd', '/upload_dnd')
     
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
