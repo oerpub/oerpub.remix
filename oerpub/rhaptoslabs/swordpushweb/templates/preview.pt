@@ -19,6 +19,7 @@
                             common/list,
                             extra/table,
                             common/highlighteditables,
+                            extra/draganddropfiles,
                             common/image,
                             extra/figure,
                             common/undo,
