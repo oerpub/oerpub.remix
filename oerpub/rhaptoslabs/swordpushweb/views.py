@@ -636,7 +636,7 @@ def preview_save(request):
         conversionerror = str(e)
     else:
         save_and_backup_file(save_dir, 'index.cnxml', cnxml)
-        files = get_zipped_files(save_dir)
+        files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
         save_zip(save_dir, cnxml, html, files)
 
 
@@ -647,20 +647,6 @@ def preview_save(request):
 class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True
     cnxml = formencode.validators.String(not_empty=True)
-
-def get_zipped_files(save_dir):
-    # get the list of files from upload.zip if it exists
-    files = []
-    zip_filename = os.path.join(save_dir, 'upload.zip')
-    if os.path.exists(zip_filename):
-        zip_archive = zipfile.ZipFile(zip_filename, 'r')
-        for filename in zip_archive.namelist():
-            if filename in ('index.cnxml', 'index.html'):
-                continue
-            fp = zip_archive.open(filename, 'r')
-            files.append((filename, fp.read()))
-            fp.close()
-    return files
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
@@ -679,7 +665,7 @@ def cnxml_view(request):
             cnxml = cnxml.encode('ascii', 'xmlcharrefreplace')
 
         try:
-            files = get_zipped_files(save_dir)
+            files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
             save_cnxml(save_dir, cnxml, files)
             validate_cnxml(cnxml)
         except ConversionError as e:
