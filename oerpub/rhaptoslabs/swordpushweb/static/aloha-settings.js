@@ -31,7 +31,8 @@
                 upload: {
                     config: {
                         url: '/upload_dnd',
-                        send_multipart_form: false
+                        send_multipart_form: true,
+                        fieldName: 'upload'
                     }
                 }
             }

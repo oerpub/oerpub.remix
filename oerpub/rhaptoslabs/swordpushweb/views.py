@@ -1243,21 +1243,21 @@ def upload_dnd(request):
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
 
-    # Get the uploaded payload
-    blk = request.body_file.read()
+    # userfn, if browser does not support naming of blobs, this might be
+    # 'blob', so we need to further uniquefy it.
+    userfn = request.POST['upload'].filename or ''
+    ext = ''
+    mtype = request.POST['upload'].headers.get('content-type')
+    if mtype is not None:
+        ext = mimetypes.guess_extension(mtype) or ''
+    fn = userfn + datetime.datetime.now().strftime('%s') + ext
 
-    # Tie expression to start of string, to make it cheap. This makes the
-    # assumption that our data will always be base64. If this ever turns out
-    # to be a bad assumption, better parsing of the data uri will be needed.
-    datare = re.compile('^data:([^;,]*)([^,]*),')
-    match = datare.match(blk)
-    assert match is not None, "upload not in datauri scheme"
-
-    mtype = match.group(1)
-    ext = mimetypes.guess_extension(mtype) or ''
-    fn = datetime.datetime.now().strftime('%s') + ext
     with open(os.path.join(save_dir, fn), 'w') as fp:
-        fp.write(blk[match.end():].decode('base64'))
+        # Use a file iterator, to deal with large files
+        fob = request.POST['upload'].file
+        iterf = iter(lambda: fob.read(1024), '')
+        for blk in iterf:
+            fp.write(blk)
 
     response = Response(json.dumps({'url': fn}))
     response.content_type = 'application/json'
