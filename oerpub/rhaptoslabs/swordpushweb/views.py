@@ -608,17 +608,8 @@ def preview_save(request):
 
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
-    save_and_backup_file(save_dir, 'index.html_', html)
-
-    # Backup old file
-    fn = os.path.join(save_dir, 'index.html')
-    os.rename(fn, fn + '~')
-
     # Save new html file from preview area
-    fp = open(os.path.join(save_dir, 'index.html'), 'w')
-    fp.write(html)
-    #fp.flush()
-    fp.close()
+    save_and_backup_file(save_dir, 'index.html', html)
 
     conversionerror = ''
 
@@ -638,7 +629,6 @@ def preview_save(request):
         save_and_backup_file(save_dir, 'index.cnxml', cnxml)
         files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
         save_zip(save_dir, cnxml, html, files)
-
 
     response = Response(json.dumps({'saved': True, 'error': conversionerror}))
     response.content_type = 'application/json'
