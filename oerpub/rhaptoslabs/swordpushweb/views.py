@@ -1697,6 +1697,7 @@ def slideshow_preview(request):
         data = urllib.urlencode(post_values)
         google_req = urllib2.Request(url, data)
         google_response = urllib2.urlopen(google_req)
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
         temp_dir_name = '%s-%s' % (request.session['username'], now_string)
         save_dir = os.path.join(request.registry.settings['transform_dir'],temp_dir_name)
         os.mkdir(save_dir)
