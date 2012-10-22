@@ -1697,7 +1697,16 @@ def slideshow_preview(request):
         data = urllib.urlencode(post_values)
         google_req = urllib2.Request(url, data)
         google_response = urllib2.urlopen(google_req)
-        return HTTPFound(location=request.route_url('updatecnx'))
+        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        save_dir = os.path.join(request.registry.settings['transform_dir'],temp_dir_name)
+        os.mkdir(save_dir)
+        request.session['upload_dir'] = temp_dir_name
+        cnxml = clean_cnxml(cnxml)
+        save_cnxml(save_dir,cnxml,[])
+        return HTTPFound(location=request.route_url('preview'))
+        
+        
+        #return HTTPFound(location=request.route_url('updatecnx'))
 
 
     response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare, "not_converted": not_converted, "show_iframe":show_iframe}
