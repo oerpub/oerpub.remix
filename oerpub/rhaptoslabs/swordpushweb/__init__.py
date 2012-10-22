@@ -48,6 +48,9 @@ def main(global_config, **settings):
     config.add_subscriber(
         '.subscribers.add_base_template',
         'pyramid.events.BeforeRender')
+    config.add_subscriber(
+        '.subscribers.add_provider',
+        'pyramid.events.BeforeRender')
 
     config.scan()
 
