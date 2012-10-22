@@ -1612,19 +1612,19 @@ def enhance(request):
     templatePath = "templates/google_ss_preview.pt"
     if validate_form:
         introductory_paragraphs = request.POST.get('introductory_paragraphs')
-        j=1
-        cnxml=session["cnxml"]+"""<content><para id="introduction-1">"""+introductory_paragraphs+"""</para><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure>"""+"""<section id="test-section"><title>Test your knowledge</title>"""
-        print request.POST
+        question_count=0
+        cnxml=session["cnxml"]+"""<content><para id="introduction-1">"""+introductory_paragraphs+"""</para><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure>"""        
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
-            if form_question:
-                #form_options = request.POST.get('options-'+str(i)).split('\r\n')
+            if form_question:                
                 form_radio_answer = request.POST.get('radio-'+str(i)) #this give us something like 'answer-1-1'. so our solution is this
-                print "QUESTION",form_question
+                question_count +=1                
+                if question_count==1:
+					cnxml+="""<section id="test-section"><title>Test your knowledge</title>"""
                 itemlist = ""
                 for j in range(1,10):
                     try:
-                        print "OPTION ",request.POST.get('answer-'+str(i)+'-'+str(j))
+                        
                         form_all_answers = request.POST.get('answer-'+str(i)+'-'+str(j))
                         if form_all_answers:
                             itemlist +="<item>" + form_all_answers+"</item>"
@@ -1640,7 +1640,7 @@ def enhance(request):
                     solution = request.POST.get('answer-'+str(i)+'-1')
                     cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""</para></problem>"""
                 print "FORM RADIO ANSWER",form_radio_answer
-                print "SOLUTION", solution
+                print "SOLUTION", solution                
                 cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise>"""
 				
 					
@@ -1657,7 +1657,10 @@ def enhance(request):
                     #cnxml+=""" <solution id="solution-"""+str(j)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
                     #j+=1
         metadata = session['metadata']
-        cnxml += "</section></content></document>"
+        if question_count>=1:
+			cnxml += "</section></content></document>"
+		else:
+			cnxml += "</content></document>"
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
