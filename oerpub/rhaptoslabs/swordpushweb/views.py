@@ -217,6 +217,12 @@ def save_and_backup_file(save_dir, filename, content, mode='w'):
     f.write(content)
     f.close()
 
+def append_zip(zipfilename, filename, content):
+    """ Append files to a zip file. files is a list of tuples where each tuple
+        is a (filename, content) pair. """
+    with zipfile.ZipFile(zipfilename, 'a') as zip_archive:
+        zip_archive.writestr(filename, content)
+
 def save_zip(save_dir, cnxml, html, files):
     ram = StringIO()
     zip_archive = zipfile.ZipFile(ram, 'w')
@@ -1250,14 +1256,21 @@ def upload_dnd(request):
     mtype = request.POST['upload'].headers.get('content-type')
     if mtype is not None:
         ext = mimetypes.guess_extension(mtype) or ''
-    fn = userfn + datetime.datetime.now().strftime('%s') + ext
 
+    # If it has an extension (a dot and three of four characters at the end),
+    # strip it
+    userfn = re.compile('\.\w{3,4}$').sub('', userfn)
+    fn = userfn + '_' + datetime.datetime.now().strftime('%s') + ext
+
+    # No point in using an iterator, we need the entire content for the zip
+    # file anyway
+    fob = request.POST['upload'].file
+    blk = fob.read()
     with open(os.path.join(save_dir, fn), 'w') as fp:
-        # Use a file iterator, to deal with large files
-        fob = request.POST['upload'].file
-        iterf = iter(lambda: fob.read(1024), '')
-        for blk in iterf:
-            fp.write(blk)
+        fp.write(blk)
+
+    # Update upload.zip
+    append_zip(os.path.join(save_dir, 'upload.zip'), fn, blk)
 
     response = Response(json.dumps({'url': fn}))
     response.content_type = 'application/json'
