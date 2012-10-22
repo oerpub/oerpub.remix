@@ -1,0 +1,71 @@
+<!-- ================= -->
+<!--  Toolbar Buttons  -->
+<!-- ================= -->
+<div class="toolbar">
+
+<div class="btn-toolbar">
+  <div class="btn-group headings">
+    <button class="btn currentHeading" rel="tooltip" title="Text Heading">Nothin
+    <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" tit
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <!-- "changeHeading" is important so a click can be attached and
+           data-tagname is used both to identify if the cursor is in one of thes
+       is used to change one heading to another
+       -->
+      <li><a href="#" class="action changeHeading" data-tagname="p">Normal Text<
+      <li><a href="#" class="action changeHeading" data-tagname="h1">Heading</a>
+      <li><a href="#" class="action changeHeading" data-tagname="h2">Subheading<
+      <li><a href="#" class="action changeHeading" data-tagname="h3">SubSubHeadi
+    </ul>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn action strong" rel="tooltip" title="Bold"><i class="icon-
+    <button class="btn action emphasis" rel="tooltip" title="Italics"><i class="
+    <button class="btn action underline" rel="tooltip" title="Underline"><i clas
+  </div>
+
+  <div class="btn-group">
+    <button class="btn action insertLink" rel="tooltip" title="Insert Link"><i c
+    <button class="btn action insertFigure" rel="tooltip" title="Insert Figure">
+    <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" tit
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#" class="action insertImage">Insert Image</a></li>
+      <li><a href="#" class="action insertFigure">Insert Figure</a></li>
+      <li class="divider"></li>
+      <li><a href="#" class="action">Insert Exercise</a></li>
+      <li><a href="#" class="action">Insert Example</a></li>
+    </ul>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn action unorderedList" rel="tooltip" title="Insert List"><
+    <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" tit
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#" class="action orderedList">Insert Ordered List</a></li>
+      <li><a href="#" class="action unorderedList">Insert Unordered List</a></li
+    </ul>
+    <button class="btn action outdentList" rel="tooltip" title="Indent List"><i 
+    <button class="btn action indentList" rel="tooltip" title="Outdent List"><i 
+  </div>
+
+  <div class="btn-group">
+    <button class="btn action createTable" rel="tooltip" title="Create Table"><i
+    <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" tit
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#" class="action addrowbefore">Add Row Before</a></li>
+      <li><a href="#" class="action addrowafter">Add Row After</a></li>
+    </ul>
+  </div>
+
+</div>
+
+</div><!-- / ".toolbar" -->

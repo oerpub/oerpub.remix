@@ -1275,3 +1275,7 @@ def upload_dnd(request):
     response = Response(json.dumps({'url': fn}))
     response.content_type = 'application/json'
     return response
+
+@view_config(name='toolbar', renderer='templates/toolbar.pt')
+def toolbar(request):
+    return {}
