@@ -36,7 +36,7 @@ def add_routes(config):
     config.add_route('oauth2callback', '/oauth2callback')
     config.add_route('choose-module', '/choose-module')
     config.add_route('updatecnx', '/updatecnx')
-    config.add_route('slideshow_preview', '/slideshow_preview')
+    config.add_route('enhance', '/enhance')
 
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests

@@ -1435,7 +1435,7 @@ def return_slideshare_upload_form(request):
         #print deposit_receipt.metadata #.get("dcterms_title")
         if redirect_to_google_oauth:
             raise HTTPFound(location=request.route_url('google_oauth'))
-        raise HTTPFound(location=request.route_url('slideshow_preview'))
+        raise HTTPFound(location=request.route_url('enhance'))
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
 
 @view_config(route_name='oauth2callback')
@@ -1465,7 +1465,7 @@ def google_oauth_callback(request):
     session['google-resource-id'] = resource_id
     if session.has_key('original-file-location'):
         del session['original-file-location']
-    raise HTTPFound(location=request.route_url('slideshow_preview'))
+    raise HTTPFound(location=request.route_url('enhance'))
 
 
 @view_config(route_name='updatecnx')
@@ -1582,8 +1582,8 @@ def update_cnx_metadata(request):
     }
     return render_to_response(templatePath, response, request=request)
 
-@view_config(route_name='slideshow_preview')
-def slideshow_preview(request):
+@view_config(route_name='enhance')
+def enhance(request):
     check_login(request)
     session = request.session
     google_resource_id = ""
