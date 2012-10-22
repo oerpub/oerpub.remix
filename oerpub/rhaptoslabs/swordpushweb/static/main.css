@@ -50,8 +50,13 @@ span .button{
   color: white;
 }
 
-#header-wrap .toolbar a {
-    color: #333333;
+.toolbar .dropdown-menu a {
+    color: #333333 !important;
+}
+
+.toolbar .dropdown-menu .disabled a, 
+.toolbar .dropdown-menu .disabled a:hover {
+    color: #999999 !important;
 }
 
 #header-container{
