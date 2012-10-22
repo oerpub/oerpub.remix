@@ -1659,8 +1659,8 @@ def enhance(request):
         metadata = session['metadata']
         if question_count>=1:
 			cnxml += "</section></content></document>"
-		else:
-			cnxml += "</content></document>"
+        else:
+            cnxml += "</content></document>"
         workspaces = [(i['href'], i['title']) for i in session['collections']]
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
