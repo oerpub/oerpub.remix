@@ -63,6 +63,10 @@
     <ul class="dropdown-menu">
       <li><a href="#" class="action addrowbefore">Add Row Before</a></li>
       <li><a href="#" class="action addrowafter">Add Row After</a></li>
+      <li><a href="#" class="action addcolumnbefore">Add Column Before</a></li>
+      <li><a href="#" class="action addcolumnafter">Add Column After</a></li>
+      <li><a href="#" class="action deleterow">Delete Row</a></li>
+      <li><a href="#" class="action deletecolumn">Delete Column</a></li>
     </ul>
   </div>
 
