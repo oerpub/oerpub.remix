@@ -160,7 +160,7 @@ if (newChoice =="2"){
                 </script>
                 <span>
                   <span>
-                  ${form.begin(request.route_url('slideshow_preview'), id='optionsform',name='optionsform')}
+                  ${form.begin(request.route_url('enhance'), id='optionsform',name='optionsform')}
 				  ${form.csrf_token()}
                     <div class="formlabel">Introductory paragraph</div>
                     <div class="forminfo">You can use the text box below to orient your readers before they start watching the presentation</div>
