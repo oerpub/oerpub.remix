@@ -50,6 +50,10 @@ span .button{
   color: white;
 }
 
+#header-wrap .toolbar a {
+    color: #333333;
+}
+
 #header-container{
   position: fixed;
   top: 0;

@@ -7,11 +7,14 @@
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" href="${request.application_url}/aloha/src/css/aloha.css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
+    <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
         data-aloha-plugins="common/ui,
-                            extra/simpletoolbar,
+                            extra/toolbar,
                             common/format,
                             common/paste,
                             common/block,
@@ -131,9 +134,7 @@
 
         </div>
     </div>
-    <div class="toolbar-container">
-        <div class="toolbar"></div>
-    </div>
+    <div tal:replace="structure provider('toolbar')" />
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
