@@ -204,7 +204,7 @@ def get_files_from_zipfile(zip_file):
 
     zip_archive = zipfile.ZipFile(zip_file, 'r')
     for filename in zip_archive.namelist():
-        if filename in ['index.cnxml', 'index.xhtml']:
+        if filename in ['index.cnxml', 'index.html']:
             continue
         fp = zip_archive.open(filename, 'r')
         files.append((filename, fp.read()))
