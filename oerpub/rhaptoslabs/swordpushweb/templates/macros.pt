@@ -207,3 +207,76 @@
     </li>
 </ul>
 </metal:workspace_popup>
+
+<metal:featured_link define-macro="featured_link"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');">
+            <tal:featured_link_groups tal:repeat="group view.get_featured_link_groups">
+            <tr class="edit-link-tr" tal:repeat="link group.links">
+                <input type="hidden" name="__start__" value=":mapping" />
+                <td class="edit-link-td" style="width: 100%;">
+                    <div class="edit-link-title">
+                        <img id="edit-link-strength-image"
+                        src="${images_url}/${view.get_strength_image_name(link)}">
+                        <span tal:content="link.title">Example text</span>
+                        <a href="#"
+                            tal:attributes="href link.url"
+                            title="Visit link in new window"
+                            class="icon" target="_blank">
+                            <img src="${images_url}/external-link.png">
+                        </a>
+
+                        <input type="hidden" name="fl_title"
+                            tal:attributes="value link.title"
+                            class="edit-link-title" />
+
+                        <input type="hidden" name="fl_category"
+                            tal:attributes="value link.category"
+                            class="edit-link-category" />
+                            
+                        <input type="hidden" name="fl_strength"
+                            tal:attributes="value link.strength"
+                            class="edit-link-strength" />
+                            
+                        <input type="hidden" name="url"
+                            tal:condition="link.url"
+                            tal:attributes="value link.url"
+                            class="edit-link-url" />
+                        
+                        <input type="hidden" name="fl_cnxmodule"
+                            tal:condition="link.module"
+                            tal:attributes="value link.module"
+                            class="edit-link-cnxmodule" />
+                        
+                        <input type="hidden" name="fl_cnxversion"
+                            tal:condition="link.module"
+                            tal:attributes="value link.cnxversion"
+                            class="edit-link-cnxversion" />
+                    </div>
+                </td>
+                <td nowrap="nowrap" class="link-edit-link">
+                    <a class="edit-link" href="#">
+                        Edit link
+                    </a>
+                </td>
+                <td nowrap="nowrap" id="example-id" class="link-edit-link">
+                    <a href="#" class="remove-link">
+                        Remove
+                    </a>
+                </td>
+                <input type="hidden" name="__end__" />
+            </tr>
+            </tal:featured_link_groups>
+</metal:featured_link>
+
+<metal:featured_links_table define-macro="featured_links_table">
+<table class="listing" id="featured-links-table">
+
+    <input type="hidden"
+        name="__start__" value="featuredlinks:sequence" />
+        <tbody>
+            <tr metal:use-macro="view.featured_link">Featured link</tr>
+        </tbody>
+    <input type="hidden" name="__end__" />
+
+</table>
+</metal:featured_links_table>

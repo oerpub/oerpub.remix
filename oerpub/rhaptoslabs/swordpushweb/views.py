@@ -823,6 +823,7 @@ class Metadata_View(BaseHelper):
         self.templatePath = 'templates/metadata.pt'
         self.config = load_config(request)
         self.metadata = self.config['metadata']
+        self.featured_links = []
         self.workspaces = \
             [(i['href'], i['title']) for i in self.session['collections']]
 
@@ -989,6 +990,17 @@ class Metadata_View(BaseHelper):
     def workspace_popup(self):
         return self.macro_renderer.implementation().macros['workspace_popup']
 
+    @reify
+    def featured_link(self):
+        return self.macro_renderer.implementation().macros['featured_link']
+
+    @reify
+    def featured_links_table(self):
+        return self.macro_renderer.implementation().macros['featured_links_table']
+
+    def show_featured_links_form(self):
+        return self.metadata.get('featured_link_groups', '') and 'checked' or ''
+
     def get_title(self, metadata, session):
         return metadata.get('dcterms:title', session.get('title', ''))
 
@@ -1000,6 +1012,10 @@ class Metadata_View(BaseHelper):
     
     def get_values(self, field):
         return getattr(self, field)
+
+    @reify
+    def get_featured_link_groups(self):
+        return self.metadata.get('featured_link_groups', [])
 
     @reify
     def authors(self):
@@ -1048,6 +1064,9 @@ class Metadata_View(BaseHelper):
 
     def get_google_code(self, metadata):
         return metadata.get('oerdc:analyticsCode', '')
+
+    def get_strength_image_name(self, link):
+        return 'strength%s.png' % link.strength
 
     @view_config(route_name='metadata')
     def generate_html_view(self):
@@ -1118,17 +1137,17 @@ class Metadata_View(BaseHelper):
 
         module_url = request.POST.get('module', None)
         metadata = config['metadata']
+        username = self.session['username']
+        password = self.session['password']
         if module_url:
-            metadata.update(get_metadata_from_repo(session, module_url))
+            metadata.update(get_metadata_from_repo(session, module_url, username, password))
         else:
             for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
                 self.defaults[role] = ','.join(
-                    self.config['metadata'][role]).replace(
-                        '_USER_', self.session['username'])
+                    self.config['metadata'][role]).replace('_USER_', username)
 
                 self.config['metadata'][role] = ', '.join(
-                    self.config['metadata'][role]).replace(
-                        '_USER_', self.session['username'])
+                    self.config['metadata'][role]).replace('_USER_', username)
                 
                 self.defaults['language'] = \
                     self.config['metadata'].get('language', u'en')
