@@ -50,6 +50,15 @@ span .button{
   color: white;
 }
 
+.toolbar .dropdown-menu a {
+    color: #333333 !important;
+}
+
+.toolbar .dropdown-menu .disabled a, 
+.toolbar .dropdown-menu .disabled a:hover {
+    color: #999999 !important;
+}
+
 #header-container{
   position: fixed;
   top: 0;

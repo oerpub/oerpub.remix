@@ -9,6 +9,7 @@ import logging
 import libxml2
 import lxml
 import re
+import mimetypes
 from cStringIO import StringIO
 import peppercorn
 import codecs
@@ -210,6 +211,12 @@ def save_and_backup_file(save_dir, filename, content, mode='w'):
     f = open(filename, mode)
     f.write(content)
     f.close()
+
+def append_zip(zipfilename, filename, content):
+    """ Append files to a zip file. files is a list of tuples where each tuple
+        is a (filename, content) pair. """
+    with zipfile.ZipFile(zipfilename, 'a') as zip_archive:
+        zip_archive.writestr(filename, content)
 
 def save_zip(save_dir, cnxml, html, files):
     ram = StringIO()
@@ -616,17 +623,8 @@ def preview_save(request):
 
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
-    save_and_backup_file(save_dir, 'index.html_', html)
-
-    # Backup old file
-    fn = os.path.join(save_dir, 'index.html')
-    os.rename(fn, fn + '~')
-
     # Save new html file from preview area
-    fp = open(os.path.join(save_dir, 'index.html'), 'w')
-    fp.write(html)
-    #fp.flush()
-    fp.close()
+    save_and_backup_file(save_dir, 'index.html', html)
 
     conversionerror = ''
 
@@ -644,9 +642,8 @@ def preview_save(request):
         conversionerror = str(e)
     else:
         save_and_backup_file(save_dir, 'index.cnxml', cnxml)
-        files = get_zipped_files(save_dir)
+        files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
         save_zip(save_dir, cnxml, html, files)
-
 
     response = Response(json.dumps({'saved': True, 'error': conversionerror}))
     response.content_type = 'application/json'
@@ -655,20 +652,6 @@ def preview_save(request):
 class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True
     cnxml = formencode.validators.String(not_empty=True)
-
-def get_zipped_files(save_dir):
-    # get the list of files from upload.zip if it exists
-    files = []
-    zip_filename = os.path.join(save_dir, 'upload.zip')
-    if os.path.exists(zip_filename):
-        zip_archive = zipfile.ZipFile(zip_filename, 'r')
-        for filename in zip_archive.namelist():
-            if filename in ('index.cnxml', 'index.html'):
-                continue
-            fp = zip_archive.open(filename, 'r')
-            files.append((filename, fp.read()))
-            fp.close()
-    return files
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
@@ -688,7 +671,7 @@ def cnxml_view(request):
 
 
         try:
-            files = get_zipped_files(save_dir)
+            files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
             save_cnxml(save_dir, cnxml, files)
             validate_cnxml(cnxml)
         except ConversionError as e:
@@ -1288,3 +1271,41 @@ def download_zip(request):
     res.last_modified = datetime.datetime.utcfromtimestamp(
         stat.st_mtime).strftime('%a, %d %b %Y %H:%M:%S GMT')
     return res
+
+@view_config(route_name='upload_dnd')
+def upload_dnd(request):
+    check_login(request)
+
+    save_dir = os.path.join(request.registry.settings['transform_dir'],
+        request.session['upload_dir'])
+
+    # userfn, if browser does not support naming of blobs, this might be
+    # 'blob', so we need to further uniquefy it.
+    userfn = request.POST['upload'].filename or ''
+    ext = ''
+    mtype = request.POST['upload'].headers.get('content-type')
+    if mtype is not None:
+        ext = mimetypes.guess_extension(mtype) or ''
+
+    # If it has an extension (a dot and three of four characters at the end),
+    # strip it
+    userfn = re.compile('\.\w{3,4}$').sub('', userfn)
+    fn = userfn + '_' + datetime.datetime.now().strftime('%s') + ext
+
+    # No point in using an iterator, we need the entire content for the zip
+    # file anyway
+    fob = request.POST['upload'].file
+    blk = fob.read()
+    with open(os.path.join(save_dir, fn), 'w') as fp:
+        fp.write(blk)
+
+    # Update upload.zip
+    append_zip(os.path.join(save_dir, 'upload.zip'), fn, blk)
+
+    response = Response(json.dumps({'url': fn}))
+    response.content_type = 'application/json'
+    return response
+
+@view_config(name='toolbar', renderer='templates/toolbar.pt')
+def toolbar(request):
+    return {}

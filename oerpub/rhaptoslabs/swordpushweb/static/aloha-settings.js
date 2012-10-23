@@ -26,6 +26,15 @@
                 },
                 rootTags: ['span', 'div', 'figure'],
                 dragdrop: "1"
+            },
+            draganddropfiles: {
+                upload: {
+                    config: {
+                        url: '/upload_dnd',
+                        send_multipart_form: true,
+                        fieldName: 'upload'
+                    }
+                }
             }
         },
         bundles: {

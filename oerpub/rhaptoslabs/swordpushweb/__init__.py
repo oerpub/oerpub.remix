@@ -32,6 +32,7 @@ def add_routes(config):
     config.add_route('modules_list', '/modules_list')
     config.add_route('download_zip', '/download_zip')
     config.add_route('choose-module', '/choose-module')
+    config.add_route('upload_dnd', '/upload_dnd')
     
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
@@ -56,4 +57,7 @@ def add_static_resources(config):
 
     config.add_subscriber(
         '.subscribers.add_base_template',
+        'pyramid.events.BeforeRender')
+    config.add_subscriber(
+        '.subscribers.add_provider',
         'pyramid.events.BeforeRender')
