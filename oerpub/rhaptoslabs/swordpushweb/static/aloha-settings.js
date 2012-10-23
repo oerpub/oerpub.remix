@@ -21,7 +21,7 @@
                     '.default-block': {
                     },
                     'figure': {
-                        'aloha-block-type': 'EditableImageBlock'
+                        'aloha-block-type': 'FigureBlock'
                     }
                 },
                 rootTags: ['span', 'div', 'figure'],
