@@ -11,7 +11,7 @@
 
         plugins: {
             genericbutton: {
-                buttons: [{'id': 'saveButton', 'title': 'Save', 'event': 'swordpushweb.save' }]
+                buttons: [{'id': 'save', 'title': 'Save', 'event': 'swordpushweb.save' }]
             },
             format: {
                 config : ['b', 'i', 'u', 'p', 'sub', 'sup', 'h1', 'h2', 'h3']
