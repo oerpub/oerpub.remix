@@ -51,7 +51,23 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                     <h3>Importer tools</h3>
 
                     <ul class="create-new-list">
+
+                        <!-- li id="editor">
+                            <label>
+                                <span style="visibility: hidden; display: none;" class="or-bullet">or</span> 
+                                <span class="label-text">
+                                    <img src="${images_url}/module_icon.gif"> <strong>Module editor</strong>
+                                </span>
+                            </label>
+                            <div class="upload-form" style="width: 556px; ">
+                                <input class="button" value="Edit a new or existing module »" type="submit" id="show-neworexisting">
+                            </div>
+                        </li -->
+
                         <li id="doc-importer">
+                            <!-- div style="margin: 0 0 1em -1.5em;">
+                                <strong>Or use one of our importer tools:</strong>
+                            </div -->                            
                             <label>
                                 <span style="visibility: hidden;" class="or-bullet">or</span> 
                                 <span class="label-text">
@@ -68,7 +84,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
                         <li id="gdoc-importer">
                             <label>
-                                <span style="visibility: visible;" class="or-bullet">or</span> 
                                 <span class="label-text">
                                     <img src="${images_url}/google-docs-22.png">
                                 </span>
@@ -86,7 +101,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                         </li>
                           <li id="url-importer">
                             <label>
-                              <span style="visibility: visible;" class="or-bullet">or</span> 
                               <span class="label-text">
                                 <img src="${images_url}/url-icon-01.png"/>
                                 <strong>URL</strong> <span style="font-weight: normal;">(for converting an Internet page)</span>
@@ -131,26 +145,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                       </div>
 
                   </td>
-
-                  <td style="vertical-align: top; padding-right: 2em; display: none;">
-            <h3>Online editor</h3>
-                          <ul class="create-new-list">
-                            <li id="editor">
-                              <label>
-                                <span style="visibility: hidden;" class="or-bullet">or</span> 
-                                <span class="label-text">
-                                  <img src="helper_files/module_icon.gif"> <strong>Module editor</strong>
-                               </span>
-                              </label>
-                              <div class="upload-form">
-                                <input class="button" value="Edit a new or existing module &#187;" type="submit" id="show-neworexisting-2"
-            onclick="window.location = 'choose-module-11.html'; return false;"
-            >
-                              </div>
-                            </li>
-                          </ul>
-                  </td>
-
                 </tr>
               </tbody>
             </table>
@@ -167,11 +161,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
   <div id="neworexisting" style="display: none;">
     <div style="margin-top: .5em;">
-<!--
-     <input type="radio" name="neworexisting" checked="checked"> 
--->
       <div>
-        <span class="button">New module</span>
+        <span class="button submit-neworexisting">New module</span>
       </div>
       <div class="forminfo">
         Work on a brand new module, starting from scratch.
@@ -179,24 +170,13 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
     </div>
     <div style="margin-top: 1em;">
       <div>
-        <span class="button">Existing module</span>
+          <span class="button submit-neworexisting"
+              tal:attributes="url request.route_url('choose-module')">Existing module</span>
       </div>
-<!--
-      <input type="radio" name="neworexisting">
-      <strong>Existing module</strong>
--->
       <div class="forminfo">
         Choose an existing module to edit, whether or not it is already in your Personal Workspace.
       </div>
     </div>
-<!--
-    <div class="headeraction" style="float:right;margin-top:5px;">
-      <span href="#" id="submit-neworexisting" class="button"
-onclick="window.location = 'choose-module-05.html'; return false;"
->Next &#187;</span></div>
-    <div class="headeraction" style="float:right;margin-top:5px;margin-right:1em;">
-      <span href="#" id="cancel-neworexisting" class="button">Cancel</span></div>
--->
     <div style="text-align: center; margin: 1.5em 0 0;">
       <span class="button" id="cancel-neworexisting">Cancel</span>
     </div>
