@@ -16,6 +16,7 @@
         data-aloha-plugins="common/ui,
                             extra/toolbar,
                             common/format,
+                            common/link,
                             common/paste,
                             common/block,
                             user/blockdemo,
