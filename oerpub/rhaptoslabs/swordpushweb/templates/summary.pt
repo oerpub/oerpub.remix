@@ -21,15 +21,6 @@
 
                 <div id="pageheader-wrap">
 
-                    <div id="module-actions">
-                        <span class="advanced">
-                            <a class="button" title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy">
-                                <span class="advanced-marker"><img src="${images_url}/gear_orange_3.png"/></span>
-                                <span class="button-text">Download a copy</span>
-                            </a>
-                        </span>
-                    </div>
-
                     <div id="page-title">
                         <h1>
                             Success

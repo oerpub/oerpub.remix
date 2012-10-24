@@ -16,7 +16,14 @@
                     href = $(this).attr("href");
                     $("#selected_workspace").attr("href", href);
                 });
-                                
+
+                $("#fl-field").hide();
+                $('.edit-link').click(editFeaturedLink);
+                $('.remove-link').click(removeFeaturedLink);
+
+                if ($('table#featured-links-table tr').length > 0) {
+                    $("#formentry-fl .formlabel").click();
+                }
             });
 
         </script>
@@ -38,28 +45,8 @@
             <div id="forward-steps">
                 <span id="uploading-to">
                     Uploading to 
-
-                    <ul class="popMenu">
-                        <li class="popMenu">
-                            <a id="selected_workspace"
-                                href="#" class="popMenu"
-                                tal:attributes="href selected_workspace">
-                                <span class="workarea-choice">Personal Workspace</span>
-                                <img src="${images_url}/down-arrow-05.png"> 
-                            </a>
-
-                            <ul class="popOut" style="display: none; ">
-                                <li tal:repeat="ws workspaces">
-                                    <a href="#" 
-                                        tal:content="ws[1]"
-                                        tal:attributes="href ws[0]">
-                                        Personal Workspace
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                    <ul metal:use-macro="view.workspace_popup">
                     </ul>
-
                     in Connexions
                 </span>
                 
@@ -77,11 +64,13 @@
     ${form.csrf_token()}
 
     <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
-        <tal:hidden>${form.hidden(field)}</tal:hidden>
+        <tal:hidden>${form.hidden(field, value=view.get_values(field))}</tal:hidden>
     </tal:field>
 
     <input id="workspace" type="hidden" name="workspace"
         tal:attributes="value selected_workspace">
+    <input id="module" type="hidden" name="associated_module_url"
+        tal:attributes="value module_url|nothing">
 
     <div id="ie6-container-wrap">
         <div id="container">
@@ -146,7 +135,7 @@
                                         <div class="forminfo">Enter the title of this module.</div>
                                         <div class="formfield">
                                             <input type="text" name="title" size="50"
-                                            value="${config['metadata']['title']}"/>
+                                            value="${view.get_title(metadata, session)}"/>
                                         </div>
                                     </div>
                                     <div class="formentry">
@@ -156,8 +145,13 @@
                                             <tbody>
                                                 <tr tal:repeat="row python:range(3)">
                                                     <td tal:repeat="column python:range(2)">
-                                                        <input type="checkbox" name="subject" tal:attributes="value subjects[row+column*3]; checked (subjects[row+column*3] in config['metadata']['subject'])"/>
-                                                        <span class="formlabel" tal:content="subjects[row+column*3]">Subject</span>
+                                                        <input type="checkbox" name="subject"
+                                                            tal:define="subject subjects[row+column*3];
+                                                                        current_subjects python:view.get_subjects(metadata)"
+                                                            tal:attributes="value subject;
+                                                                            checked (subject in current_subjects)"/>
+                                                        <span class="formlabel"
+                                                            tal:content="subjects[row+column*3]">Subject</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -167,7 +161,7 @@
                                         <div class="formlabel">Summary</div>
                                         <div class="forminfo">Enter a summary of the module.</div>
                                         <div class="formfield">
-                                            <textarea name="summary" rows="6" cols="60">${config['metadata']['summary']}</textarea>
+                                            <textarea name="summary" rows="6" cols="60">${view.get_summary(metadata)}</textarea>
                                         </div>
                                     </div>
                                 </td>
@@ -191,11 +185,11 @@
                                                 <span class="formlabel">Contributors</span>
                                                 <span>(<a href="#" id="edit-roles">edit</a>)</span>
                                                 <ul style="margin-top: 0pt; margin-bottom: 0.5em;">
-                                                    <li id="list-authors">Authors: <span>${config['metadata']['authors']}</span></li>
-                                                    <li id="list-maintainers">Maintainers: <span>${config['metadata']['maintainers']}</span></li>
-                                                    <li id="list-copyright">Copyright Holders: <span>${config['metadata']['copyright']}</span></li>
-                                                    <li id="list-editors">Editors: <span>${config['metadata']['editors']}</span></li>
-                                                    <li id="list-translators">Translators: <span>${config['metadata']['translators']}</span></li>
+                                                    <li id="list-authors">Authors: <span>${view.authors}</span></li>
+                                                    <li id="list-maintainers">Maintainers: <span>${view.maintainers}</span></li>
+                                                    <li id="list-copyright">Copyright Holders: <span>${view.copyright}</span></li>
+                                                    <li id="list-editors">Editors: <span>${view.editors}</span></li>
+                                                    <li id="list-translators">Translators: <span>${view.translators}</span></li>
                                                 </ul>
                                             </div>
 
@@ -205,7 +199,7 @@
                                     <div class="formentry">
                                         <div class="formlabel">Language</div>
                                         <div class="forminfo">Select the primary language for this module.</div>
-                                        <div class="formfield">${form.select("language", languages, selected_value=config['metadata']['language'])}</div>
+                                        <div class="formfield">${form.select("language", languages, selected_value=view.get_language(metadata))}</div>
                                     </div>
                                     <div class="formentry">
                                         <div class="formlabel">Keywords (one per line)</div>
@@ -214,15 +208,19 @@
                                             are used behind the scenes to help people find it in
                                             searches.</div>
                                         <div class="formfield">
-                                            <textarea name="keywords" rows="4" cols="40">
-                                                ${config['metadata']['keywords']}
-                                            </textarea>
+                                            <textarea name="keywords" rows="4" cols="40"><span tal:replace="python:view.get_keywords(metadata)"/></textarea>
                                         </div>
                                     </div>
-                                    <div class="formentry" id="formentry-ga">
+                                    <div class="formentry" id="formentry-ga"
+                                        tal:define="google_code python:view.get_google_code(metadata);">
                                         <div class="formlabel">
-                                            <input type="checkbox" id="google_code_opener"
-                                            name="google_code_opener"/>
+                                            <input tal:condition="google_code"
+                                                checked="checked"
+                                                type="checkbox" id="google_code_opener"
+                                                name="google_code_opener"/>
+                                            <input tal:condition="not:google_code"
+                                                type="checkbox" id="google_code_opener"
+                                                name="google_code_opener"/>
                                             Add optional Google Analytics Tracking Code
                                         </div>
                                         <div class="errortext" style="display: none;">
@@ -232,17 +230,28 @@
                                             <div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
                                             <div class="formfield">
                                                 <input type="text" name="google_code" size="40"
-                                                value="${config['metadata']['google_code']}"/>
+                                                value="${google_code}"/>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div id="formentry-fl" class="formentry">
-                                        <div class="formlabel">
+                                        <div class="formlabel"
+                                            tal:define="checked view.show_featured_links_form()">
+
                                             <input id="show-featuredlinks-form"
+                                            tal:condition="checked"
+                                            checked="checked"
                                             type="checkbox"
                                             title="Featured Links must each be removed individually"
                                             name="fl_opener">
+
+                                            <input id="show-featuredlinks-form"
+                                            tal:condition="not:checked"
+                                            type="checkbox"
+                                            title="Featured Links must each be removed individually"
+                                            name="fl_opener">
+
                                             Add/edit optional Featured Links 
                                             <a title="Opens in a new window"
                                                 id="show-featuredlinks-help"
@@ -258,17 +267,10 @@
                                                 Make sure that all of your links are published and/or publicly available.
                                             </p>
 
-                                            <table class="listing" id="featured-links-table">
-
-                                                <input type="hidden"
-                                                    name="__start__" value="featuredlinks:sequence" />
-                                                    <tbody>
-                                                    </tbody>
-                                                <input type="hidden" name="__end__" />
-
+                                            <table metal:use-macro="view.featured_links_table">
                                             </table>
 
-                                            <div>
+                                            <div id="create-featured-link">
                                                 <a class="button2" onclick="return false;" id="show-featuredlinks" href="#">
                                                     + Create a new Featured Link
                                                 </a>
@@ -401,7 +403,6 @@
                                 name="create-fl-useurlormodule"
                                 value="create-fl-useurl"
                                 type="radio"
-                                checked="checked"
                                 class="noborder">
                         </td>
                         <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">

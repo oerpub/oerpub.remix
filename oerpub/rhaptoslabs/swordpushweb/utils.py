@@ -1,10 +1,48 @@
+import cStringIO
+import types
 import os
 import libxml2
 import libxslt
 import zipfile
 import lxml
+import pycurl
+import logging
+
+from pyramid.httpexceptions import HTTPFound
+
+from oerpub.rhaptoslabs import sword2cnx
 
 current_dir = os.path.dirname(__file__)
+ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
+
+NAMESPACES = {'sword'   : 'http://purl.org/net/sword/',
+              'dcterms' : 'http://purl.org/dc/terms/',
+              'md'      : 'http://cnx.rice.edu/mdml',
+              'xsi'     : 'http://www.w3.org/2001/XMLSchema-instance',
+              'oerdc'   : 'http://cnx.org/aboutus/technology/schemas/oerdc',
+              'cnxml'   : 'http://cnx.rice.edu/cnxml',
+              }
+
+log = logging.getLogger('utils')
+
+def create_module_in_2_steps(form, connection, metadata_entry, zip_file, save_dir):
+    zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
+    data = zip_file.read()
+    deposit_receipt = connection.create(
+        col_iri = form.data['workspace'],
+        payload = data,
+        filename = 'upload.zip',
+        mimetype = 'application/zip',
+        packaging = ZIP_PACKAGING,
+        in_progress = True)
+
+    deposit_receipt = connection.update(metadata_entry = metadata_entry,
+                                        filename = 'upload.zip',
+                                        dr = deposit_receipt,
+                                        in_progress=True)
+    
+    zip_file.close()
+    return deposit_receipt
 
 def pretty_print_dict(x, indent=0):
     output = '{'
@@ -194,7 +232,8 @@ def get_cnxml_from_zipfile(zip_file):
 
 def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
     root = lxml.etree.fromstringlist(cnxml.readlines())
-    featuredlinks_element = lxml.etree.fromstringlist(featuredlinks)
+    featuredlinks = ''.join(featuredlinks)
+    featuredlinks_element = lxml.etree.fromstring(featuredlinks)
     root.insert(1, featuredlinks_element) 
     return lxml.etree.tostring(root)
 
@@ -233,17 +272,20 @@ def build_featured_links(data):
         for details in values:
             title = details['fl_title']
             strength = details['fl_strength']
-            url = details['url']
-            cnxmodule = details['fl_cnxmodule']
-            cnxversion = details['fl_cnxversion']
+            url = details.get('url', '')
+            module = details.get('fl_cnxmodule', '')
 
             link = ''
             if url:
-                  link = u'<link url="%s" strength="%s">%s</link>' %(
-                      url, strength, title)
-            else:
-                  link = u'<link url="%s" strength="%s">%s</link>' %(
-                      url, strength, title)
+                link = u'<link url="%s" strength="%s">%s</link>' %(
+                    url, strength, title)
+            elif module:
+                base = 'http://cnx.org/content'
+                cnxversion = details.get('fl_cnxversion')
+                if not cnxversion:
+                    cnxversion = 'latest'
+                link = u'<link url="%s/%s/%s/" strength="%s">%s</link>' %(
+                    base, module, cnxversion, strength, title)
 
             links.append(link)
 
@@ -251,3 +293,190 @@ def build_featured_links(data):
 
     links.append(u'</featured-links>')
     return links
+
+
+def check_login(request, raise_exception=True):
+    # Check if logged in
+    for key in ['username', 'password', 'service_document_url']:
+        if not request.session.has_key(key):
+            if raise_exception:
+                raise HTTPFound(location=request.route_url('login'))
+            else:
+                return False
+    return True
+
+
+def get_connection(session):
+    conn = sword2cnx.Connection(session['service_document_url'],
+                                user_name=session['username'],
+                                user_pass=session['password'],
+                                always_authenticate=True,
+                                download_service_document=False)
+    return conn
+
+
+def get_metadata_from_repo(session, module_url, user, password):
+    conn = get_connection(session)
+    resource = conn.get_resource(content_iri = module_url)
+    metadata = Metadata(resource.content, module_url, user, password)
+    return metadata
+
+
+class Metadata(dict):
+
+    fields = {'dcterms:title':        types.StringType,
+              'dcterms:abstract':     types.StringType,
+              'dcterms:language':     types.StringType,
+              'oerdc:analyticsCode':  types.StringType,}
+    
+    contributor_fields = {'dcterms:creator':      types.ListType,
+                          'oerdc:maintainer':     types.ListType,
+                          'dcterms:rightsHolder': types.ListType,
+                          'oerdc:translator':     types.ListType,
+                          'oerdc:editor':         types.ListType,}
+
+    def __init__(self, xml_deposit_receipt, module_url, user, password):
+        """
+        """
+        self.encoding = 'utf-8'
+        self.raw_data = xml_deposit_receipt
+        self.dom = lxml.etree.fromstring(self.raw_data)
+        self._parse_metadata()
+        self.url = self._module_export_url(module_url)
+        self.cnxml = self._fetch_cnxml(self.url,
+                                       user.encode(self.encoding),
+                                       password.encode(self.encoding))
+        if self.cnxml:
+            self._parse_featured_link_groups(self.cnxml)
+    
+    def _parse_metadata(self):
+        for name, ftype in self.fields.items():
+            value = self._get_value_from_raw(name,
+                                             ftype,
+                                             self.dom,
+                                             NAMESPACES)
+            self[name] = value
+
+        self._parse_subjects_and_keywords()
+        self._parse_contributors()
+
+    def _parse_subjects_and_keywords(self):
+        """ We have to do this, because subjects and keywords are marshalled
+            in the same basic element. The only thing distinguishing them is
+            the xsi:type.
+        """
+        elements = self.dom.findall('dcterms:subject', namespaces=NAMESPACES)
+        self._get_subjects(elements)
+        self._get_keywords(elements)
+
+    def _parse_contributors(self):
+        for name, ftype in self.contributor_fields.items():
+            value  = []
+            elements = self.dom.findall(name, namespaces=NAMESPACES)
+            for e in elements:
+                tmp_key = '{%s}id' % NAMESPACES['oerdc']
+                tmp_val = e.attrib.get(tmp_key, '')
+                if tmp_val:
+                    value.append(tmp_val)
+            self[name] = value
+
+    def _parse_featured_link_groups(self, cnxml):
+        dom = lxml.etree.fromstring(cnxml)
+        links = []
+        for e in dom.xpath('//cnxml:link-group', namespaces=NAMESPACES):
+            group = FeaturedLinkGroup(e)
+            links.append(group)
+        self['featured_link_groups'] = links
+
+    def _get_value_from_raw(self, name, ftype, dom, namespaces):
+        value = ''
+        elements = dom.findall(name, namespaces=namespaces)
+        if elements:
+            if ftype == types.ListType:
+                value = []
+                for e in elements:
+                    value.append(e.text)
+            else:
+                value = elements[0].text
+        return value
+
+    def _get_keywords(self, elements):
+        value = []
+        elements = [e for e in elements if not e.attrib]
+        if elements:
+            for e in elements:
+                value.append(e.text)
+        self['keywords'] = value
+
+    def _get_subjects(self, elements):
+        value = []
+        elements = [e for e in elements if e.attrib]
+        if elements:
+            for e in elements:
+                value.append(e.text)
+        self['subjects'] = value
+
+    def _module_export_url(self, url):
+        module_url = '/'.join(url.split('/')[:-1])
+        module_url = '%s/module_export' % module_url
+        return (module_url).encode(self.encoding)
+
+    def _fetch_cnxml(self, url, user, password):
+        buff = cStringIO.StringIO()
+        pc = pycurl.Curl()
+        pc.setopt(pc.WRITEFUNCTION, buff.write)
+        pc.setopt(pc.URL, url)
+        pc.setopt(pc.USERPWD, '%s:%s' % (user, password))
+        pc.setopt(pc.POSTFIELDS, 'format=plain')
+        pc.perform()
+
+        if pc.getinfo(pc.HTTP_CODE) == 200:
+            result = buff.getvalue()
+        else:
+            result = ''
+        return result
+
+class FeaturedLinkGroup(object):
+    
+    def __init__(self, element):
+        self.element = element
+        self.group_type = self.parse_group_type(self.element)
+        self.links = self.parse_links(self.element)
+
+    def parse_group_type(self, element):
+        return element.attrib['type']
+
+    def parse_links(self, element):
+        links = []
+        for e in element.xpath('cnxml:link', namespaces=NAMESPACES):
+            links.append(FeaturedLink(e, self.group_type))
+        return links
+    
+class FeaturedLink(object):
+    def __init__(self, element, category):
+        self.element = element
+        self.category = category
+        self.title = self.parse_title(self.element)
+        self.url = self.parse_url(self.element)
+        self.strength = self.parse_strength(self.element)
+        self.module = self.parse_module(self.element)
+        self.cnxversion = self.parse_cnxversion(self.element)
+    
+    def parse_title(self, element):
+        return element.text
+
+    def parse_url(self, element):
+        prefix = 'http://'
+        url = element.attrib.get('url', '')
+        if url and not url.startswith(prefix):
+            url = '%s%s' % (prefix, url)
+        return url
+
+    def parse_strength(self, element):
+        return element.attrib['strength']
+
+    def parse_module(self, element):
+        return element.attrib.get('module', '')
+
+    def parse_cnxversion(self, element):
+        return element.attrib.get('cnxversion', '')
