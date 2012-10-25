@@ -15,6 +15,8 @@
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
         data-aloha-plugins="common/ui,
                             extra/toolbar,
+                            extra/bubble,
+                            extra/oerpub,
                             common/format,
                             common/link,
                             common/paste,
