@@ -81,4 +81,39 @@
 
 </div>
 
+<!-- Image dialog -->
+<div class="scope image modal hide fade">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Image</h3>
+    </div>
+
+    <div class="modal-body">
+        <div>
+            <div class="component imageSource"></div>
+            <div class="component imageTitle"></div>
+            <div class="component imageAlt"></div>
+        </div>
+        <div>
+            <div class="component imageResizeWidth"></div>
+            <div class="component imageResizeHeight"></div>
+        </div>
+        <div>
+            <span class="component imageAlignLeft"></span>
+            <span class="component imageAlignRight"></span>
+            <span class="component imageAlignNone"></span>
+            <span class="component imageIncPadding"></span>
+        </div>
+        <div>
+            <span class="component imageCropButton"></span>
+            <span class="component imageCnrReset"></span>
+            <span class="component imageCnrRatio"></span>
+            <span class="component imageDecPadding"></span>
+        </div>
+        <div class="component imageBrowser"></div>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+    </div>
+</div>
 </div><!-- / ".toolbar" -->
