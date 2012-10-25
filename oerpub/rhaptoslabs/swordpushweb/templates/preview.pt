@@ -135,13 +135,13 @@
 
         </div>
     </div>
-    <div tal:replace="structure provider('toolbar')" />
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
         tal:define="filename python:request.session.get('filename')">
     <div id="ie6-container-wrap">
         <div id="container">
+            <div tal:replace="structure provider('toolbar')" />
             <div id="content">
             <div id="artboard">
                 <div id="pageheader-wrap">
