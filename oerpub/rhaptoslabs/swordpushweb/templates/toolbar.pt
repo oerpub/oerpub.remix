@@ -45,9 +45,6 @@
     <ul class="dropdown-menu">
       <li><a href="#" class="action insertImage">Insert Image</a></li>
       <li><a href="#" class="action insertFigure">Insert Figure</a></li>
-      <li class="divider"></li>
-      <li><a href="#" class="action">Insert Exercise</a></li>
-      <li><a href="#" class="action">Insert Example</a></li>
     </ul>
   </div>
 
