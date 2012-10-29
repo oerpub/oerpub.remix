@@ -27,7 +27,6 @@
                             common/highlighteditables,
                             extra/draganddropfiles,
                             common/image,
-                            extra/figure,
                             common/undo,
                             extra/undobutton,
                             extra/genericbutton,
