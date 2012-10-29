@@ -77,9 +77,6 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
     height: 47px;
     width: 20px;
 }
-.toolbar .icon-save {
-    background-position: -618px 0;
-}
 .toolbar .icon-undo {
     background-position: -518px 0;
 }
@@ -118,4 +115,8 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
 }
 .toolbar .btn.currentHeading {
     height: 47px;
+}
+.toolbar .btn.save {
+    height: 47px;
+    width: 4em;
 }

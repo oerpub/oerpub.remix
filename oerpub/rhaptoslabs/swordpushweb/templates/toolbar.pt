@@ -22,7 +22,7 @@
   </div>
 
   <div class="btn-group">
-    <button class="btn action save" rel="tooltip" title="Save"><i class="icon-save"></i></button>
+    <button class="btn action save" rel="tooltip" title="Save">Save</button>
   </div>
 
   <div class="btn-group">

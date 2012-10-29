@@ -38,6 +38,7 @@
                     function(PubSub, GenericButton){
                 // Save button is disabled until something is changed
                 GenericButton.getButtons()["save"].enable(false);
+                $('.btn.save').html('Saved');
 
                 function savePreview(){
                     var editor = Aloha.getEditableById('canvas');
@@ -63,6 +64,7 @@
                             if(data.saved){
                                 $('#statusmessage').data('message')('Saved');
                                 GenericButton.getButtons()["save"].enable(false);
+                                $('.btn.save').html('Saved');
                             } else {
                                 $('#statusmessage').data('message')(data.error, 'error');
                             }
@@ -102,6 +104,7 @@
                     var editor = Aloha.getEditableById('canvas');
                     Aloha.bind('aloha-smart-content-changed', function(){
                         if(editor.isModified()){
+                            $('.btn.save').html('Save');
                             GenericButton.getButtons()["save"].enable(true);
                         }
                     });
