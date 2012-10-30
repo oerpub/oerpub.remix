@@ -80,7 +80,7 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
     -webkit-box-shadow: none;
 }
 .toolbar .btn-toolbar {
-    margin: 5px 0;
+    margin: 3px 0;
 }
 .toolbar .btn-group > .btn + .dropdown-toggle {
     height: 37px;
@@ -131,4 +131,21 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
 .toolbar .btn.save {
     height: 37px;
     width: 4em;
+}
+
+.toolbar .btn-group > .btn:hover,
+.toolbar .btn-group > .btn:focus,
+.toolbar .btn-group > .btn:active,
+.toolbar .btn-group > .btn.active {
+}
+
+.separator {
+    background-image: url("toolbar.png");
+    background-position: -3px 0;
+    display: inline-block;
+    height: 33px;
+    letter-spacing: normal;
+    width: 20px;
+    word-spacing: normal;
+    vertical-align: middle;
 }

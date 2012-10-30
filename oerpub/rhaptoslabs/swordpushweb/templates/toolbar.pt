@@ -7,12 +7,12 @@
   <div class="btn-group">
     <button class="btn action save" rel="tooltip" title="Save">Save</button>
   </div>
-
+  <span class="separator"> </span>
   <div class="btn-group">
     <button class="btn action undo" rel="tooltip" title="Undo"><i class="icon-undo"></i></button>
     <button class="btn action redo" rel="tooltip" title="Redo"><i class="icon-redo"></i></button>
   </div>
-
+  <span class="separator"> </span>
   <div class="btn-group headings">
     <button class="btn currentHeading" rel="tooltip" title="Text Heading">Nothing</button>
     <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Change Heading">
@@ -29,7 +29,7 @@
       <li><a href="#" class="action changeHeading" data-tagname="h3">SubSubHeading</a></li>
     </ul>
   </div>
-
+  <span class="separator"> </span>
   <div class="btn-group">
     <button class="btn action strong" rel="tooltip" title="Bold"><i class="icon-bold"></i></button>
     <button class="btn action emphasis" rel="tooltip" title="Italics"><i class="icon-italic"></i></button>
@@ -37,16 +37,16 @@
     <button class="btn action superscript" rel="tooltip" title="Superscript"><i class="icon-superscript"></i></button>
     <button class="btn action subscript" rel="tooltip" title="Subscript"><i class="icon-subscript"></i></button>
   </div>
-
+  <span class="separator"> </span>
   <div class="btn-group">
     <button class="btn action insertLink" rel="tooltip" title="Insert Link"><i class="icon-link-insert"></i></button>
   </div>
-
+  <span class="separator"> </span>
   <div class="btn-group">
     <button class="btn action unorderedList" rel="tooltip" title="Insert Unordered List"><i class="icon-unordered-list"></i></button>
     <button class="btn action orderedList" rel="tooltip" title="Insert Ordered List"><i class="icon-ordered-list"></i></button>
   </div>
-
+  <span class="separator"> </span>
   <div class="btn-group">
     <button class="btn action insertImage" rel="tooltip" title="Insert Image"><i class="icon-image-insert"></i></button>
     <button class="btn action createTable" rel="tooltip" title="Create Table"><i class="icon-table-insert"></i></button>
