@@ -68,7 +68,7 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
 .toolbar [class^="icon-"] {
     height: 33px;
     width: 33px;
-    background-image: url("toolbar.png");
+    background-image: url("images/toolbar.png");
 }
 .toolbar .btn {
     padding: 5px;
