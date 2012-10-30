@@ -71,11 +71,23 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
     background-image: url("toolbar.png");
 }
 .toolbar .btn {
-    padding: 5px;
+    padding: 0;
+    background-image: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+}
+.toolbar .btn-toolbar {
+    margin: 5px 0;
 }
 .toolbar .btn-group > .btn + .dropdown-toggle {
-    height: 47px;
+    height: 37px;
     width: 20px;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
 }
 .toolbar .icon-undo {
     background-position: -518px 0;
@@ -114,9 +126,9 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
     background-position: -455px 0;
 }
 .toolbar .btn.currentHeading {
-    height: 47px;
+    height: 37px;
 }
 .toolbar .btn.save {
-    height: 47px;
+    height: 37px;
     width: 4em;
 }
