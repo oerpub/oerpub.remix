@@ -43,3 +43,7 @@ figure figcaption::before {
 #statusmessage {
     height: 0em;
 }
+
+.aloha-editable-active, .aloha-editable-active[contenteditable="true"]:focus {
+    outline: none !important;
+}
