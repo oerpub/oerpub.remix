@@ -65,7 +65,7 @@ figure figcaption::before {
   margin: 0;
   height: 33px;
   width: 33px;
-  background-image: url("toolbar.png");
+  background-image: url("images/toolbar.png");
 }
 .toolbar .btn {
   padding: 0;
@@ -203,7 +203,7 @@ figure figcaption::before {
   background-position: -452px -66px;
 }
 .separator {
-  background-image: url("toolbar.png");
+  background-image: url("images/toolbar.png");
   background-position: -3px 0;
   display: inline-block;
   height: 33px;
