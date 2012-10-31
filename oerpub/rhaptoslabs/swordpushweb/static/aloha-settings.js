@@ -39,7 +39,7 @@
         },
         bundles: {
             // Path for custom bundle relative from require.js path
-            user: '../demo/block'
+            oerpub: '../plugins/oerpub'
         }
     };
 })(window);
