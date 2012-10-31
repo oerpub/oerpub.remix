@@ -604,7 +604,7 @@ FORM DATA
         metadata = {}
         metadata['dcterms:title'] = uploaded_filename.split(".")[0]
         cnxml = """<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
-  <title>TEST DOC</title>
+  <title>"""+session['uploaded_filename']+"""</title>
 <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
   <!-- WARNING! The 'metadata' section is read only. Do not edit below.
        Changes to the metadata section in the source will not be saved. -->
@@ -614,26 +614,7 @@ FORM DATA
   <md:version>**new**</md:version>
   <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
   <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
-  <md:actors>
-    <md:person userid="""+"\""+username+"\""+""">
-      <md:firstname></md:firstname>
-      <md:surname></md:surname>
-      <md:fullname></md:fullname>
-      <md:email></md:email>
-    </md:person>
-  </md:actors>
-  <md:roles>
-    <md:role type="author">"""+username+"""</md:role>
-    <md:role type="maintainer">"""+username+"""</md:role>
-    <md:role type="licensor">"""+username+"""</md:role>
-  </md:roles>
-  <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
-  <!-- For information on license requirements for use or modification, see license url in the
-       above <md:license> element.
-       For information on formatting required attribution, see the URL:
-         CONTENT_URL/content_info#cnx_cite_header
-       where CONTENT_URL is the value provided above in the <md:content-url> element.
-  -->
+  
   <md:abstract/>
   <md:language>en</md:language>
   <!-- WARNING! The 'metadata' section is read only. Do not edit above.
