@@ -22,7 +22,7 @@
                             common/paste,
                             common/block,
                             common/list,
-                            extra/table,
+                            oerpub/table,
                             extra/draganddropfiles,
                             common/image,
                             common/undo,
