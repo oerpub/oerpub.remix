@@ -117,13 +117,27 @@ figure figcaption::before { content: "Figure " counter(figure) " "; font-weight:
     .icon-table-insert {
         background-position: -452px 0;
     }
-    .btn.currentHeading {
+    .btn.heading {
         width: 9em;
-        height: 37px;
+        height: 24px;
+        border: 1px solid #999999;
+        text-align: left;
+        padding: 0 0.5em;
+        .caret {
+            position: absolute;
+            right: 0.5em;
+        }
+        .currentHeading {
+            text-align: left;
+        }
     }
     .btn.save {
-        height: 37px;
+        height: 24px;
         width: 4em;
+        border: 1px solid #999999;
+    }
+    .dropdown-menu a {
+        padding: 3px 0.5em;
     }
 }
 

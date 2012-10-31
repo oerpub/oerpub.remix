@@ -122,13 +122,27 @@ figure figcaption::before {
 .toolbar .icon-table-insert {
   background-position: -452px 0;
 }
-.toolbar .btn.currentHeading {
+.toolbar .btn.heading {
   width: 9em;
-  height: 37px;
+  height: 24px;
+  border: 1px solid #999999;
+  text-align: left;
+  padding: 0 0.5em;
+}
+.toolbar .btn.heading .caret {
+  position: absolute;
+  right: 0.5em;
+}
+.toolbar .btn.heading .currentHeading {
+  text-align: left;
 }
 .toolbar .btn.save {
-  height: 37px;
+  height: 24px;
   width: 4em;
+  border: 1px solid #999999;
+}
+.toolbar .dropdown-menu a {
+  padding: 3px 0.5em;
 }
 .toolbar .btn-group > .btn:hover .icon-undo,
 .toolbar .btn-group > .btn:focus .icon-undo,
