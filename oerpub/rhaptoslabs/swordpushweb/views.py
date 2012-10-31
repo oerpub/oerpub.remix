@@ -614,8 +614,6 @@ FORM DATA
   <md:version>**new**</md:version>
   <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
   <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
-  
-  <md:abstract/>
   <md:language>en</md:language>
   <!-- WARNING! The 'metadata' section is read only. Do not edit above.
        Changes to the metadata section in the source will not be saved. -->
