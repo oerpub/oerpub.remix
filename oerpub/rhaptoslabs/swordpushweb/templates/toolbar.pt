@@ -48,10 +48,11 @@
   <span class="separator"> </span>
   <div class="btn-group">
     <button class="btn action insertImage" rel="tooltip" title="Insert Image"><i class="icon-image-insert"></i></button>
-    <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Create Table"><i class="icon-table-insert"></i></button>
+    <button class="btn action createTable" rel="tooltip" title="Create Table"><i class="icon-table-insert"></i></button>
+    <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Table Operations">
+      <span class="caret"></span>
+    </button>
     <ul class="dropdown-menu">
-      <li><a href="#" class="action createTable">Create Table</a></li>
-      <li><a href="#" class="action addrowbefore">Add Row Before</a></li>
       <li><a href="#" class="action addrowafter">Add Row After</a></li>
       <li><a href="#" class="action addcolumnbefore">Add Column Before</a></li>
       <li><a href="#" class="action addcolumnafter">Add Column After</a></li>
