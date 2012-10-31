@@ -85,7 +85,11 @@ if (newChoice =="2"){
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
-                <input type="button" class="button"  value="&laquo; Back: Choose Location" id="back-to-chooser"   title="Return to the choose import option" url="${request.route_url('importer')}"  >
+                <input type="button" class="button"
+                value="&#171; Back: Choose Location"
+                id="back-to-chooser"
+                title="Return to the previous screen to choose a different import or editing option"
+                url="${request.route_url('choose')}"/>
             </div>
            <div id="forward-steps">
            
