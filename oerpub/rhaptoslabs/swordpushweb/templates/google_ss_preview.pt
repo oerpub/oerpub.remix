@@ -85,10 +85,7 @@ if (newChoice =="2"){
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
-                <input type="button" class="button" 
-                    value="&laquo; Back: Choose Location" id="back-to-chooser"
-                    url="${request.route_url('importer')}"
-                    title="Return to the choose import option">
+                <input type="button" class="button"  value="&laquo; Back: Choose Location" id="back-to-chooser"   title="Return to the choose import option" url="${request.route_url('importer')}"  >
             </div>
            <div id="forward-steps">
            
@@ -96,7 +93,7 @@ if (newChoice =="2"){
                 class="button forward-button"
                 name="form.submitted"
                
-                value="Next: Describe Your Presentation &#187;" 
+                value="Next: Describe Your Module &#187;" 
                 
                 title="Describe Your Presentation"/>
             </div>

@@ -604,7 +604,7 @@ FORM DATA
         metadata = {}
         metadata['dcterms:title'] = uploaded_filename.split(".")[0]
         cnxml = """<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
-  <title>"""+session['uploaded_filename']+"""</title>
+  <title>"""+session['title']+"""</title>
 <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
   <!-- WARNING! The 'metadata' section is read only. Do not edit below.
        Changes to the metadata section in the source will not be saved. -->
