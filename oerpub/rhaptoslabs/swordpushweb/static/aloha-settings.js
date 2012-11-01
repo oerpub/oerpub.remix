@@ -8,7 +8,7 @@
         jQuery: window.jQuery,
         logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
         errorhandling : true,
-
+        waitSeconds: 0,
         plugins: {
             genericbutton: {
                 buttons: [{'id': 'save', 'title': 'Save', 'event': 'swordpushweb.save' }]
@@ -27,14 +27,10 @@
                 rootTags: ['span', 'div', 'figure'],
                 dragdrop: "1"
             },
-            draganddropfiles: {
-                upload: {
-                    config: {
-                        url: '/upload_dnd',
-                        send_multipart_form: true,
-                        fieldName: 'upload'
-                    }
-                }
+            image: {
+                uploadurl: '/upload_dnd',
+                uploadmethod: 'POST',
+                uploadfield: 'upload'
             }
         },
         bundles: {
