@@ -4,11 +4,13 @@
         var Aloha = window.Aloha = {};
     }
 
+    require.config({ waitSeconds: 42 });
+
     Aloha.settings = {
         jQuery: window.jQuery,
         logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
         errorhandling : true,
-        waitSeconds: 0,
+        requireConfig: { waitSeconds: 42 },
         plugins: {
             genericbutton: {
                 buttons: [{'id': 'save', 'title': 'Save', 'event': 'swordpushweb.save' }]
