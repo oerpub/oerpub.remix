@@ -193,7 +193,7 @@ if (newChoice =="2"){
 							</tr>
                          </table> 
                       
-                      <input type="button" class="add-more-choices" name="Add more choices" value="Add more Choices" id="question-1">
+                      <input type="button" class="add-more-choices" name="Add more choices" value="Add more choices" id="question-1">
                       
                       
 			          	</li>
