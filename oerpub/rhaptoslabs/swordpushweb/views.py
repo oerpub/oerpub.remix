@@ -634,7 +634,7 @@ For information on formatting required attribution, see the URL:
 CONTENT_URL/content_info#cnx_cite_header
 where CONTENT_URL is the value provided above in the <md:content-url> element.
 -->
-<md:abstract/>
+
 <md:language>en</md:language>
 <!-- WARNING! The 'metadata' section is read only. Do not edit above.
 Changes to the metadata section in the source will not be saved. -->
