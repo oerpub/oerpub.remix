@@ -614,9 +614,30 @@ FORM DATA
   <md:version>**new**</md:version>
   <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
   <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
-  <md:language>en</md:language>
-  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
-       Changes to the metadata section in the source will not be saved. -->
+ <md:actors>
+<md:person userid="""+"\""+username+"\""+""">
+<md:firstname></md:firstname>
+<md:surname></md:surname>
+<md:fullname></md:fullname>
+<md:email></md:email>
+</md:person>
+</md:actors>
+<md:roles>
+<md:role type="author">"""+username+"""</md:role>
+<md:role type="maintainer">"""+username+"""</md:role>
+<md:role type="licensor">"""+username+"""</md:role>
+</md:roles>
+<md:license url="http://creativecommons.org/licenses/by/3.0/"/>
+<!-- For information on license requirements for use or modification, see license url in the
+above <md:license> element.
+For information on formatting required attribution, see the URL:
+CONTENT_URL/content_info#cnx_cite_header
+where CONTENT_URL is the value provided above in the <md:content-url> element.
+-->
+<md:abstract/>
+<md:language>en</md:language>
+<!-- WARNING! The 'metadata' section is read only. Do not edit above.
+Changes to the metadata section in the source will not be saved. -->
 </metadata>"""
         for key in metadata.keys():
             if metadata[key] == '':
@@ -1592,7 +1613,7 @@ def enhance(request):
     if validate_form:
         introductory_paragraphs = request.POST.get('introductory_paragraphs')
         question_count=0
-        cnxml=session["cnxml"]+"""<content><section id="intro-section-title"><title id="introtitle">Introduction</title><para id="introduction-1">"""+introductory_paragraphs+"""</para></section><section title="slides-embed"><title id="slide-embed-title">View the slides</title><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure></section>"""        
+        cnxml=session["cnxml"]+"""<content><section id="intro-section-title"><title id="introtitle">Introduction</title><para id="introduction-1">"""+introductory_paragraphs+"""</para></section><section id="slides-embed"><title id="slide-embed-title">View the slides</title><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure></section>"""        
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
             if form_question:                
