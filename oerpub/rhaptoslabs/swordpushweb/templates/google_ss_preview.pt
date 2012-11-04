@@ -88,7 +88,7 @@ if (newChoice =="2"){
                 <input type="button" class="button"
                 value="&#171; Back: Choose Location"
                 id="back-to-chooser"
-                title="Return to the previous screen to choose a different import or editing option"
+                title="Choose Location"
                 url="${request.route_url('choose')}"/>
             </div>
            <div id="forward-steps">
@@ -97,9 +97,9 @@ if (newChoice =="2"){
                 class="button forward-button"
                 name="form.submitted"
                
-                value="Next: Describe Your Module &#187;" 
+                value="Next:Preview Your Module &#187;" 
                 
-                title="Describe Your Presentation"/>
+                title="Preview Your Module"/>
             </div>
         </div>
     </div>
@@ -132,7 +132,7 @@ if (newChoice =="2"){
 						  </p>
                           
                           <p tal:condition="embed_slideshare">
-	            						   <br/><br/>
+	            						   
 							               <p tal:condition="show_iframe">
 							               
 												<iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshare_id}" 
@@ -141,11 +141,11 @@ if (newChoice =="2"){
 												</iframe>
 										  </p>
 										  <p tal:condition="not_converted">
-											<p>
+
 												Your slides are being uploaded to Slideshare (or Google Docs).<br/>
 												You will receive an email once they are ready. <br/>
-												In the mean time, you can enhance it with an introduction and a quiz.<br/>
-											</p>
+												In the mean time, you can enhance your presentation with an introduction and a quiz.<br/>
+
 										  </p>
                            </p>
                         </p>
@@ -171,15 +171,15 @@ if (newChoice =="2"){
                 </span>
 
          
-				<div class="formlabel">Add a Quiz</div>
+				<div class="formlabel">Add a quiz</div>
                 <div class="forminfo">To help readers retain the important information from your slides, you can add a simple quiz below</div>
                 
                 <ul id="all-questions">
                 
 					<li id="add-questions-area-1" class="all-questions">
 					
-                      <div class="formlabel">Add a Question</div>
-                      <div class="forminfo">Add a Question</div>
+                      <div class="formlabel">Add a question</div>
+                      <div class="forminfo">Add a question</div>
                       <div class="formfield">
                           <input type="text" size="100" name="question-1" id="question-1">                          
                       </div>                                         
@@ -193,12 +193,12 @@ if (newChoice =="2"){
 							</tr>
                          </table> 
                       
-                      <input type="button" class="add-more-choices" name="Add More Choices" value="Add more Choices" id="question-1">
+                      <input type="button" class="add-more-choices" name="Add more choices" value="Add more Choices" id="question-1">
                       
                       
 			          	</li>
       				</ul>
-				        <input class="button" id="add-more-questions" value="Add More Questions" type="button">
+				        <input class="button" id="add-more-questions" value="Add more questions" type="button">
                 
                   
                 </span>
