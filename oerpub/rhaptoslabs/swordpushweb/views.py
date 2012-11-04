@@ -622,11 +622,7 @@ FORM DATA
 <md:email></md:email>
 </md:person>
 </md:actors>
-<md:roles>
-<md:role type="author">"""+username+"""</md:role>
-<md:role type="maintainer">"""+username+"""</md:role>
-<md:role type="licensor">"""+username+"""</md:role>
-</md:roles>
+
 <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
 <!-- For information on license requirements for use or modification, see license url in the
 above <md:license> element.
