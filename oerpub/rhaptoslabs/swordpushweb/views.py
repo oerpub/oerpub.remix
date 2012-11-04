@@ -1592,7 +1592,7 @@ def enhance(request):
     if validate_form:
         introductory_paragraphs = request.POST.get('introductory_paragraphs')
         question_count=0
-        cnxml=session["cnxml"]+"""<content><para id="introduction-1">"""+introductory_paragraphs+"""</para><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure>"""        
+        cnxml=session["cnxml"]+"""<content><section id="intro-section-title"><title id="introtitle">Introduction</title><para id="introduction-1">"""+introductory_paragraphs+"""</para></section><section title="slides-embed"><title id="slide-embed-title">View the slides</title><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure></section>"""        
         for i in range(1,6):
             form_question = request.POST.get('question-'+str(i))
             if form_question:                
