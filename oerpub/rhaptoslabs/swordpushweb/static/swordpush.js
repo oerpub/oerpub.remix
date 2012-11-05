@@ -213,6 +213,10 @@ $(document).ready(function()
         return _doAction(confirmMsg3, e);
     });
 
+    $("button#btn-go-back").click(function(e){
+        _doNavAction(e);
+    });
+
     $("#start-from-beginning").click(function(e){
         var target = $(this).attr('href');
         if (!target) {
@@ -502,8 +506,20 @@ $(document).ready(function()
     $('div#workspace-list a.workspace-link').click(onWorkspaceChange);
 });
 
+function _doNavAction(event) {
+    var element = event.target;
+    var target = $(element).attr('href');
+    if (!target) {
+        target = $(element).attr('url');
+    }
+    window.location = target;
+    event.stopPropagation();
+    return true;
+}
+
 function _doAction(message, event) {
     // don't let the event propagate up, we handle all actions here.
+    // challenge the user before doing the action.
     var element = event.target;
     var c = confirm(message);
     if (c == true) { 

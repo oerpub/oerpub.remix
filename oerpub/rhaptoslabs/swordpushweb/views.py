@@ -567,53 +567,6 @@ FORM DATA
     return render_to_response(templatePath, response, request=request)
 
 
-class PreviewSchema(formencode.Schema):
-    allow_extra_fields = True
-    title = formencode.validators.String()
-
-
-@view_config(route_name='preview', renderer='templates/preview.pt',
-    http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
-def preview_view(request):
-    check_login(request)
-    
-    session = request.session
-    module = request.params.get('module')
-    if module:
-        conn = sword2cnx.Connection(session['service_document_url'],
-                                    user_name=session['username'],
-                                    user_pass=session['password'],
-                                    always_authenticate=True,
-                                    download_service_document=False)
-
-        # example: http://cnx.org/Members/user001/m17222/sword/editmedia
-        result = conn.get_resource(content_iri = module,
-                                   packaging = ZIP_PACKAGING) 
-        
-    defaults = {}
-    defaults['title'] = request.session.get('title', '')
-    form = Form(request,
-                schema=PreviewSchema,
-                defaults=defaults
-               )
-
-    body_filename = request.session.get('preview-no-cache')
-    if body_filename is None:
-        body_filename = 'index.html'
-    else:
-        del request.session['preview-no-cache']
-
-    return {
-        'body_base': '%s%s/' % (
-                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                     request.session['upload_dir']),
-        'body_url': '%s%s/index.html'% (
-                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                     request.session['upload_dir']),
-        'form': FormRenderer(form),
-    }
-
-
 @view_config(route_name='preview_save')
 def preview_save(request):
     check_login(request)
@@ -1272,6 +1225,56 @@ class Choose_Module(Module_Association_View):
     @reify
     def content_macro(self):
         return self.macro_renderer.implementation().macros['content_macro']
+
+
+class PreviewSchema(formencode.Schema):
+    allow_extra_fields = True
+    title = formencode.validators.String()
+
+
+class Preview_View(BaseHelper):
+    @view_config(route_name='preview', renderer='templates/preview.pt',
+        http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
+    def generate_html_view(self):
+        request = self.request
+        check_login(request)
+        
+        session = request.session
+        module = request.params.get('module')
+        if module:
+            conn = sword2cnx.Connection(session['service_document_url'],
+                                        user_name=session['username'],
+                                        user_pass=session['password'],
+                                        always_authenticate=True,
+                                        download_service_document=False)
+
+            # example: http://cnx.org/Members/user001/m17222/sword/editmedia
+            result = conn.get_resource(content_iri = module,
+                                       packaging = ZIP_PACKAGING) 
+            
+        defaults = {}
+        defaults['title'] = request.session.get('title', '')
+        form = Form(request,
+                    schema=PreviewSchema,
+                    defaults=defaults
+                   )
+
+        body_filename = request.session.get('preview-no-cache')
+        if body_filename is None:
+            body_filename = 'index.html'
+        else:
+            del request.session['preview-no-cache']
+
+        return {
+            'body_base': '%s%s/' % (
+                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                         request.session['upload_dir']),
+            'body_url': '%s%s/index.html'% (
+                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                         request.session['upload_dir']),
+            'form': FormRenderer(form),
+        }
+
         
 @view_config(route_name='download_zip',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
