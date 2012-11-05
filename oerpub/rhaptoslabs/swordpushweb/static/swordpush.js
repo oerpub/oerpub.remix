@@ -202,7 +202,7 @@ $(document).ready(function()
             return _doAction(confirmMsg4, e);
         } else if ($("iframe").length != 0 || $("#metadata").length != 0) {
             return _doAction(confirmMsg2, e);
-        } else if ($("textarea#cnxml").length != 0) {
+        } else if ($("div#canvas").length != 0) {
             return _doAction(confirmMsg3, e);
         } else {
             return true;
@@ -347,7 +347,7 @@ $(document).ready(function()
     // Show the "New or existing module?" overlay.
     $('#show-neworexisting').click(function(e) {
         if(!e.isDefaultPrevented()){
-            $('#neworexisting').modal();
+            //$('#neworexisting').modal();
         }
         e.preventDefault();
     });
