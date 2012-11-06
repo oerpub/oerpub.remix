@@ -213,7 +213,7 @@ $(document).ready(function()
         return _doAction(confirmMsg3, e);
     });
 
-    $("button#btn-go-back").click(function(e){
+    $("button#btn-navigate-back").click(function(e){
         _doNavAction(e);
     });
 

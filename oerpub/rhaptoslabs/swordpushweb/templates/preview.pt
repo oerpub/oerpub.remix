@@ -218,14 +218,14 @@
                 <button class="btn btn-primary submit-neworexisting" 
                     url="${request.route_url('metadata')}">
                     New module
-                </button>
+                </button><br/>
                 This is an entirely new module. 
             </div>
             <div class="forminfo" style="margin: .5em 0 1em;">
                 <button class="btn btn-primary submit-neworexisting" 
                     url="${request.route_url('module_association')}">
                     Override existing module
-                </button>
+                </button><br/>
                 Choose an existing module to apply your import to, replacing its contents.  
             </div>
         </div>
@@ -248,7 +248,8 @@
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <button id="btn-go-back" class="btn btn-primary">OK</button>
+            <button id="btn-navigate-back" class="btn btn-primary"
+                tal:attributes="href string:${request.route_url('choose')}">OK</button>
         </div>
     </div>
 
