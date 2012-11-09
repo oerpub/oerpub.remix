@@ -540,8 +540,6 @@ font-family: tahoma, verdana, arial, helvetica, sans-serif;
   padding: 0 0 .4em;
   font-size: 2.3em;
   font-weight: normal;
-  visibility:hidden;
-  display:none;
 }
 
 #cnx_authorship, #cnx_rate, #cnx_abstract{
