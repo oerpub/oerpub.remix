@@ -23,6 +23,7 @@
 	   is used to change one heading to another
 	   -->
       <li><a href="#" class="action changeHeading" data-tagname="p">Normal Text</a></li>
+      <li><a href="#" class="action changeHeading" data-tagname="pre">Code</a></li>
       <li><a href="#" class="action changeHeading" data-tagname="h1">Heading</a></li>
       <li><a href="#" class="action changeHeading" data-tagname="h2">Subheading</a></li>
       <li><a href="#" class="action changeHeading" data-tagname="h3">SubSubHeading</a></li>
@@ -39,6 +40,7 @@
   <span class="separator"> </span>
   <div class="btn-group">
     <button class="btn action insertLink" rel="tooltip" title="Insert Link"><i class="icon-link-insert"></i></button>
+    <!-- <button class="btn action changeHeading" data-tagname="pre" rel="tooltip" title="Code">Code</button> -->
   </div>
   <span class="separator"> </span>
   <div class="btn-group">
