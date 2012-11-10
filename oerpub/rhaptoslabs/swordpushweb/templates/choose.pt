@@ -1,6 +1,17 @@
 <metal:use use-macro="base">
 
 <metal:script-slot fill-slot="script-slot">
+
+    <link rel="stylesheet" type="text/css" href="${request.application_url}/aloha/src/css/aloha.css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_metacontent.css')}"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
+    <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
+    <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
+
 <script type="text/javascript">
 
     $(document).ready(function(){
@@ -52,7 +63,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
                     <ul class="create-new-list">
 
-                        <!-- li id="editor">
+                        <li id="editor">
                             <label>
                                 <span style="visibility: hidden; display: none;" class="or-bullet">or</span> 
                                 <span class="label-text">
@@ -60,9 +71,16 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 </span>
                             </label>
                             <div class="upload-form" style="width: 556px; ">
-                                <input class="button" value="Edit a new or existing module »" type="submit" id="show-neworexisting">
+                                <input class="btn forward-button"
+                                    value="Edit a new or existing module »"
+                                    href="#neworexisting"
+                                    role="button"
+                                    class="btn"
+                                    data-toggle="modal"
+                                    type="button" 
+                                    id="show-neworexisting">
                             </div>
-                        </li -->
+                        </li>
 
                         <li id="doc-importer">
                             <!-- div style="margin: 0 0 1em -1.5em;">
@@ -159,28 +177,34 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
     </div>
 </div>
 
-  <div id="neworexisting" style="display: none;">
-    <div style="margin-top: .5em;">
-      <div>
-        <span class="button submit-neworexisting">New module</span>
-      </div>
-      <div class="forminfo">
-        Work on a brand new module, starting from scratch.
-      </div>
+<div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="New or existing" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="neworexistingLabel">
+            Work on a brand new module, starting from scratch.
+        </h3>
     </div>
-    <div style="margin-top: 1em;">
-      <div>
-          <span class="button submit-neworexisting"
-              tal:attributes="url request.route_url('choose-module')">Existing module</span>
-      </div>
-      <div class="forminfo">
-        Choose an existing module to edit, whether or not it is already in your Personal Workspace.
-      </div>
+    <div class="modal-body">
+        <div class="forminfo" style="margin: .5em 0 1em;">
+            <button class="btn btn-primary submit-neworexisting">
+                New module
+            </button><br/>
+            This is an entirely new module. 
+        </div>
+        <div class="forminfo" style="margin: .5em 0 1em;">
+            <button class="btn btn-primary submit-neworexisting" 
+                url="${request.route_url('choose-module')}">
+                Existing module
+            </button><br/>
+            Choose an existing module to apply your import to, replacing its contents.  
+        </div>
     </div>
-    <div style="text-align: center; margin: 1.5em 0 0;">
-      <span class="button" id="cancel-neworexisting">Cancel</span>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     </div>
-  </div>
+</div>
+
 <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
 </iframe>

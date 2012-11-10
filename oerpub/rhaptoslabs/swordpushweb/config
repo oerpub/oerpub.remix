@@ -17,4 +17,5 @@
         "summary": '',
         "translators": [''],
     },
+    "blank_cnxml_file": "src/oerpub.rhaptoslabs.swordpushweb/oerpub/rhaptoslabs/swordpushweb/templates/blank.cnxml",
 }

@@ -1,4 +1,5 @@
 {
+    "blank_cnxml_file": "src/oerpub.rhaptoslabs.swordpushweb/oerpub/rhaptoslabs/swordpushweb/templates/blank.cnxml",
     "workspace_url": None,
     "service_document_url": u'http://cnx.org/sword/servicedocument',
     "login_url": u'http://cnx.org/login_form',

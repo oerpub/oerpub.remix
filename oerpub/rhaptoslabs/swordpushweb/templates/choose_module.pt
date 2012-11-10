@@ -32,7 +32,7 @@ ${form.csrf_token()}
                 class="button"
                 value="&laquo; Back: Return to start page"
                 title="Return to the initial page"
-                url="${request.route_url('choose')}">
+                tal:attributes="url view.get_previous_action()">
         </div>
 
         <input id="workspace" type="hidden" name="workspace">
@@ -43,7 +43,7 @@ ${form.csrf_token()}
                 disabled="disabled"
                 class="button forward-button" 
                 value="Next: Edit selected module &raquo;" 
-                url="${request.route_url('preview')}"
+                tal:attributes="url view.get_next_action()"
                 title="Select a module below and then click 'Next' to start editing it">
 
         </div>
