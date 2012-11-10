@@ -2,7 +2,7 @@
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
 $(document).ready(function(){
-$("#slideshare.embed").html("<img src=\"${images_url}/slideshare.jpg\"");
+$("#slideshare-embed").html("<img src=\"${images_url}/slideshare.jpg\"");
 });
 </script>
 </metal:script-slot>
