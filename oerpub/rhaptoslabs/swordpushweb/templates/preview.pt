@@ -2,9 +2,9 @@
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
 $(document).ready(function(){
-alert($("#preview-frame").contents().find("#slideshare-embed").html());
 
-//$("#slideshare-embed").html("<img src=\"${images_url}/slideshare.jpg\"");
+$("#preview-frame").contents().find("tr").find("#slideshare-embed").html("<img src=\"${images_url}/slideshare.jpg\"");
+
 });
 </script>
 </metal:script-slot>
