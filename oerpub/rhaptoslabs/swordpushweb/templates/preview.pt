@@ -3,7 +3,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 
-alert($("#preview-frame").contents().find("tr").find("#slideshare-embed").html());
+$("#preview-frame").contents().find("tr").find("#slideshare-embed").html("<img src=\"${images_url}/slideshare.jpg\"");
 
 });
 </script>
