@@ -5,9 +5,7 @@
     <link rel="stylesheet" type="text/css" href="${request.application_url}/aloha/src/css/aloha.css"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_metacontent.css')}"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
     <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
@@ -71,7 +69,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 </span>
                             </label>
                             <div class="upload-form" style="width: 556px; ">
-                                <input class="btn forward-button"
+                                <input class="btn"
                                     value="Edit a new or existing module »"
                                     href="#neworexisting"
                                     role="button"
@@ -95,7 +93,13 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             </label>
 
                             <div class="upload-form">
-                                <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
+                                <input id="file-submit"
+                                    class="btn"
+                                    role="button"
+                                    value="Choose file and preview &#187;"
+                                    name="form.submitted"
+                                    type="submit">
+                                
                                 <input id="upload" name="upload" style="visibility: hidden;" type="file" />
                             </div>
                         </li>
@@ -112,7 +116,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
                                 <input id="google-submit"
                                     type="submit"
-                                    class="button" 
+                                    class="btn" 
                                     name="form.submitted"
                                     value="Select and preview &#187;">
                             </div>
@@ -130,8 +134,11 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     placeholder="http://www.example.com" type="url" 
                                     onkeydown="keyDown(event)" />
 
-                                <input class="button" id="url-submit" name="url.submitted"
-                                    value="Convert and preview &#187;" disabled="disabled"
+                                <input class="btn"
+                                    id="url-submit"
+                                    name="url.submitted"
+                                    value="Convert and preview &#187;"
+                                    disabled="disabled"
                                     type="submit">
                             </div>
                         
