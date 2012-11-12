@@ -317,10 +317,13 @@ def preview_view(request):
     else:
         del request.session['preview-no-cache']
 
-    import pdb;pdb.set_trace()
     return {
-        'header_url': request.route_url('preview_header'),
-        'body_url': request.route_url('preview_body'),
+        'body_base': '%s%s/' % (
+                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                     request.session['upload_dir']),
+        'body_url': '%s%s/index.html'% (
+                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                     request.session['upload_dir']),
         'form': FormRenderer(form),
     }
 
