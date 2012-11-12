@@ -193,6 +193,7 @@ def logout_view(request):
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
+    newmodule = formencode.validators.String()
 
 class ConversionError(Exception):
     def __init__(self, msg):
@@ -289,6 +290,7 @@ class PreviewSchema(formencode.Schema):
 @view_config(route_name='preview', renderer='templates/preview.pt',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
 def preview_view(request):
+    import pdb;pdb.set_trace()
     check_login(request)
     
     session = request.session
@@ -1061,7 +1063,6 @@ class Choose_Document_Source(BaseHelper):
                     save_cnxml(save_dir, cnxml, files)
 
                 elif form.data['upload'] is not None:
-                    # this is a lot of data to stick on the session :(
                     self.request.session['filename'] = form.data['upload'].filename
 
                 # Google Docs Conversion
