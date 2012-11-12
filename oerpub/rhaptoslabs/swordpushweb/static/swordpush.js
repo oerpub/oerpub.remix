@@ -367,7 +367,7 @@ $(document).ready(function()
         e.preventDefault();
         url = $(this).attr('url');
         $.modal.close();
-        window.location = url;
+        $('form#neworexisting-form').submit(); 
     });
 
     // Workgroup menu ("Describe your module" and "Choose module" pages) derived

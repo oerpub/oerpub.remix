@@ -184,6 +184,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
     </div>
 </div>
 
+${form.begin(request.route_url('choose'), multipart='multipart', id='neworexisting-form')}
+${form.csrf_token()}
 <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
     aria-labelledby="New or existing" aria-hidden="true">
     <div class="modal-header">
@@ -194,8 +196,11 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
     </div>
     <div class="modal-body">
         <div class="forminfo" style="margin: .5em 0 1em;">
+            <input id="upload" name="upload" type="hidden" />
+            <input id="newmodule" name="newmodule" value="newmodule" type="hidden" />
             <button class="btn btn-primary submit-neworexisting"
-                url="${request.route_url('preview')}">
+                value="newmodule"
+                url="${request.route_url('choose')}">
                 New module
             </button><br/>
             This is an entirely new module. 
@@ -212,6 +217,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     </div>
 </div>
+${form.end()}
 
 <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
