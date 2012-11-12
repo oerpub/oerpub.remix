@@ -194,7 +194,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
     </div>
     <div class="modal-body">
         <div class="forminfo" style="margin: .5em 0 1em;">
-            <button class="btn btn-primary submit-neworexisting">
+            <button class="btn btn-primary submit-neworexisting"
+                url="${request.route_url('preview')}">
                 New module
             </button><br/>
             This is an entirely new module. 
