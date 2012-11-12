@@ -15,15 +15,15 @@
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
         data-aloha-plugins="common/ui,
                             extra/toolbar,
-                            extra/bubble,
+                            oerpub/popover,
                             common/format,
-                            extra/link,
+                            common/link,
                             common/paste,
                             common/block,
                             common/list,
                             oerpub/table,
                             oerpub/image,
-                            oerpub/oerui,
+                            oerpub/assorted,
                             common/undo,
                             extra/undobutton,
                             extra/genericbutton,
@@ -91,7 +91,7 @@
                     // Remove the pyramid debug toolbar from the preview
                     // if it exists. This code should do nothing in production
                     $editable.find('#pDebug').remove();
-                    $editable.aloha();
+                    $editable.aloha().focus();
 
                     // Auto-save periodically. This only does anything if
                     // editor.isModified().
