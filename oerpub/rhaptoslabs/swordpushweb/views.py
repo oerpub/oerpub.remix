@@ -215,8 +215,9 @@ def save_and_backup_file(save_dir, filename, content, mode='w'):
 def append_zip(zipfilename, filename, content):
     """ Append files to a zip file. files is a list of tuples where each tuple
         is a (filename, content) pair. """
-    with zipfile.ZipFile(zipfilename, 'a') as zip_archive:
-        zip_archive.writestr(filename, content)
+    zip_archive = zipfile.ZipFile(zipfilename, 'a')
+    zip_archive.writestr(filename, content)
+    zip_archive.close()
 
 def save_zip(save_dir, cnxml, html, files):
     ram = StringIO()
