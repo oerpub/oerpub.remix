@@ -359,8 +359,8 @@ def choose_view(request):
 
                 (request.session['title'], request.session['filename']) = \
                     process_gdocs_resource(save_dir, \
-                                           gdocs_resource_id, \
-                                           gdocs_access_token)
+                                           gdocs_resource_id)
+                                           # , gdocs_access_token) # Google Docs authentication does not work anymore 2012-11-09
 
             # HTML URL Import:
             elif form.data.get('url_text'):
