@@ -59,7 +59,7 @@ figure figcaption::before {
   width: 100%;
   padding-left: 1em;
   box-shadow: 0 2px 3px 0 #CCC;
-  z-index: 1020;
+  z-index: 1010;
 }
 .toolbar [class^="icon-"] {
   margin: 0;
