@@ -9,10 +9,8 @@ import logging
 import libxml2
 import lxml
 import re
-import mimetypes
 from cStringIO import StringIO
 import peppercorn
-import codecs
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -53,7 +51,6 @@ from helpers import BaseHelper
 
 TESTING = False      
 CWD = os.getcwd()
-
 
 
 class LoginSchema(formencode.Schema):
@@ -216,8 +213,9 @@ def save_and_backup_file(save_dir, filename, content, mode='w'):
 def append_zip(zipfilename, filename, content):
     """ Append files to a zip file. files is a list of tuples where each tuple
         is a (filename, content) pair. """
-    with zipfile.ZipFile(zipfilename, 'a') as zip_archive:
-        zip_archive.writestr(filename, content)
+    zip_archive = zipfile.ZipFile(zipfilename, 'a')
+    zip_archive.writestr(filename, content)
+    zip_archive.close()
 
 def save_zip(save_dir, cnxml, html, files):
     ram = StringIO()
@@ -285,7 +283,6 @@ def render_conversionerror(request, error):
 class PreviewSchema(formencode.Schema):
     allow_extra_fields = True
     title = formencode.validators.String()
-
 
 @view_config(route_name='preview', renderer='templates/preview.pt',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
@@ -376,7 +373,6 @@ def preview_body_view(request):
 class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True
     cnxml = formencode.validators.String(not_empty=True)
-
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
