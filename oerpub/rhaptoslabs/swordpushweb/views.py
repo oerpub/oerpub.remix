@@ -1059,6 +1059,7 @@ class Choose_Document_Source(BaseHelper):
 
                 elif form.data['upload'] is not None:
                     self.request.session['filename'] = form.data['upload'].filename
+                    self.process_document_data(form, self.request, save_dir)
 
                 # Google Docs Conversion
                 # if we have a Google Docs ID and Access token.

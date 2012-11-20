@@ -101,6 +101,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     type="submit">
                                 
                                 <input id="upload" name="upload" style="visibility: hidden;" type="file" />
+                                <input id="newmodule" name="newmodule" value="" type="hidden" />
                             </div>
                         </li>
 
@@ -112,8 +113,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             </label>
 
                             <div class="upload-form">
-                                ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')}
-                                ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
+                                ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')} ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
                                 <input id="google-submit"
                                     type="submit"
                                     class="btn" 
