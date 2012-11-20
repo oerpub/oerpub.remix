@@ -4,38 +4,6 @@
 <title>New module</title>
 <metadata xmlns:md="http://cnx.rice.edu/mdml"
           mdml-version="0.5">
-  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
-       Changes to the metadata section in the source will not be saved. -->
-  <md:repository>http://cnx.org/content</md:repository>
-  <md:content-id>new</md:content-id>
-  <md:title>New module</md:title>
-  <md:version>**new**</md:version>
-  <md:created>CREATED</md:created>
-  <md:revised>REVISED</md:revised>
-  <md:actors>
-    <md:person userid="ID">
-      <md:firstname>NAME</md:firstname>
-      <md:surname>SURNAME</md:surname>
-      <md:fullname>FULLNAME</md:fullname>
-      <md:email>EMAIL</md:email>
-    </md:person>
-  </md:actors>
-  <md:roles>
-    <md:role type="author">ID</md:role>
-    <md:role type="maintainer">ID</md:role>
-    <md:role type="licensor">ID</md:role>
-  </md:roles>
-  <md:license url="http://creativecommons.org/licenses/by/3.0/" />
-  <!-- For information on license requirements for use or modification, see license url in the
-       above <md:license> element.
-       For information on formatting required attribution, see the URL:
-         CONTENT_URL/content_info#cnx_cite_header
-       where CONTENT_URL is the value provided above in the <md:content-url> element.
-  -->
-  <md:abstract></md:abstract>
-  <md:language>en</md:language>
-  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
-       Changes to the metadata section in the source will not be saved. -->
 </metadata>
 
 <content>

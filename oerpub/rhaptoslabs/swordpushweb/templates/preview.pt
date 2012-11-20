@@ -205,6 +205,8 @@
 
 
     <!-- Modal dialogs -->
+    ${form.begin(request.route_url('metadata'), multipart='multipart', id='neworexisting-form')}
+    ${form.csrf_token()}
     <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
         aria-labelledby="New or existing" aria-hidden="true">
         <div class="modal-header">
@@ -233,6 +235,7 @@
             <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
         </div>
     </div>
+    ${form.end()}
 
     <!-- Back navigation warning -->
     <div id="go-or-stay-dialog" class="modal hide fade" tabindex="-1" role="dialog"

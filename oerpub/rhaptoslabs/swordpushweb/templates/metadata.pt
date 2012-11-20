@@ -1,7 +1,12 @@
 <metal:use use-macro="base">
     <metal:script-slot fill-slot="script-slot">    
-        <script type="text/javascript">
+    
+        <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
+        <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
+        <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
+        <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
 
+        <script type="text/javascript">
             $(document).ready(function(){
                 $('.forward-button').removeAttr('disabled');
                 $('.forward-button').val("Finish: Upload \u00bb");
@@ -25,7 +30,6 @@
                     $("#formentry-fl .formlabel").click();
                 }
             });
-
         </script>
     
     </metal:script-slot>    
@@ -34,11 +38,14 @@
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
-                <input id="back-to-chooser"
+                <input type="button" class="btn"
+                    id="back-to-chooser"
+                    href="#go-or-stay-dialog"
+                    role="button"
+                    data-toggle="modal"
                     type="button"
                     title="Return to the previous page"
                     value="&laquo; Back"
-                    class="button"
                     url="${request.route_url('preview')}">
             </div>
 
@@ -50,7 +57,9 @@
                     in Connexions
                 </span>
                 
-                <input id="top-upload-to-cnx" type="button" class="button forward-button"
+                <input id="top-upload-to-cnx"
+                    class="btn forward-button"
+                    type="button"
                     title="Click 'Finish' to add the module as edited to the designated work area. Further steps are required before the module can be published in the Connexions repository." 
                     value="Finish: Upload &raquo;">
 
@@ -256,7 +265,8 @@
                                             <a title="Opens in a new window"
                                                 id="show-featuredlinks-help"
                                                 style="font-size: .85em; font-weight: normal;"
-                                                href="#">
+                                                data-toggle="modal"
+                                                href="#featuredlinks-help">
                                                 (what's this?)
                                             </a>
                                         </div>
@@ -457,23 +467,33 @@
 
     </div>
 
-    <div id="featuredlinks-help" style="display: none;">
+    <div id="featuredlinks-help" class="modal hide fade" tabindex="-1" role="dialog"
+        aria-labelledby="New or existing" aria-hidden="true">
 
-        <div>
-            <span class="button" id="close-featuredlinks-help">Close X</span>
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="featuredLinksHelpLabel">
+                About Featured Links
+            </h3>
         </div>
 
-        <strong>About Featured Links</strong>
+        <div class="modal-body">
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <p>
+                    "Featured Links" provide a way for authors to prominently display links in their modules.  
+                    These can be links to example, supplemental, or prerequisite materials, such as other modules, outside resources, or files for downloading. 
+                    They are featured in a special box in the upper-right-hand corner of the module when viewed online, as seen in this example:
+                </p>
 
-        <p>
-            "Featured Links" provide a way for authors to prominently display links in their modules.  
-            These can be links to example, supplemental, or prerequisite materials, such as other modules, outside resources, or files for downloading. 
-            They are featured in a special box in the upper-right-hand corner of the module when viewed online, as seen in this example:
-        </p>
-        <div style="text-align: center;">
-            <img src="${images_url}/featured-links-02.png"/>
+                <div style="text-align: center;">
+                    <img src="${images_url}/featured-links-02.png"/>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                </div>
+            </div>
         </div>
-
     </div>
 
     </metal:hidden-slot>

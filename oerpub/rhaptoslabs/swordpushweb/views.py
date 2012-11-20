@@ -290,7 +290,6 @@ class PreviewSchema(formencode.Schema):
 @view_config(route_name='preview', renderer='templates/preview.pt',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
 def preview_view(request):
-    import pdb;pdb.set_trace()
     check_login(request)
     
     session = request.session
