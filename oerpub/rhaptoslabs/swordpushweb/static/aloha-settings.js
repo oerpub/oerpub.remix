@@ -30,9 +30,23 @@
                 dragdrop: "1"
             },
             image: {
-                uploadurl: '/upload_dnd',
-                uploadmethod: 'POST',
-                uploadfield: 'upload'
+                onUploadSuccess: function(xhr){
+                    // Expect a json-formatted response
+                    try {
+                        var msg = JSON.parse(xhr.response);
+                        return msg.url;
+                    } catch(e) {}
+                    return null;
+                }
+            },
+            draganddropfiles: {
+                upload: {
+                    config: {
+                        url: '/upload_dnd',
+                        send_multipart_form: true,
+                        fieldName: 'upload'
+                    }
+                }
             }
         },
         bundles: {

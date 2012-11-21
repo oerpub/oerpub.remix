@@ -10,6 +10,24 @@
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
+
+    <!-- Mathjax -->
+    <script src="${request.application_url}/aloha/src/plugins/extra/math/lib/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"> <!-- xhtml --></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({
+      jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
+      extensions: ["asciimath2jax.js", "tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+      tex2jax: { inlineMath: [["[TEX_START]","[TEX_END]"], ["\\(", "\\)"]] },
+      // Apparently we can't change the escape sequence for ASCIIMath (MathJax doesn't find it)
+      // asciimath2jax: { inlineMath: [["[ASCIIMATH_START]", "[ASCIIMATH_END]"]], },
+
+      // The default for Firefox is "HTML" for some reason so change it to MML
+      MMLorHTML: {prefer:{MSIE:"MML",Firefox:"MML",Opera:"HTML",Chrome:"HTML",Safari:"HTML",other:"HTML"}},
+      TeX: {
+        extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], noErrors: { disabled: true }
+      },
+      AsciiMath: { noErrors: { disabled: true } }
+    });</script>
+
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
     <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
@@ -21,7 +39,9 @@
                             common/block,
                             common/list,
                             oerpub/table,
-                            oerpub/image,
+                            oerpub/math,
+                            extra/draganddropfiles,
+                            common/image,
                             oerpub/assorted,
                             common/undo,
                             extra/undobutton,
@@ -91,6 +111,8 @@
                     // if it exists. This code should do nothing in production
                     $editable.find('#pDebug').remove();
                     $editable.aloha().focus();
+
+                    MathJax.Hub.Configured();
 
                     // Auto-save periodically. This only does anything if
                     // editor.isModified().
