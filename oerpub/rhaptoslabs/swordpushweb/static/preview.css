@@ -47,3 +47,23 @@ figure figcaption::before {
 .aloha-editable-active, .aloha-editable-active[contenteditable="true"]:focus {
     outline: none !important;
 }
+
+.modal-header {
+  background-color: #9ABCDC !important; /* Connexions Blue */
+}
+
+.modal-header .close {
+    margin-top: -5px !important;
+}
+
+.modal-header h3 {
+    line-height: 15px !important;
+}
+
+.modal-body {
+    padding: 10px !important;
+}
+
+.modal-footer {
+    padding: 5px 15px 5px !important;
+}
