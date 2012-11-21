@@ -49,8 +49,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                 Choose one of the following to import the contents of a new or existing module. 
               </p>
 
-              ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
-              ${form.csrf_token()}
+            ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
+            ${form.csrf_token()}
 
             <table style="width: 100%; border-collapse: collapse; border-width: 0;">
               <tbody>
@@ -113,7 +113,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             </label>
 
                             <div class="upload-form">
-                                ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')} ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
+                                ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')} 
+                                ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
                                 <input id="google-submit"
                                     type="submit"
                                     class="btn" 
@@ -184,8 +185,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
     </div>
 </div>
 
-${form.begin(request.route_url('choose'), multipart='multipart', id='neworexisting-form')}
-${form.csrf_token()}
 <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
     aria-labelledby="New or existing" aria-hidden="true">
     <div class="modal-header">
@@ -195,29 +194,29 @@ ${form.csrf_token()}
         </h3>
     </div>
     <div class="modal-body">
+        ${form.begin(request.route_url('choose'), id='neworexisting-form')}
+        ${form.csrf_token()}
+        ${form.hidden('upload', value='')}
         <div class="forminfo" style="margin: .5em 0 1em;">
-            <input id="upload" name="upload" type="hidden" />
-            <input id="newmodule" name="newmodule" value="newmodule" type="hidden" />
-            <button class="btn btn-primary submit-neworexisting"
-                value="newmodule"
-                url="${request.route_url('choose')}">
-                New module
-            </button><br/>
+            <input class="btn btn-primary" id="newmodule"
+                name="newmodule" value="New module" type="submit"> <br/>
             This is an entirely new module. 
         </div>
+        ${form.end()}
+
+        ${form.begin(request.route_url('choose-module'), id='neworexisting-form')}
+        ${form.csrf_token()}
         <div class="forminfo" style="margin: .5em 0 1em;">
-            <button class="btn btn-primary submit-neworexisting" 
-                url="${request.route_url('choose-module')}">
-                Existing module
-            </button><br/>
+            <input class="btn btn-primary" id="existingmodule"
+                name="existingmodule" value="Existing module" type="submit"> <br />
             Choose an existing module to apply your import to, replacing its contents.  
         </div>
+        ${form.end()}
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     </div>
 </div>
-${form.end()}
 
 <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">

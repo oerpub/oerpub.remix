@@ -364,10 +364,8 @@ $(document).ready(function()
 
     // Apply the "New or existing module?" overlay.
     $('.submit-neworexisting').click(function(e) {
-        e.preventDefault();
-        url = $(this).attr('url');
-        $.modal.close();
-        $('form#neworexisting-form').submit(); 
+        alert('Deprecated!');
+        return False;
     });
 
     // Workgroup menu ("Describe your module" and "Choose module" pages) derived

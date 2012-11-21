@@ -187,11 +187,6 @@ def logout_view(request):
     raise HTTPFound(location=request.route_url('login'))
 
 
-class UploadSchema(formencode.Schema):
-    allow_extra_fields = True
-    upload = formencode.validators.FieldStorageUploadConverter()
-    newmodule = formencode.validators.String()
-
 class ConversionError(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -978,7 +973,7 @@ class Modules_List_View(BaseHelper):
     @view_config(
         route_name='modules_list', renderer="templates/modules_list.pt")
     def generate_html_view(self):
-        check_login(self.request)
+        self.check_login()
         config = load_config(self.request)
         conn = self.get_connection()
 
@@ -1022,11 +1017,17 @@ class Choose_Module(Module_Association_View):
     def content_macro(self):
         return self.macro_renderer.implementation().macros['content_macro']
 
+
+class UploadSchema(formencode.Schema):
+    allow_extra_fields = True
+    upload = formencode.validators.FieldStorageUploadConverter()
+
+
 class Choose_Document_Source(BaseHelper):
 
     @view_config(route_name='choose')
     def generate_html_view(self):
-        check_login(self.request)
+        self.check_login()
 
         templatePath = 'templates/choose.pt'
 

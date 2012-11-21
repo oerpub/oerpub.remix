@@ -204,8 +204,6 @@
 
 
     <!-- Modal dialogs -->
-    ${form.begin(request.route_url('metadata'), multipart='multipart', id='neworexisting-form')}
-    ${form.csrf_token()}
     <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
         aria-labelledby="New or existing" aria-hidden="true">
         <div class="modal-header">
@@ -215,26 +213,29 @@
             </h3>
         </div>
         <div class="modal-body">
+            ${form.begin(request.route_url('metadata'), id='neworexisting-form')}
+            ${form.csrf_token()}
+            ${form.hidden('upload', value='')}
             <div class="forminfo" style="margin: .5em 0 1em;">
-                <button class="btn btn-primary submit-neworexisting" 
-                    url="${request.route_url('metadata')}">
-                    New module
-                </button><br/>
+                <input class="btn btn-primary" id="newmodule"
+                    name="newmodule" value="New module" type="submit"> <br/>
                 This is an entirely new module. 
             </div>
+            ${form.end()}
+
+            ${form.begin(request.route_url('choose-module'), id='neworexisting-form')}
+            ${form.csrf_token()}
             <div class="forminfo" style="margin: .5em 0 1em;">
-                <button class="btn btn-primary submit-neworexisting" 
-                    url="${request.route_url('module_association')}">
-                    Override existing module
-                </button><br/>
+                <input class="btn btn-primary" id="existingmodule"
+                    name="existingmodule" value="Existing module" type="submit"> <br />
                 Choose an existing module to apply your import to, replacing its contents.  
             </div>
-        </div>
+            ${form.end()}
+
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
         </div>
     </div>
-    ${form.end()}
 
     <!-- Back navigation warning -->
     <div id="go-or-stay-dialog" class="modal hide fade" tabindex="-1" role="dialog"
