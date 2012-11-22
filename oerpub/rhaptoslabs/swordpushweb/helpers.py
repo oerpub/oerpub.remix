@@ -29,6 +29,14 @@ class BaseHelper(object):
         renderer = get_renderer("templates/base.pt")
         return renderer.implementation().macros['main']
 
+    @reify
+    def back_navigation_warning(self):
+        return self.macro_renderer.implementation().macros['back_navigation_warning']
+
+    @reify
+    def forward_navigation_warning(self):
+        return self.macro_renderer.implementation().macros['forward_navigation_warning']
+
     def get_next_action(self):
         url = self.request.route_url(self.navigation_actions['next'])
         return url
