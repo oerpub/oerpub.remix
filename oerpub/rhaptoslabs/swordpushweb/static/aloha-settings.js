@@ -12,6 +12,11 @@
         errorhandling : true,
         requireConfig: { waitSeconds: 42 },
         plugins: {
+            assorted: {
+                image: {
+                    preview: false
+                }
+            },
             genericbutton: {
                 buttons: [{'id': 'save', 'title': 'Save', 'event': 'swordpushweb.save' }]
             },
