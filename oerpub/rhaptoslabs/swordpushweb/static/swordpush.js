@@ -195,7 +195,7 @@ $(document).ready(function()
         return true;
     });
 
-    $("#back-to-chooser, #header h1 a, #header img.cnxlogo, #start-over input").click(function(e){
+    $("#back-to-chooser, #start-over input").click(function(e){
         if ($("#edit-frame").length != 0 || $("#metadata").length != 0 && $(this).attr("id") == 'back-to-chooser') {
             return _doAction(confirmMsg3, e);
         } else if ($("#see-error").length != 0) {
@@ -214,6 +214,10 @@ $(document).ready(function()
     });
 
     $("button#btn-navigate-back").click(function(e){
+        _doNavAction(e);
+    });
+
+    $("button#btn-navigate-forward").click(function(e){
         _doNavAction(e);
     });
 
