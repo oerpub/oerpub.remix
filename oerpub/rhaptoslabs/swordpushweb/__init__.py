@@ -23,8 +23,6 @@ def add_routes(config):
     config.add_route('cnxlogin', '/cnxlogin')
     config.add_route('choose', '/choose')
     config.add_route('preview', '/preview')
-    config.add_route('preview_header', '/preview_header')
-    config.add_route('preview_body', '/preview_body')
     config.add_route('preview_save', '/preview_save')
     config.add_route('cnxml', '/cnxml')
     config.add_route('metadata', '/metadata')
