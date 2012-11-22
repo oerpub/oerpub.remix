@@ -204,8 +204,9 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
         </div>
         ${form.end()}
 
-        ${form.begin(request.route_url('choose-module'), id='neworexisting-form')}
+        ${form.begin(request.route_url('choose'), id='neworexisting-form')}
         ${form.csrf_token()}
+        ${form.hidden('upload', value='')}
         <div class="forminfo" style="margin: .5em 0 1em;">
             <input class="btn btn-primary" id="existingmodule"
                 name="existingmodule" value="Existing module" type="submit"> <br />

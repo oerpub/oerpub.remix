@@ -112,33 +112,28 @@
     </metal:script>
 
     <metal:workflownav fill-slot="workflownav">
-    ${form.begin(request.route_url('metadata'), name="preview_form")}
-    ${form.csrf_token()}
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
                 <input type="button" class="btn"
-                href="#go-or-stay-dialog"
+                href="#go-back-or-stay-dialog"
                 role="button"
                 data-toggle="modal"
                 type="button"
                 value="&#171; Back: Return to start page"
                 id="btn-back-to-chooser"
-                title="Return to the previous screen to choose a different import or editing option"
-                url="${request.route_url('choose')}"/>
+                title="Return to the previous screen to choose a different import or editing option" />
             </div>
 
             <div id="forward-steps">
                 <input id="show-neworexisting"
-                href="#neworexisting"
+                href="#go-forward-or-stay-dialog"
                 role="button"
                 class="btn"
                 data-toggle="modal"
-                class="button forward-button"
                 type="button"
                 value="Next Step &#187;"
-                url="${request.route_url('module_association')}"
-                title="Select whether this will be used for a new module or to override the contents of an existing module">
+                title="Select whether this will be used for a new module or to override the contents of an existing module" />
             </div>
 
         </div>
@@ -147,114 +142,70 @@
 
     <metal:content-slot fill-slot="content-slot"
         tal:define="filename python:request.session.get('filename')">
+    ${form.begin(request.route_url('preview'), name="preview_form")}
+    ${form.csrf_token()}
     <div id="ie6-container-wrap">
         <div id="container">
-            <div tal:replace="structure provider('toolbar')" />
+            <div tal:replace="structure provider('toolbar')">toolbar</div>
             <div id="content">
-            <div id="artboard">
-                <div id="pageheader-wrap">
+                <div id="artboard">
+                    <div id="pageheader-wrap">
 
-                    <div id="module-actions">
-                        <div class="advanced" style="display: block;">
-                            <h2 class="advanced-label">
-                                Advanced
-                            </h2>
-                            <strong>Module actions: </strong>
-                            <a id="download-copy"
-                                title="Save a ZIP file containing the module's XML and metadata to your local computer."
-                                href="#asdfaasdf"
-                                tal:attributes="href request.route_url('download_zip')">
-                                <span class="button">Download a copy</span>
-                            </a>
-                            <a id="edit-xml"
-                                title="Make changes to the module by editing its XML code."
-                                href="${request.route_url('cnxml')}">
-                                <span class="button">Edit XML</span>
-                            </a>
+                        <div id="module-actions">
+                            <div class="advanced" style="display: block;">
+                                <h2 class="advanced-label">
+                                    Advanced
+                                </h2>
+                                <strong>Module actions: </strong>
+                                <a id="download-copy"
+                                    title="Save a ZIP file containing the module's XML and metadata to your local computer."
+                                    href="#asdfaasdf"
+                                    tal:attributes="href request.route_url('download_zip')">
+                                    <span class="button">Download a copy</span>
+                                </a>
+                                <a id="edit-xml"
+                                    title="Make changes to the module by editing its XML code."
+                                    href="${request.route_url('cnxml')}">
+                                    <span class="button">Edit XML</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="page-title">
+                            <h1>
+                                Preview:
+                                <span class="metatitle">
+                                    Conversion of <span>${filename}</span>
+                                </span>
+                            </h1>
+                        </div>
+
+                        <div id="page-description">
+                            <p class="forminfo">
+                                View below how the module will appear in Connexions.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div id="statusmessage"></div>
+                    <div id="editor">
+                        <div id="canvas">
                         </div>
                     </div>
-
-                    <div id="page-title">
-                        <h1>
-                            Preview:
-                            <span class="metatitle">
-                                Conversion of <span>${filename}</span>
-                            </span>
-                        </h1>
-                    </div>
-
-                    <div id="page-description">
-                        <p class="forminfo">
-                            View below how the module will appear in Connexions.
-                        </p>
-                    </div>
-
                 </div>
-
-                <div id="statusmessage"></div>
-                <div id="editor">
-                    <div id="canvas">
-                    </div>
-                </div>
-            </div>
             </div>
         </div>
     </div>
     ${form.end()}
 
+    <span metal:use-macro="view.forward_navigation_warning">
+        next step
+    </span>
 
-    <!-- Modal dialogs -->
-    <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
-        aria-labelledby="New or existing" aria-hidden="true">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="neworexistingLabel">
-                Is this for a new module or will it override an existing one?
-            </h3>
-        </div>
-        <div class="modal-body">
-            ${form.begin(request.route_url('metadata'), id='neworexisting-form')}
-            ${form.csrf_token()}
-            ${form.hidden('upload', value='')}
-            <div class="forminfo" style="margin: .5em 0 1em;">
-                <input class="btn btn-primary" id="newmodule"
-                    name="newmodule" value="New module" type="submit"> <br/>
-                This is an entirely new module. 
-            </div>
-            ${form.end()}
-
-            ${form.begin(request.route_url('choose-module'), id='neworexisting-form')}
-            ${form.csrf_token()}
-            <div class="forminfo" style="margin: .5em 0 1em;">
-                <input class="btn btn-primary" id="existingmodule"
-                    name="existingmodule" value="Existing module" type="submit"> <br />
-                Choose an existing module to apply your import to, replacing its contents.  
-            </div>
-            ${form.end()}
-
-        <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        </div>
-    </div>
-
-    <!-- Back navigation warning -->
-    <div id="go-or-stay-dialog" class="modal hide fade" tabindex="-1" role="dialog"
-        aria-labelledby="Go or stay" aria-hidden="true">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="go-or-stay-label">
-                Are you sure you want to leave this page? 
-            </h3>
-        </div>
-        <div class="modal-body">
-            Your changes have not been saved and any work will be lost if you leave this page.
-        </div>
-        <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <button id="btn-navigate-back" class="btn btn-primary"
-                tal:attributes="href string:${request.route_url('choose')}">OK</button>
-        </div>
-    </div>
+    <span metal:use-macro="view.back_navigation_warning">
+        back navigation warning
+    </span>
 
     </metal:content-slot>
 

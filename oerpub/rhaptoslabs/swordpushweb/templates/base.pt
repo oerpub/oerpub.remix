@@ -146,7 +146,11 @@
 
                 <div id="header">
                     <img class="cnxlogo" src="/static/images/connexions_icon.png"/>
-                    <h1><a href="/">OERPUB Connexions Importer</a></h1>
+                    <h1>
+                        <a id="cnxlogo-link"
+                            href="#go-back-or-stay-dialog" role="button"
+                            data-toggle="modal">OERPUB Connexions Importer</a>
+                    </h1>
                 </div>
                 
                 <metal:workflownav define-slot="workflownav">
@@ -175,6 +179,9 @@
         
         <!--Hidden content like popups, modal forms, etc. go here.-->
         <metal:hidden-slot define-slot="hidden-slot">
+        <span metal:use-macro="view.back_navigation_warning">
+            back navigation warning
+        </span>
         </metal:hidden-slot>
 
         <metal:footer-slot define-slot="footer-slot">

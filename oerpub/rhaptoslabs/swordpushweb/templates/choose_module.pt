@@ -1,6 +1,11 @@
 <metal:use use-macro="base">
 
 <metal:script-slot fill-slot="script-slot">    
+    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
+    <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
+    <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
+
     <script type="text/javascript">
 
         $(document).ready(function(){
@@ -29,7 +34,7 @@ ${form.csrf_token()}
         <div id="back-steps">
             <input id="back-to-chooser"
                 type="button"
-                class="button"
+                class="btn"
                 value="&laquo; Back: Return to start page"
                 title="Return to the initial page"
                 tal:attributes="url view.get_previous_action()">
@@ -41,7 +46,7 @@ ${form.csrf_token()}
             <input type="submit"
                 name="form.submitted"
                 disabled="disabled"
-                class="button forward-button" 
+                class="btn forward-button" 
                 value="Next: Edit selected module &raquo;" 
                 tal:attributes="url view.get_next_action()"
                 title="Select a module below and then click 'Next' to start editing it">
