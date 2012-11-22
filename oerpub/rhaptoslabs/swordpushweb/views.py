@@ -9,6 +9,8 @@ import logging
 import libxml2
 import lxml
 import re
+import subprocess
+
 from cStringIO import StringIO
 import peppercorn
 from lxml import etree
@@ -48,6 +50,7 @@ from z3c.batching.batch import Batch
 from utils import check_login, get_metadata_from_repo
 from utils import ZIP_PACKAGING
 from helpers import BaseHelper 
+import parse_sword_treatment
 
 TESTING = False      
 CWD = os.getcwd()
@@ -279,70 +282,79 @@ class PreviewSchema(formencode.Schema):
     allow_extra_fields = True
     title = formencode.validators.String()
 
-@view_config(route_name='preview', renderer='templates/preview.pt',
-    http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
-def preview_view(request):
-    check_login(request)
-    
-    session = request.session
-    module = request.params.get('module')
-    if module:
-        conn = sword2cnx.Connection(session['service_document_url'],
-                                    user_name=session['username'],
-                                    user_pass=session['password'],
-                                    always_authenticate=True,
-                                    download_service_document=False)
 
-        # example: http://cnx.org/Members/user001/m17222/sword/editmedia
-        result = conn.get_resource(content_iri = module,
-                                   packaging = ZIP_PACKAGING) 
+class PreviewView(BaseHelper):
+
+    navigation_actions = {'next': 'metadata', 
+                          'previous': 'choose',}
+
+    @view_config(route_name='preview', renderer='templates/preview.pt',
+        http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
+    def generate_html_view(self):
+        import pdb;pdb.set_trace()
+        self.check_login()
         
-    defaults = {}
-    defaults['title'] = request.session.get('title', '')
-    form = Form(request,
-                schema=PreviewSchema,
-                defaults=defaults
-               )
+        request = self.request
+        session = request.session
+        module = request.params.get('module')
+        if module:
+            conn = sword2cnx.Connection(session['service_document_url'],
+                                        user_name=session['username'],
+                                        user_pass=session['password'],
+                                        always_authenticate=True,
+                                        download_service_document=False)
 
-    body_filename = request.session.get('preview-no-cache')
-    if body_filename is None:
-        body_filename = 'index.xhtml'
-    else:
-        del request.session['preview-no-cache']
+            # example: http://cnx.org/Members/user001/m17222/sword/editmedia
+            zip_file = conn.get_resource(content_iri = module,
+                                         packaging = ZIP_PACKAGING) 
+            
+            save_dir = os.path.join(request.registry.settings['transform_dir'],
+                                    request.session['upload_dir'])
+            cnxml = get_cnxml_from_zipfile(zip_file)
+            files = get_files_from_zipfile(zip_file)
+            save_cnxml(save_dir, cnxml, files)
+            
+        defaults = {}
+        defaults['title'] = request.session.get('title', '')
+        form = Form(request,
+                    schema=PreviewSchema,
+                    defaults=defaults
+                   )
 
-    return {
-        'body_base': '%s%s/' % (
-                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                     request.session['upload_dir']),
-        'body_url': '%s%s/index.html'% (
-                     request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                     request.session['upload_dir']),
-        'form': FormRenderer(form),
-    }
+        body_filename = request.session.get('preview-no-cache')
+        if body_filename is None:
+            body_filename = 'index.xhtml'
+        else:
+            del request.session['preview-no-cache']
+
+        return {
+            'body_base': '%s%s/' % (
+                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                         request.session['upload_dir']),
+            'body_url': '%s%s/index.html'% (
+                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                         request.session['upload_dir']),
+            'form': FormRenderer(form),
+        }
+
+    @reify
+    def neworexisting_dialog(self):
+        return self.macro_renderer.implementation().macros['neworexisting_dialog']
 
 
-@view_config(route_name='preview_header')
-def preview_header_view(request):
-    print('PREVIEW HEADER')
+@view_config(route_name='preview_save')
+def preview_save(request):
     check_login(request)
-    templatePath = 'templates/%s/preview_header.pt'%(
-        ['novice','expert'][request.session.get('expert_mode', False)])
-    return render_to_response(templatePath, {}, request=request)
+    html = request.POST['html']
+    if isinstance(html, unicode):
+        html = html.encode('ascii', 'xmlcharrefreplace')        
 
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
     # Save new html file from preview area
     save_and_backup_file(save_dir, 'index.html', html)
 
-@view_config(route_name='preview_body')
-def preview_body_view(request):
-    return HTTPFound(
-        '%s%s/index.xhtml'% (
-            request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-            request.session['upload_dir']),
-        headers={'Cache-Control': 'max-age=0, must-revalidate, no-cache, no-store'},
-        request=request
-    )
+    conversionerror = ''
 
     #transform preview html to cnxml
     try:
@@ -365,9 +377,11 @@ def preview_body_view(request):
     response.content_type = 'application/json'
     return response
 
+
 class CnxmlSchema(formencode.Schema):
     allow_extra_fields = True
     cnxml = formencode.validators.String(not_empty=True)
+
 
 @view_config(route_name='cnxml', renderer='templates/cnxml_editor.pt')
 def cnxml_view(request):
@@ -424,15 +438,19 @@ def cnxml_view(request):
     }
 
 
-@view_config(route_name='summary')
-def summary_view(request):
-    check_login(request)
-    templatePath = 'templates/summary.pt'
-    import parse_sword_treatment
+class SummaryView(BaseHelper):
 
-    deposit_receipt = request.session['deposit_receipt']
-    response = parse_sword_treatment.get_requirements(deposit_receipt)
-    return render_to_response(templatePath, response, request=request)
+    @view_config(route_name='summary')
+    def generate_html_view(self):
+        self.check_login()
+        templatePath = 'templates/summary.pt'
+        
+        request = self.request
+        deposit_receipt = request.session['deposit_receipt']
+        response = parse_sword_treatment.get_requirements(deposit_receipt)
+        response['view'] = self
+        return render_to_response(
+            templatePath, response, request=request)
 
 
 class ConfigSchema(formencode.Schema):
@@ -943,6 +961,7 @@ class Module_Association_View(BaseHelper):
                     'request': request,
                     'config': config,
                     'module_macros': module_macros,
+                    'view': self,
         }
         return response
 
@@ -992,6 +1011,7 @@ class Modules_List_View(BaseHelper):
                     'modules': modules,
                     'request': self.request,
                     'config': config,
+                    'view': self,
         }
         return response
 
@@ -1025,6 +1045,10 @@ class UploadSchema(formencode.Schema):
 
 class Choose_Document_Source(BaseHelper):
 
+    navigation_actions = {'next': '', 
+                          'previous': '/',
+                          'batch': ''}
+
     @view_config(route_name='choose')
     def generate_html_view(self):
         self.check_login()
@@ -1057,6 +1081,10 @@ class Choose_Document_Source(BaseHelper):
                     cnxml = self.empty_cnxml()
                     files = []
                     save_cnxml(save_dir, cnxml, files)
+                
+                elif form.data.get('existingmodule'):
+                    return HTTPFound(
+                        location=self.request.route_url('choose-module'))
 
                 elif form.data['upload'] is not None:
                     self.request.session['filename'] = form.data['upload'].filename
@@ -1072,7 +1100,8 @@ class Choose_Document_Source(BaseHelper):
                     errors = self.process_url_data(self.request, save_dir)
                     if errors:
                         self.request['errors'] = errors
-                        response = {'form': FormRenderer(form), }
+                        response = {'form': FormRenderer(form),
+                                    'view': self, }
                         return render_to_response(
                             templatePath, response, request=self.request)
 
@@ -1101,6 +1130,7 @@ class Choose_Document_Source(BaseHelper):
         response = {
             'form': FormRenderer(form),
             'field_list': field_list,
+            'view': self,
         }
         return render_to_response(templatePath, response, request=self.request)
 
@@ -1337,7 +1367,6 @@ class Choose_Document_Source(BaseHelper):
 
     def get_commit_hash(self):
         try:
-            import subprocess
             p = subprocess.Popen(["git","log","-1"], stdout=subprocess.PIPE)
             out, err = p.communicate()
             commit_hash = out[:out.find('\n')]
