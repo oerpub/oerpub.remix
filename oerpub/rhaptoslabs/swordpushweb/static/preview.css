@@ -73,4 +73,10 @@ figure figcaption::before {
 
 .modal-footer {
     padding: 5px 15px 5px !important;
+    background-color: white;
+    border: none;
+}
+
+.btn {
+    line-height: 1.1em;
 }
