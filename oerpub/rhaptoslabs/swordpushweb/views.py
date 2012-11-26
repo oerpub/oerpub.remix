@@ -10,6 +10,7 @@ import libxml2
 import lxml
 import re
 import subprocess
+import urlparse
 
 from cStringIO import StringIO
 import peppercorn
@@ -47,8 +48,8 @@ import convert as JOD # Imports JOD convert script
 import jod_check #Imports script which checks to see if JOD is running
 from z3c.batching.batch import Batch
 
-from utils import check_login, get_metadata_from_repo
-from utils import ZIP_PACKAGING
+from utils import check_login, get_metadata_from_repo, extract_to_save_dir
+from utils import ZIP_PACKAGING, get_files
 from helpers import BaseHelper 
 import parse_sword_treatment
 
@@ -291,7 +292,6 @@ class PreviewView(BaseHelper):
     @view_config(route_name='preview', renderer='templates/preview.pt',
         http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
     def generate_html_view(self):
-        import pdb;pdb.set_trace()
         self.check_login()
         
         request = self.request
@@ -304,15 +304,31 @@ class PreviewView(BaseHelper):
                                         always_authenticate=True,
                                         download_service_document=False)
 
+            parts = urlparse.urlsplit(module)
+            path = parts.path.split('/')
+            path = path[:path.index('sword')]
+            module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
+
             # example: http://cnx.org/Members/user001/m17222/sword/editmedia
-            zip_file = conn.get_resource(content_iri = module,
-                                         packaging = ZIP_PACKAGING) 
+            zip_file = conn.get_cnx_module(module_url = module_url,
+                                           packaging = 'zip')
             
             save_dir = os.path.join(request.registry.settings['transform_dir'],
                                     request.session['upload_dir'])
-            cnxml = get_cnxml_from_zipfile(zip_file)
-            files = get_files_from_zipfile(zip_file)
-            save_cnxml(save_dir, cnxml, files)
+            extract_to_save_dir(zip_file, save_dir)
+
+            cnxml_file = open(os.path.join(save_dir, 'index.cnxml'), 'rb')
+            cnxml = cnxml_file.read()
+            cnxml_file.close()
+            conversionerror = None
+            try:
+                htmlpreview = cnxml_to_htmlpreview(cnxml)
+                save_and_backup_file(save_dir, 'index.html', htmlpreview)
+                files = get_files(save_dir)
+                save_zip(save_dir, cnxml, htmlpreview, files)
+            except libxml2.parserError:
+                conversionerror = traceback.format_exc()
+                raise ConversionError(conversionerror)
             
         defaults = {}
         defaults['title'] = request.session.get('title', '')

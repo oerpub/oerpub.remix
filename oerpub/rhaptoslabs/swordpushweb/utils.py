@@ -1,3 +1,4 @@
+import shutil
 import cStringIO
 import types
 import os
@@ -24,6 +25,29 @@ NAMESPACES = {'sword'   : 'http://purl.org/net/sword/',
               }
 
 log = logging.getLogger('utils')
+
+def get_files(save_dir):
+    files = []
+    names = os.listdir(save_dir)
+    for name in names:
+        tmpfile = open(os.path.join(save_dir, name), 'rb')
+        content = tmpfile.read()
+        tmpfile.close()
+        files.append([name, content])
+    return files
+
+def extract_to_save_dir(zip_file, save_dir):
+    if not zip_file:
+        return
+    
+    tmp_dir = os.path.join(save_dir, 'tmp')
+    for zinfo in zip_file.infolist():
+        zip_file.extract(zinfo, tmp_dir)
+        fileparts = zinfo.filename.split('/')
+        src = os.path.join(tmp_dir, zinfo.filename)
+        dest = os.path.join(save_dir, fileparts[-1])
+        shutil.move(src, dest)
+    shutil.rmtree(tmp_dir, ignore_errors=True)
 
 def create_module_in_2_steps(form, connection, metadata_entry, zip_file, save_dir):
     zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
