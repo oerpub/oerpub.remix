@@ -92,6 +92,10 @@
                 PubSub.sub('swordpushweb.save', function(){
                     savePreview();
                 });
+                var NextStep = $('#forward-steps');
+                NextStep.on('click', function(evt) {
+                    savePreview();
+                });
 
                 // Set up status message area
                 var statusarea = $('#statusmessage');
