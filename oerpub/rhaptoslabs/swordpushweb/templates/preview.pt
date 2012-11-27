@@ -92,10 +92,6 @@
                 PubSub.sub('swordpushweb.save', function(){
                     savePreview();
                 });
-                var NextStep = $('#forward-steps');
-                NextStep.on('click', function(evt) {
-                    savePreview();
-                });
 
                 // Set up status message area
                 var statusarea = $('#statusmessage');
@@ -119,6 +115,18 @@
                     MathJax.Hub.Configured();
 
                     // Auto-save periodically. This only does anything if
+
+                    Aloha.jQuery('#show-neworexisting').on('click', function(e){
+                        var editor = Aloha.getEditableById('canvas');
+                        if(editor.isModified()){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $('#statusmessage').data('message')(
+                                'Please save the document before continuing',
+                                'error');
+                        }
+                    });
+
                     // editor.isModified().
                     window.setInterval(savePreview, 30000);
 
