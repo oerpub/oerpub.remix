@@ -24,7 +24,8 @@
 
                 $("#fl-field").hide();
                 $('.edit-link').click(editFeaturedLink);
-                $('.remove-link').click(removeFeaturedLink);
+                //$('.remove-link').click(showYesNoDialog);
+                $('#btn-remove-featuredlink').click(removelink);
 
                 if ($('table#featured-links-table tr').length > 0) {
                     $("#formentry-fl .formlabel").click();
@@ -342,7 +343,7 @@
                         </a>
                     </td>
                     <td nowrap="nowrap" id="example-id" class="link-edit-link">
-                        <a href="#" class="remove-link">
+                        <a href="#yesnodialog" class="remove-link">
                             Remove
                         </a>
                     </td>
@@ -501,6 +502,24 @@
                     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="yesnodialog" class="modal hide fade" tabindex="-1" role="dialog"
+        aria-labelledby="Yes / No dialog" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="go-or-stay-label">
+                Are you sure you want to continue? 
+            </h3>
+        </div>
+        <div class="modal-body">
+            Are you sure you want to remove this link? <br/>
+            You cannot undo its removal, but you can always manually add it again.
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <button id="btn-remove-featuredlink" class="btn btn-primary" data-dismiss="modal">OK</button>
         </div>
     </div>
 
