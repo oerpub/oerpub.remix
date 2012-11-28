@@ -56,7 +56,7 @@
                 GenericButton.getButtons()["save"].enable(false);
                 $('.btn.save').html('Saved');
 
-                function savePreview(){
+                function savePreview(callback_function){
                     var editor = Aloha.getEditableById('canvas');
                     if(editor.isModified()){
                         // setUnmodified, to avoid another concurrent save from
@@ -81,6 +81,9 @@
                                 $('#statusmessage').data('message')('Saved');
                                 GenericButton.getButtons()["save"].enable(false);
                                 $('.btn.save').html('Saved');
+                                if (callback_function) {
+                                    callback_function();
+                                }
                             } else {
                                 $('#statusmessage').data('message')(data.error, 'error');
                             }
@@ -94,7 +97,19 @@
                 });
                 var NextStep = $('#show-neworexisting');
                 NextStep.on('click', function(evt) {
-                    savePreview();
+                    var editor = Aloha.getEditableById('canvas');
+                        if(editor.isModified()){
+                        // show the info slider
+                        $('#upload-wait').center();
+                        $('#upload-wait').slideDown('slow');
+                        $('#btn-newmodule').attr('disabled', '1');
+                        $('#btn-exsitingmodule').attr('disabled', '1');
+                        savePreview(function (event) {
+                            $('#upload-wait').slideUp('slow');
+                            $('#btn-newmodule').removeAttr('disabled');
+                            $('#btn-exsitingmodule').removeAttr('disabled');
+                        });
+                    }
                 });
 
                 // Set up status message area
@@ -132,6 +147,12 @@
                     });
                     Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
                 });
+            });
+        });
+
+        $(document).ready(function() {
+            $('#neworexisting').on('hidden', function() {
+                $('#upload-wait').slideUp('slow');
             });
         });
         </script>
@@ -236,14 +257,14 @@
         </div>
         <div class="modal-body">
             <div class="forminfo" style="margin: .5em 0 1em;">
-                <button class="btn btn-primary submit-neworexisting" 
+                <button id="btn-newmodule" class="btn btn-primary submit-neworexisting" 
                     url="${request.route_url('metadata')}">
                     New module
                 </button>
                 This is an entirely new module. 
             </div>
             <div class="forminfo" style="margin: .5em 0 1em;">
-                <button class="btn btn-primary submit-neworexisting" 
+                <button id="btn-exsitingmodule" class="btn btn-primary submit-neworexisting" 
                     url="${request.route_url('module_association')}">
                     Override existing module
                 </button>
@@ -255,6 +276,9 @@
         </div>
     </div>
 
+    <div class="pleasewait" id="upload-wait" style="display: none;">
+        Your document is being saved. This may take a few moments.
+    </div>
     </metal:content-slot>
 
     <metal:footer-slot fill-slot="footer-slot" />

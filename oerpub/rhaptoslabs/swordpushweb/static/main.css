@@ -941,3 +941,7 @@ ul.popOut a:hover{
 #statusmessage div.error {
     background-color: red;
 }
+
+#upload-wait {
+    z-index: 9999;
+}
