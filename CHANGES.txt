@@ -7,7 +7,36 @@
   - default login behaviour
   - a base macro (check templates/base.pt for more details)
   - a default macro render (check templates/macros.pt for more details)
+  - abstart navigation targets.
+  - methods for surfacing navigation targets to templates.
+  Next steps:
+  Move the rest of the module level methods into classes.
+  Create a views package.
+  Split views.py into multiple modules and move into view package.
+  
+- Added the following classes:
+  PreviewView
+  SummaryView
+  Metadata_View
+  Module_Association_View
+  Modules_List_View
+  Choose_Module
+  Choose_Document_Source
 
+- Add macros to macros.pt:
+  modules_list
+  workspace_popup
+  featured_link
+  featured_links_table
+  back_navigation_warning
+  forward_navigation_warning
+  neworexisting_dialog
+
+- Ported modal popups to bootstrap.
+
+- Ported dialogs to bootstrap.
+
+  [rijkstofberg]
 
 0.1.3 - unreleased
 ------------------
