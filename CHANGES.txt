@@ -1,3 +1,14 @@
+0.1.4 - unreleased
+------------------
+- Started move towards breaking views.py into multiple modules in a views
+  package. What we have so far:
+  BaseHelper class as common ancestor for view classes in helper.py
+  It supplies:
+  - default login behaviour
+  - a base macro (check templates/base.pt for more details)
+  - a default macro render (check templates/macros.pt for more details)
+
+
 0.1.3 - unreleased
 ------------------
 - Cleared file upload form data after it is used

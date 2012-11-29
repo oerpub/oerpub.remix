@@ -998,13 +998,14 @@ class Module_Association_View(BaseHelper):
         return self.macro_renderer.implementation().macros['modules_list']
     
 class Modules_List_View(BaseHelper):
-
     # NOTE: Your implementation class *must* define these actions if you want
     # to reuse the navigation and batch macros.
     navigation_actions = {'next': 'choose', 
                           'previous': 'metadata',
                           'batch': 'module_association'}
 
+    """ Show a list of all the modules in a workspace.
+    """
     @view_config(
         route_name='modules_list', renderer="templates/modules_list.pt")
     def generate_html_view(self):

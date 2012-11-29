@@ -14,18 +14,37 @@ class BaseHelper(object):
                           'batch': None}
 
     def __init__(self, request):
+        """ Sets the following:
+            request
+            session
+            macro renderer (check templates/macros.pt for more details. 
+        """
         self.request = request
         self.session = self.request.session
         self.macro_renderer = get_renderer("templates/macros.pt")
 
     def check_login(self, raise_exception=True):
+        """ Default login behaviour.
+            It wraps utils.check_login and returns True or False.
+        """
         return utils_check_login(self.request, raise_exception)
 
     def get_connection(self):
+        """ Wraps utils.get_connection.
+            The returned connection is a sword2cnx.Connection
+
+            TODO:
+            Add a proper interface to sword2cnx so we can rather assert that
+            interface where necessary.
+        """
         return utils_get_connection(self.session)
 
     @reify
     def base(self):
+        """ Base macro renderer.
+            Useful when creating new templates. Have a look at templates/base.pt
+            for more details.
+        """
         renderer = get_renderer("templates/base.pt")
         return renderer.implementation().macros['main']
 
