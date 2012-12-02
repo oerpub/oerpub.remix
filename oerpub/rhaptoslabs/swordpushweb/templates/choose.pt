@@ -124,7 +124,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
             ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
             ${form.csrf_token()}
 
-                      <div class="upload-form" style="display: block;">
+                      <div style="display: block;">
                         
                         <ul class="create-new-list">
                           <li>
