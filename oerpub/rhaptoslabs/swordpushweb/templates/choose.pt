@@ -71,7 +71,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             <label>
                                 <span style="visibility: hidden;" class="or-bullet">or</span>
                                 <span class="label-text">
-                                    <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> or
+                                    <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> -
                                     <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
                                 </span>
                             </label>
@@ -133,9 +133,9 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               ${presentationform.csrf_token()}
                               
                              <label>
-                               <span style="visibility: visible;" class="or-bullet">or</span> 
+                               <span style="visibility: hidden;" class="or-bullet">or</span>
                                <span class="label-text" title="This import is brand new and has not been fully tested yet">
-                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> or <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp OpenOffice</strong><sup title="This import is brand new and has not been fully tested yet" style="color:orange">alpha</sup>
+                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> - <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp OpenOffice</strong><sup title="This import is brand new and has not been fully tested yet" style="color:orange">alpha</sup>
                                 </span>
                               </label>
                               <div class="upload-form">
@@ -147,9 +147,9 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                           </li>                          
                           <li id="latex-zip-importer">
                             <label>
-                              <span class="or-bullet">or</span>
+                              <span style="visibility: hidden;" class="or-bullet">or</span>
                               <span class="label-text" title="This import is brand new and has not been fully tested yet">
-                                  <img src="${images_url}/zip-icon-01.png"> <strong>Module ZIP</strong> or
+                                  <img src="${images_url}/zip-icon-01.png"> <strong>Module ZIP</strong> -
                                   <img src="${images_url}/tex-icon-01.png"> <strong>LaTeX</strong><sup title="alpha" style="color:orange">alpha</sup>
                               </span>
                             </label>
