@@ -63,29 +63,36 @@
                         // firing while this one is still ongoing.
                         editor.setUnmodified();
 
-                        var $body = $('<body />');
-                        $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
-                        $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
-                        $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
-                        $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
-                        $body.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
-                        $body.attr('xmlns:bib',  'http://bibtexml.sf.net/');
-                        $body.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
-                        $body.attr('class', 'content');
+                        var $html = $('<html />');
+                        $html.attr('xmlns',      'http://www.w3.org/1999/xhtml');
+                        $html.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
+                        $html.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
+                        $html.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
+                        $html.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
+                        $html.attr('xmlns:bib',  'http://bibtexml.sf.net/');
+                        $html.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
 
-                        var html = $body.append(editor.getContents())
-                            .get(0).outerHTML;
+                        var $body = $('<body />');
+                        $body.attr('class', 'content');
+                        $body.append(editor.getContents());
+
+                        // This is going to break in IE. Which is fine, because
+                        // we don't support that right now. Hint to poor person
+                        // who has to develop that: ActiveXObject 
+                        // Microsoft.XMLDOM
+                        var html = (new XMLSerializer()).serializeToString(
+                            $html.append($body).get(0))
                         $.post("${request.route_url('preview_save')}",
                                 {html: html}, function(data, statustext){
-                            if(data.saved){
+                            if(data.error){
+                                $('#statusmessage').data('message')(data.error, 'error');
+                            } else {
                                 $('#statusmessage').data('message')('Saved');
                                 GenericButton.getButtons()["save"].enable(false);
                                 $('.btn.save').html('Saved');
                                 if (callback_function) {
                                     callback_function();
                                 }
-                            } else {
-                                $('#statusmessage').data('message')(data.error, 'error');
                             }
                         });
                     }
