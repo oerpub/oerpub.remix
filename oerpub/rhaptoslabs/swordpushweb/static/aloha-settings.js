@@ -14,7 +14,8 @@
         plugins: {
             assorted: {
                 image: {
-                    preview: false
+                    preview: false,
+                    uploadurl: '/upload_dnd'
                 }
             },
             genericbutton: {
