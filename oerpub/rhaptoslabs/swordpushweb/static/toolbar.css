@@ -122,6 +122,9 @@ figure figcaption::before {
 .toolbar .icon-table-insert {
   background-position: -452px 0;
 }
+.toolbar .icon-math-insert {
+  background-position: -221px 0;
+}
 .toolbar .btn.heading {
   width: 9em;
   height: 24px;
@@ -215,6 +218,12 @@ figure figcaption::before {
 .toolbar .btn-group > .btn:active .icon-table-insert,
 .toolbar .btn-group > .btn.active .icon-table-insert {
   background-position: -452px -66px;
+}
+.toolbar .btn-group > .btn:hover .icon-math-insert,
+.toolbar .btn-group > .btn:focus .icon-math-insert,
+.toolbar .btn-group > .btn:active .icon-math-insert,
+.toolbar .btn-group > .btn.active .icon-math-insert {
+  background-position: -221px -66px;
 }
 .separator {
   background-image: url("images/toolbar.png");

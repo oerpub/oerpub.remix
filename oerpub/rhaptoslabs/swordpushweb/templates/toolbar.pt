@@ -62,7 +62,7 @@
       <li><a href="#" class="action deleterow">Delete Row</a></li>
       <li><a href="#" class="action deletecolumn">Delete Column</a></li>
     </ul>
-    <button class="btn action insertMath" rel="tooltip" title="Insert Math">x<sup>2</sup></button>
+    <button class="btn action insertMath" rel="tooltip" title="Insert Math"><i class="icon-math-insert"></i></button>
   </div>
 
 </div>
