@@ -76,8 +76,12 @@
                         $body.attr('class', 'content');
                         $body.append(editor.getContents());
 
-                        var html = $html.append($body)
-                            .get(0).outerHTML;
+                        // This is going to break in IE. Which is fine, because
+                        // we don't support that right now. Hint to poor person
+                        // who has to develop that: ActiveXObject 
+                        // Microsoft.XMLDOM
+                        var html = (new XMLSerializer()).serializeToString(
+                            $html.append($body).get(0))
                         $.post("${request.route_url('preview_save')}",
                                 {html: html}, function(data, statustext){
                             if(data.error){
