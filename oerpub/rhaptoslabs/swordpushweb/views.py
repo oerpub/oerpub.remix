@@ -630,21 +630,23 @@ def preview_save(request):
     conversionerror = ''
 
     #transform preview html to cnxml
+    cnxml = None
     try:
         cnxml = aloha_htmlsoup_to_cnxml(html)
     except Exception as e:
         #return render_conversionerror(request, str(e))
         conversionerror = str(e)
 
-    try:
-        validate_cnxml(cnxml)
-    except ConversionError as e:
-        #return render_conversionerror(request, str(e))
-        conversionerror = str(e)
-    else:
-        save_and_backup_file(save_dir, 'index.cnxml', cnxml)
-        files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
-        save_zip(save_dir, cnxml, html, files)
+    if cnxml is not None:
+        try:
+            validate_cnxml(cnxml)
+        except ConversionError as e:
+            #return render_conversionerror(request, str(e))
+            conversionerror = str(e)
+        else:
+            save_and_backup_file(save_dir, 'index.cnxml', cnxml)
+            files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
+            save_zip(save_dir, cnxml, html, files)
 
     response = Response(json.dumps({'saved': True, 'error': conversionerror}))
     response.content_type = 'application/json'
