@@ -3,6 +3,8 @@
 <script type="text/javascript">
 $(document).ready(function(){
 
+$("#slideshare-embed").hide();
+console.log("Done hiding");
 $("#preview-frame").contents().find("tr").find("#slideshare-embed").html("<img src=\"${images_url}/slideshare.jpg\"");
 
 });
