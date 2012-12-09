@@ -1282,7 +1282,7 @@ def download_zip(request):
     check_login(request)
 
     res = Response(content_type='application/zip')
-    res.headers.add('Content-Disposition', 'attachment;filename=upload.zip')
+    res.headers.add('Content-Disposition', 'attachment;filename=saved-module.zip')
 
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
