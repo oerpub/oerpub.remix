@@ -119,6 +119,12 @@ figure figcaption::before {
 .toolbar .icon-ordered-list {
   background-position: -254px 0;
 }
+.toolbar .icon-indent-list {
+  background-position: -650px 0;
+}
+.toolbar .icon-outdent-list {
+  background-position: -683px 0;
+}
 .toolbar .icon-table-insert {
   background-position: -452px 0;
 }
@@ -212,6 +218,18 @@ figure figcaption::before {
 .toolbar .btn-group > .btn:active .icon-ordered-list,
 .toolbar .btn-group > .btn.active .icon-ordered-list {
   background-position: -254px -66px;
+}
+.toolbar .btn-group > .btn:hover .icon-indent-list,
+.toolbar .btn-group > .btn:focus .icon-indent-list,
+.toolbar .btn-group > .btn:active .icon-indent-list,
+.toolbar .btn-group > .btn.active .icon-indent-list {
+  background-position: -650px -66px;
+}
+.toolbar .btn-group > .btn:hover .icon-outdent-list,
+.toolbar .btn-group > .btn:focus .icon-outdent-list,
+.toolbar .btn-group > .btn:active .icon-outdent-list,
+.toolbar .btn-group > .btn.active .icon-outdent-list {
+  background-position: -683px -66px;
 }
 .toolbar .btn-group > .btn:hover .icon-table-insert,
 .toolbar .btn-group > .btn:focus .icon-table-insert,
