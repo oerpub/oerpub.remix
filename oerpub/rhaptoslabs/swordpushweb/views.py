@@ -1159,7 +1159,7 @@ class Choose_Document_Source(BaseHelper):
         form.data['gdocs_access_token'] = None
 
         title, filename = self.process_gdocs_resource(
-            save_dir, gdocs_resource_id, gdocs_access_token)
+            save_dir, gdocs_resource_id)
 
         self.request.session['title'] = title
         self.request.session['filename'] = filename
