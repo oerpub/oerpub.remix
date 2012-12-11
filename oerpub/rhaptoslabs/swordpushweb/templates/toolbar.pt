@@ -63,6 +63,7 @@
       <li><a href="#" class="action addcolumnafter">Add Column After</a></li>
       <li><a href="#" class="action deleterow">Delete Row</a></li>
       <li><a href="#" class="action deletecolumn">Delete Column</a></li>
+      <li><a href="#" class="action deletetable">Delete Table</a></li>
     </ul>
     <button class="btn action insertMath" rel="tooltip" title="Insert Math"><i class="icon-math-insert"></i></button>
   </div>
