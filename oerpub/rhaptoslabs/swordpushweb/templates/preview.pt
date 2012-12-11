@@ -4,28 +4,48 @@
     <!-- Aloha editor -->
     <base href="${body_base}" />
     <link rel="stylesheet" type="text/css" href="${request.application_url}/aloha/src/css/aloha.css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" href="${request.application_url}/bootstrap/docs/assets/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" href="${request.application_url}/bootstrap/docs/assets/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_metacontent.css')}"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
+
+    <!-- Mathjax -->
+    <script src="${request.application_url}/mathjax/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"> <!-- xhtml --></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({
+      jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
+      extensions: ["asciimath2jax.js", "tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+      tex2jax: { inlineMath: [["[TEX_START]","[TEX_END]"], ["\\(", "\\)"]] },
+      // Apparently we can't change the escape sequence for ASCIIMath (MathJax doesn't find it)
+      // asciimath2jax: { inlineMath: [["[ASCIIMATH_START]", "[ASCIIMATH_END]"]], },
+
+      // The default for Firefox is "HTML" for some reason so change it to MML
+      MMLorHTML: {prefer:{MSIE:"MML",Firefox:"MML",Opera:"HTML",Chrome:"HTML",Safari:"HTML",other:"HTML"}},
+      TeX: {
+        extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], noErrors: { disabled: true }
+      },
+      AsciiMath: { noErrors: { disabled: true } }
+    });</script>
+
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
-    <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
+    <script src="${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
     <script type="text/javascript" src="${request.application_url}/aloha/src/lib/aloha.js"
         data-aloha-plugins="common/ui,
-                            extra/toolbar,
-                            oerpub/popover,
+                            oer/toolbar,
+                            cnx/popover,
                             common/format,
                             common/paste,
                             common/block,
                             common/list,
                             oerpub/table,
-                            oerpub/image,
+                            cnx/math,
+                            extra/draganddropfiles,
+                            common/image,
                             oerpub/assorted,
                             common/undo,
-                            extra/undobutton,
-                            extra/genericbutton,
+                            oerpub/undobutton,
+                            oerpub/genericbutton,
                             common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
         <script type="text/javascript">
@@ -36,33 +56,43 @@
                 GenericButton.getButtons()["save"].enable(false);
                 $('.btn.save').html('Saved');
 
-                function savePreview(){
+                function savePreview(callback_function){
                     var editor = Aloha.getEditableById('canvas');
                     if(editor.isModified()){
                         // setUnmodified, to avoid another concurrent save from
                         // firing while this one is still ongoing.
                         editor.setUnmodified();
 
-                        var $body = $('<body />');
-                        $body.attr('xmlns',      'http://www.w3.org/1999/xhtml');
-                        $body.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
-                        $body.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
-                        $body.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
-                        $body.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
-                        $body.attr('xmlns:bib',  'http://bibtexml.sf.net/');
-                        $body.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
-                        $body.attr('class', 'content');
+                        var $html = $('<html />');
+                        $html.attr('xmlns',      'http://www.w3.org/1999/xhtml');
+                        $html.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
+                        $html.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
+                        $html.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
+                        $html.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
+                        $html.attr('xmlns:bib',  'http://bibtexml.sf.net/');
+                        $html.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
 
-                        var html = $body.append(editor.getContents())
-                            .get(0).outerHTML;
+                        var $body = $('<body />');
+                        $body.attr('class', 'content');
+                        $body.append(editor.getContents());
+
+                        // This is going to break in IE. Which is fine, because
+                        // we don't support that right now. Hint to poor person
+                        // who has to develop that: ActiveXObject 
+                        // Microsoft.XMLDOM
+                        var html = (new XMLSerializer()).serializeToString(
+                            $html.append($body).get(0))
                         $.post("${request.route_url('preview_save')}",
                                 {html: html}, function(data, statustext){
-                            if(data.saved){
+                            if(data.error){
+                                $('#statusmessage').data('message')(data.error, 'error');
+                            } else {
                                 $('#statusmessage').data('message')('Saved');
                                 GenericButton.getButtons()["save"].enable(false);
                                 $('.btn.save').html('Saved');
-                            } else {
-                                $('#statusmessage').data('message')(data.error, 'error');
+                                if (callback_function) {
+                                    callback_function();
+                                }
                             }
                         });
                     }
@@ -71,6 +101,22 @@
                 // Attach save handler to Save button
                 PubSub.sub('swordpushweb.save', function(){
                     savePreview();
+                });
+                var NextStep = $('#show-neworexisting');
+                NextStep.on('click', function(evt) {
+                    var editor = Aloha.getEditableById('canvas');
+                        if(editor.isModified()){
+                        // show the info slider
+                        $('#upload-wait').center();
+                        $('#upload-wait').slideDown('slow');
+                        $('#btn-newmodule').attr('disabled', '1');
+                        $('#btn-exsitingmodule').attr('disabled', '1');
+                        savePreview(function (event) {
+                            $('#upload-wait').slideUp('slow');
+                            $('#btn-newmodule').removeAttr('disabled');
+                            $('#btn-exsitingmodule').removeAttr('disabled');
+                        });
+                    }
                 });
 
                 // Set up status message area
@@ -92,6 +138,8 @@
                     $editable.find('#pDebug').remove();
                     $editable.aloha().focus();
 
+                    MathJax.Hub.Configured();
+
                     // Auto-save periodically. This only does anything if
                     // editor.isModified().
                     window.setInterval(savePreview, 30000);
@@ -106,6 +154,12 @@
                     });
                     Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
                 });
+            });
+        });
+
+        $(document).ready(function() {
+            $('#neworexisting').on('hidden', function() {
+                $('#upload-wait').slideUp('slow');
             });
         });
         </script>
@@ -207,6 +261,39 @@
         back navigation warning
     </span>
 
+    <!-- Modal -->
+    <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
+        aria-labelledby="New or existing" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="neworexistingLabel">
+                Is this for a new module or will it override an existing one?
+            </h3>
+        </div>
+        <div class="modal-body">
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <button id="btn-newmodule" class="btn btn-primary submit-neworexisting" 
+                    url="${request.route_url('metadata')}">
+                    New module
+                </button>
+                This is an entirely new module. 
+            </div>
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <button id="btn-exsitingmodule" class="btn btn-primary submit-neworexisting" 
+                    url="${request.route_url('module_association')}">
+                    Override existing module
+                </button>
+                Choose an existing module to apply your import to, replacing its contents.  
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+    </div>
+
+    <div class="pleasewait" id="upload-wait" style="display: none;">
+        Your document is being saved. This may take a few moments.
+    </div>
     </metal:content-slot>
 
     <metal:footer-slot fill-slot="footer-slot" />
