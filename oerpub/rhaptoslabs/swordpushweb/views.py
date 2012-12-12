@@ -13,6 +13,7 @@ import mimetypes
 from cStringIO import StringIO
 import peppercorn
 import codecs
+from pkg_resources import resource_filename
 from lxml import etree
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -224,7 +225,39 @@ def save_zip(save_dir, cnxml, html, files):
     zip_archive = zipfile.ZipFile(ram, 'w')
     zip_archive.writestr('index.cnxml', cnxml)
     if html is not None:
+        # Add a head and css to the html. Also add #canvas to the body
+        # so the css that was constructed to work with the editor nested
+        # in that element continues to work.
+        tree = etree.fromstring(html, etree.HTMLParser())
+        xslt = etree.XML("""\
+            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+                <xsl:template match="/html">
+                    <html><xsl:copy-of select="@*"/>
+                    <head><link rel="stylesheet" type="text/css" href="oerpub.css" />
+                    </head>
+                    <xsl:apply-templates />
+                    </html>
+                </xsl:template>
+                <xsl:template match="body">
+                    <body>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:attribute name="id">
+                            <xsl:text>canvas</xsl:text>
+                        </xsl:attribute>
+                        <xsl:apply-templates />
+                    </body>
+                </xsl:template>
+                <xsl:template match="@*|node()">
+                    <xsl:copy><xsl:apply-templates select="@*|node()"/></xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>""")
+        html = str(etree.XSLT(xslt)(tree))
         zip_archive.writestr('index.html', html)
+        # Add the css file itself
+        f1 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'static/html5_metacontent.css')
+        f2 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'static/html5_content_in_oerpub.css')
+        zip_archive.writestr('oerpub.css', open(f1, 'r').read() + open(f2, 'r').read())
+
     for filename, fileObj in files:
         zip_archive.writestr(filename, fileObj)
     zip_archive.close()
