@@ -1,183 +1,16 @@
 <metal:use use-macro="base">
 
     <metal:script fill-slot="script-slot">
-    <!-- Aloha editor -->
-    <base href="/sandpit/"
-          tal:attributes="href body_base"/>
-    <link rel="stylesheet" type="text/css" href="/src/css/aloha.css"
-          tal:attributes="href string:${request.application_url}/aloha/src/css/aloha.css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css"
-          tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet"  href=""
-          tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" type="text/css" href="/css/override-css/bootstrap-override.css"
-          tal:attributes="href string:${request.application_url}/css/override-css/bootstrap-override.css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" type="text/css" href="/static/html5_metacontent.css"
-          tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_metacontent.css')}"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" type="text/css" href="/static/html5_content_in_oerpub.css"
-          tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" type="text/css" href="/static/preview.css"
-          tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
-    <script type="text/javascript" src="/src/lib/require.js"
-            tal:attributes="src string:${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
-
-    <!-- Mathjax -->
-    <script type="text/javascript"
-            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"
-            tal:attributes="src string:${request.application_url}/mathjax/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"> <!-- xhtml --></script>
-
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({
-      jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
-      extensions: ["asciimath2jax.js", "tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
-      tex2jax: { inlineMath: [["[TEX_START]","[TEX_END]"], ["\\(", "\\)"]] },
-      // Apparently we can't change the escape sequence for ASCIIMath (MathJax doesn't find it)
-      // asciimath2jax: { inlineMath: [["[ASCIIMATH_START]", "[ASCIIMATH_END]"]], },
-
-      // The default for Firefox is "HTML" for some reason so change it to MML
-      MMLorHTML: {prefer:{MSIE:"MML",Firefox:"MML",Opera:"HTML",Chrome:"HTML",Safari:"HTML",other:"HTML"}},
-      TeX: {
-        extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], noErrors: { disabled: true }
-      },
-      AsciiMath: { noErrors: { disabled: true } }
-    });</script>
-
-    <script type="text/javascript" src="/static/aloha-settings.js"
-            tal:attributes="src string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
-    <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"
-            tal:attributes="src string:${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
-    <script type="text/javascript" src="/src/lib/aloha.js"
-            tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
-        data-aloha-plugins="common/ui,
-                            oer/toolbar,
-                            cnx/popover,
-                            common/format,
-                            common/paste,
-                            common/block,
-                            common/list,
-                            oerpub/table,
-                            cnx/math,
-                            extra/draganddropfiles,
-                            common/image,
-                            oerpub/assorted,
-                            common/undo,
-                            oerpub/undobutton,
-                            oerpub/genericbutton,
-                            common/dom-to-xhtml"> <!-- xhtml workaround --></script>
-
+        <metal:m use-macro="editor.css" />
+        <metal:m use-macro="editor.javascript" />
         <script type="text/javascript">
-        Aloha.ready(function(){
-            Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'],
-                    function(PubSub, GenericButton){
-                // Save button is disabled until something is changed
-                GenericButton.getButtons()["save"].enable(false);
-                $('.btn.save').html('Saved');
-
-                function savePreview(callback_function){
-                    var editor = Aloha.getEditableById('canvas');
-                    if(editor.isModified()){
-                        // setUnmodified, to avoid another concurrent save from
-                        // firing while this one is still ongoing.
-                        editor.setUnmodified();
-
-                        var $html = $('<html />');
-                        $html.attr('xmlns',      'http://www.w3.org/1999/xhtml');
-                        $html.attr('xmlns:c',    'http://cnx.rice.edu/cnxml');
-                        $html.attr('xmlns:md',   'http://cnx.rice.edu/mdml/0.4');
-                        $html.attr('xmlns:qml',  'http://cnx.rice.edu/qml/1.0');
-                        $html.attr('xmlns:mod',  'http://cnx.rice.edu/#moduleIds' ); 
-                        $html.attr('xmlns:bib',  'http://bibtexml.sf.net/');
-                        $html.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
-
-                        var $body = $('<body />');
-                        $body.attr('class', 'content');
-                        $body.append(editor.getContents());
-
-                        // This is going to break in IE. Which is fine, because
-                        // we don't support that right now. Hint to poor person
-                        // who has to develop that: ActiveXObject 
-                        // Microsoft.XMLDOM
-                        var html = (new XMLSerializer()).serializeToString(
-                            $html.append($body).get(0))
-                        $.post("${request.route_url('preview_save')}",
-                                {html: html}, function(data, statustext){
-                            if(data.error){
-                                $('#statusmessage').data('message')(data.error, 'error');
-                            } else {
-                                $('#statusmessage').data('message')('Saved');
-                                GenericButton.getButtons()["save"].enable(false);
-                                $('.btn.save').html('Saved');
-                                if (callback_function) {
-                                    callback_function();
-                                }
-                            }
-                        });
-                    }
-                }
-
-                // Attach save handler to Save button
-                PubSub.sub('swordpushweb.save', function(){
-                    savePreview();
-                });
-                var NextStep = $('#show-neworexisting');
-                NextStep.on('click', function(evt) {
-                    var editor = Aloha.getEditableById('canvas');
-                        if(editor.isModified()){
-                        // show the info slider
-                        $('#upload-wait').center();
-                        $('#upload-wait').slideDown('slow');
-                        $('#btn-newmodule').attr('disabled', '1');
-                        $('#btn-exsitingmodule').attr('disabled', '1');
-                        savePreview(function (event) {
-                            $('#upload-wait').slideUp('slow');
-                            $('#btn-newmodule').removeAttr('disabled');
-                            $('#btn-exsitingmodule').removeAttr('disabled');
-                        });
-                    }
-                });
-
-                // Set up status message area
-                var statusarea = $('#statusmessage');
-                statusarea.data('message', function(message, type) {
-                    type = type || 'info';
-                    $("<div />", {'class': type, text: message}).hide()
-                        .appendTo(statusarea).center().fadeIn(700)
-                        .delay(1500).fadeOut(800, function() { $(this).remove(); });
-                });
-
-                // Fetch the preview
-                $('#statusmessage').data('message')('Loading preview...');
-                Aloha.jQuery.get('${body_url}', function(data){
-                    var $editable = Aloha.jQuery('#canvas').html(data);
-
-                    // Remove the pyramid debug toolbar from the preview
-                    // if it exists. This code should do nothing in production
-                    $editable.find('#pDebug').remove();
-                    $editable.aloha().focus();
-
-                    MathJax.Hub.Configured();
-
-                    // Auto-save periodically. This only does anything if
-                    // editor.isModified().
-                    window.setInterval(savePreview, 30000);
-
-                    // Bind a handler for the changed event
-                    var editor = Aloha.getEditableById('canvas');
-                    Aloha.bind('aloha-smart-content-changed', function(){
-                        if(editor.isModified()){
-                            $('.btn.save').html('Save');
-                            GenericButton.getButtons()["save"].enable(true);
-                        }
+            Aloha.ready(function(){
+                $(document).ready(function() {
+                    $('#neworexisting').on('hidden', function() {
+                        $('#upload-wait').slideUp('slow');
                     });
-                    Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
                 });
             });
-        });
-
-        $(document).ready(function() {
-            $('#neworexisting').on('hidden', function() {
-                $('#upload-wait').slideUp('slow');
-            });
-        });
         </script>
     </metal:script>
 
@@ -213,60 +46,8 @@
 
     <metal:content-slot fill-slot="content-slot"
         tal:define="filename python:request.session.get('filename')">
-    <div id="ie6-container-wrap">
-        <div id="container">
-            <div tal:replace="structure provider('toolbar')" />
-            <div id="content">
-            <div id="artboard">
-                <div id="pageheader-wrap">
-
-                    <div id="module-actions">
-                        <div class="advanced" style="display: block;">
-                            <h2 class="advanced-label">
-                                Advanced
-                            </h2>
-                            <strong>Module actions: </strong>
-                            <a id="download-copy"
-                                title="Save a ZIP file containing the module's XML and metadata to your local computer."
-                                href="#asdfaasdf"
-                                tal:attributes="href request.route_url('download_zip')">
-                                <span class="button">Download a copy</span>
-                            </a>
-                            <a id="edit-xml"
-                                title="Make changes to the module by editing its XML code."
-                                href="${request.route_url('cnxml')}">
-                                <span class="button">Edit XML</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div id="page-title">
-                        <h1>
-                            Preview:
-                            <span class="metatitle">
-                                Conversion of <span>${filename}</span>
-                            </span>
-                        </h1>
-                    </div>
-
-                    <div id="page-description">
-                        <p class="forminfo">
-                            View below how the module will appear in Connexions.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div id="statusmessage"></div>
-                <div id="editor">
-                    <div id="canvas">
-                    </div>
-                </div>
-            </div>
-            </div>
-        </div>
-    </div>
-    ${form.end()}
+        <metal:m use-macro="editor.content" />
+        ${form.end()}
 
 
     <!-- Modal -->
