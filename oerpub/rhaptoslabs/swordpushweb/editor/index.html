@@ -2,7 +2,7 @@
     <head>
         <title>Oerpub Editor</title>
         <metal:css_macro define-macro="css">
-            <link rel="stylesheet" type="text/css" href="/src/css/aloha.css"
+            <link rel="stylesheet" type="text/css" href="/aloha/src/css/aloha.css"
                   tal:attributes="href string:${request.application_url}/aloha/src/css/aloha.css"> <!-- xhtml workaround --></link>
             <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css"
                   tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
@@ -18,10 +18,14 @@
                   tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
         </metal:css_macro>
         <metal:js_macro define-macro="javascript">
-            <base href="/sandpit/"
+            <base href="/editor/sandbox/"
                   tal:attributes="href body_base"/>
+            <script src="/static/jquery-1.7.1.min.js"
+                    tal:replace="nothing"> <!-- xhtml --></script>
+            <script src="/static/swordpush.js"
+                    tal:replace="nothing"> <!-- xhtml --></script>
             <!-- Aloha editor -->
-            <script type="text/javascript" src="/src/lib/require.js"
+            <script type="text/javascript" src="/aloha/src/lib/require.js"
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
 
             <!-- Mathjax -->
@@ -48,7 +52,7 @@
                     tal:attributes="src string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
             <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"
                     tal:attributes="src string:${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
-            <script type="text/javascript" src="/src/lib/aloha.js"
+            <script type="text/javascript" src="/aloha/src/lib/aloha.js"
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
                 data-aloha-plugins="common/ui,
                                     oer/toolbar,
@@ -67,6 +71,12 @@
                                     oerpub/genericbutton,
                                     common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
+                <script type="text/javascript"
+                        tal:content="string:var body_url = '${body_url}';">
+                    var body_url = '/editor/sandbox/index.html';</script>
+                <script type="text/javascript"
+                        tal:content="string:var save_url = '${request.route_url('preview_save')}';">
+                    var save_url = null;</script>
                 <script type="text/javascript">
                 Aloha.ready(function(){
                     Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'],
@@ -100,20 +110,22 @@
                                 // who has to develop that: ActiveXObject 
                                 // Microsoft.XMLDOM
                                 var html = (new XMLSerializer()).serializeToString(
-                                    $html.append($body).get(0))
-                                $.post("${request.route_url('preview_save')}",
-                                        {html: html}, function(data, statustext){
-                                    if(data.error){
-                                        $('#statusmessage').data('message')(data.error, 'error');
-                                    } else {
-                                        $('#statusmessage').data('message')('Saved');
-                                        GenericButton.getButtons()["save"].enable(false);
-                                        $('.btn.save').html('Saved');
-                                        if (callback_function) {
-                                            callback_function();
+                                    $html.append($body).get(0));
+                                if(save_url !== null){
+                                    $.post(save_url,
+                                            {html: html}, function(data, statustext){
+                                        if(data.error){
+                                            $('#statusmessage').data('message')(data.error, 'error');
+                                        } else {
+                                            $('#statusmessage').data('message')('Saved');
+                                            GenericButton.getButtons()["save"].enable(false);
+                                            $('.btn.save').html('Saved');
+                                            if (callback_function) {
+                                                callback_function();
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
                         }
 
@@ -136,7 +148,7 @@
 
                         // Fetch the preview
                         $('#statusmessage').data('message')('Loading preview...');
-                        Aloha.jQuery.get('${body_url}', function(data){
+                        Aloha.jQuery.get(body_url, function(data){
                             var $editable = Aloha.jQuery('#canvas').html(data);
 
                             // Remove the pyramid debug toolbar from the preview
