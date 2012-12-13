@@ -17,7 +17,11 @@
                   tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
             <link rel="stylesheet" type="text/css" href="/static/preview.css"
                   tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
+            <link rel="stylesheet" type="text/css" media="screen" href="/static/toolbar.css"
+                  tal:replace="nothing"> <!-- xhtml --></link>
         </metal:css_macro>
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/toolbar.css"> <!-- xhtml --></link>
+        <link rel="stylesheet" type="text/css" media="screen" href="/editor/style.css"> <!-- xhtml --></link>
         <metal:js_macro define-macro="javascript">
             <base href="/editor/sandbox/"
                   tal:attributes="href body_base"/>
