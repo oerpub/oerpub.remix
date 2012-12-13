@@ -118,24 +118,11 @@
                         }
 
                         // Attach save handler to Save button
-                        PubSub.sub('swordpushweb.save', function(){
-                            savePreview();
-                        });
-                        var NextStep = $('#show-neworexisting');
-                        NextStep.on('click', function(evt) {
-                            var editor = Aloha.getEditableById('canvas');
-                                if(editor.isModified()){
-                                // show the info slider
-                                $('#upload-wait').center();
-                                $('#upload-wait').slideDown('slow');
-                                $('#btn-newmodule').attr('disabled', '1');
-                                $('#btn-exsitingmodule').attr('disabled', '1');
-                                savePreview(function (event) {
-                                    $('#upload-wait').slideUp('slow');
-                                    $('#btn-newmodule').removeAttr('disabled');
-                                    $('#btn-exsitingmodule').removeAttr('disabled');
-                                });
+                        PubSub.sub('swordpushweb.save', function(data){
+                            if(data && data.callback){
+                                data.callback();
                             }
+                            savePreview();
                         });
 
                         // Set up status message area
@@ -183,7 +170,8 @@
     <metal:body define-macro="content">
         <div id="ie6-container-wrap">
             <div id="container">
-                <div tal:replace="structure provider('toolbar')" />
+                <div class="toolbar aloha-dialog"
+                     tal:replace="structure provider('toolbar')" />
                 <div id="content">
                 <div id="artboard">
                     <div id="pageheader-wrap">

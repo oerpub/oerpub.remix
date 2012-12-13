@@ -5,6 +5,20 @@
         <metal:m use-macro="editor.javascript" />
         <script type="text/javascript">
             Aloha.ready(function(){
+                $('#show-neworexisting').on('click', function(evt) {
+                    if(Aloha.getEditableById('canvas').isModified()){
+                        // show the info slider
+                        $('#upload-wait').center().slideDown('slow');
+                        $('#btn-newmodule').attr('disabled', '1');
+                        $('#btn-exsitingmodule').attr('disabled', '1');
+                        PubSub.pub('swordpushweb.save', {
+                            callback: function(){
+                                $('#upload-wait').slideUp('slow');
+                                $('#btn-newmodule').removeAttr('disabled');
+                                $('#btn-exsitingmodule').removeAttr('disabled');
+                            }});
+                    }
+                });
                 $(document).ready(function() {
                     $('#neworexisting').on('hidden', function() {
                         $('#upload-wait').slideUp('slow');
@@ -31,9 +45,8 @@
                 <input id="show-neworexisting"
                 href="#neworexisting"
                 role="button"
-                class="btn"
+                class="btn button forward-button"
                 data-toggle="modal"
-                class="button forward-button"
                 type="button"
                 value="Next Step &#187;"
                 url="${request.route_url('module_association')}"
@@ -42,12 +55,12 @@
 
         </div>
     </div>
+    ${form.end()}
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
         tal:define="filename python:request.session.get('filename')">
         <metal:m use-macro="editor.content" />
-        ${form.end()}
 
 
     <!-- Modal -->
