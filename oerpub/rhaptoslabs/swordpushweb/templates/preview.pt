@@ -11,19 +11,21 @@
                         if(Aloha.getEditableById('canvas').isModified()){
                             // show the info slider
                             $('#upload-wait').center().slideDown('slow');
-                            $('#btn-newmodule').attr('disabled', '1');
-                            $('#btn-exsitingmodule').attr('disabled', '1');
+                            $('#btn-newmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
+                            $('#btn-existingmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
                             PubSub.pub('swordpushweb.save', {
                                 callback: function(){
                                     $('#upload-wait').slideUp('slow');
 
                                     var btn = $('#btn-newmodule');
-                                    btn.attr('disabled', '1');
-                                    btn.removeClass('btn-primary');
+                                    btn.removeAttr('disabled');
+                                    btn.addClass('btn-primary');
                                     
-                                    var btn = $('#btn-exsitingmodule');
-                                    btn.attr('disabled', '1');
-                                    btn.removeClass('btn-primary');
+                                    var btn = $('#btn-existingmodule');
+                                    btn.removeAttr('disabled');
+                                    btn.addClass('btn-primary');
                                 }});
                         }
                     });
