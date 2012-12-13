@@ -51,6 +51,7 @@ from z3c.batching.batch import Batch
 from utils import check_login, get_metadata_from_repo
 from utils import ZIP_PACKAGING
 from helpers import BaseHelper 
+from .editor import helper as editorhelper
 
 TESTING = False      
 CWD = os.getcwd()
@@ -645,6 +646,7 @@ def preview_view(request):
                      request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
                      request.session['upload_dir']),
         'form': FormRenderer(form),
+        'editor': editorhelper
     }
 
 
