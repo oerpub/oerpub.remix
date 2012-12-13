@@ -1,6 +1,7 @@
 <metal:use use-macro="base">
 
     <metal:script fill-slot="script-slot">
+
         <metal:m use-macro="editor.css" />
         <metal:m use-macro="editor.javascript" />
         <script type="text/javascript">
