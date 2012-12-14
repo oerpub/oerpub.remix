@@ -35,11 +35,11 @@
 
                     var btn = $('#btn-newmodule');
                     $(btn).removeAttr('disabled');
-                   $(btn).addClass('btn-primary');
+                    $(btn).addClass('btn-primary');
                    
-                   var btn = $('#btn-exsitingmodule');
-                   $(btn).removeAttr('disabled');
-                   $(btn).addClass('btn-primary');
+                    var btn = $('#btn-exsitingmodule');
+                    $(btn).removeAttr('disabled');
+                    $(btn).addClass('btn-primary');
                 });
             });
         </script>
