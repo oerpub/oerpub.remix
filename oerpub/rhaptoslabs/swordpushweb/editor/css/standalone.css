@@ -1,7 +1,0 @@
-/* This file has only local style differences for the stand-alone/static demo
-   version of the editor. It is ignored when used as part of the swordpushweb
-   product. */
-
-.toolbar {
-    top: 0;
-}

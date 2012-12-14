@@ -55,7 +55,7 @@ figure figcaption::before {
   background-color: whiteSmoke;
   opacity: 0.95;
   position: fixed;
-  top: 104px;
+  top: 0;
   width: 100%;
   padding-left: 1em;
   box-shadow: 0 2px 3px 0 #CCC;
@@ -65,7 +65,7 @@ figure figcaption::before {
   margin: 0;
   height: 33px;
   width: 33px;
-  background-image: url("images/toolbar.png");
+  background-image: url("../images/toolbar.png");
 }
 .toolbar .btn {
   padding: 0;
@@ -244,7 +244,7 @@ figure figcaption::before {
   background-position: -221px -66px;
 }
 .separator {
-  background-image: url("images/toolbar.png");
+  background-image: url("../images/toolbar.png");
   background-position: -3px 0;
   display: inline-block;
   height: 33px;

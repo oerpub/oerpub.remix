@@ -30,7 +30,6 @@
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cookie.js')}"></script>
 
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
-        <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/toolbar.css')}" type="text/css" media="screen" charset="utf-8" />
         <!--[if IE 6]>
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
         <![endif]-->

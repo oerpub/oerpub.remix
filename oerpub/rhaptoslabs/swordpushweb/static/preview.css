@@ -12,3 +12,7 @@
     position: relative;
     z-index:1;
 }
+
+.toolbar {
+  top: 104px;
+}
