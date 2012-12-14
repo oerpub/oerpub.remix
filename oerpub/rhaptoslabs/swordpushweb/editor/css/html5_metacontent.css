@@ -229,7 +229,8 @@ font-family: tahoma, verdana, arial, helvetica, sans-serif;
   list-style-type: square;
   margin: 0.5em 0 0 1.5em;
   padding: 0;
-  list-style-image: url(bullet.gif);
+  /* Whoever wrote this forgot to bring the image. Commenting for now. */
+  /* list-style-image: url(bullet.gif);*/
 }
 
 #canvas li{
