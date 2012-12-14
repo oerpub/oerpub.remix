@@ -255,8 +255,8 @@ def save_zip(save_dir, cnxml, html, files):
         html = str(etree.XSLT(xslt)(tree))
         zip_archive.writestr('index.html', html)
         # Add the css file itself
-        f1 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'static/html5_metacontent.css')
-        f2 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'static/html5_content_in_oerpub.css')
+        f1 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'editor/css/html5_metacontent.css')
+        f2 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'editor/css/html5_content_in_oerpub.css')
         zip_archive.writestr('oerpub.css', open(f1, 'r').read() + open(f2, 'r').read())
 
     for filename, fileObj in files:
