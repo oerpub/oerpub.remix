@@ -20,6 +20,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response, get_renderer
 from pyramid.response import Response
 from pyramid.decorator import reify
+from pyramid.threadlocal import get_current_registry
 
 import formencode
 
@@ -51,7 +52,7 @@ from z3c.batching.batch import Batch
 from utils import check_login, get_metadata_from_repo
 from utils import ZIP_PACKAGING
 from helpers import BaseHelper 
-from .editor import helper as editorhelper
+from .editor import EditorHelper
 
 TESTING = False      
 CWD = os.getcwd()
@@ -255,8 +256,9 @@ def save_zip(save_dir, cnxml, html, files):
         html = str(etree.XSLT(xslt)(tree))
         zip_archive.writestr('index.html', html)
         # Add the css file itself
-        f1 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'editor/css/html5_metacontent.css')
-        f2 = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'editor/css/html5_content_in_oerpub.css')
+        registry = get_current_registry()
+        f1 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_metacontent.css')
+        f2 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_content_in_oerpub.css')
         zip_archive.writestr('oerpub.css', open(f1, 'r').read() + open(f2, 'r').read())
 
     for filename, fileObj in files:
@@ -646,7 +648,7 @@ def preview_view(request):
                      request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
                      request.session['upload_dir']),
         'form': FormRenderer(form),
-        'editor': editorhelper
+        'editor': EditorHelper(request)
     }
 
 

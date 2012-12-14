@@ -37,8 +37,8 @@ class ZPTRendererFactory(object):
         return self.loader.load(template_name + '.html')
 
 class EditorHelper(object):
-    def __init__(self):
-        search_path = resource_filename('oerpub.rhaptoslabs.swordpushweb', 'editor')
+    def __init__(self, request):
+        search_path = request.registry.settings['aloha.editor']
         renderer = ZPTRendererFactory((search_path, ), auto_reload=False)
         self.macros = renderer.load('index').macros
 
@@ -47,8 +47,6 @@ class EditorHelper(object):
             return self.macros[attr]
         except KeyError:
             raise AttributeError(attr)
-
-helper = EditorHelper()
 
 # from oerpub.rhaptoslabs.swordpushweb.editor import EditorHelper
 # EditorHelper(request)
