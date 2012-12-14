@@ -13,21 +13,19 @@
                   tal:attributes="href string:${request.application_url}/editor/css/bootstrap.css"> <!-- xhtml workaround --></link>
             <link rel="stylesheet" type="text/css" href="/editor/css/aloha.css"
                   tal:attributes="href string:${request.application_url}/editor/css/aloha.css"> <!-- xhtml workaround --></link>
-            <link rel="stylesheet" type="text/css" href="/static/html5_metacontent.css"
-                  tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_metacontent.css')}"> <!-- xhtml workaround --></link>
-            <link rel="stylesheet" type="text/css" href="/static/html5_content_in_oerpub.css"
-                  tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
-            <link rel="stylesheet" type="text/css" href="/static/preview.css"
-                  tal:attributes="href string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
-            <link rel="stylesheet" type="text/css" media="screen" href="/static/toolbar.css"
-                  tal:replace="nothing"> <!-- xhtml --></link>
+            <link rel="stylesheet" type="text/css" href="/editor/css/html5_metacontent.css"
+                  tal:attributes="href string:${request.application_url}/editor/css/html5_metacontent.css"> <!-- xhtml workaround --></link>
+            <link rel="stylesheet" type="text/css" href="/editor/css/html5_content_in_oerpub.css"
+                  tal:attributes="href string:${request.application_url}/editor/css/html5_content_in_oerpub.css"> <!-- xhtml workaround --></link>
+            <link rel="stylesheet" type="text/css" href="/editor/css/style.css"
+                  tal:attributes="href string:${request.application_url}/editor/css/style.css"> <!-- xhtml --></link>
         </metal:css_macro>
         <link rel="stylesheet" type="text/css" media="screen" href="/static/toolbar.css"> <!-- xhtml --></link>
-        <link rel="stylesheet" type="text/css" media="screen" href="/editor/css/style.css"> <!-- xhtml --></link>
+        <link rel="stylesheet" type="text/css" media="screen" href="/editor/css/standalone.css"> <!-- xhtml --></link>
         <metal:js_macro define-macro="javascript">
             <base href="/editor/sandbox/"
                   tal:attributes="href body_base"/>
-            <script src="/static/jquery-1.7.1.min.js"
+            <script src="/editor/js/jquery-1.7.1.min.js"
                     tal:replace="nothing"> <!-- xhtml --></script>
             <script src="/static/swordpush.js"
                     tal:replace="nothing"> <!-- xhtml --></script>

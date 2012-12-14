@@ -2,15 +2,6 @@
     display: none !important;
 }
 
-#artboard {
-    margin-top: 40px;
-    background-color: #CCC;
-}
-
-#canvas {
-    margin-top: 0;
-}
-
 #content {
     padding: 1em 1em;
     background-color: #CCC;
@@ -20,8 +11,4 @@
     margin-top: -13px;
     position: relative;
     z-index:1;
-}
-
-#statusmessage {
-    height: 0em;
 }

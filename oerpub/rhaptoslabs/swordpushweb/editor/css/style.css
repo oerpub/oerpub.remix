@@ -1,7 +1,22 @@
-/* This file has only local style differences for the stand-alone/static demo
-   version of the editor. It is ignored when used as part of the swordpushweb
-   product. */
+#artboard {
+    margin-top: 40px;
+    background-color: #CCC;
+}
 
-.toolbar {
-    top: 0;
+#canvas {
+    margin-top: 0;
+}
+
+#statusmessage {
+    height: 0em;
+}
+
+/* Can go away once we factor out swordpush.js */
+#page-title {
+    display: none !important;
+}
+
+#content {
+    padding: 1em 1em;
+    background-color: #CCC;
 }
