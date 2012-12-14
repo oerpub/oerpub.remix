@@ -1,36 +1,5 @@
-figure {
-    counter-increment: figure;
-}
-
-figure figcaption::before {
-    content: "Figure 1." counter(figure) " ";
-    font-weight: bold;
-}
-
-/* Hide aloha default toolbar */
-.aloha-table-wrapper div.aloha-wai-red {
-    background-image: none !important;
-}
-
-.aloha-toolbar {
-    display: none !important;
-}
-
 #page-title {
     display: none !important;
-}
-
-#page-description {
-    display: none !important;
-}    
-
-#artboard {
-    margin-top: 40px;
-    background-color: #CCC;
-}
-
-#canvas {
-    margin-top: 0;
 }
 
 #content {
@@ -44,39 +13,6 @@ figure figcaption::before {
     z-index:1;
 }
 
-#statusmessage {
-    height: 0em;
-}
-
-.aloha-editable-active, .aloha-editable-active[contenteditable="true"]:focus {
-    outline: none !important;
-}
-
-.modal-header {
-    background-color: #9ABCDC !important; /* Connexions Blue */
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 6px;
-}
-
-.modal-header .close {
-    margin-top: -5px !important;
-}
-
-.modal-header h3 {
-    line-height: 16px !important;
-    font-size: 16px;
-}
-
-.modal-body {
-    padding: 10px !important;
-}
-
-.modal-footer {
-    padding: 5px 15px 5px !important;
-    background-color: white;
-    border: none;
-}
-
-.btn {
-    line-height: 1.1em;
+.toolbar {
+  top: 104px;
 }

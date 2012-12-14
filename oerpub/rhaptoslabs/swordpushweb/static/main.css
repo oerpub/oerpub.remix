@@ -917,31 +917,6 @@ ul.popOut a:hover{
     background-color: #FFDD66 !important;
 }
 
-#statusmessage {
-    height: 3em;
-}
-
-#statusmessage div {
-    text-align: center;
-    margin-bottom: 0.25em;
-
-    border: 1px solid #f0f000;
-    background-color: #ffffe0;
-
-    font-weight: bold;
-    padding: .75em 1em;
-    margin: auto;
-    display: inline;
-    -moz-box-shadow:    3px 3px 2px 2px #ddd;
-    -webkit-box-shadow: 3px 3px 2px 2px #ddd;
-    box-shadow:         3px 3px 2px 2px #ddd;
-    z-index: 4;
-}
-
-#statusmessage div.error {
-    background-color: red;
-}
-
 #upload-wait {
     z-index: 9999;
 }
