@@ -5,7 +5,7 @@ if(!jQuery.fn.center) {
         if(heading.length){
             this.css("top", heading.offset().top + "px");
         } else {
-            this.css("top", "450px");
+            this.css("top", "45px");
         }
         this.css("left", (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft() + "px");
         return this;
