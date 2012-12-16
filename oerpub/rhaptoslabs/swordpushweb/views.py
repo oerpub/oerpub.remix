@@ -38,7 +38,8 @@ import gdata.docs.client
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
-from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml, aloha_htmlsoup_to_cnxml
+from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
+from rhaptos.cnxmlutils.utils import aloha_to_html, html_to_valid_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
 from utils import escape_system, clean_cnxml, load_config
 from utils import save_config, add_directory_to_zip
@@ -669,7 +670,8 @@ def preview_save(request):
     #transform preview html to cnxml
     cnxml = None
     try:
-        cnxml = aloha_htmlsoup_to_cnxml(html)
+        structured_html = aloha_to_html(html)           #1 create structured HTML5
+        cnxml = html_to_valid_cnxml(structured_html)    #2 create cnxml from structured HTML5
     except Exception as e:
         #return render_conversionerror(request, str(e))
         conversionerror = str(e)
