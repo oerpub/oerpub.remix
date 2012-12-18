@@ -1,12 +1,14 @@
 <metal:use use-macro="base">
     <metal:script-slot fill-slot="script-slot">
 
-        <link rel="stylesheet" type="text/css" href="${request.application_url}/aloha/src/css/aloha.css"> <!-- xhtml workaround --></link>
-        <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
-        <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
-        <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/html5_content_in_oerpub.css')}"> <!-- xhtml workaround --></link>
-        <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
-        <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css"
+              tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
+        <link rel="stylesheet"  href=""
+              tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
+        <link rel="stylesheet" type="text/css" href="${request.application_url}/css/override-css/bootstrap-override.css"
+              tal:attributes="href string:${request.application_url}/css/override-css/bootstrap-override.css"> <!-- xhtml workaround --></link>
+
+        <script src="${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
 
     </metal:script-slot>
 

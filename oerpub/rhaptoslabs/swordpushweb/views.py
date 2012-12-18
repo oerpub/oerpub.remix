@@ -1155,7 +1155,7 @@ class Choose_Document_Source(BaseHelper):
 
                 # HTML URL Import:
                 elif form.data.get('url_text'):
-                    errors = self.process_url_data(self.request, save_dir)
+                    errors = self.process_url_data(form, self.request, save_dir)
                     if errors:
                         self.request['errors'] = errors
                         response = {'form': FormRenderer(form),
