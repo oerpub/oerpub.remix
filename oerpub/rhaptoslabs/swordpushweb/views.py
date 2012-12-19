@@ -418,8 +418,6 @@ def preview_save(request):
         try:
             edited_title = tree.xpath('/html/head/title/text()')[0]
             request.session['title'] = edited_title
-            # else:
-            #     request.session['title'] = 'Untitled Document'
         except:
             request.session['title'] = 'Untitled Document'
 
