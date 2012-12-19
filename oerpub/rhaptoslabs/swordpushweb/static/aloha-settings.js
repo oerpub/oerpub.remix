@@ -10,7 +10,12 @@
         jQuery: window.jQuery,
         logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
         errorhandling : true,
-        requireConfig: { waitSeconds: 42 },
+        requireConfig: {
+            waitSeconds: 42,
+            paths: {
+                jqueryui: '../../oerpub/js/jquery-ui-1.9.0.custom-aloha'
+            }
+        },
         plugins: {
             assorted: {
                 image: {
