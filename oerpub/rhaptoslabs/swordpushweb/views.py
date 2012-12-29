@@ -58,8 +58,6 @@ import parse_sword_treatment
 from .editor import EditorHelper
 
 TESTING = False      
-CWD = os.getcwd()
-
 
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
