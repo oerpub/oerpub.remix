@@ -56,8 +56,6 @@ from helpers import BaseHelper
 from .editor import EditorHelper
 
 TESTING = False      
-CWD = os.getcwd()
-
 
 
 class LoginSchema(formencode.Schema):
