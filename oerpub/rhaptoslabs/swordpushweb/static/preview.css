@@ -8,9 +8,10 @@
 }
 
 #module-actions {
-    margin-top: -13px;
-    position: relative;
-    z-index:1;
+    position: fixed;
+    right: 8px;
+    top: 128px;
+    z-index: 1011;
 }
 
 .toolbar {
