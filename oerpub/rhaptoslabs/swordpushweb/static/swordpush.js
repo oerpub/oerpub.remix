@@ -352,26 +352,6 @@ $(document).ready(function()
         showWaitMessage();
     });
 
-    // Show the "New or existing module?" overlay.
-    $('#show-neworexisting').click(function(e) {
-        if(!e.isDefaultPrevented()){
-            //$('#neworexisting').modal();
-        }
-        e.preventDefault();
-    });
-
-    // Hide the "New or existing module?" overlay.
-    $('#cancel-neworexisting').click(function(e) {
-        e.preventDefault();
-        $.modal.close();
-    });
-
-    // Apply the "New or existing module?" overlay.
-    $('.submit-neworexisting').click(function(e) {
-        alert('Deprecated!');
-        return False;
-    });
-
     // Workgroup menu ("Describe your module" and "Choose module" pages) derived
     // from Aaron Miller's work at:
     //   http://www.awmcreative.com/blog/jquery/jquery-pop-menu/ 
