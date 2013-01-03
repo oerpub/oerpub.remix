@@ -6,8 +6,7 @@
           tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
     <link rel="stylesheet"  href=""
           tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" type="text/css" href="${request.application_url}/css/override-css/bootstrap-override.css"
-          tal:attributes="href string:${request.application_url}/css/override-css/bootstrap-override.css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" type="text/css" href="${request.application_url}/aloha/oerpub/css/bootstrap.css"> <!-- xhtml workaround --></link>
     <link rel="stylesheet" type="text/css" media="screen" href="/static/toolbar.css"
           tal:replace="nothing"> <!-- xhtml --></link>
 
