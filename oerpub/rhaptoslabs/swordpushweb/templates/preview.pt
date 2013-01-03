@@ -9,39 +9,24 @@
         <script type="text/javascript">
             Aloha.ready(function(){
                 Aloha.require(['PubSub'], function(PubSub){
-                    $('#show-neworexisting').on('click', function(evt) {
+                    $('#step-metadata').on('click', function(evt) {
                         if(Aloha.getEditableById('canvas').isModified()){
                             // show the info slider
                             $('#upload-wait').center().slideDown('slow');
-                            $('#btn-newmodule').attr('disabled', 'disabled')
-                                .removeClass('btn-primary');
-                            $('#btn-existingmodule').attr('disabled', 'disabled')
-                                .removeClass('btn-primary');
                             PubSub.pub('swordpushweb.save', {
                                 callback: function(){
-                                    $('#upload-wait').slideUp('slow');
-
-                                    var btn = $('#btn-newmodule');
-                                    btn.removeAttr('disabled');
-                                    btn.addClass('btn-primary');
-                                    
-                                    var btn = $('#btn-existingmodule');
-                                    btn.removeAttr('disabled');
-                                    btn.addClass('btn-primary');
+                                    $('#upload-wait').slideUp('slow', function(){
+                                        window.location = '/metadata';
+                                    });
                                 }});
+                        } else {
+                            window.location = '/metadata';
                         }
                     });
                 });
                 $('#neworexisting').on('hidden', function() {
+                    // Simple cleanup
                     $('#upload-wait').slideUp('slow');
-
-                    var btn = $('#btn-newmodule');
-                    $(btn).removeAttr('disabled');
-                    $(btn).addClass('btn-primary');
-                   
-                    var btn = $('#btn-exsitingmodule');
-                    $(btn).removeAttr('disabled');
-                    $(btn).addClass('btn-primary');
                 });
             });
         </script>
@@ -62,8 +47,7 @@
             </div>
 
             <div id="forward-steps">
-                <input id="show-neworexisting"
-                href="#go-forward-or-stay-dialog"
+                <input id="step-metadata"
                 role="button"
                 class="btn button forward-button"
                 data-toggle="modal"
@@ -123,10 +107,6 @@
                 </div>
             </div>
         </div>
-
-    <span metal:use-macro="view.forward_navigation_warning">
-        next step
-    </span>
 
     <span metal:use-macro="view.back_navigation_warning">
         back navigation warning
