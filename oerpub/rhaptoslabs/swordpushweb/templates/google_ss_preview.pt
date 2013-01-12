@@ -1,8 +1,5 @@
 <metal:use use-macro="base">
-
 <metal:script-slot fill-slot="script-slot">
-<script type="text/javascript">
-</script>
 <script type="text/javascript">
     var nextSelectValue = 2;
     var newInput;
@@ -16,32 +13,21 @@
 		console.log("Choice number"+ choiceNumber);;
 		var newchoice = new Number(choiceNumber+1);
 		newChoice = new String(newchoice);
-		//$("#radio-"+questionNumber+"-"+choiceNumber).css({"visibility":"visible"});
 		var table = 'form[name="optionsform"] #table-question-'+questionNumber;
 		var tableLastRow = table+" tr:last"
 		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
 		var radioName = "radio-"+new String(questionNumber);
 		var radioValue = "answer-"+questionNumber;
+			
+		if (newChoice =="2"){
 		
-		
-   
-if (newChoice =="2"){
-		
-		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-1"+"' value='answer-"+questionNumber+"-1"+"' class='answer-"+questionNumber+"' checked>Correct</td>";
-		$(radioButton).appendTo(tableLastRow);
-}
+			var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-1"+"' value='answer-"+questionNumber+"-1"+"' class='answer-"+questionNumber+"' checked>Correct</td>";
+			$(radioButton).appendTo(tableLastRow);
+		}
 
 		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+ "' class='answer-"+questionNumber+"' >Correct</td>";
-		
 		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
-		//$(tableLastRow).append(
-		//$(table+" > tbody > tr").eq(choiceNumber-1).after(html);
 		$(tableLastRow).after(html);
- 
-		
-		
-		
-		
 	  });
       $("#add-more-questions").live("click", function(){
       
@@ -62,12 +48,6 @@ if (newChoice =="2"){
             newQuestionBox.append(newChoiceBox);
             var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
             var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
-            
-            //var replaceName = newQuestionBox.find(optionId).attr('name','options-'+newNum);
-            //var replaceId = newQuestionBox.find(optionId).attr('id','options-'+newNum);
-            
-            //var replaceName = newQuestionBox.find(solutionId).attr('name','solution-'+newNum);
-            //var replaceId = newQuestionBox.find(solutionId).attr('id','solution-'+newNum);
            $('form[name="optionsform"] #add-questions-area-' + num).after(newQuestionBox);
 			
             
@@ -76,7 +56,6 @@ if (newChoice =="2"){
     });
 
 </script>
-}    
 </metal:script-slot>
 
     <metal:workflownav fill-slot="workflownav">
