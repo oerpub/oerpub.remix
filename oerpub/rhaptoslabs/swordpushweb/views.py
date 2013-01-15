@@ -1163,31 +1163,31 @@ class Choose_Document_Source(BaseHelper):
                 self.request.session['upload_dir'] = temp_dir_name
                 self.source = 'undefined'
                 if form.data.get('newmodule'):
-                    self.source = 'newemptymodule'
+                    self.set_source('newemptymodule')
                     # save empty cnxml and html files
                     cnxml = self.empty_cnxml()
                     files = []
                     save_cnxml(save_dir, cnxml, files)
                 
                 elif form.data.get('existingmodule'):
-                    self.source = 'existingmodule'
+                    self.set_source('existingmodule')
                     return HTTPFound(
                         location=self.request.route_url('choose-module', _query=[('source', self.source)]))
 
                 elif form.data['upload'] is not None:
-                    self.source = 'fileupload'
+                    self.set_source('fileupload')
                     self.request.session['filename'] = form.data['upload'].filename
                     self.process_document_data(form, self.request, save_dir)
 
                 # Google Docs Conversion
                 # if we have a Google Docs ID and Access token.
                 elif form.data.get('gdocs_resource_id'):
-                    source = 'gdocupload'
+                    self.set_source('gdocupload')
                     self.process_gdoc_data(form, self.request, save_dir)
 
                 # HTML URL Import:
                 elif form.data.get('url_text'):
-                    self.source = 'urlupload'
+                    self.set_source('urlupload')
                     errors = self.process_url_data(form, self.request, save_dir)
                     if errors:
                         self.request['errors'] = errors
@@ -1198,7 +1198,7 @@ class Choose_Document_Source(BaseHelper):
 
                 # Office, CNXML-ZIP or LaTeX-ZIP file
                 else:
-                    self.source = 'cnxinputs'
+                    self.set_source('cnxinputs')
                     self.process_document_data(form, self.request, save_dir)
 
             except ConversionError as e:
@@ -1216,7 +1216,7 @@ class Choose_Document_Source(BaseHelper):
                 return render_to_response(templatePath, response, request=self.request)
 
             self.request.session.flash(message)
-            return HTTPFound(location=self.request.route_url('preview',  _query=[('source', self.source)]))
+            return HTTPFound(location=self.request.route_url('preview'))
 
         # First view or errors
         response = {

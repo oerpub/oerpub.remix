@@ -18,16 +18,10 @@ class BaseHelper(object):
             request
             session
             macro renderer (check templates/macros.pt for more details. 
-            source
         """
         self.request = request
         self.session = self.request.session
         self.macro_renderer = get_renderer("templates/macros.pt")
-        self.source = 'undefined'
-        if request.POST and 'source' in request.POST: 
-          self.source = request.POST['source']
-        elif request.GET and 'source' in request.GET: 
-          self.source = request.GET['source']
 
     def check_login(self, raise_exception=True):
         """ Default login behaviour.
@@ -77,5 +71,8 @@ class BaseHelper(object):
                                      _query=params)
         return url
 
+    def set_source(self, source):
+        self.request.session['source'] = source
+
     def get_source(self):
-        return self.source
+        return self.request.session['source'] if 'source' in self.request.session else 'undefined'
