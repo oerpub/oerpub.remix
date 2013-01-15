@@ -1172,7 +1172,7 @@ class Choose_Document_Source(BaseHelper):
                 elif form.data.get('existingmodule'):
                     self.set_source('existingmodule')
                     return HTTPFound(
-                        location=self.request.route_url('choose-module', _query=[('source', self.source)]))
+                        location=self.request.route_url('choose-module'))
 
                 elif form.data['upload'] is not None:
                     self.set_source('fileupload')
