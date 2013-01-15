@@ -46,11 +46,11 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
             </div>
 
             <div id="choose-upload">
-              <h1>
+              <h3>
                 Create, edit, and adapt content in Connexions
-              </h1>
+              </h3>
               <p class="forminfo">
-                Choose one of the following to import the contents of a new or existing module. 
+                Choose one of the following to import or edit the contents of a new or existing module.
               </p>
 
             ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
@@ -61,10 +61,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                 <tr>
                   <td style="vertical-align: top; padding-right: 2em; width: 60%;">
 
-                    <h3>Importer tools</h3>
-
                     <ul class="create-new-list">
-
                         <li id="editor">
                             <label>
                                 <span style="visibility: hidden; display: none;" class="or-bullet">or</span> 
@@ -73,16 +70,20 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 </span>
                             </label>
                             <div class="upload-form" style="width: 556px; ">
-                                <input class="btn"
-                                    value="Edit a new or existing module »"
-                                    href="#neworexisting"
-                                    role="button"
-                                    class="btn"
-                                    data-toggle="modal"
-                                    type="button" 
-                                    id="show-neworexisting">
+                                <input class="btn" id="newmodule"
+                                    name="newmodule" value="Create a new module »" type="submit"
+                                    title="This is an entirely new module."> <br/>
+                                <br/>
+                                <input class="btn" id="existingmodule"
+                                    name="existingmodule" value="Edit an existing module »" type="submit"
+                                    title="Choose an existing module and edit."> <br />
                             </div>
                         </li>
+                    </ul>
+
+                    <div><strong>Or use one of our importer tools:</strong></div>
+
+                    <ul class="create-new-list">
 
                         <li id="doc-importer">
                             <!-- div style="margin: 0 0 1em -1.5em;">
@@ -158,7 +159,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                         <ul class="create-new-list">
                           <li id="latex-zip-importer">
                             <label>
-                              <span class="or-bullet">or</span> 
+                              <span style="visibility: hidden; display: none;" class="or-bullet">or</span> 
                               <span class="label-text">
                                   <img src="${images_url}/zip-icon-01.png"> <strong>Module ZIP</strong> or 
                                   <img src="${images_url}/tex-icon-01.png"> <strong>LaTeX</strong>
@@ -186,40 +187,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
             </div>
 
         </div>
-    </div>
-</div>
-
-<div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
-    aria-labelledby="New or existing" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="neworexistingLabel">
-            Work on a brand new module, starting from scratch.
-        </h3>
-    </div>
-    <div class="modal-body">
-        ${form.begin(request.route_url('choose'), id='neworexisting-form')}
-        ${form.csrf_token()}
-        ${form.hidden('upload', value='')}
-        <div class="forminfo" style="margin: .5em 0 1em;">
-            <input class="btn btn-primary" id="newmodule"
-                name="newmodule" value="New module" type="submit"> <br/>
-            This is an entirely new module. 
-        </div>
-        ${form.end()}
-
-        ${form.begin(request.route_url('choose'), id='neworexisting-form')}
-        ${form.csrf_token()}
-        ${form.hidden('upload', value='')}
-        <div class="forminfo" style="margin: .5em 0 1em;">
-            <input class="btn btn-primary" id="existingmodule"
-                name="existingmodule" value="Existing module" type="submit"> <br />
-            Choose an existing module to apply your import to, replacing its contents.  
-        </div>
-        ${form.end()}
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     </div>
 </div>
 
