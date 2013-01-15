@@ -26,7 +26,7 @@
 </metal:script-slot>    
 
 <metal:workflownav fill-slot="workflownav">
-${form.begin(request.route_url('preview'), name="preview")}
+${form.begin(request.route_url('preview', _query=[('source', view.get_source())]), name="preview")}
 ${form.csrf_token()}
 
 <div id="workflownav-wrap">
@@ -48,9 +48,8 @@ ${form.csrf_token()}
                 disabled="disabled"
                 class="btn forward-button" 
                 value="Next: Edit selected module &raquo;" 
-                tal:attributes="url view.get_next_action()"
+                url="${view.get_next_action() + '?source=' + view.get_source()}"
                 title="Select a module below and then click 'Next' to start editing it">
-
         </div>
     </div>
 </div>

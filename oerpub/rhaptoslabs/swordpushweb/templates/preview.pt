@@ -53,7 +53,7 @@
                 data-toggle="modal"
                 type="button"
                 value="Next Step &#187;"
-                title="Select whether this will be used for a new module or to override the contents of an existing module" />
+                title="${view.get_NextButtonToolTip()}" />
             </div>
 
         </div>
