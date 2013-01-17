@@ -6,27 +6,106 @@
         <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
 
         <metal:m use-macro="editor.javascript" />
+        <script type="text/javascript" 
+                tal:condition="python: view.get_source() == 'newemptymodule'">
+            oerpub_document_source = 'newemptymodule';
+            Aloha.ready(function(){
+              $('#step-contextually-forward').attr('title', 'Add module description and ' +
+                                                            'save module to cnx.org');
+            });
+        </script>
+        <script type="text/javascript" 
+                tal:condition="python: view.get_source() == 'existingmodule'">
+            oerpub_document_source = 'existingmodule';
+            Aloha.ready(function(){
+              $('#step-contextually-forward').attr('title', 'Review module description and ' +
+                                                            'save module to cnx.org');
+            });
+        </script>
+        <script type="text/javascript" 
+                tal:condition="python: view.get_source() != 'newemptymodule' and view.get_source() != 'existingmodule'">
+            oerpub_document_source = 'importmodule';
+            Aloha.ready(function(){
+              $('#step-contextually-forward').attr('href', '#neworexisting');
+              $('#step-contextually-forward').attr('title', 'Select whether this will be used for a new module or '+
+                                                            'to override the contents of an existing module');
+            });
+        </script>
         <script type="text/javascript">
             Aloha.ready(function(){
                 Aloha.require(['PubSub'], function(PubSub){
-                    $('#step-metadata').on('click', function(evt) {
+                    $('#step-contextually-forward').on('click', function(evt) {
                         if(Aloha.getEditableById('canvas').isModified()){
-                            // show the info slider
+                            // show the wait-while-we-save info slider
                             $('#upload-wait').center().slideDown('slow');
-                            PubSub.pub('swordpushweb.save', {
-                                callback: function(){
-                                    $('#upload-wait').slideUp('slow', function(){
+
+                            if      ( oerpub_document_source == 'newemptymodule' ) {
+                                PubSub.pub('swordpushweb.save', {
+                                    callback: function() {
+                                        // unshow the wait-while-we-save info slider
+                                        $('#upload-wait').slideUp('slow');
+
                                         window.location = '/metadata';
-                                    });
-                                }});
-                        } else {
-                            window.location = '/metadata';
+                                    }
+                                });
+                            }
+                            else if ( oerpub_document_source == 'existingmodule' ) {
+                                PubSub.pub('swordpushweb.save', {
+                                    callback: function() {
+                                        // unshow the wait-while-we-save info slider
+                                        $('#upload-wait').slideUp('slow');
+
+                                        window.location = '/metadata';
+                                    }
+                                });
+                            }
+                            else {
+                                // disable the modal dbox's button while saving
+                                $('#btn-newmodule').attr('disabled', 'disabled')
+                                                   .removeClass('btn-primary');
+                                $('#btn-existingmodule').attr('disabled', 'disabled')
+                                                        .removeClass('btn-primary');
+
+                                PubSub.pub('swordpushweb.save', {
+                                    callback: function() {
+                                        // unshow the wait-while-we-save info slider
+                                        $('#upload-wait').slideUp('slow');
+
+                                        $('#btn-newmodule').removeAttr('disabled')
+                                                           .addClass('btn-primary');
+                                        $('#btn-existingmodule').removeAttr('disabled')
+                                                                .addClass('btn-primary');
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            // document changes have been saved ...
+
+                            // for those workflow where the new or existing module has already been made,
+                            // proceed directly to the metadata page
+                            if      ( oerpub_document_source == 'newemptymodule' ) {
+                                window.location = '/metadata';
+                            }
+                            else if ( oerpub_document_source == 'existingmodule' ) {
+                                window.location = '/metadata';
+                            }
+                            else {
+                                // wait for user to push one of the dbox's buttons or 
+                                // close dbox
+                            }
                         }
                     });
                 });
                 $('#neworexisting').on('hidden', function() {
-                    // Simple cleanup
+                    // close the dbox while saving 
+                    // which may mean the server is experiencing technical difficulties
                     $('#upload-wait').slideUp('slow');
+
+                    $('#btn-newmodule').removeAttr('disabled')
+                                       .addClass('btn-primary');
+                    $('#btn-exsitingmodule').removeAttr('disabled')
+                                            .addClass('btn-primary');
                 });
             });
         </script>
@@ -47,13 +126,12 @@
             </div>
 
             <div id="forward-steps">
-                <input id="step-metadata"
+                <input id="step-contextually-forward"
                 role="button"
                 class="btn button forward-button"
                 data-toggle="modal"
                 type="button"
-                value="Next Step &#187;"
-                title="${view.get_NextButtonToolTip()}" />
+                value="Next Step &#187;" />
             </div>
 
         </div>
@@ -130,7 +208,7 @@
                 This is an entirely new module. 
             </div>
             <div class="forminfo" style="margin: .5em 0 1em;">
-                <button id="btn-exsitingmodule" class="btn btn-primary submit-neworexisting" 
+                <button id="btn-existingmodule" class="btn btn-primary submit-neworexisting" 
                     url="${request.route_url('module_association')}">
                     Override existing module
                 </button>
