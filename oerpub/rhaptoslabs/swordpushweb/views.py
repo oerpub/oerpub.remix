@@ -58,8 +58,6 @@ import parse_sword_treatment
 from .editor import EditorHelper
 
 TESTING = False      
-CWD = os.getcwd()
-
 
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
@@ -233,7 +231,20 @@ def save_zip(save_dir, cnxml, html, files):
             <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
                 <xsl:template match="/html">
                     <html><xsl:copy-of select="@*"/>
-                    <head><link rel="stylesheet" type="text/css" href="oerpub.css" />
+                    <head>
+                      <link rel="stylesheet" type="text/css" href="oerpub.css" />
+                      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
+                      <script type="text/javascript" src="oerpub.js"></script>
+                      <script type="text/x-mathjax-config">MathJax.Hub.Config({
+                        jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
+                        extensions: ["asciimath2jax.js", "tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+                        tex2jax: { inlineMath: [["[TEX_START]","[TEX_END]"], ["\\\\(", "\\\\)"]] },
+                        MMLorHTML: {prefer:{MSIE:"MML",Firefox:"MML",Opera:"HTML",Chrome:"HTML",Safari:"HTML",other:"HTML"}},
+                        TeX: {
+                          extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], noErrors: { disabled: true }
+                        },
+                        AsciiMath: { noErrors: { disabled: true } }
+                      });</script>
                     </head>
                     <xsl:apply-templates />
                     </html>
@@ -415,6 +426,14 @@ def preview_save(request):
     try:
         structured_html = aloha_to_html(html)           #1 create structured HTML5
         cnxml = html_to_valid_cnxml(structured_html)    #2 create cnxml from structured HTML5
+
+        # parse the new title from structured HTML
+        tree = etree.fromstring(structured_html, etree.HTMLParser())
+        try:
+            edited_title = tree.xpath('/html/head/title/text()')[0]
+            request.session['title'] = edited_title
+        except:
+            request.session['title'] = 'Untitled Document'
     except Exception as e:
         #return render_conversionerror(request, str(e))
         conversionerror = str(e)
