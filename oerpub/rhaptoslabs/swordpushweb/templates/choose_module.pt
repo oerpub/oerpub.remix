@@ -50,7 +50,6 @@ ${form.csrf_token()}
                 value="Next: Edit selected module &raquo;" 
                 tal:attributes="url view.get_next_action()"
                 title="Select a module below and then click 'Next' to start editing it">
-
         </div>
     </div>
 </div>

@@ -70,3 +70,9 @@ class BaseHelper(object):
         url = self.request.route_url(self.navigation_actions['batch'],
                                      _query=params)
         return url
+
+    def set_source(self, source):
+        self.request.session['source'] = source
+
+    def get_source(self):
+        return self.request.session['source'] if 'source' in self.request.session else 'undefined'

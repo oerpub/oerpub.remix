@@ -406,6 +406,14 @@ class PreviewView(BaseHelper):
     def neworexisting_dialog(self):
         return self.macro_renderer.implementation().macros['neworexisting_dialog']
 
+    def get_NextButtonToolTip(self):
+      source = self.get_source()
+      if source == 'newemptymodule':
+          return 'Add module description and save module to cnx.org'
+      elif source == 'existingmodule':
+          return 'Review module description and save module to cnx.org'
+      else:
+          return 'Select whether this will be used for a new module or to override the contents of an existing module'
 
 @view_config(route_name='preview_save')
 def preview_save(request):
@@ -425,6 +433,13 @@ def preview_save(request):
     cnxml = None
     try:
         structured_html = aloha_to_html(html)           #1 create structured HTML5
+        tree = etree.fromstring(structured_html, etree.HTMLParser())
+        try:
+            edited_title = tree.xpath('/html/head/title/text()')[0]
+            request.session['title'] = edited_title
+        except:
+            request.session['title'] = 'Untitled Document'
+
         cnxml = html_to_valid_cnxml(structured_html)    #2 create cnxml from structured HTML5
 
         # parse the new title from structured HTML
@@ -1143,6 +1158,7 @@ class Choose_Document_Source(BaseHelper):
 
         # Check for successful form completion
         if form.validate():
+
             try: # Catch-all exception block
                 message = 'The file was successfully converted.'
 
@@ -1153,27 +1169,33 @@ class Choose_Document_Source(BaseHelper):
                 # might kill the ability to do multiple tabs in parallel,
                 # unless it gets offloaded onto the form again.
                 self.request.session['upload_dir'] = temp_dir_name
+                self.source = 'undefined'
                 if form.data.get('newmodule'):
+                    self.set_source('newemptymodule')
                     # save empty cnxml and html files
                     cnxml = self.empty_cnxml()
                     files = []
                     save_cnxml(save_dir, cnxml, files)
                 
                 elif form.data.get('existingmodule'):
+                    self.set_source('existingmodule')
                     return HTTPFound(
                         location=self.request.route_url('choose-module'))
 
                 elif form.data['upload'] is not None:
+                    self.set_source('fileupload')
                     self.request.session['filename'] = form.data['upload'].filename
                     self.process_document_data(form, self.request, save_dir)
 
                 # Google Docs Conversion
                 # if we have a Google Docs ID and Access token.
                 elif form.data.get('gdocs_resource_id'):
+                    self.set_source('gdocupload')
                     self.process_gdoc_data(form, self.request, save_dir)
 
                 # HTML URL Import:
                 elif form.data.get('url_text'):
+                    self.set_source('urlupload')
                     errors = self.process_url_data(form, self.request, save_dir)
                     if errors:
                         self.request['errors'] = errors
@@ -1184,6 +1206,7 @@ class Choose_Document_Source(BaseHelper):
 
                 # Office, CNXML-ZIP or LaTeX-ZIP file
                 else:
+                    self.set_source('cnxinputs')
                     self.process_document_data(form, self.request, save_dir)
 
             except ConversionError as e:
