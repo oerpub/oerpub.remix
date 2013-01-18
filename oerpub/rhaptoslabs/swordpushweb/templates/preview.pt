@@ -107,13 +107,6 @@
                     $('#btn-existingmodule').removeAttr('disabled')
                                             .addClass('btn-primary');
                 });
-                // a complete mystery why I need to manually do this
-                $('#btn-newmodule').on('click', function() {
-                  window.location = $('#btn-newmodule').attr('url');
-                });
-                $('#btn-existingmodule').on('click', function() {
-                  window.location = $('#btn-existingmodule').attr('url');
-                });
             });
         </script>
     </metal:script>
