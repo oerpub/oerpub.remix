@@ -9,6 +9,12 @@
 
         <script src="${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
 
+<script type="text/javascript">
+    $(document).ready(function(){
+            $("#header h1 a").attr('href', '/choose');
+    });
+</script>
+
     </metal:script-slot>
 
     <metal:workflownav fill-slot="workflownav">
