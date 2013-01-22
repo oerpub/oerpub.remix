@@ -1,10 +1,18 @@
 <metal:use use-macro="base">
 
 <metal:script-slot fill-slot="script-slot">    
-    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
-    <link rel="stylesheet" href="${request.application_url}/aloha/bootstrap/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
-    <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
-    <script src="${request.application_url}/aloha/bootstrap/js/bootstrap.js"> <!-- xhtml workaround --></script>
+  
+    <link rel="stylesheet" type="text/css"
+          href="${request.application_url}/bootstrap/docs/assets/css/bootstrap.css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" type="text/css"
+          href="${request.application_url}/bootstrap/docs/assets/css/bootstrap-responsive.css"> <!-- xhtml workaround --></link>
+    <link rel="stylesheet" type="text/css" 
+          href="${request.application_url}/aloha/oerpub/css/bootstrap.css"> <!-- xhtml workaround --></link>
+
+    <script type="text/javascript" 
+            src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
+    <script type="text/javascript"
+            src="${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
 
     <script type="text/javascript">
 
@@ -32,12 +40,14 @@ ${form.csrf_token()}
 <div id="workflownav-wrap">
     <div id="workflownav-container">
         <div id="back-steps">
-            <input id="back-to-chooser"
-                type="button"
+            <input id="btn-back-to-chooser"
                 class="btn"
+                role="button"
+                type="button"
+                href="#go-back-or-stay-dialog"
+                data-toggle="modal"
                 value="&laquo; Back: Return to start page"
-                title="Return to the initial page"
-                tal:attributes="url view.get_previous_action()">
+                title="Return to the initial page">
         </div>
 
         <input id="workspace" type="hidden" name="workspace">
@@ -68,6 +78,10 @@ ${form.end()}
 <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
 </iframe>
+
+<span metal:use-macro="view.back_navigation_warning">
+    back navigation warning
+</span>
 
 </tal:body>
 
