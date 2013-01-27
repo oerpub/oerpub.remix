@@ -545,7 +545,7 @@ def choose_view(request):
                             fp.close()
                         except IOError as io:
                             raise ConversionError("%s not found" %
-                                                  original_filename)
+                                                  odt_filename)
                     
                     # Convert and save all the resulting files.
 
