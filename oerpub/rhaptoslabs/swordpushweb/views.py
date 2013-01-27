@@ -550,7 +550,7 @@ def choose_view(request):
                                                       odt_filename)
                             else:
                                 raise ConversionError("%s not found because command \"%s\" failed" %
-                                                      odt_filename,command)
+                                                      (odt_filename,command) )
                     
                     # Convert and save all the resulting files.
 
