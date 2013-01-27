@@ -531,6 +531,7 @@ def choose_view(request):
                     if(extension != '.odt'):
                         converter = JOD.DocumentConverterClient()
                         # Checks to see if JOD is active on the machine. If it is the conversion occurs using JOD else it converts using OO headless
+                        command = None
                         if jod_check.check('office[0-9]'):
                             try:
                                 converter.convert(original_filename, 'odt', filename + '.odt')
@@ -544,8 +545,12 @@ def choose_view(request):
                             fp = open(odt_filename, 'r')
                             fp.close()
                         except IOError as io:
-                            raise ConversionError("%s not found" %
-                                                  odt_filename)
+                            if command == None:
+                                raise ConversionError("%s not found" %
+                                                      odt_filename)
+                            else:
+                                raise ConversionError("%s not found because command %s failed" %
+                                                      odt_filename,command)
                     
                     # Convert and save all the resulting files.
 
