@@ -1,4 +1,7 @@
+from zope.interface import implements
 from pyramid.view import render_view
+
+from .interfaces import IWorkflowSteps
 
 class Provider(object):
     """ Simple provider callable that allows us to traverse to views in our
@@ -12,3 +15,6 @@ class Provider(object):
     def __call__(self, name='', secure=True):
         context = self.context
         return render_view(context, self.request, name, secure)
+
+class WorkflowStepsUtility(object):
+    implements(IWorkflowSteps)

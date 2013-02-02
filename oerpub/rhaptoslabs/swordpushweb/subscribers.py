@@ -1,5 +1,6 @@
 from pyramid.renderers import get_renderer
 from .provider import Provider
+from .interfaces import IWorkflowSteps
 
 def add_base_template(event):
     """
@@ -18,3 +19,10 @@ def add_provider(event):
     views/templates, much like zope/plone providers. """
     provider = Provider(event['context'], event['request'])
     event['provider'] = provider
+
+def add_utils(event):
+    """
+    Add 'utils' dict to the event. This gives our templates access to it.
+    """
+    workflowsteps = event['request'].registry.getUtility(IWorkflowSteps)
+    event['workflowsteps'] = workflowsteps

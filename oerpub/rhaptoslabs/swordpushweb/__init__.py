@@ -1,5 +1,9 @@
+from pyramid.registry import Registry
 from pyramid.config import Configurator
 from pyramid_beaker import session_factory_from_settings
+
+from .interfaces import IWorkflowSteps
+from .provider import WorkflowStepsUtility
 
 def main(global_config, **settings):
     """
@@ -12,6 +16,8 @@ def main(global_config, **settings):
     
     add_routes(config)
     add_static_resources(config)
+    add_subscribers(config)
+    register_utilities(config)
 
     config.scan()
     return config.make_wsgi_app()
@@ -55,9 +61,18 @@ def add_static_resources(config):
         'oerpub.rhaptoslabs.swordpushweb:transforms',
         cache_max_age=0)
 
+def add_subscribers(config):
     config.add_subscriber(
         '.subscribers.add_base_template',
         'pyramid.events.BeforeRender')
+
     config.add_subscriber(
         '.subscribers.add_provider',
         'pyramid.events.BeforeRender')
+
+    config.add_subscriber(
+        '.subscribers.add_utils',
+        'pyramid.events.BeforeRender')
+
+def register_utilities(config):
+    config.registry.registerUtility(WorkflowStepsUtility, IWorkflowSteps)
