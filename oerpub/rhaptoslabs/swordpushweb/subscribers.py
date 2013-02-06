@@ -22,7 +22,9 @@ def add_provider(event):
 
 def add_utils(event):
     """
-    Add 'utils' dict to the event. This gives our templates access to it.
+    We do a lookup against the application registry and add the result to the
+    event dictionary. That makes 'workflowsteps' accessible in the the
+    templates.
     """
     workflowsteps = event['request'].registry.getUtility(IWorkflowSteps)
     event['workflowsteps'] = workflowsteps
