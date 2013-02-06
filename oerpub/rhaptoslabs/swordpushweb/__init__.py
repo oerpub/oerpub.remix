@@ -1,4 +1,3 @@
-from pyramid.registry import Registry
 from pyramid.config import Configurator
 from pyramid_beaker import session_factory_from_settings
 
