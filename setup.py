@@ -26,6 +26,7 @@ tests_requires = requires.extend(
      'oerpub.rhaptoslabs.latex2cnxml',
      'oerpub.rhaptoslabs.html_gdocs2cnxml',
      'oerpub.rhaptoslabs.cnxml2htmlpreview',
+     'WebTest',
     ]
 )
 
