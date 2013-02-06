@@ -31,6 +31,24 @@
                                 }});
                         }
                     });
+                    // Subscribe to the 'swordpushweb.save' event.
+                    // It is fired by the the AlohaEditor when someone clicks
+                    // the 'Save' button.
+                    // Disable the navigation buttons.
+                    PubSub.sub('swordpushweb.save', function(data) {
+                        $('#back-to-chooser').attr('disabled', 'disabled');
+                        $('#show-neworexisting').attr('disabled', 'disabled');
+                    });
+                    // subscribe to the 'swordpusweb.saved' event. It is fired
+                    // by the 'savePreview' function in the AlohaEditor.oerpub
+                    // index.html page.
+                    // Here we re-enable the navigation buttons.
+                    PubSub.sub('swordpushweb.saved', function(data) {
+                        var btn = $('#back-to-chooser');
+                        btn.removeAttr('disabled');
+                        var btn = $('#show-neworexisting');
+                        btn.removeAttr('disabled');
+                    });
                 });
                 $('#neworexisting').on('hidden', function() {
                     $('#upload-wait').slideUp('slow');
