@@ -17,7 +17,7 @@
             });
 
 </script>
-}    
+}
 </metal:script-slot>
 
 <metal:workflownav fill-slot="workflownav" />
@@ -37,7 +37,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                 Create, edit, and adapt content in Connexions
               </h1>
               <p class="forminfo">
-                Choose one of the following to import the contents of a new or existing module. 
+                Choose one of the following to import the contents of a new or existing module.
               </p>
 
               ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
@@ -69,9 +69,9 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 <strong>Or use one of our importer tools:</strong>
                             </div -->                            
                             <label>
-                                <span style="visibility: hidden;" class="or-bullet">or</span> 
+                                <span style="visibility: hidden;" class="or-bullet">or</span>
                                 <span class="label-text">
-                                    <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> or 
+                                    <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> -
                                     <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
                                 </span>
                             </label>
@@ -94,7 +94,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
                                 <input id="google-submit"
                                     type="submit"
-                                    class="button" 
+                                    class="button"
                                     name="form.submitted"
                                     value="Select and preview &#187;">
                             </div>
@@ -109,7 +109,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
                             <div class="upload-form">
                                 <input id="url_text" name="url_text" style="width: 30em;"
-                                    placeholder="http://www.example.com" type="url" 
+                                    placeholder="http://www.example.com" type="url"
                                     onkeydown="keyDown(event)" />
 
                                 <input class="button" id="url-submit" name="url.submitted"
@@ -118,20 +118,39 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             </div>
                         
                           </li>
-
+                          
                     </ul>
+                     
+            ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
+            ${form.csrf_token()}
 
-                      <div class="advanced" style="display: block;">
-                        <h2 class="advanced-label">
-                          Advanced
-                        </h2>
+                      <div style="display: block;">
+                        
                         <ul class="create-new-list">
+                          <li>
+                              ${form.end()}
+                              ${presentationform.begin(request.route_url('choose'), multipart='multipart', id='presentationform')}
+                              ${presentationform.csrf_token()}
+                              
+                             <label>
+                               <span style="visibility: hidden;" class="or-bullet">or</span>
+                               <span class="label-text" title="This import is brand new and has not been fully tested yet">
+                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> - <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp OpenOffice</strong><sup title="This import is brand new and has not been fully tested yet" style="color:orange">alpha</sup>
+                                </span>
+                              </label>
+                              <div class="upload-form">
+                              <input class="button" id="presentation-submit" name="form.submitted" value="Choose Presentation and preview &#187;" type="submit">
+                              <input id="importer" name="importer" style="visibility: hidden;" type="file" />
+                              <!--<input class="button"  value="Import Your Presentations &#187;" onClick="location.href='/importer'" type="button">-->
+                              </div>    
+                              ${presentationform.end()}
+                          </li>                          
                           <li id="latex-zip-importer">
                             <label>
-                              <span class="or-bullet">or</span> 
-                              <span class="label-text">
-                                  <img src="${images_url}/zip-icon-01.png"> <strong>Module ZIP</strong> or 
-                                  <img src="${images_url}/tex-icon-01.png"> <strong>LaTeX</strong>
+                              <span style="visibility: hidden;" class="or-bullet">or</span>
+                              <span class="label-text" title="This import is brand new and has not been fully tested yet">
+                                  <img src="${images_url}/zip-icon-01.png"> <strong>Module ZIP</strong> -
+                                  <img src="${images_url}/tex-icon-01.png"> <strong>LaTeX</strong><sup title="alpha" style="color:orange">alpha</sup>
                               </span>
                             </label>
                             <div class="upload-form">
