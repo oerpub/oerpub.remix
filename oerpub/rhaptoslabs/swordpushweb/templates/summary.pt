@@ -1,19 +1,11 @@
 <metal:use use-macro="base">
     <metal:script-slot fill-slot="script-slot">
 
-        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css"
-              tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap.css" type="text/css"> <!-- xhtml workaround --></link>
-        <link rel="stylesheet"  href=""
-              tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap-responsive.css" type="text/css"> <!-- xhtml workaround --></link>
-        <link rel="stylesheet" type="text/css" href="${request.application_url}/aloha/oerpub/css/bootstrap.css"> <!-- xhtml workaround --></link>
-
-        <script src="${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
-
-<script type="text/javascript">
-    $(document).ready(function(){
-            $("#header h1 a").attr('href', '/choose');
-    });
-</script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+                $("#header h1 a").attr('href', '/choose');
+        });
+    </script>
 
     </metal:script-slot>
 
