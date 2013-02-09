@@ -72,7 +72,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 <span style="visibility: hidden;" class="or-bullet">or</span>
                                 <span class="label-text">
                                     <img src="${images_url}/word-icon.gif"> <strong>Microsoft Word</strong> -
-                                    <img src="${images_url}/oo-icon.gif"> <strong>Open Office</strong>
+                                    <img src="${images_url}/oo-icon.gif"> <strong>Open/Libre Office Writer</strong>
                                 </span>
                             </label>
 
@@ -125,6 +125,9 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
             ${form.csrf_token()}
 
                       <div style="display: block;">
+
+                        <br/>
+                        <h3>Alpha importer tools</h3>
                         
                         <ul class="create-new-list">
                           <li>
@@ -135,7 +138,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                              <label>
                                <span style="visibility: hidden;" class="or-bullet">or</span>
                                <span class="label-text" title="This import is brand new and has not been fully tested yet">
-                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> - <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp OpenOffice</strong><sup title="This import is brand new and has not been fully tested yet" style="color:orange">alpha</sup>
+                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> - <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp Open Office Impress</strong><sup title="This import is brand new and has not been fully tested yet" style="color:orange">alpha</sup>
                                 </span>
                               </label>
                               <div class="upload-form">
