@@ -242,7 +242,7 @@ def save_zip(save_dir, cnxml, html, files):
                         jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
                         extensions: ["asciimath2jax.js", "tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
                         tex2jax: { inlineMath: [["[TEX_START]","[TEX_END]"], ["\\\\(", "\\\\)"]] },
-                        MMLorHTML: {prefer:{MSIE:"MML",Firefox:"MML",Opera:"HTML",Chrome:"HTML",Safari:"HTML",other:"HTML"}},
+                        MMLorHTML: {prefer:{MSIE:"HTML",Firefox:"HTML",Opera:"HTML",Chrome:"HTML",Safari:"HTML",other:"HTML"}},
                         TeX: {
                           extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], noErrors: { disabled: true }
                         },
