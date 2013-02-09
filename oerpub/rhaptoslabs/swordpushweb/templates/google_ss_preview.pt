@@ -1,0 +1,195 @@
+<metal:use use-macro="base">
+<metal:script-slot fill-slot="script-slot">
+<script type="text/javascript">
+    var nextSelectValue = 2;
+    var newInput;
+    $(document).ready(function(){
+	  $(".add-more-choices").live("click", function(e){
+	  
+	  
+		var questionNumber = $(this).attr("id").split("-")[1];
+		var id = ".answer-"+questionNumber;
+		var choiceNumber = $(id).length;
+		console.log("Choice number"+ choiceNumber);;
+		var newchoice = new Number(choiceNumber+1);
+		newChoice = new String(newchoice);
+		var table = 'form[name="optionsform"] #table-question-'+questionNumber;
+		var tableLastRow = table+" tr:last"
+		var newName = "'answer-"+questionNumber+"-"+newChoice+"'";
+		var radioName = "radio-"+new String(questionNumber);
+		var radioValue = "answer-"+questionNumber;
+			
+		if (newChoice =="2"){
+		
+			var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-1"+"' value='answer-"+questionNumber+"-1"+"' class='answer-"+questionNumber+"' checked>Correct</td>";
+			$(radioButton).appendTo(tableLastRow);
+		}
+
+		var radioButton = "<td><input type='radio' name="+ radioName + " id='radio-"+questionNumber+"-"+newChoice+"' value='answer-"+questionNumber+"-"+newChoice+ "' class='answer-"+questionNumber+"' >Correct</td>";
+		var html = "<tr><td><input name="+ newName +"id="+newName+" class='answer-'"+questionNumber+"'  size='100'></td>"+radioButton+"</tr>";
+		$(tableLastRow).after(html);
+	  });
+      $("#add-more-questions").live("click", function(){
+      
+			
+      		var num     = $('.all-questions').length;
+            var newNum  = new Number(num + 1);
+            var questionId = '#question-'+num;
+            var questiontableDiv = "#table-question-"+num;
+            
+            var newQuestionBox = $('#add-questions-area-' + num).clone().attr('id', 'add-questions-area-' + newNum);
+            newQuestionBox.find(questiontableDiv).remove().end();
+            newQuestionBox.find(".add-more-choices").remove().end();
+            newNum = new String(newNum);
+            
+            var newTable = "<table id='table-question-"+newNum+"'><tr><td><input name='answer-"+newNum+"-1'  class='answer-"+newNum+"'  size='100'></td></tr></table> ";
+            newQuestionBox.append(newTable);
+            var newChoiceBox= "<input type='button' class='add-more-choices' name='Add More Choices' value='Add more Choices' id='question-"+newNum+"'>";
+            newQuestionBox.append(newChoiceBox);
+            var replaceName = newQuestionBox.find(questionId).attr('name','question-'+newNum);
+            var replaceId = newQuestionBox.find(questionId).attr('id','question-'+newNum);
+           $('form[name="optionsform"] #add-questions-area-' + num).after(newQuestionBox);
+			
+            
+
+      });
+    });
+
+</script>
+</metal:script-slot>
+
+    <metal:workflownav fill-slot="workflownav">
+   
+                
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input type="button" class="button"
+                value="&#171; Back: Choose Location"
+                id="back-to-chooser"
+                title="Choose Location"
+                url="${request.route_url('choose')}"/>
+            </div>
+           <div id="forward-steps">
+           
+                <input id="options-submit"
+                class="button forward-button"
+                name="form.submitted"
+               
+                value="Next:Preview Your Module &#187;" 
+                
+                title="Preview Your Module"/>
+            </div>
+        </div>
+    </div>
+    
+    </metal:workflownav>
+
+    <metal:content-slot fill-slot="content-slot">
+    <div id="ie6-container-wrap">
+        <div id="container">
+            <div id="content">
+                <div id="pageheader-wrap">
+
+                    <div id="page-title">
+                        <h1>
+                            Enhance your presentation
+                            <span class="metatitle">
+                                
+                            </span>
+                        </h1>
+                    </div>
+
+                    <div id="page-description">
+                        <p class="forminfo">
+                          <p tal:condition="embed_google">
+                          
+							<br/><br/>
+								<iframe src="https://docs.google.com/presentation/embed?id=${google_resource_id}&start=false&loop=false&delayms=3000" 
+									frameborder="0" width="1058" height="823" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+								</iframe>
+						  </p>
+                          
+                          <p tal:condition="embed_slideshare">
+	            						   
+							               <p tal:condition="show_iframe">
+							               
+												<iframe src="http://www.slideshare.net/slideshow/embed_code/${slideshare_id}" 
+													width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" 
+													scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0" allowfullscreen>
+												</iframe>
+										  </p>
+										  <p tal:condition="not_converted">
+
+												Your slides are being uploaded to Slideshare (or Google Docs).<br/>
+												You will receive an email once they are ready. <br/>
+												In the mean time, you can enhance your presentation with an introduction and a quiz.<br/>
+
+										  </p>
+                           </p>
+                        </p>
+                    </div>
+
+                </div>
+
+                <script type="text/javascript">
+                    function ForcePreviewReload () {
+                        var src = jQuery('iframe#preview-frame.preview').attr('src');
+                        jQuery('iframe#preview-frame.preview').attr('src', src);
+                    }
+                </script>
+                <span>
+                  <span>
+                  ${form.begin(request.route_url('enhance'), id='optionsform',name='optionsform')}
+				  ${form.csrf_token()}
+                    <div class="formlabel">Introductory paragraph</div>
+                    <div class="forminfo">You can use the text box below to orient your readers before they start watching the presentation</div>
+                    <div class="formfield">
+                      <textarea name="introductory_paragraphs" rows="6" cols="100"></textarea>
+                  </div>
+                </span>
+
+         
+				<div class="formlabel">Add a quiz</div>
+                <div class="forminfo">To help readers retain the important information from your slides, you can add a simple quiz below</div>
+                
+                <ul id="all-questions">
+                
+					<li id="add-questions-area-1" class="all-questions">
+					
+                      <div class="formlabel">Add a question</div>
+                      <div class="forminfo">Add a question</div>
+                      <div class="formfield">
+                          <input type="text" size="100" name="question-1" id="question-1">                          
+                      </div>                                         
+                      <div class="formlabel">Answer</div>
+                      <div class="forminfo">Answers</div>
+						<table id="table-question-1">
+							<tr>
+								<td>
+									<input name="answer-1-1" class="answer-1"  size="100">
+								</td>
+							</tr>
+                         </table> 
+                      
+                      <input type="button" class="add-more-choices" name="Add more choices" value="Add more choices" id="question-1">
+                      
+                      
+			          	</li>
+      				</ul>
+				        <input class="button" id="add-more-questions" value="Add more questions" type="button">
+                
+                  
+                </span>
+                ${form.end()}
+                
+                
+
+            </div>
+        </div>
+    </div>
+    
+    </metal:content-slot>
+
+    <metal:footer-slot fill-slot="footer-slot" />
+</metal:use>
