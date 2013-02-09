@@ -10,6 +10,8 @@ import libxml2
 import lxml
 import re
 import mimetypes
+from BeautifulSoup import BeautifulSoup
+import MySQLdb as mdb
 from cStringIO import StringIO
 import peppercorn
 import codecs
@@ -21,12 +23,9 @@ from pyramid.renderers import render_to_response, get_renderer
 from pyramid.response import Response
 from pyramid.decorator import reify
 from pyramid.threadlocal import get_current_registry
-
 import formencode
-
 from pyramid_simpleform import Form
 from pyramid_simpleform.renderers import FormRenderer
-
 from languages import languages
 from oerpub.rhaptoslabs import sword2cnx
 from rhaptos.cnxmlutils.odt2cnxml import transform
@@ -38,11 +37,14 @@ import gdata.docs.client
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs_authentication import getAuthorizedGoogleDocsClient
 from oerpub.rhaptoslabs.html_gdocs2cnxml.gdocs2cnxml import gdocs_to_cnxml
 import urllib2
+import urllib
 from oerpub.rhaptoslabs.html_gdocs2cnxml.htmlsoup2cnxml import htmlsoup_to_cnxml
 from rhaptos.cnxmlutils.utils import aloha_to_html, html_to_valid_cnxml
 from oerpub.rhaptoslabs.latex2cnxml.latex2cnxml import latex_to_cnxml
-from utils import escape_system, clean_cnxml, load_config
-from utils import save_config, add_directory_to_zip
+from oerpub.rhaptoslabs.slideimporter.slideshare import upload_to_slideshare, get_details, get_slideshow_download_url, get_transcript, fetch_slideshow_status
+from oerpub.rhaptoslabs.slideimporter.google_presentations import GooglePresentationUploader,GoogleOAuth
+from utils import load_config, save_config, add_directory_to_zip
+from utils import escape_system, clean_cnxml
 from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
 from utils import get_files_from_zipfile, build_featured_links
 from utils import create_module_in_2_steps
@@ -195,6 +197,24 @@ def logout_view(request):
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload = formencode.validators.FieldStorageUploadConverter()
+
+class ImporterSchema(formencode.Schema):
+    allow_extra_fields = True
+    importer = formencode.validators.FieldStorageUploadConverter()
+    #upload_to_ss = formencode.validators.String()
+    #upload_to_google = formencode.validators.String()
+    #introductory_paragraphs = formencode.validators.String()
+
+class ImporterChoiceSchema(formencode.Schema):
+    allow_extra_fields = True
+    upload_to_ss = formencode.validators.String()
+    upload_to_google = formencode.validators.String()
+    #introductory_paragraphs = formencode.validators.String()
+class QuestionAnswerSchema(formencode.Schema):
+	allow_extra_fields = True
+	#question1 = formencode.validators.String()
+	#options1 = formencode.validators.String()
+	#solution1 = formencode.validators.String()
 
 class ConversionError(Exception):
     def __init__(self, msg):
@@ -364,10 +384,12 @@ def process_gdocs_resource(save_dir, gdocs_resource_id, gdocs_access_token=None)
 @view_config(route_name='choose')
 def choose_view(request):
     check_login(request)
+    session = request.session
 
     templatePath = 'templates/choose.pt'
 
     form = Form(request, schema=UploadSchema)
+    presentationform = Form(request, schema=ImporterSchema)
     field_list = [('upload', 'File')]
 
     # clear the session
@@ -377,7 +399,11 @@ def choose_view(request):
         del request.session['title']
 
     # Check for successful form completion
+    print form.all_errors()
+    print presentationform.all_errors()
+
     if form.validate():
+        print "NORMAL FORM"
         try: # Catch-all exception block
             # Create a directory to do the conversions
             now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -614,8 +640,86 @@ FORM DATA
         return HTTPFound(location=request.route_url('preview'))
 
     # First view or errors
+    elif presentationform.validate():
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        print "Inside presentation form"
+        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        save_dir = os.path.join(
+            request.registry.settings['slideshare_import_dir'],
+            temp_dir_name
+        )
+        os.mkdir(save_dir)
+        uploaded_filename = form.data['importer'].filename.replace(os.sep, '_')
+        original_filename = os.path.join(save_dir, form.data['importer'].filename.replace(os.sep, '_'))
+        saved_file = open(original_filename, 'wb')
+        input_file = form.data['importer'].file
+        shutil.copyfileobj(input_file, saved_file)
+        saved_file.close()
+        input_file.close()
+        username = session['username']
+
+        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
+        print "Ziiped filepath",zipped_filepath
+        session['userfilepath'] = zipped_filepath
+        zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
+        zip_archive.write(original_filename,uploaded_filename)
+        zip_archive.close()
+        session['uploaded_filename'] = uploaded_filename
+        session['original_filename'] = original_filename
+        print "Original filename ",original_filename
+        username = session['username']
+        #slideshare_details = get_details(slideshow_id)
+        #slideshare_download_url = get_slideshow_download_url(slideshare_details)
+        #session['transcript'] = get_transcript(slideshare_details)
+        session['title'] = uploaded_filename.split(".")[0]
+        metadata = {}
+        metadata['dcterms:title'] = uploaded_filename.split(".")[0]
+        cnxml = """<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
+  <title>"""+session['title']+"""</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
+       Changes to the metadata section in the source will not be saved. -->
+  <md:repository>http://cnx.org/content</md:repository>
+  <md:content-id>new</md:content-id>
+  <md:title>""</md:title>
+  <md:version>**new**</md:version>
+  <md:created>2012/06/22 03:49:41.962 GMT-5</md:created>
+  <md:revised>2012/06/22 03:49:42.716 GMT-5</md:revised>
+ <md:actors>
+<md:person userid="""+"\""+username+"\""+""">
+<md:firstname></md:firstname>
+<md:surname></md:surname>
+<md:fullname></md:fullname>
+<md:email></md:email>
+</md:person>
+</md:actors>
+<md:roles>
+
+<md:role type="maintainer">"""+username+"""</md:role>
+<md:role type="licensor">"""+username+"""</md:role>
+</md:roles>
+<md:license url="http://creativecommons.org/licenses/by/3.0/"/>
+<!-- For information on license requirements for use or modification, see license url in the
+above <md:license> element.
+For information on formatting required attribution, see the URL:
+CONTENT_URL/content_info#cnx_cite_header
+where CONTENT_URL is the value provided above in the <md:content-url> element.
+-->
+
+<md:language>en</md:language>
+<!-- WARNING! The 'metadata' section is read only. Do not edit above.
+Changes to the metadata section in the source will not be saved. -->
+</metadata>"""
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        session['metadata'] = metadata
+        print cnxml
+        session['cnxml'] = cnxml
+        return HTTPFound(location=request.route_url('importer'))
     response = {
         'form': FormRenderer(form),
+        'presentationform': FormRenderer(presentationform),
         'field_list': field_list,
     }
     return render_to_response(templatePath, response, request=request)
@@ -630,7 +734,6 @@ class PreviewSchema(formencode.Schema):
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
 def preview_view(request):
     check_login(request)
-    
     session = request.session
     module = request.params.get('module')
     if module:
@@ -798,7 +901,6 @@ def admin_config_view(request):
     """
 
     check_login(request)
-    session = request.session
     subjects = ["Arts", "Business", "Humanities", "Mathematics and Statistics",
                 "Science and Technology", "Social Sciences"]
     form = Form(request, schema=ConfigSchema)
@@ -1394,3 +1496,374 @@ def upload_dnd(request):
 @view_config(name='toolbar', renderer='templates/toolbar.pt')
 def toolbar(request):
     return {}
+
+        
+def get_oauth_token_and_secret(username):
+    try:
+        connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
+        with connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT oauth_token,oauth_secret FROM user WHERE username='"+username+"'")
+            row = cursor.fetchone()
+            return {"oauth_token": row[0],"oauth_secret":row[1]}
+    except mdb.Error, e:
+        print e
+
+def is_returning_google_user(username):
+    connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')
+    query = "SELECT * FROM user WHERE username='"+username+"'"
+    print query
+    numrows=0
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute(query)
+        numrows = int(cursor.rowcount)
+    connection.close()
+    if numrows == 0:
+        return False
+    else :
+        return True
+
+
+@view_config(route_name='importer',renderer='templates/importer.pt')
+def return_slideshare_upload_form(request):
+    check_login(request)
+    session = request.session
+    redirect_to_google_oauth = False
+    if session.has_key('original-file-location'):
+        del session['original-file-location']
+    form = Form(request, schema=ImporterChoiceSchema)
+    response = {'form':FormRenderer(form)}
+    validate_form = form.validate()
+    if validate_form:
+        original_filename = session['original_filename']
+        upload_to_google = form.data['upload_to_google']
+        upload_to_ss = form.data['upload_to_ss']
+        username = session['username']
+        if (upload_to_ss=="true"):
+
+            slideshow_id = upload_to_slideshare("saketkc",original_filename)
+            session['slideshare_id'] = slideshow_id
+        if (upload_to_google == "true"):
+            if is_returning_google_user(username):
+                print "RETURNING USER"
+                redirect_to_google_oauth = False
+                oauth_token_and_secret = get_oauth_token_and_secret(username)
+                oauth_token = oauth_token_and_secret["oauth_token"]
+                oauth_secret = oauth_token_and_secret["oauth_secret"]
+                guploader = GooglePresentationUploader()
+                guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)
+                guploader.upload(original_filename)
+                guploader.get_first_revision_feed()
+                guploader.publish_presentation_on_web()
+                resource_id = guploader.get_resource_id().split(':')[1]
+                session['google-resource-id'] = resource_id
+                print "UPLOADING TO GOOGLE"
+            else:
+                print "NEW USER"
+                redirect_to_google_oauth = True
+                session['original-file-path'] = original_filename
+        else:
+            print "NO GOOGLE FOUND"
+        username = session['username']
+        uploaded_filename = session['uploaded_filename']
+        slideshare_details = get_details(slideshow_id)
+        slideshare_download_url = get_slideshow_download_url(slideshare_details)
+        session['transcript'] = get_transcript(slideshare_details)
+        cnxml = """<featured-links>
+  <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
+       Changes to the links section in the source will not be saved. -->
+    <link-group type="supplemental">
+      <link url="""+ "\"" + uploaded_filename + "\""+""" strength="3">Download the original slides in PPT format</link>
+      <link url="""+ "\"" +slideshare_download_url + "\"" +""" strength="2">SlideShare PPT Download Link</link>
+    </link-group>
+  <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
+       Changes to the links section in the source will not be saved. -->
+</featured-links>"""
+        session['cnxml'] += cnxml
+
+
+
+        #print deposit_receipt.metadata #.get("dcterms_title")
+        if redirect_to_google_oauth:
+            raise HTTPFound(location=request.route_url('google_oauth'))
+        raise HTTPFound(location=request.route_url('enhance'))
+    return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
+
+@view_config(route_name='oauth2callback')
+def google_oauth_callback(request):
+    url = request.host_url + request.path_qs
+    url =  url.replace('%2F','/')
+    if not request.session.has_key('saved_request_token'):
+        return HTTPFound(location = '/google_oauth')
+    oauth = GoogleOAuth(request_token = request.session['saved_request_token'])
+    oauth.authorize_request_token(request.session['saved_request_token'],url)
+    oauth.get_access_token()
+    session = request.session
+    connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
+    oauth_token =  oauth.get_token_key()
+    oauth_secret = oauth.get_token_secret()
+    query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_secret+"'"+")"
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute(query)
+    connection.close()
+    guploader = GooglePresentationUploader()
+    guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)
+    upload_to_gdocs = guploader.upload(session['original-file-path'])
+    guploader.get_first_revision_feed()
+    guploader.publish_presentation_on_web()
+    resource_id = guploader.get_resource_id().split(':')[1]
+    session['google-resource-id'] = resource_id
+    if session.has_key('original-file-location'):
+        del session['original-file-location']
+    raise HTTPFound(location=request.route_url('enhance'))
+
+
+@view_config(route_name='updatecnx')
+def update_cnx_metadata(request):
+    """
+    Handle update of metadata to cnx
+    """
+    check_login(request)
+    templatePath = 'templates/update_metadata.pt'
+    session = request.session
+    config = load_config(request)
+    workspaces = [(i['href'], i['title']) for i in session['collections']]
+    subjects = ["Arts",
+                "Business",
+                "Humanities",
+                "Mathematics and Statistics",
+                "Science and Technology",
+                "Social Sciences",
+                ]
+    field_list = [
+                  ['authors', 'authors', {'type': 'hidden'}],
+                  ['maintainers', 'maintainers', {'type': 'hidden'}],
+                  ['copyright', 'copyright', {'type': 'hidden'}],
+                  ['editors', 'editors', {'type': 'hidden'}],
+                  ['translators', 'translators', {'type': 'hidden'}],
+                  ['title', 'Title', {'type': 'text'}],
+                  ['summary', 'Summary', {'type': 'textarea'}],
+                  ['keywords', 'Keywords (One per line)', {'type': 'textarea'}],
+                  ['subject', 'Subject', {'type': 'checkbox',
+                                          'values': subjects}],
+                  ['language', 'Language', {'type': 'select',
+                                            'values': languages,
+                                            'selected_value': 'en'}],
+                  ['google_code', 'Google Analytics Code', {'type': 'text'}],
+                  ['workspace', 'Workspace', {'type': 'select',
+                                            'values': workspaces}],
+                  ]
+    remember_fields = [field[0] for field in field_list[5:]]
+    defaults = {}
+
+    for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
+        defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
+        config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
+
+    if 'title' in session:
+        print('TITLE '+session['title']+' in session')
+        defaults['title'] = session['title']
+        config['metadata']['title'] = session['title']
+
+    form = Form(request,
+                schema=MetadataSchema,
+                defaults=defaults
+                )
+
+    # Check for successful form completion
+    if form.validate():
+        for field_name in remember_fields:
+            if form.data['keep_%s' % field_name]:
+                session[field_name] = form.data[field_name]
+            else:
+                if field_name in session:
+                    del(session[field_name])
+
+        metadata = {}
+        metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
+                                    else session['filename']
+        metadata_entry = sword2cnx.MetaData(metadata)
+        role_metadata = {}
+        role_mappings = {'authors': 'dcterms:creator',
+                         'maintainers': 'oerdc:maintainer',
+                         'copyright': 'dcterms:rightsHolder',
+                         'editors': 'oerdc:editor',
+                         'translators': 'oerdc:translator'}
+        for k, v in role_mappings.items():
+            role_metadata[v] = form.data[k].split(',')
+        for key, value in role_metadata.iteritems():
+            for v in value:
+                v = v.strip()
+                if v:
+                    metadata_entry.add_field(key, '', {'oerdc:id': v})
+        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)
+        update = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)
+        metadata={}
+        metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
+                                    else session['filename']
+        metadata['dcterms:abstract'] = form.data['summary'].strip()
+        metadata['dcterms:language'] = form.data['language']
+        metadata['dcterms:subject'] = [i.strip() for i in
+                                       form.data['keywords'].splitlines()
+                                       if i.strip()]
+        metadata['oerdc:oer-subject'] = form.data['subject']
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        add = conn.update_metadata_for_resource(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
+        metadata['oerdc:analyticsCode'] = form.data['google_code'].strip()
+        for key in metadata.keys():
+            if metadata[key] == '':
+                del metadata[key]
+        metadata_entry = sword2cnx.MetaData(metadata)
+        add = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True)
+        return HTTPFound(location=request.route_url('summary'))
+    response =  {
+        'form': FormRenderer(form),
+        'field_list': field_list,
+        'workspaces': workspaces,
+        'languages': languages,
+        'subjects': subjects,
+        'config': config,
+    }
+    return render_to_response(templatePath, response, request=request)
+
+@view_config(route_name='enhance')
+def enhance(request):
+    check_login(request)
+    session = request.session
+    google_resource_id = ""
+    slideshare_id = ""
+    embed_google = False
+    embed_slideshare = False
+    not_converted = True
+    show_iframe = False
+    form = Form(request, schema=QuestionAnswerSchema)
+    validate_form = form.validate()
+    print form.all_errors()
+    if session.has_key('google-resource-id'):
+        google_resource_id = session['google-resource-id']
+    if session.has_key('slideshare_id'):
+        slideshare_id = session['slideshare_id']
+        if fetch_slideshow_status(slideshare_id) == "2":
+            not_converted = False
+            show_iframe = True
+
+
+
+    if google_resource_id!="":
+        embed_google = True
+    if slideshare_id!="":
+        embed_slideshare = True
+    templatePath = "templates/google_ss_preview.pt"
+    if validate_form:
+        introductory_paragraphs = request.POST.get('introductory_paragraphs')
+        question_count=0
+        cnxml=session["cnxml"]+"""<content><section id="intro-section-title"><title id="introtitle">Introduction</title><para id="introduction-1">"""+introductory_paragraphs+"""</para></section><section id="slides-embed"><title id="slide-embed-title">View the slides</title><figure id="ss-embed-figure"><media id="slideshare-embed" alt="slideshare-embed"><iframe src="http://www.slideshare.net/slideshow/embed_code/"""+slideshare_id+"""" width="425" height="355" /></media></figure></section>"""        
+        for i in range(1,6):
+            form_question = request.POST.get('question-'+str(i))
+            if form_question:                
+                form_radio_answer = request.POST.get('radio-'+str(i)) #this give us something like 'answer-1-1'. so our solution is this
+                question_count +=1                
+                if question_count==1:
+					cnxml+="""<section id="test-section"><title>Test your knowledge</title>"""
+                itemlist = ""
+                for j in range(1,10):
+                    try:
+                        
+                        form_all_answers = request.POST.get('answer-'+str(i)+'-'+str(j))
+                        if form_all_answers:
+                            itemlist +="<item>" + form_all_answers+"</item>"
+                        
+                    except:
+                        print "No element found"
+                
+                if form_radio_answer:
+					solution = request.POST.get(form_radio_answer)
+					cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""<list id="option-list-"""+str(i)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(itemlist)+"""</list></para></problem>"""
+                else:
+                    print "ELESE CONDUITION OF radio"
+                    solution = request.POST.get('answer-'+str(i)+'-1')
+                    cnxml+="""<exercise id="exercise-"""+str(i)+""""><problem id="problem-"""+str(i)+""""><para id="para-"""+str(i)+"""">"""+str(form_question)+"""</para></problem>"""
+                print "FORM RADIO ANSWER",form_radio_answer
+                print "SOLUTION", solution                
+                cnxml+=""" <solution id="solution-"""+str(i)+""""> <para id="solution-para-"""+str(i)+"""">"""+solution+"""</para></solution></exercise>"""
+				
+					
+                """form_solution = request.POST.get('solution-'+str(i))
+                all_post_data = {"data":{"options":form_options,"solution":form_solution,"question":form_question}}
+                for question in all_post_data:
+                    options = all_post_data[question]['options']
+                    solution = all_post_data[question]['solution']
+                    asked_question = all_post_data[question]['question']
+                    optionlist=""
+                    for option in options:
+                        optionlist+="<item>"+option+"</item>"""
+                    #cnxml+="""<exercise id="exercise-"""+str(j)+""""><problem id="problem-"""+str(j)+""""><para id="para-"""+str(j)+"""">"""+str(asked_question)+"""<list id="option-list-"""+str(j)+"""" list-type="enumerated" number-style="lower-alpha">"""+str(optionlist)+"""</list></para></problem>"""
+                    #cnxml+=""" <solution id="solution-"""+str(j)+""""> <para id="solution-para-"""+str(j)+"""">"""+solution+"""</para></solution></exercise>"""
+                    #j+=1
+        metadata = session['metadata']
+        if question_count>=1:
+			cnxml += "</section></content></document>"
+        else:
+            cnxml += "</content></document>"
+        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        metadata_entry = sword2cnx.MetaData(metadata)
+        zipped_filepath = session['userfilepath']
+        zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
+        zip_archive.writestr("index.cnxml",cnxml)
+        zip_archive.close()
+        conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=True)
+        collections = [{'title': i.title, 'href': i.href}
+                                  for i in sword2cnx.get_workspaces(conn)]
+        session['collections'] = collections
+        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        session['workspaces'] = workspaces
+        with open(zipped_filepath, 'rb') as zip_file:
+            deposit_receipt = conn.create(
+                col_iri = workspaces[0][0],
+                metadata_entry = metadata_entry,
+                payload = zip_file,
+                filename = 'upload.zip',
+                mimetype = 'application/zip',
+                packaging = 'http://purl.org/net/sword/package/SimpleZip',
+                in_progress = True)
+        session['dr'] = deposit_receipt
+        session['deposit_receipt'] = deposit_receipt.to_xml()
+        soup = BeautifulSoup(deposit_receipt.to_xml())
+        data = soup.find("link",rel="edit")
+        edit_iri = data['href']
+        session['edit_iri'] = edit_iri
+        creator = soup.find('dcterms:creator')
+        username = session['username']
+        email = creator["oerdc:email"]
+        url = "http://connexions-oerpub.appspot.com/"
+        post_values = {"username":username,"email":email,"slideshow_id":slideshare_id}
+        data = urllib.urlencode(post_values)
+        google_req = urllib2.Request(url, data)
+        google_response = urllib2.urlopen(google_req)
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        save_dir = os.path.join(request.registry.settings['transform_dir'],temp_dir_name)
+        os.mkdir(save_dir)
+        request.session['upload_dir'] = temp_dir_name
+        cnxml = clean_cnxml(cnxml)
+        save_cnxml(save_dir,cnxml,[])
+        return HTTPFound(location=request.route_url('preview'))
+        
+        
+        #return HTTPFound(location=request.route_url('updatecnx'))
+
+
+    response = {'form':FormRenderer(form),"slideshare_id":slideshare_id,"google_resource_id":google_resource_id,"embed_google":embed_google,"embed_slideshare":embed_slideshare, "not_converted": not_converted, "show_iframe":show_iframe}
+    return render_to_response(templatePath, response, request=request)

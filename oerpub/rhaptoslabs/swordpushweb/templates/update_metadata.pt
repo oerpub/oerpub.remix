@@ -1,0 +1,216 @@
+<metal:use use-macro="base">
+    <metal:script-slot fill-slot="script-slot">    
+        <script type="text/javascript">
+
+            $(document).ready(function(){
+                $('.forward-button').removeAttr('disabled');
+                $('.forward-button').val("Finish: Upload to Connexions \u00bb");
+                $('#back-steps .button').removeAttr('disabled');
+                $("#formentry-title").removeClass("error");
+                $("#formentry-title .errortext").hide();
+                $("#formentry-ga").removeClass("error");
+                $("#formentry-ga .errortext").hide();
+            });
+
+        </script>
+    
+    </metal:script-slot>    
+    <metal:workflownav fill-slot="workflownav">
+    ${form.begin(request.route_url('updatecnx'), name="metadata_form")}
+    ${form.csrf_token()}
+
+    <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
+        <tal:hidden>${form.hidden(field)}</tal:hidden>
+    </tal:field>
+
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+        
+            <div id="back-steps">
+                <input type="button" class="button" 
+                    value="&laquo; Back: Enhance Your Presentation" id="back-to-chooser"
+                    url="${request.route_url('slideshow_preview')}"
+                    title="Return to the enhance your presentation">
+            </div>
+            
+            <div id="forward-steps">
+                <span class="popupmenu">
+                    <span class="advanced-marker" title="Advanced mode feature">
+                        <img src="${images_url}/gear_orange_3.png" />
+                    </span>
+                    <span class="formfield">${form.select("workspace", workspaces, selected_value=config['workspace_url'])}</span>
+                </span>
+                <input id="top-upload-to-cnx" type="submit" class="button forward-button"
+                value="Finish: Upload Metadata to Connexions &raquo;"
+                title="Click 'Finish' to add the module as edited to your Personal Workspace. Further steps are required before the module can be published in the Connexions repository.">
+            </div>
+        </div>
+    </div>
+    </metal:workflownav>
+
+    <metal:content-slot fill-slot="content-slot">
+    <div id="ie6-container-wrap">
+        <div id="container">
+            <div id="content">
+
+
+                <div id="pageheader-wrap">
+
+                    <div id="module-actions">
+                        <span class="advanced" style="display: none;">
+                            
+                        </span>
+                    </div>
+
+                    <div id="page-title">
+                        <h1>
+                            Describe your module
+                        </h1>
+                    </div>
+
+                    <div class="pleasewait" id="upload-wait" style="display: none;">      
+                        Your module is being uploaded to Connexions. This may take a few moments.
+                    </div>
+
+                    <div id="page-description">
+                        <p class="forminfo">
+                            <span class="required">* = Required field</span>
+                        </p>
+                    </div>
+
+                </div>
+
+                <div id="roles-picker" style="display:none;">
+                    <table cellspacing="0" id="roles-table">
+                        <tbody>
+                            <tr>
+                                <td class="table-row-top"></td>
+                                <td class="table-row-top" colspan="3">Required Roles</td>
+                                <td class="table-row-top" colspan="2">Optional Roles</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td width="200" id="roles-last-row-user" class="table-row-mid" style="text-align:left;">Username</td>
+                                <td width="110" id="roles-last-row-authors" class="table-row-mid">Author</td>
+                                <td width="110" id="roles-last-row-maintainers" class="table-row-mid">Maintainer</td>
+                                <td width="110" id="roles-last-row-copyright" class="table-row-mid">Copyright</td>
+                                <td width="110" id="roles-last-row-editors" class="table-row-mid">Editor</td>
+                                <td width="110" id="roles-last-row-translators" class="table-row-mid">Translator</td>
+                                <td width="24" id="roles-last-row-remove"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="headeraction" style="float:left;margin-top:5px;margin-left:0;"><span href="#" id="add-role" class="button">Add user</span></div>
+                    <div class="headeraction" style="float:right;margin-top:5px;margin-right:26px;"><span href="#" id="cancel-roles" class="button">Cancel</span></div>
+                    <div class="headeraction" style="float:right;margin-top:5px;"><span href="#" id="submit-roles" class="button">Done</span></div>
+                </div>
+
+
+                <div id="metadata">
+                    <table cellspacing="0" cellpadding="2" border="0" width="100%">
+                        <tbody>
+                            <tr>
+                                <td width="50%" valign="top">
+                                    <div class="formentry" id="formentry-title">
+                                        <div class="formlabel">Title <span style="color: rgb(204, 85, 102); font-weight: bold;">*</span></div>
+                                        <div class="errortext" style="display: none;">
+                                            Please enter a valid title
+                                        </div>
+                                        <div class="forminfo">Enter the title of this module.</div>
+                                        <div class="formfield">
+                                            <input type="text" name="title" size="50"
+                                                value="${config['metadata']['title']}"/>
+                                        </div>
+                                    </div>
+                                    <div class="formentry">
+                                        <div class="formlabel">Subject</div>
+                                        <div class="forminfo">Select the subject categories that apply to this module.</div>
+                                        <table>
+                                            <tbody>
+                                                <tr tal:repeat="row python:range(3)">
+                                                    <td tal:repeat="column python:range(2)">
+                                                        <input type="checkbox" name="subject" tal:attributes="value subjects[row+column*3]; checked (subjects[row+column*3] in config['metadata']['subject'])"/>
+                                                        <span class="formlabel" tal:content="subjects[row+column*3]">Subject</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="formentry">
+                                        <div class="formlabel">Summary</div>
+                                        <div class="forminfo">Enter a summary of the module.</div>
+                                        <div class="formfield">
+                                            <textarea name="summary" rows="6" cols="60">${config['metadata']['summary']}</textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    
+                                </td>
+                                <td width="50%" valign="top">
+                                    <div class="formentry">
+                                        <div class="formlabel">Language</div>
+                                        <div class="forminfo">Select the primary language for this module.</div>
+                                        <div class="formfield">${form.select("language", languages, selected_value=config['metadata']['language'])}</div>
+                                    </div>
+                                    <div class="formentry">
+                                        <div class="formlabel">Keywords (one per line)</div>
+                                        <div class="forminfo">Enter each keyword on its own
+                                            line. Keywords are not displayed on the content, but
+                                            are used behind the scenes to help people find it in
+                                            searches.</div>
+                                        <div class="formfield">
+                                            <textarea name="keywords" rows="4" cols="40">
+                                                ${config['metadata']['keywords']}
+                                            </textarea>
+                                        </div>
+                                    </div>
+                                    <div class="formentry" id="formentry-ga">
+                                        <div class="formlabel">
+                                            <input type="checkbox" id="google_code_opener"
+                                                name="google_code_opener"/>
+                                            Add optional Google Analytics Tracking Code
+                                        </div>
+                                        <div class="errortext" style="display: none;">
+                                            The tracking code you entered is not a valid format.
+                                        </div>
+                                        <div id="ga-field" style="display: none;">
+                                            <div class="forminfo">Enter a Google Analytics Tracking Code (e.g. UA-xxxxxxx-x) for this content to track usage.</div>
+                                            <div class="formfield">
+                                                <input type="text" name="google_code" size="40"
+                                                    value="${config['metadata']['google_code']}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="display: none;" class="formentry advanced" id="roles">
+                                        <div class="formlabel">
+                                            <span style="padding: 0pt 0.3em;" title="Advanced mode feature" class="advanced-marker">
+                                                <img style="vertical-align: 0.2em;" src="${images_url}/gear_orange_3.png"/>
+                                            </span>
+                                            Contributors
+                                        </div>
+                                        <ul style="margin-top: 0pt; margin-bottom: 0.5em;">
+                                            <li id="list-authors">Authors: <span>${config['metadata']['authors']}</span></li>
+                                            <li id="list-maintainers">Maintainers: <span>${config['metadata']['maintainers']}</span></li>
+                                            <li id="list-copyright">Copyright Holders: <span>${config['metadata']['copyright']}</span></li>
+                                            <li id="list-editors">Editors: <span>${config['metadata']['editors']}</span></li>
+                                            <li id="list-translators">Translators: <span>${config['metadata']['translators']}</span></li>
+                                        </ul>
+                                        <div>
+                                            <span class="button" id="edit-roles">Edit</span>
+                                        </div>
+                                        <br/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    ${form.end()}
+
+    </metal:content-slot>
+
+</metal:use>
