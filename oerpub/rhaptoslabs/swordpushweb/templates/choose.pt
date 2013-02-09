@@ -138,7 +138,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                              <label>
                                <span style="visibility: hidden;" class="or-bullet">or</span>
                                <span class="label-text" title="This import is brand new and has not been fully tested yet">
-                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> - <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp Open Office Impress</strong><sup title="This import is brand new and has not been fully tested yet" style="color:orange">alpha</sup>
+                                 <img src="${images_url}/ms-powerpoint-logo.gif"><strong>&nbsp Microsoft Presentation</strong> - <img src="${images_url}/openoffice-presentation.png"><strong>&nbsp Open/Libre Office Impress</strong><sup title="This import is brand new and has not been fully tested yet" style="color:orange">alpha</sup>
                                 </span>
                               </label>
                               <div class="upload-form">
