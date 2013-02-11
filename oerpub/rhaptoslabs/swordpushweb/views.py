@@ -1859,7 +1859,7 @@ def enhance(request):
         request.session['upload_dir'] = temp_dir_name
         cnxml = clean_cnxml(cnxml)
         save_cnxml(save_dir,cnxml,[])
-        return HTTPFound(location=request.route_url('preview'))
+        return HTTPFound(location=request.route_url('metadata'))
         
         
         #return HTTPFound(location=request.route_url('updatecnx'))

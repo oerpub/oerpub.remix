@@ -71,14 +71,11 @@
                 url="${request.route_url('choose')}"/>
             </div>
            <div id="forward-steps">
-           
                 <input id="options-submit"
                 class="button forward-button"
                 name="form.submitted"
-               
-                value="Next:Preview Your Module &#187;" 
-                
-                title="Preview Your Module"/>
+                value="Next: Edit metadata &#187;" 
+                title="Edit Your Metadata"/>
             </div>
         </div>
     </div>
