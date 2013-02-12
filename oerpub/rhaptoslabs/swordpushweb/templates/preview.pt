@@ -9,7 +9,7 @@
         <script type="text/javascript">
             Aloha.ready(function(){
                 Aloha.require(['PubSub'], function(PubSub){
-                    $('#show-neworexisting').on('click', function(evt) {
+                    $('#neworexisting').on('show', function(evt) {
                         if(Aloha.getEditableById('canvas').isModified()){
                             // show the info slider
                             $('#upload-wait').center().slideDown('slow');
@@ -17,19 +17,8 @@
                                 .removeClass('btn-primary');
                             $('#btn-existingmodule').attr('disabled', 'disabled')
                                 .removeClass('btn-primary');
-                            PubSub.pub('swordpushweb.save', {
-                                callback: function(){
-                                    $('#upload-wait').slideUp('slow');
-
-                                    var btn = $('#btn-newmodule');
-                                    btn.removeAttr('disabled');
-                                    btn.addClass('btn-primary');
-                                    
-                                    var btn = $('#btn-existingmodule');
-                                    btn.removeAttr('disabled');
-                                    btn.addClass('btn-primary');
-                                }});
-                        }
+                            PubSub.pub('swordpushweb.save');
+                        };
                     });
                     // Subscribe to the 'swordpushweb.save' event.
                     // It is fired by the the AlohaEditor when someone clicks
@@ -46,8 +35,19 @@
                     PubSub.sub('swordpushweb.saved', function(data) {
                         var btn = $('#back-to-chooser');
                         btn.removeAttr('disabled');
+
                         var btn = $('#show-neworexisting');
                         btn.removeAttr('disabled');
+
+                        var btn = $('#btn-newmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
+                        
+                        var btn = $('#btn-existingmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
+
+                        $('#upload-wait').slideUp('slow');
                     });
                 });
                 $('#neworexisting').on('hidden', function() {
@@ -164,7 +164,7 @@
                 This is an entirely new module. 
             </div>
             <div class="forminfo" style="margin: .5em 0 1em;">
-                <button id="btn-exsitingmodule" class="btn btn-primary submit-neworexisting" 
+                <button id="btn-existingmodule" class="btn btn-primary submit-neworexisting" 
                     url="${request.route_url('module_association')}">
                     Override existing module
                 </button>
