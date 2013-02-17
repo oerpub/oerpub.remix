@@ -4,7 +4,7 @@ import unittest
 
 from pyramid import testing
 
-from oerpub.rhaptoslabs.swordpushweb.views import Metadata_View
+from oerpub.rhaptoslabs.swordpushweb.views.metadata import Metadata_View
 
 WORKING_DIR = os.getcwd()
 
