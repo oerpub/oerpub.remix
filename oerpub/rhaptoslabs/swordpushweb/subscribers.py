@@ -8,9 +8,9 @@ def add_base_template(event):
 
     https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/templates.html#using-a-beforerender-event-to-expose-chameleon-base-template
     """
-    base = get_renderer('templates/base.pt').implementation()
+    base = get_renderer('views/templates/base.pt').implementation()
     event.update({'base': base})
-    base = get_renderer('templates/base_bare.pt').implementation()
+    base = get_renderer('views/templates/base_bare.pt').implementation()
     event.update({'basebare': base})
 
 def add_provider(event):
