@@ -36,6 +36,9 @@
 
 - Ported dialogs to bootstrap.
 
+- All the content has been separated into individual files in the
+  new views package.
+
   [rijkstofberg]
 
 0.1.3 - unreleased
