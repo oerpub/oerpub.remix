@@ -1,0 +1,271 @@
+<metal:use use-macro="base">
+
+    <metal:script fill-slot="script-slot">
+
+        <metal:m use-macro="editor.css" />
+        <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
+
+        <metal:m use-macro="editor.javascript" />
+        <script type="text/javascript" 
+                tal:condition="python: view.get_source() == 'newemptymodule'">
+            oerpub_document_source = 'newemptymodule';
+            Aloha.ready(function(){
+              $('#step-contextually-forward').attr('title', 'Add module description and ' +
+                                                            'save module to cnx.org');
+            });
+        </script>
+        <script type="text/javascript" 
+                tal:condition="python: view.get_source() == 'existingmodule'">
+            oerpub_document_source = 'existingmodule';
+            Aloha.ready(function(){
+              $('#step-contextually-forward').attr('title', 'Review module description and ' +
+                                                            'save module to cnx.org');
+            });
+        </script>
+        <script type="text/javascript" 
+                tal:condition="python: view.get_source() != 'newemptymodule' and view.get_source() != 'existingmodule'">
+            oerpub_document_source = 'importmodule';
+            Aloha.ready(function(){
+              $('#step-contextually-forward').attr('href', '#neworexisting');
+              $('#step-contextually-forward').attr('title', 'Select whether this will be used for a new module or '+
+                                                            'to override the contents of an existing module');
+            });
+        </script>
+        <script type="text/javascript">
+            Aloha.ready(function(){
+                Aloha.require(['PubSub'], function(PubSub){
+<<<<<<< HEAD
+                    $('#step-contextually-forward').on('click', function(evt) {
+=======
+                    $('#neworexisting').on('show', function(evt) {
+>>>>>>> html5
+                        if(Aloha.getEditableById('canvas').isModified()){
+                            // show the wait-while-we-save info slider
+                            $('#upload-wait').center().slideDown('slow');
+<<<<<<< HEAD
+
+                            if      ( oerpub_document_source == 'newemptymodule' ) {
+                                PubSub.pub('swordpushweb.save', {
+                                    callback: function() {
+                                        // unshow the wait-while-we-save info slider
+                                        $('#upload-wait').slideUp('slow');
+
+                                        window.location = '/metadata';
+                                    }
+                                });
+                            }
+                            else if ( oerpub_document_source == 'existingmodule' ) {
+                                PubSub.pub('swordpushweb.save', {
+                                    callback: function() {
+                                        // unshow the wait-while-we-save info slider
+                                        $('#upload-wait').slideUp('slow');
+
+                                        window.location = '/metadata';
+                                    }
+                                });
+                            }
+                            else {
+                                // disable the modal dbox's button while saving
+                                $('#btn-newmodule').attr('disabled', 'disabled')
+                                                   .removeClass('btn-primary');
+                                $('#btn-existingmodule').attr('disabled', 'disabled')
+                                                        .removeClass('btn-primary');
+
+                                PubSub.pub('swordpushweb.save', {
+                                    callback: function() {
+                                        // unshow the wait-while-we-save info slider
+                                        $('#upload-wait').slideUp('slow');
+
+                                        $('#btn-newmodule').removeAttr('disabled')
+                                                           .addClass('btn-primary');
+                                        $('#btn-existingmodule').removeAttr('disabled')
+                                                                .addClass('btn-primary');
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            // document changes have been saved ...
+
+                            // for those workflow where the new or existing module has already been made,
+                            // proceed directly to the metadata page
+                            if      ( oerpub_document_source == 'newemptymodule' ) {
+                                window.location = '/metadata';
+                            }
+                            else if ( oerpub_document_source == 'existingmodule' ) {
+                                window.location = '/metadata';
+                            }
+                            else {
+                                // wait for user to push one of the dbox's buttons or 
+                                // close dbox
+                            }
+                        }
+=======
+                            $('#btn-newmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
+                            $('#btn-existingmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
+                            PubSub.pub('swordpushweb.save');
+                        };
+                    });
+                    // Subscribe to the 'swordpushweb.save' event.
+                    // It is fired by the the AlohaEditor when someone clicks
+                    // the 'Save' button.
+                    // Disable the navigation buttons.
+                    PubSub.sub('swordpushweb.save', function(data) {
+                        $('#back-to-chooser').attr('disabled', 'disabled');
+                        $('#show-neworexisting').attr('disabled', 'disabled');
+                    });
+                    // subscribe to the 'swordpusweb.saved' event. It is fired
+                    // by the 'savePreview' function in the AlohaEditor.oerpub
+                    // index.html page.
+                    // Here we re-enable the navigation buttons.
+                    PubSub.sub('swordpushweb.saved', function(data) {
+                        var btn = $('#back-to-chooser');
+                        btn.removeAttr('disabled');
+
+                        var btn = $('#show-neworexisting');
+                        btn.removeAttr('disabled');
+
+                        var btn = $('#btn-newmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
+                        
+                        var btn = $('#btn-existingmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
+
+                        $('#upload-wait').slideUp('slow');
+>>>>>>> html5
+                    });
+                });
+                $('#neworexisting').on('hidden', function() {
+                    // close the dbox while saving 
+                    // which may mean the server is experiencing technical difficulties
+                    $('#upload-wait').slideUp('slow');
+
+                    $('#btn-newmodule').removeAttr('disabled')
+                                       .addClass('btn-primary');
+                    $('#btn-existingmodule').removeAttr('disabled')
+                                            .addClass('btn-primary');
+                });
+            });
+        </script>
+    </metal:script>
+
+    <metal:workflownav fill-slot="workflownav">
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input type="button" class="btn"
+                href="#go-back-or-stay-dialog"
+                role="button"
+                data-toggle="modal"
+                type="button"
+                value="&#171; Back: Return to start page"
+                id="btn-back-to-chooser"
+                title="Return to the previous screen to choose a different import or editing option" />
+            </div>
+
+            <div id="forward-steps">
+                <input id="step-contextually-forward"
+                role="button"
+                class="btn button forward-button"
+                data-toggle="modal"
+                type="button"
+                value="Next Step &#187;" />
+            </div>
+
+        </div>
+    </div>
+    ${form.end()}
+    </metal:workflownav>
+
+    <metal:content-slot fill-slot="content-slot"
+        tal:define="filename python:request.session.get('filename')">
+        <div id="ie6-container-wrap">
+            <div id="container">
+                <!-- ================= -->
+                <!--  Toolbar Buttons  -->
+                <!-- ================= -->
+                <metal:m use-macro="editor.toolbar" />
+                <div id="content">
+                    <div id="artboard">
+                        <div id="pageheader-wrap">
+                            <div id="module-actions">
+                                <div class="advanced" style="display: block;">
+                                    <h2 class="advanced-label">
+                                        Advanced
+                                    </h2>
+                                    <strong>Module actions: </strong>
+                                    <a id="download-copy"
+                                        title="Save a ZIP file containing the module's XML and metadata to your local computer."
+                                        href="#asdfaasdf"
+                                        tal:attributes="href request.route_url('download_zip')">
+                                        <span class="button">Download a copy</span>
+                                    </a>
+                                    <a id="edit-xml"
+                                        title="Make changes to the module by editing its XML code."
+                                        href="${request.route_url('cnxml')}">
+                                        <span class="button">Edit XML</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div id="page-title">
+                                <h1>
+                                    Preview:
+                                    <span class="metatitle">
+                                        Conversion of <span tal:content="filename">Filename</span>
+                                    </span>
+                                </h1>
+                            </div>
+
+                        </div>
+                        <metal:m use-macro="editor.editor" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <span metal:use-macro="view.back_navigation_warning">
+        back navigation warning
+    </span>
+
+    <!-- Modal -->
+    <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
+        aria-labelledby="New or existing" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="neworexistingLabel">
+                Is this for a new module or will it override an existing one?
+            </h3>
+        </div>
+        <div class="modal-body">
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <button id="btn-newmodule" class="btn btn-primary submit-neworexisting" 
+                    url="${request.route_url('metadata')}">
+                    New module
+                </button>
+                This is an entirely new module. 
+            </div>
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <button id="btn-existingmodule" class="btn btn-primary submit-neworexisting" 
+                    url="${request.route_url('module_association')}">
+                    Override existing module
+                </button>
+                Choose an existing module to apply your import to, replacing its contents.  
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+    </div>
+
+    <div class="pleasewait" id="upload-wait" style="display: none;">
+        Your document is being saved. This may take a few moments.
+    </div>
+    </metal:content-slot>
+
+    <metal:footer-slot fill-slot="footer-slot" />
+</metal:use>

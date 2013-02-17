@@ -34,67 +34,45 @@
         <script type="text/javascript">
             Aloha.ready(function(){
                 Aloha.require(['PubSub'], function(PubSub){
-                    $('#step-contextually-forward').on('click', function(evt) {
+                    $('#neworexisting').on('show', function(evt) {
                         if(Aloha.getEditableById('canvas').isModified()){
-                            // show the wait-while-we-save info slider
+                            // show the info slider
                             $('#upload-wait').center().slideDown('slow');
+                            $('#btn-newmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
+                            $('#btn-existingmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
+                            PubSub.pub('swordpushweb.save');
+                        };
+                    });
+                    // Subscribe to the 'swordpushweb.save' event.
+                    // It is fired by the the AlohaEditor when someone clicks
+                    // the 'Save' button.
+                    // Disable the navigation buttons.
+                    PubSub.sub('swordpushweb.save', function(data) {
+                        $('#back-to-chooser').attr('disabled', 'disabled');
+                        $('#show-neworexisting').attr('disabled', 'disabled');
+                    });
+                    // subscribe to the 'swordpusweb.saved' event. It is fired
+                    // by the 'savePreview' function in the AlohaEditor.oerpub
+                    // index.html page.
+                    // Here we re-enable the navigation buttons.
+                    PubSub.sub('swordpushweb.saved', function(data) {
+                        var btn = $('#back-to-chooser');
+                        btn.removeAttr('disabled');
 
-                            if      ( oerpub_document_source == 'newemptymodule' ) {
-                                PubSub.pub('swordpushweb.save', {
-                                    callback: function() {
-                                        // unshow the wait-while-we-save info slider
-                                        $('#upload-wait').slideUp('slow');
+                        var btn = $('#show-neworexisting');
+                        btn.removeAttr('disabled');
 
-                                        window.location = '/metadata';
-                                    }
-                                });
-                            }
-                            else if ( oerpub_document_source == 'existingmodule' ) {
-                                PubSub.pub('swordpushweb.save', {
-                                    callback: function() {
-                                        // unshow the wait-while-we-save info slider
-                                        $('#upload-wait').slideUp('slow');
+                        var btn = $('#btn-newmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
+                        
+                        var btn = $('#btn-existingmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
 
-                                        window.location = '/metadata';
-                                    }
-                                });
-                            }
-                            else {
-                                // disable the modal dbox's button while saving
-                                $('#btn-newmodule').attr('disabled', 'disabled')
-                                                   .removeClass('btn-primary');
-                                $('#btn-existingmodule').attr('disabled', 'disabled')
-                                                        .removeClass('btn-primary');
-
-                                PubSub.pub('swordpushweb.save', {
-                                    callback: function() {
-                                        // unshow the wait-while-we-save info slider
-                                        $('#upload-wait').slideUp('slow');
-
-                                        $('#btn-newmodule').removeAttr('disabled')
-                                                           .addClass('btn-primary');
-                                        $('#btn-existingmodule').removeAttr('disabled')
-                                                                .addClass('btn-primary');
-                                    }
-                                });
-                            }
-                        }
-                        else {
-                            // document changes have been saved ...
-
-                            // for those workflow where the new or existing module has already been made,
-                            // proceed directly to the metadata page
-                            if      ( oerpub_document_source == 'newemptymodule' ) {
-                                window.location = '/metadata';
-                            }
-                            else if ( oerpub_document_source == 'existingmodule' ) {
-                                window.location = '/metadata';
-                            }
-                            else {
-                                // wait for user to push one of the dbox's buttons or 
-                                // close dbox
-                            }
-                        }
+                        $('#upload-wait').slideUp('slow');
                     });
                 });
                 $('#neworexisting').on('hidden', function() {
@@ -102,16 +80,21 @@
                     // which may mean the server is experiencing technical difficulties
                     $('#upload-wait').slideUp('slow');
 
-                    $('#btn-newmodule').removeAttr('disabled')
-                                       .addClass('btn-primary');
-                    $('#btn-existingmodule').removeAttr('disabled')
-                                            .addClass('btn-primary');
+                    var btn = $('#btn-newmodule');
+                    $(btn).removeAttr('disabled');
+                    $(btn).addClass('btn-primary');
+                   
+                    var btn = $('#btn-exsitingmodule');
+                    $(btn).removeAttr('disabled');
+                    $(btn).addClass('btn-primary');
                 });
             });
         </script>
     </metal:script>
 
     <metal:workflownav fill-slot="workflownav">
+    ${form.begin(request.route_url('metadata'), name="preview_form")}
+    ${form.csrf_token()}
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">

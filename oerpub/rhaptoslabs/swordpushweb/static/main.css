@@ -1,3 +1,4 @@
+
 body{
   font-size: .8em;
   font-family: Verdana, DejaVu Sans, Tahoma;
@@ -919,4 +920,14 @@ ul.popOut a:hover{
 
 #upload-wait {
     z-index: 9999;
+}
+
+.create-new-list .highlight-buttons {
+  padding: .4em .7em .5em;
+  border: 5px solid #ff0;
+  background-color: #fff;
+  float: left;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  
 }

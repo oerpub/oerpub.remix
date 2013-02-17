@@ -8,10 +8,17 @@ import zipfile
 import lxml
 import pycurl
 import logging
+import traceback
+from lxml import etree
 
 from pyramid.httpexceptions import HTTPFound
+from pyramid.renderers import render_to_response
+from pyramid.threadlocal import get_current_registry
 
+from rhaptos.cnxmlutils.validatecnxml import validate
 from oerpub.rhaptoslabs import sword2cnx
+from oerpub.rhaptoslabs.swordpushweb.errors import ConversionError
+from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
 
 current_dir = os.path.dirname(__file__)
 ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
@@ -504,3 +511,130 @@ class FeaturedLink(object):
 
     def parse_cnxversion(self, element):
         return element.attrib.get('cnxversion', '')
+
+def append_zip(zipfilename, filename, content):
+    """ Append files to a zip file. files is a list of tuples where each tuple
+        is a (filename, content) pair. """
+    zip_archive = zipfile.ZipFile(zipfilename, 'a')
+    zip_archive.writestr(filename, content)
+    zip_archive.close()
+
+def save_zip(save_dir, cnxml, html, files):
+    ram = cStringIO.StringIO()
+    zip_archive = zipfile.ZipFile(ram, 'w')
+    zip_archive.writestr('index.cnxml', cnxml)
+    if html is not None:
+        # Add a head and css to the html. Also add #canvas to the body
+        # so the css that was constructed to work with the editor nested
+        # in that element continues to work.
+        tree = etree.fromstring(html, etree.HTMLParser())
+        xslt = etree.XML("""\
+            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+                <xsl:template match="/html">
+                    <html><xsl:copy-of select="@*"/>
+                    <head>
+                      <link rel="stylesheet" type="text/css" href="oerpub.css" />
+                      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
+                      <script type="text/javascript" src="oerpub.js"></script>
+                      <script type="text/x-mathjax-config">MathJax.Hub.Config({
+                        jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
+                        extensions: ["asciimath2jax.js", "tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+                        tex2jax: { inlineMath: [["[TEX_START]","[TEX_END]"], ["\\\\(", "\\\\)"]] },
+                        MMLorHTML: {prefer:{MSIE:"HTML",Firefox:"HTML",Opera:"HTML",Chrome:"HTML",Safari:"HTML",other:"HTML"}},
+                        TeX: {
+                          extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], noErrors: { disabled: true }
+                        },
+                        AsciiMath: { noErrors: { disabled: true } }
+                      });</script>
+                    </head>
+                    <xsl:apply-templates />
+                    </html>
+                </xsl:template>
+                <xsl:template match="body">
+                    <body>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:attribute name="id">
+                            <xsl:text>canvas</xsl:text>
+                        </xsl:attribute>
+                        <xsl:apply-templates />
+                    </body>
+                </xsl:template>
+                <xsl:template match="@*|node()">
+                    <xsl:copy><xsl:apply-templates select="@*|node()"/></xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>""")
+        html = str(etree.XSLT(xslt)(tree))
+        zip_archive.writestr('index.html', html)
+        # Add the css file itself
+        registry = get_current_registry()
+        f1 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_metacontent.css')
+        f2 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_content_in_oerpub.css')
+        zip_archive.writestr('oerpub.css', open(f1, 'r').read() + open(f2, 'r').read())
+
+    for filename, fileObj in files:
+        zip_archive.writestr(filename, fileObj)
+    zip_archive.close()
+    zip_filename = os.path.join(save_dir, 'upload.zip')
+    save_and_backup_file(save_dir, zip_filename, ram.getvalue(), mode='wb')
+
+def validate_cnxml(cnxml):
+    valid, log = validate(cnxml, validator="jing")
+    if not valid:
+        raise ConversionError(log)
+
+def save_cnxml(save_dir, cnxml, files):
+    # write CNXML output
+    save_and_backup_file(save_dir, 'index.cnxml', cnxml)
+
+    # write files
+    for filename, content in files:
+        filename = os.path.join(save_dir, filename)
+        f = open(filename, 'wb') # write binary, important!
+        f.write(content)
+        f.close()
+
+    # we generate the preview and save the error
+    conversionerror = None
+    try:
+        htmlpreview = cnxml_to_htmlpreview(cnxml)
+    except libxml2.parserError:
+        conversionerror = traceback.format_exc()
+
+    # Zip up all the files. This is done now, since we have all the files
+    # available, and it also allows us to post a simple download link.
+    # Note that we cannot use zipfile as context manager, as that is only
+    # available from python 2.7
+    # TODO: Do a filesize check xxxx
+    if conversionerror is None:
+        save_and_backup_file(save_dir, 'index.html', htmlpreview)
+        save_zip(save_dir, cnxml, htmlpreview, files)
+    else:
+        save_zip(save_dir, cnxml, None, files)
+        raise ConversionError(conversionerror)
+
+def render_conversionerror(request, error):
+    templatePath = 'templates/conv_error.pt'
+    fname='gdoc'
+    if 'filename' in request.session:
+        fname=request.session['filename']
+    response = {'filename' : fname, 'error': error}
+
+    # put the error on the session for retrieval on the editor
+    # view
+    request.session['transformerror'] = error
+
+    if('title' in request.session):
+        del request.session['title']
+    return render_to_response(templatePath, response, request=request)
+
+def save_and_backup_file(save_dir, filename, content, mode='w'):
+    """ save a file, but first make a backup if the file exists
+    """
+    if isinstance(content, unicode):
+        content = content.encode('ascii', 'xmlcharrefreplace')
+    filename = os.path.join(save_dir, filename)
+    if os.path.exists(filename):
+        os.rename(filename, filename + '~')
+    f = open(filename, mode)
+    f.write(content)
+    f.close()

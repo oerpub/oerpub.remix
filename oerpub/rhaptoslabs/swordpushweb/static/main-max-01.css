@@ -243,6 +243,16 @@ label img{
   padding-top: 1em;
 }
 
+div.left {
+    float:left;
+    margin : 10px;
+}
+
+div.right {
+    float: right;    
+}
+
+
 #edit-existing-contents ul, #edit-existing-contents li{
   list-style-type: none;
   display: block;
@@ -382,11 +392,16 @@ h1{
   margin: 0;
 }
 
-iframe{
+iframe#login-frame{
   height: 100%;
   border: 1px dotted #bbb;
 }
 
+#slideshare-embed{
+  height: 355px;
+  margin-left: 20%;
+  
+}
 #left-column-wrap{
   width: 50%;
   float: left;
@@ -592,4 +607,14 @@ div.CodeMirror-lines {
 
 .highlight {
     font-weight: bold;
+}
+
+#create-new-list .highlight-buttons {
+  padding: .4em .7em .5em;
+  border: 5px solid #ff0;
+  background-color: #fff;
+  float: left;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  
 }

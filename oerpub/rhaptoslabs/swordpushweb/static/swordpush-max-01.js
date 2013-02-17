@@ -305,10 +305,35 @@ $(document).ready(function() {
         $('form#uploadform').submit(); 
     });
 
+    $('input#presentation-submit').click(function(event){
+        event.preventDefault();
+        $('input#importer').click();
+    });
+
+    $('input#importer').change(function(event){
+        showWaitMessage();
+        $('form#presentationform').submit(); 
+    });
+
     $('input#url-submit').click(function(event){
         showWaitMessage();
     });
-
+    
+    $('input#choose-importer').click(function(event){
+		event.preventDefault();
+        if ($('#import-to-google').is(':checked')) {
+            $('input#upload-to-google').val("true");
+        
+        } 
+        if ($('#import-to-ss').is(':checked')) {
+            $('input#upload-to-ss').val("true");
+        
+        } 
+        
+        $('form#importform').submit(); 
+        
+    });
+    $('#file-browser').hide();
 });
 
 function _doAction(message, event) {

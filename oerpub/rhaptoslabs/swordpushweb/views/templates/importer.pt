@@ -1,0 +1,154 @@
+<metal:use use-macro="base">
+
+<metal:script-slot fill-slot="script-slot">
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+        // deactivate expert mode from now on
+        if ($("#expertmode").hasClass("expert-activated")) {
+          $("#expertmode").click();
+        }
+
+        $('input#import-submit').click(function(event){
+        event.preventDefault();
+        $('#import-submit').attr("disabled", true);
+        showWaitMessage();
+        $('form#importform').submit();
+        });        
+        if($('#import-to-ss').is(":checked")){
+            $('#slideshare-href').removeClass("label-text");
+            $('#slideshare-href').addClass("highlight-buttons");
+        
+        }
+        $('#import-to-ss').change(function(){
+          if($(this).is(":checked")){
+           $('#google-href').addClass("label-text");
+            $('#google-href').removeClass("highlight-buttons");
+          
+            $('#slideshare-href').removeClass("label-text");
+            $('#slideshare-href').addClass("highlight-buttons");
+
+          }
+          else{
+
+            $('#slideshare-href').addClass("label-text");
+            $('#slideshare-href').removeClass("highlight-buttons");
+          
+          }
+        });
+
+        $('#import-to-google').change(function(){
+          if($(this).is(":checked")){
+           $('#slideshare-href').addClass("label-text");
+            $('#slideshare-href').removeClass("highlight-buttons");
+            $('#google-href').removeClass("label-text");
+            $('#google-href').addClass("highlight-buttons");
+
+          }
+          else{
+
+            $('#google-href').addClass("label-text");
+            $('#google-href').removeClass("highlight-buttons");
+          
+          }
+        });
+
+    });
+    
+</script>
+}    
+</metal:script-slot>
+
+
+
+<metal:workflownav fill-slot="workflownav">
+
+${form.begin(request.route_url('importer'), id='importform')}
+${form.csrf_token()}
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input type="button" class="button" 
+                    value="&laquo; Back: Choose Document" id="back-to-chooser"
+                    url="${request.route_url('choose')}"
+                    title="Return to the module preview">
+            </div>
+           <div id="forward-steps">
+                <input id="choose-importer"
+                class="button forward-button"
+                type="submit"
+                value="Next: Enhance Your Presentation &#187;" 
+                url="${request.route_url('metadata')}"
+                title="Add/edit title and other information about the module"/>
+            </div>
+        </div>
+    </div>
+    </metal:workflownav>
+
+<tal:body metal:fill-slot="content-slot"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images')">
+  <div id="ie6-container-wrap">
+    <div id="container">
+      <div id="content">
+        <div id="nav-column-wrap">
+          <div id="nav-column">
+            <ul>
+              <li id="nav-upload" class="selected">
+                <a href="" title="Import to SlideShare"><span>Import</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div id="main-column-wrap">
+          <div id="main-column">
+            <div class="pleasewait" id="upload-wait" style="display: none;">
+              Your document is being uploaded to SlideShare . This may take few moments.
+             </div>
+
+            <div id="choose-upload">
+              <h1>
+                Choose where to run your presentation                
+              </h1>
+              <p class="forminfo">
+                Your new Connexions module will show your slides interactively to readers. 
+                It will use either Connexions' Slideshare account or your personal Google Docs account to display the slides. 
+                Which would you prefer ?              
+              </p>
+
+              
+              <ul class="create-new-list">
+                <li>
+                    <div class="upload-form" id="choose-importer-box">                        
+                      <div class="left"><input type="radio" id="import-to-ss" name="importer" value="google" checked="yes" style="float:left"/></div>
+                      <div class="left"><span class="label-text" id="slideshare-href"><img src="${images_url}/slideshare.jpg"><strong>SlideShare</strong></span></div>
+                      <br/><br/><br/><br/><br/>
+                        <div class="left"><input type="radio" id="import-to-google" name="importer" value="slideshare" style="float:left"/></div>
+                        <div class="left"><span class="label-text" id="google-href"><img src="${images_url}/google-docs-22.png"><strong>Google Presentations</strong></span></div>
+                        <br/><br/><br/><br/><br/>
+                        <!--<div class="left"><input class="button" id="choose-importer" value="Proceed to Import &#187;" type="submit"></div>-->
+                        <br/><br/>
+                        <input type="hidden" id="upload-to-google" name="upload_to_google" value="false">
+                        <input type="hidden" id="upload-to-ss" name="upload_to_ss" value="true">
+                        
+                    </div>
+                </li>
+              </ul>
+              ${form.end()}
+              
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
+      frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
+  </iframe>
+
+</tal:body>
+
+</metal:use>
