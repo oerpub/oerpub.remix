@@ -340,7 +340,7 @@ $(document).ready(function()
     // Simple file upload
     $('input#file-submit').click(function(event){
         event.preventDefault();
-        $('input#upload').click();
+        $('input#upload_file').click();
     });
     
     $('input#presentation-submit').click(function(event){
@@ -348,9 +348,9 @@ $(document).ready(function()
         $('input#importer').click();
     });
 
-    $('input#upload').change(function(event){
+    $('input#upload_file').change(function(event){
         showWaitMessage();
-        $('form#uploadform').submit(); 
+        $('form#officedocument_form').submit(); 
     });
 
     $('input#importer').change(function(event){
@@ -614,7 +614,7 @@ function pickerCallback(data) {
         document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
         document.getElementById('gdocs_access_token').value = data.docs[0].accessToken;
         showWaitMessage();
-        $('form#uploadform').submit(); 
+        $('form#googledocs_form').submit(); 
     }
 }
 
