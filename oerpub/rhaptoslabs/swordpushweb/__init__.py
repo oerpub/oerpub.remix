@@ -79,4 +79,4 @@ def add_subscribers(config):
         'pyramid.events.BeforeRender')
 
 def register_utilities(config):
-    config.registry.registerUtility(WorkflowStepsUtility, IWorkflowSteps)
+    config.registry.registerUtility(WorkflowStepsUtility(), IWorkflowSteps)
