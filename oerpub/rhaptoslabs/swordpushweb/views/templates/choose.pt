@@ -76,6 +76,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 <input class="btn" id="existingmodule"
                                     name="existingmodule" value="Edit an existing module »" type="submit"
                                     title="Choose an existing module and edit."> <br />
+                                <input type="hidden" id="neworexistingmodule"
+                                    name="neworexistingmodule" value="neworexistingmodule">
                             </div>
                         </li>
                     ${neworexisting_form.end()}
@@ -86,8 +88,10 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
                     <ul class="create-new-list">
 
-                    ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
-                    ${form.csrf_token()}
+                    ${officedocument_form.begin(request.route_url('choose'),
+                                                multipart='multipart',
+                                                id='officedocument_form')}
+                    ${officedocument_form.csrf_token()}
 
                         <li id="doc-importer">
                             <!-- div style="margin: 0 0 1em -1.5em;">
@@ -109,14 +113,18 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     name="form.submitted"
                                     type="submit">
                                 
-                                <input id="upload" name="upload" style="visibility: hidden;" type="file" />
-                                <input id="newmodule" name="newmodule" value="" type="hidden" />
+                                <input id="upload_file" name="upload_file"
+                                    style="visibility: hidden;" type="file" />
+                                <input id="newmodule" name="newmodule"
+                                    value="newmodule" type="hidden" />
                             </div>
                         </li>
-                    ${form.end()}
+                    ${officedocument_form.end()}
 
-                    ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
-                    ${form.csrf_token()}
+                    ${googledocs_form.begin(request.route_url('choose'),
+                                            multipart='multipart',
+                                            id='googledocs_form')}
+                    ${googledocs_form.csrf_token()}
 
                         <li id="gdoc-importer">
                             <label>
@@ -126,15 +134,21 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             </label>
 
                             <div class="upload-form">
-                                ${form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')} 
-                                ${form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
+                                ${googledocs_form.hidden('gdocs_resource_id', value=None, id='gdocs_resource_id')} 
+                                ${googledocs_form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
                                 <input id="google-submit"
                                     type="submit"
                                     class="btn" 
-                                    name="form.submitted"
+                                    name="googledocs_form.submitted"
                                     value="Select and preview &#187;">
                             </div>
                         </li>
+                    ${googledocs_form.end()}
+
+                    ${url_form.begin(request.route_url('choose'),
+                                            multipart='multipart',
+                                            id='url_form')}
+                    ${url_form.csrf_token()}
                           <li id="url-importer">
                             <label>
                               <span class="label-text">
@@ -157,7 +171,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             </div>
                         
                           </li>
-                    ${form.end()}
+                    ${url_form.end()}
 
                     </ul>
                      
@@ -167,10 +181,11 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                         <h3>Alpha importer tools</h3>
                         
                         <ul class="create-new-list">
+                    ${presentationform.begin(request.route_url('choose'),
+                                             multipart='multipart',
+                                             id='presentationform')}
+                    ${presentationform.csrf_token()}
                           <li>
-                              ${presentationform.begin(request.route_url('choose'), multipart='multipart', id='presentationform')}
-                              ${presentationform.csrf_token()}
-                              
                              <label>
                                <span style="visibility: hidden;" class="or-bullet">or</span>
                                <span class="label-text" title="This import is brand new and has not been fully tested yet">
@@ -182,11 +197,13 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               <input id="importer" name="importer" style="visibility: hidden;" type="file" />
                               <!--<input class="button"  value="Import Your Presentations &#187;" onClick="location.href='/importer'" type="button">-->
                               </div>    
-                              ${presentationform.end()}
                           </li>                          
+                    ${presentationform.end()}
 
-                    ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
-                    ${form.csrf_token()}
+                    ${zip_or_latex_form.begin(request.route_url('choose'),
+                                              multipart='multipart',
+                                              id='zip_or_latex_form')}
+                    ${zip_or_latex_form.csrf_token()}
                           <li id="latex-zip-importer">
                             <label>
                               <span style="visibility: hidden;" class="or-bullet">or</span>
@@ -202,7 +219,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
                             </div>
                           </li>
-                    ${form.end()}
+                    ${zip_or_latex_form.end()}
 
                         </ul>
                       </div>

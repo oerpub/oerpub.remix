@@ -40,22 +40,29 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     check_login,
     escape_system,
     add_directory_to_zip,
-    render_conversionerror)
-from oerpub.rhaptoslabs.swordpushweb.errors import ConversionError
+    render_conversionerror,
+    ZIP_PACKAGING,
+    LATEX_PACKAGING,
+    UNKNOWN_PACKAGING,)
+from oerpub.rhaptoslabs.swordpushweb.errors import (
+    ConversionError,
+    UnknownPackagingError)
 
 
 class ModuleEditorSchema(formencode.Schema):
     allow_extra_fields = True
     newmodule = formencode.validators.Bool()
     existingmodule = formencode.validators.Bool()
+    neworexistingmodule = formencode.validators.NotEmpty()
 
-class WordprocessorSchema(formencode.Schema):
+class OfficeDocumentUploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload_file = formencode.validators.FieldStorageUploadConverter()
 
 class GoogleDocsSchema(formencode.Schema):
     allow_extra_fields = True
-    upload_url = formencode.validators.URL()
+    gdocs_resource_id = formencode.validators.NotEmpty()
+    #gdocs_access_token = formencode.validators.NotEmpty()
 
 class URLSchema(formencode.Schema):
     allow_extra_fields = True
@@ -91,14 +98,12 @@ class Choose_Document_Source(BaseHelper):
 
         templatePath = 'templates/choose.pt'
 
-        form = Form(self.request, schema=UploadSchema)
         neworexisting_form = Form(request, schema=ModuleEditorSchema)
-        wordprocessor_form = Form(request, schema=WordprocessorSchema)
+        officedocument_form = Form(request, schema=OfficeDocumentUploadSchema)
         googledocs_form = Form(request, schema=GoogleDocsSchema)
         url_form = Form(request, schema=URLSchema)
         presentationform = Form(request, schema=ImporterSchema)
         zip_or_latex_form = Form(request, schema=ZipOrLatexSchema)
-        field_list = [('upload', 'File')]
 
         # clear the session
         if 'transformerror' in self.request.session:
@@ -107,105 +112,63 @@ class Choose_Document_Source(BaseHelper):
             del self.request.session['title']
 
         # Check for successful form completion
-        print form.all_errors()
         print presentationform.all_errors()
-
+        
+        #TODO: This can be replaced by utility/adapter lookups
         if neworexisting_form.validate():
             return self._process_neworexisting_submit(request, neworexisting_form)
-        elif wordprocessor_form.validate():
-            self._process_wordprocessor_submit()
+        elif officedocument_form.validate():
+            return self._process_officedocument_submit(request, officedocument_form)
         elif googledocs_form.validate():
-            self._process_googledocs_submit()
+            return self._process_googledocs_submit(request, googledocs_form)
         elif url_form.validate():
-            self._process_url_submit()
+            return self._process_url_submit(request, url_form)
         elif presentationform.validate():
-            self._process_presentationform_submit()
+            return self._process_presentationform_submit(request, presentationform)
         elif zip_or_latex_form.validate():
-            self._process_zip_or_latex_form()
+            return self._process_zip_or_latex_form(request, zip_or_latex_form)
 
         # First view or errors
         response = {
-            'form': FormRenderer(form),
             'neworexisting_form': FormRenderer(neworexisting_form),
-            'wordprocessor_form': FormRenderer(wordprocessor_form),
+            'officedocument_form': FormRenderer(officedocument_form),
             'googledocs_form': FormRenderer(googledocs_form),
             'url_form': FormRenderer(url_form),
             'presentationform': FormRenderer(presentationform),
-            'field_list': field_list,
+            'zip_or_latex_form': FormRenderer(zip_or_latex_form),
             'view': self,
         }
         return render_to_response(templatePath, response, request=self.request)
-
-    def getNextUrl(self):
-        return ''
 
     def _process_neworexisting_submit(self, request, form):
         print 'process new or existing submit'
         processor = NewOrExistingModuleProcessor(request, form)
         return processor.process()
-        result = ''
-        if result:
-            nextUrl = self.getNextUrl()
 
-
-    def _process_wordprocessor_submit(self):
+    def _process_officedocument_submit(self, request, form):
         print 'process wordprocessor submit'
+        processor = OfficeDocumentProcessor(request, form)
+        return processor.process()
     
-    def _process_googledocs_submit(self):
+    def _process_googledocs_submit(self, request, form):
         print 'process google doc submit'
+        processor = GoogleDocProcessor(request, form)
+        return processor.process()
     
-    def _process_url_submit(self):
+    def _process_url_submit(self, request, form):
         print 'process URL submit'
+        processor = BaseFormProcessor(request, form)
+        return processor.process()
 
-    def _process_presentationform_submit(self):
+    def _process_presentationform_submit(self, request, form):
         print 'process presentation submit'
+        processor = BaseFormProcessor(request, form)
+        return processor.process()
     
-    def _process_zip_or_latex_form(self):
+    def _process_zip_or_latex_form(self, request, form):
         print 'process zip or latex submit'
-
-    def process_gdoc_data(self, form, request, save_dir):
-        gdocs_resource_id = form.data['gdocs_resource_id']
-        gdocs_access_token = form.data['gdocs_access_token']
-
-        form.data['gdocs_resource_id'] = None
-        form.data['gdocs_access_token'] = None
-
-        title, filename = self.process_gdocs_resource(
-            save_dir, gdocs_resource_id)
-
-        self.request.session['title'] = title
-        self.request.session['filename'] = filename
-    
-    def process_gdocs_resource(self, save_dir, gdocs_resource_id, gdocs_access_token=None):
-
-        # login to gdocs and get a client object
-        gd_client = getAuthorizedGoogleDocsClient()
-
-        # Create a AuthSub Token based on gdocs_access_token String
-        auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token) \
-                         if gdocs_access_token \
-                         else None
-
-        # get the Google Docs Entry
-        gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
-
-        # Get the contents of the document
-        gd_entry_url = gd_entry.content.src
-        html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
-
-        # Transformation and get images
-        cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
-
-        cnxml = clean_cnxml(cnxml)
-        save_cnxml(save_dir, cnxml, objects.items())
-
-        validate_cnxml(cnxml)
-
-        # Return the title and filename.  Old comment states
-        # that returning this filename might kill the ability to
-        # do multiple tabs in parallel, unless it gets offloaded
-        # onto the form again.
-        return (gd_entry.title.text, "Google Document")
+        processor = ZipOrLatexModuleProcessor(request, form)
+        return processor.process()
 
     def process_url_data(self, form, request, save_dir):
         url = form.data['url_text']
@@ -255,113 +218,6 @@ class Choose_Document_Source(BaseHelper):
                 return render_to_response(self.templatePath,
                                           response,
                                           request=request)
-
-    def process_document_data(self, form, request, save_dir):
-        # Save the original file so that we can convert, plus keep it.
-        original_filename = str(os.path.join(
-            save_dir,
-            form.data['upload'].filename.replace(os.sep, '_'))
-        )
-
-        saved_file = open(original_filename, 'wb')
-        input_file = form.data['upload'].file
-        shutil.copyfileobj(input_file, saved_file)
-        saved_file.close()
-        input_file.close()
-
-        form.data['upload'] = None
-
-        # Check if it is a ZIP file with at least index.cnxml or a LaTeX file in it
-        try:
-            zip_archive = zipfile.ZipFile(original_filename, 'r')
-            is_zip_archive = ('index.cnxml' in zip_archive.namelist())
-
-            # Do we have a latex file?
-            if not is_zip_archive:
-                # incoming latex.zip must contain a latex.tex file, where "latex" is the base name.
-                (latex_head, latex_tail) = os.path.split(original_filename)
-                (latex_root, latex_ext)  = os.path.splitext(latex_tail)
-                latex_basename = latex_root
-                latex_filename = latex_basename + '.tex'
-                is_latex_archive = (latex_filename in zip_archive.namelist())
-
-        except zipfile.BadZipfile:
-            is_zip_archive = False
-            is_latex_archive = False
-
-        # ZIP package from previous conversion
-        if is_zip_archive:
-            # Unzip into transform directory
-            zip_archive.extractall(path=save_dir)
-
-            # Rename ZIP file so that the user can download it again
-            os.rename(original_filename, os.path.join(save_dir, 'upload.zip'))
-
-            # Read CNXML
-            with open(os.path.join(save_dir, 'index.cnxml'), 'rt') as fp:
-                cnxml = fp.read()
-
-            # Convert the CNXML to XHTML for preview
-            html = cnxml_to_htmlpreview(cnxml)
-            with open(os.path.join(save_dir, 'index.xhtml'), 'w') as index:
-                index.write(html)
-
-            cnxml = clean_cnxml(cnxml)
-            validate_cnxml(cnxml)
-
-        # LaTeX
-        elif is_latex_archive:
-            f = open(original_filename)
-            latex_archive = f.read()
-
-            # LaTeX 2 CNXML transformation
-            cnxml, objects = latex_to_cnxml(latex_archive, original_filename)
-
-            cnxml = clean_cnxml(cnxml)
-            save_cnxml(save_dir, cnxml, objects.items())
-            validate_cnxml(cnxml)
-
-        # OOo / MS Word Conversion
-        else:
-            # Convert from other office format to odt if needed
-            filename, extension = os.path.splitext(original_filename)
-            odt_filename = str(filename) + '.odt'
-
-            if(extension != '.odt'):
-                converter = JOD.DocumentConverterClient()
-                # Checks to see if JOD is active on the machine. If it is the
-                # conversion occurs using JOD else it converts using OO headless
-                command = None
-                if jod_check.check('office[0-9]'):
-                    try:
-                        converter.convert(original_filename, 'odt', filename + '.odt')
-                    except Exception as e:
-                        print e
-                else:
-                    odt_filename= '%s.odt' % filename
-                    command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(original_filename)[1:-1] + ',' + odt_filename + ')"'
-                    os.system(command)
-                try:
-                    fp = open(odt_filename, 'r')
-                    fp.close()
-                except IOError as io:
-                    if command == None:
-                        raise ConversionError("%s not found" %
-                                              original_filename)
-                    else:
-                        raise ConversionError(
-                            "%s not found because command \"%s\" failed" %
-                            (odt_filename,command) )
-            
-            # Convert and save all the resulting files.
-
-            tree, files, errors = transform(odt_filename)
-            cnxml = clean_cnxml(etree.tostring(tree))
-
-            save_cnxml(save_dir, cnxml, files.items())
-
-            # now validate with jing
-            validate_cnxml(cnxml)
 
     def process_presentation_data(self, request, form, session):
         print "Inside presentation form"
@@ -505,6 +361,10 @@ class BaseFormProcessor(object):
         return self.request.session.get('source', 'undefined')
 
 class NewOrExistingModuleProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(NewOrExistingModuleProcessor, self).__init__(request, form)
+        self.set_source('')
+
     def process(self):
         try:
             if self.form.data.get('newmodule'):
@@ -541,78 +401,284 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
             content = cnxmlfile.read()
         return content
 
+class ZipOrLatexModuleProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(ZipOrLatexModuleProcessor, self).__init__(request, form)
+        ufname = self.form.data['upload'].filename.replace(os.sep, '_')
+        self.original_filename = os.path.join(self.save_dir, ufname)
 
-"""
-        elif form.validate():
-            print "NORMAL FORM"
-            try: # Catch-all exception block
-                message = 'The file was successfully converted.'
+        # Save the original file so that we can convert, plus keep it.
+        saved_file = open(self.original_filename, 'wb')
+        input_file = self.form.data['upload'].file
+        shutil.copyfileobj(input_file, saved_file)
+        saved_file.close()
+        input_file.close()
 
-                # Create a directory to do the conversions
-                temp_dir_name, save_dir = self.create_work_dir(self.request)
+        self.zip_archive = zipfile.ZipFile(self.original_filename, 'r')
+        self.form.data['upload'] = None
+        self.set_source('cnxinputs')
 
-                # Keep the info we need for next uploads.  Note that this
-                # might kill the ability to do multiple tabs in parallel,
-                # unless it gets offloaded onto the form again.
-                self.request.session['upload_dir'] = temp_dir_name
-                self.source = 'undefined'
-                if form.data.get('newmodule'):
-                    self.set_source('newemptymodule')
-                    # save empty cnxml and html files
-                    cnxml = self.empty_cnxml()
-                    files = []
-                    save_cnxml(save_dir, cnxml, files)
-                
-                elif form.data.get('existingmodule'):
-                    self.set_source('existingmodule')
-                    return HTTPFound(
-                        location=self.request.route_url('choose-module'))
+    def process(self):
+        try:
+            processor = None
+            packaging = self.get_type()
+            if packaging == ZIP_PACKAGING:
+                processor = ZipFileProcessor(self.request, self.form)
+                return processor.process()
+            elif packaging == LATEX_PACKAGING:
+                processor = LatexProcessor(self.request, self.form)
+                return processor.process()
 
-                elif form.data['upload'] is not None:
-                    self.set_source('fileupload')
-                    self.request.session['filename'] = form.data['upload'].filename
-                    self.process_document_data(form, self.request, save_dir)
+        except UnknownPackagingError as e:
+            return render_conversionerror(self.request, e.msg)
 
-                # Google Docs Conversion
-                # if we have a Google Docs ID and Access token.
-                elif form.data.get('gdocs_resource_id'):
-                    self.set_source('gdocupload')
-                    self.process_gdoc_data(form, self.request, save_dir)
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
 
-                # HTML URL Import:
-                elif form.data.get('url_text'):
-                    self.set_source('urlupload')
-                    errors = self.process_url_data(form, self.request, save_dir)
-                    if errors:
-                        self.request['errors'] = errors
-                        response = {'form': FormRenderer(form),
-                                    'view': self, }
-                        return render_to_response(
-                            templatePath, response, request=self.request)
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url('preview'))
+    
+    def get_type(self):
+        # Check if it is a ZIP file with at least index.cnxml or a LaTeX file in it
+        result = UNKNOWN_PACKAGING
+        try:
+            is_zip_archive = ('index.cnxml' in self.zip_archive.namelist())
 
-                # Office, CNXML-ZIP or LaTeX-ZIP file
-                else:
-                    self.set_source('cnxinputs')
-                    self.process_document_data(form, self.request, save_dir)
+            # Do we have a latex file?
+            if is_zip_archive:
+                result = ZIP_PACKAGING
+            else:
+                # incoming latex.zip must contain a latex.tex file, where
+                # "latex" is the base name.
+                (latex_head, latex_tail) = os.path.split(self.original_filename)
+                (latex_root, latex_ext)  = os.path.splitext(latex_tail)
+                latex_basename = latex_root
+                latex_filename = latex_basename + '.tex'
+                is_latex_archive = (latex_filename in self.zip_archive.namelist())
+                if is_latex_archive:
+                    result = LATEX_PACKAGING
 
-            except ConversionError as e:
-                return render_conversionerror(self.request, e.msg)
+        except zipfile.BadZipfile:
+            raise UnknownPackagingError(
+                'Could not find type for %s' % self.original_filename)
 
-            except Exception:
-                tb = traceback.format_exc()
-                self.write_traceback_to_zipfile(
-                    tb, self.request, temp_dir_name, form)
+        return result
 
-                templatePath = 'templates/error.pt'
-                response = {'traceback': tb}
-                if('title' in self.request.session):
-                    del self.request.session['title']
-                return render_to_response(templatePath, response, request=self.request)
+class ZipFileProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(ZipFileProcessor, self).__init__(request, form)
+        self.set_source('cnxinputs')
 
-            self.request.session.flash(message)
-            return HTTPFound(location=self.request.route_url('preview'))
+    def process(self):
+        try:
+            # Unzip into transform directory
+            self.zip_archive.extractall(path=self.save_dir)
+
+            # Rename ZIP file so that the user can download it again
+            os.rename(self.original_filename,
+                      os.path.join(self.save_dir, 'upload.zip'))
+
+            # Read CNXML
+            with open(os.path.join(self.save_dir, 'index.cnxml'), 'rt') as fp:
+                cnxml = fp.read()
+
+            # Convert the CNXML to XHTML for preview
+            html = cnxml_to_htmlpreview(cnxml)
+            with open(os.path.join(self.save_dir, 'index.xhtml'), 'w') as index:
+                index.write(html)
+
+            cnxml = clean_cnxml(cnxml)
+            validate_cnxml(cnxml)
+
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url('preview'))
+
+class LatexProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(LatexProcessor, self).__init__(request, form)
+        self.set_source('cnxinputs')
+
+    def process(self):
+        try:
+            f = open(self.original_filename)
+            latex_archive = f.read()
+
+            # LaTeX 2 CNXML transformation
+            cnxml, objects = latex_to_cnxml(latex_archive, self.original_filename)
+
+            cnxml = clean_cnxml(cnxml)
+            save_cnxml(self.save_dir, cnxml, objects.items())
+            validate_cnxml(cnxml)
+
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url('preview'))
+
+class OfficeDocumentProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(OfficeDocumentProcessor, self).__init__(request, form)
+        self.set_source('fileupload')
+        ufname = self.form.data['upload_file'].filename.replace(os.sep, '_')
+        self.original_filename = os.path.join(self.save_dir, ufname)
+        self.request.session['filename'] = self.form.data['upload_file'].filename
+
+        # Save the original file so that we can convert, plus keep it.
+        saved_file = open(self.original_filename, 'wb')
+        input_file = self.form.data['upload_file'].file
+        shutil.copyfileobj(input_file, saved_file)
+        saved_file.close()
+        input_file.close()
+
+    def process(self):
+        try:
+            # Convert from other office format to odt if needed
+            filename, extension = os.path.splitext(self.original_filename)
+            odt_filename = str(filename) + '.odt'
+
+            if(extension != '.odt'):
+                self._convert_to_odt(filename)        
+            # Convert and save all the resulting files.
+
+            tree, files, errors = transform(odt_filename)
+            cnxml = clean_cnxml(etree.tostring(tree))
+
+            save_cnxml(self.save_dir, cnxml, files.items())
+
+            # now validate with jing
+            validate_cnxml(cnxml)
+
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url('preview'))
+    
+    def _convert_to_odt(self,filename):
+        converter = JOD.DocumentConverterClient()
+        # Checks to see if JOD is active on the machine. If it is the
+        # conversion occurs using JOD else it converts using OO headless
+        command = None
+        if jod_check.check('office[0-9]'):
+            try:
+                converter.convert(self.original_filename, 'odt', filename + '.odt')
+            except Exception as e:
+                print e
+                raise ConversionError(e)
+        else:
+            odt_filename= '%s.odt' % filename
+            command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(self.original_filename)[1:-1] + ',' + odt_filename + ')"'
+            os.system(command)
+        try:
+            fp = open(odt_filename, 'r')
+            fp.close()
+        except IOError as io:
+            if command == None:
+                raise ConversionError("%s not found" %
+                                      self.original_filename)
+            else:
+                raise ConversionError(
+                    "%s not found because command \"%s\" failed" %
+                    (odt_filename,command) )
         
-        elif presentationform.validate():
-            self.process_presentation_data(request, presentationform, session)
-"""
+class GoogleDocProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(GoogleDocProcessor, self).__init__(request, form)
+        self.set_source('gdocupload')
+    
+    def process(self):
+        try:
+            gdocs_resource_id = self.form.data['gdocs_resource_id']
+            gdocs_access_token = self.form.data['gdocs_access_token']
+
+            self.form.data['gdocs_resource_id'] = None
+            self.form.data['gdocs_access_token'] = None
+
+            title, filename = self.process_gdocs_resource(
+                self.save_dir, gdocs_resource_id)
+
+            self.request.session['title'] = title
+            self.request.session['filename'] = filename
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url('preview'))
+    
+    def process_gdocs_resource(self, save_dir, gdocs_resource_id, gdocs_access_token=None):
+
+        # login to gdocs and get a client object
+        gd_client = getAuthorizedGoogleDocsClient()
+
+        # Create a AuthSub Token based on gdocs_access_token String
+        auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token) \
+                         if gdocs_access_token \
+                         else None
+
+        # get the Google Docs Entry
+        gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
+
+        # Get the contents of the document
+        gd_entry_url = gd_entry.content.src
+        html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
+
+        # Transformation and get images
+        cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
+
+        cnxml = clean_cnxml(cnxml)
+        save_cnxml(save_dir, cnxml, objects.items())
+
+        validate_cnxml(cnxml)
+
+        # Return the title and filename.  Old comment states
+        # that returning this filename might kill the ability to
+        # do multiple tabs in parallel, unless it gets offloaded
+        # onto the form again.
+        return (gd_entry.title.text, "Google Document")
 
