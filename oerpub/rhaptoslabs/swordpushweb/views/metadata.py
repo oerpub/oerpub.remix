@@ -10,7 +10,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 from pyramid_simpleform.renderers import FormRenderer
 
-from oerpub.rhaptoslabs.swordpushweb import languages
+from oerpub.rhaptoslabs.swordpushweb.languages import languages
 from choose import save_cnxml
 from utils import get_metadata_from_repo
 from utils import ZIP_PACKAGING, create_module_in_2_steps
