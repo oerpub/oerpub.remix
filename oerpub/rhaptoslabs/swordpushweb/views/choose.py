@@ -44,9 +44,26 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
 from oerpub.rhaptoslabs.swordpushweb.errors import ConversionError
 
 
+class ModuleEditorSchema(formencode.Schema):
+    allow_extra_fields = True
+    newmodule = formencode.validators.Bool()
+    existingmodule = formencode.validators.Bool()
+
+class WordprocessorSchema(formencode.Schema):
+    allow_extra_fields = True
+    upload_file = formencode.validators.FieldStorageUploadConverter()
+
+class GoogleDocsSchema(formencode.Schema):
+    allow_extra_fields = True
+    upload_url = formencode.validators.URL()
+
+class URLSchema(formencode.Schema):
+    allow_extra_fields = True
+    upload_url = formencode.validators.URL()
+
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
-    upload = formencode.validators.FieldStorageUploadConverter()
+    upload_file = formencode.validators.FieldStorageUploadConverter()
 
 class ImporterSchema(formencode.Schema):
     allow_extra_fields = True
@@ -54,6 +71,11 @@ class ImporterSchema(formencode.Schema):
     #upload_to_ss = formencode.validators.String()
     #upload_to_google = formencode.validators.String()
     #introductory_paragraphs = formencode.validators.String()
+
+class ZipOrLatexSchema(formencode.Schema):
+    allow_extra_fields = True
+    upload_file = formencode.validators.FieldStorageUploadConverter()
+
 
 class Choose_Document_Source(BaseHelper):
 
@@ -70,7 +92,12 @@ class Choose_Document_Source(BaseHelper):
         templatePath = 'templates/choose.pt'
 
         form = Form(self.request, schema=UploadSchema)
+        neworexisting_form = Form(request, schema=ModuleEditorSchema)
+        wordprocessor_form = Form(request, schema=WordprocessorSchema)
+        googledocs_form = Form(request, schema=GoogleDocsSchema)
+        url_form = Form(request, schema=URLSchema)
         presentationform = Form(request, schema=ImporterSchema)
+        zip_or_latex_form = Form(request, schema=ZipOrLatexSchema)
         field_list = [('upload', 'File')]
 
         # clear the session
@@ -83,86 +110,58 @@ class Choose_Document_Source(BaseHelper):
         print form.all_errors()
         print presentationform.all_errors()
 
-        if form.validate():
-            print "NORMAL FORM"
-            try: # Catch-all exception block
-                message = 'The file was successfully converted.'
-
-                # Create a directory to do the conversions
-                temp_dir_name, save_dir = self.create_work_dir(self.request)
-
-                # Keep the info we need for next uploads.  Note that this
-                # might kill the ability to do multiple tabs in parallel,
-                # unless it gets offloaded onto the form again.
-                self.request.session['upload_dir'] = temp_dir_name
-                self.source = 'undefined'
-                if form.data.get('newmodule'):
-                    self.set_source('newemptymodule')
-                    # save empty cnxml and html files
-                    cnxml = self.empty_cnxml()
-                    files = []
-                    save_cnxml(save_dir, cnxml, files)
-                
-                elif form.data.get('existingmodule'):
-                    self.set_source('existingmodule')
-                    return HTTPFound(
-                        location=self.request.route_url('choose-module'))
-
-                elif form.data['upload'] is not None:
-                    self.set_source('fileupload')
-                    self.request.session['filename'] = form.data['upload'].filename
-                    self.process_document_data(form, self.request, save_dir)
-
-                # Google Docs Conversion
-                # if we have a Google Docs ID and Access token.
-                elif form.data.get('gdocs_resource_id'):
-                    self.set_source('gdocupload')
-                    self.process_gdoc_data(form, self.request, save_dir)
-
-                # HTML URL Import:
-                elif form.data.get('url_text'):
-                    self.set_source('urlupload')
-                    errors = self.process_url_data(form, self.request, save_dir)
-                    if errors:
-                        self.request['errors'] = errors
-                        response = {'form': FormRenderer(form),
-                                    'view': self, }
-                        return render_to_response(
-                            templatePath, response, request=self.request)
-
-                # Office, CNXML-ZIP or LaTeX-ZIP file
-                else:
-                    self.set_source('cnxinputs')
-                    self.process_document_data(form, self.request, save_dir)
-
-            except ConversionError as e:
-                return render_conversionerror(self.request, e.msg)
-
-            except Exception:
-                tb = traceback.format_exc()
-                self.write_traceback_to_zipfile(
-                    tb, self.request, temp_dir_name, form)
-
-                templatePath = 'templates/error.pt'
-                response = {'traceback': tb}
-                if('title' in self.request.session):
-                    del self.request.session['title']
-                return render_to_response(templatePath, response, request=self.request)
-
-            self.request.session.flash(message)
-            return HTTPFound(location=self.request.route_url('preview'))
-        
+        if neworexisting_form.validate():
+            return self._process_neworexisting_submit(request, neworexisting_form)
+        elif wordprocessor_form.validate():
+            self._process_wordprocessor_submit()
+        elif googledocs_form.validate():
+            self._process_googledocs_submit()
+        elif url_form.validate():
+            self._process_url_submit()
         elif presentationform.validate():
-            self.process_presentation_data(request, presentationform, session)
+            self._process_presentationform_submit()
+        elif zip_or_latex_form.validate():
+            self._process_zip_or_latex_form()
 
         # First view or errors
         response = {
             'form': FormRenderer(form),
+            'neworexisting_form': FormRenderer(neworexisting_form),
+            'wordprocessor_form': FormRenderer(wordprocessor_form),
+            'googledocs_form': FormRenderer(googledocs_form),
+            'url_form': FormRenderer(url_form),
             'presentationform': FormRenderer(presentationform),
             'field_list': field_list,
             'view': self,
         }
         return render_to_response(templatePath, response, request=self.request)
+
+    def getNextUrl(self):
+        return ''
+
+    def _process_neworexisting_submit(self, request, form):
+        print 'process new or existing submit'
+        processor = NewOrExistingModuleProcessor(request, form)
+        return processor.process()
+        result = ''
+        if result:
+            nextUrl = self.getNextUrl()
+
+
+    def _process_wordprocessor_submit(self):
+        print 'process wordprocessor submit'
+    
+    def _process_googledocs_submit(self):
+        print 'process google doc submit'
+    
+    def _process_url_submit(self):
+        print 'process URL submit'
+
+    def _process_presentationform_submit(self):
+        print 'process presentation submit'
+    
+    def _process_zip_or_latex_form(self):
+        print 'process zip or latex submit'
 
     def process_gdoc_data(self, form, request, save_dir):
         gdocs_resource_id = form.data['gdocs_resource_id']
@@ -207,17 +206,6 @@ class Choose_Document_Source(BaseHelper):
         # do multiple tabs in parallel, unless it gets offloaded
         # onto the form again.
         return (gd_entry.title.text, "Google Document")
-
-    def create_work_dir(self, request):
-        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        # TODO: This has a good chance of being unique, but even so...
-        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
-        save_dir = os.path.join(
-            request.registry.settings['transform_dir'],
-            temp_dir_name
-            )
-        os.mkdir(save_dir)
-        return temp_dir_name, save_dir
 
     def process_url_data(self, form, request, save_dir):
         url = form.data['url_text']
@@ -426,6 +414,60 @@ class Choose_Document_Source(BaseHelper):
                           username,
                           username)
 
+class BaseFormProcessor(object):
+    def __init__(self, request, form):
+        self.request = request
+        self.form = form
+        self.message = 'The file was successfully converted.'
+        self.source = 'undefined'
+        self.temp_dir_name, self.save_dir = self.create_work_dir(self.request)
+        self.upload_dir = self.temp_dir_name
+        self.request.session['upload_dir'] = self.temp_dir_name
+
+    def create_work_dir(self, request):
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        # TODO: This has a good chance of being unique, but even so...
+        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        save_dir = os.path.join(
+            request.registry.settings['transform_dir'],
+            temp_dir_name
+            )
+        os.mkdir(save_dir)
+        return temp_dir_name, save_dir
+
+    def write_traceback_to_zipfile(self, traceback):
+        # Record traceback
+
+        # Get software version from git
+        commit_hash = self.get_commit_hash()
+        
+        # get the path to the error zip file
+        zip_filename = os.path.join(
+            self.request.registry.settings['errors_dir'],
+            self.temp_dir_name + '.zip'
+        )
+
+        # Zip up error report, form data, uploaded file (if any)  and
+        # temporary transform directory
+        zip_archive = zipfile.ZipFile(zip_filename, 'w')
+        info = self.format_info(traceback, commit_hash, self.request, self.form)
+        zip_archive.writestr("info.txt", info)
+
+        basePath = self.request.registry.settings['transform_dir']
+        add_directory_to_zip(self.temp_dir_name,
+                             zip_archive,
+                             basePath=basePath)
+
+    def get_commit_hash(self):
+        try:
+            p = subprocess.Popen(["git","log","-1"], stdout=subprocess.PIPE)
+            out, err = p.communicate()
+            commit_hash = out[:out.find('\n')]
+        except OSError:
+            commit_hash = 'None'
+
+        return commit_hash
+
     def format_info(self, traceback, commit_hash, request, form):
         def format_form_data(key, form):
             return key + ': ' + str(form.data.get(key))
@@ -456,42 +498,121 @@ class Choose_Document_Source(BaseHelper):
             """ + form_data
         return info
 
-    def get_commit_hash(self):
+    def set_source(self, source):
+        self.request.session['source'] = source
+
+    def get_source(self):
+        return self.request.session.get('source', 'undefined')
+
+class NewOrExistingModuleProcessor(BaseFormProcessor):
+    def process(self):
         try:
-            p = subprocess.Popen(["git","log","-1"], stdout=subprocess.PIPE)
-            out, err = p.communicate()
-            commit_hash = out[:out.find('\n')]
-        except OSError:
-            commit_hash = 'None'
+            if self.form.data.get('newmodule'):
+                self.set_source('newemptymodule')
+                # save empty cnxml and html files
+                cnxml = self.empty_cnxml()
+                files = []
+                save_cnxml(self.save_dir, cnxml, files)
+            
+            elif self.form.data.get('existingmodule'):
+                self.set_source('existingmodule')
+                return HTTPFound(
+                    location=self.request.route_url('choose-module'))
 
-        return commit_hash
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
 
-    def write_traceback_to_zipfile(self, traceback, request, temp_dir_name, form):
-        # Record traceback
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
 
-        # Get software version from git
-        commit_hash = self.get_commit_hash()
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url('preview'))
         
-        # get the path to the error zip file
-        zip_filename = os.path.join(
-            request.registry.settings['errors_dir'],
-            temp_dir_name + '.zip'
-        )
-
-        # Zip up error report, form data, uploaded file (if any)  and
-        # temporary transform directory
-        zip_archive = zipfile.ZipFile(zip_filename, 'w')
-        info = self.format_info(traceback, commit_hash, request, form)
-        zip_archive.writestr("info.txt", info)
-
-        basePath = request.registry.settings['transform_dir']
-        add_directory_to_zip(temp_dir_name,
-                             zip_archive,
-                             basePath=basePath)
-
     def empty_cnxml(self):
         config = load_config(self.request)
         filepath = config['blank_cnxml_file'] 
         with open(filepath, 'rb') as cnxmlfile:
             content = cnxmlfile.read()
         return content
+
+
+"""
+        elif form.validate():
+            print "NORMAL FORM"
+            try: # Catch-all exception block
+                message = 'The file was successfully converted.'
+
+                # Create a directory to do the conversions
+                temp_dir_name, save_dir = self.create_work_dir(self.request)
+
+                # Keep the info we need for next uploads.  Note that this
+                # might kill the ability to do multiple tabs in parallel,
+                # unless it gets offloaded onto the form again.
+                self.request.session['upload_dir'] = temp_dir_name
+                self.source = 'undefined'
+                if form.data.get('newmodule'):
+                    self.set_source('newemptymodule')
+                    # save empty cnxml and html files
+                    cnxml = self.empty_cnxml()
+                    files = []
+                    save_cnxml(save_dir, cnxml, files)
+                
+                elif form.data.get('existingmodule'):
+                    self.set_source('existingmodule')
+                    return HTTPFound(
+                        location=self.request.route_url('choose-module'))
+
+                elif form.data['upload'] is not None:
+                    self.set_source('fileupload')
+                    self.request.session['filename'] = form.data['upload'].filename
+                    self.process_document_data(form, self.request, save_dir)
+
+                # Google Docs Conversion
+                # if we have a Google Docs ID and Access token.
+                elif form.data.get('gdocs_resource_id'):
+                    self.set_source('gdocupload')
+                    self.process_gdoc_data(form, self.request, save_dir)
+
+                # HTML URL Import:
+                elif form.data.get('url_text'):
+                    self.set_source('urlupload')
+                    errors = self.process_url_data(form, self.request, save_dir)
+                    if errors:
+                        self.request['errors'] = errors
+                        response = {'form': FormRenderer(form),
+                                    'view': self, }
+                        return render_to_response(
+                            templatePath, response, request=self.request)
+
+                # Office, CNXML-ZIP or LaTeX-ZIP file
+                else:
+                    self.set_source('cnxinputs')
+                    self.process_document_data(form, self.request, save_dir)
+
+            except ConversionError as e:
+                return render_conversionerror(self.request, e.msg)
+
+            except Exception:
+                tb = traceback.format_exc()
+                self.write_traceback_to_zipfile(
+                    tb, self.request, temp_dir_name, form)
+
+                templatePath = 'templates/error.pt'
+                response = {'traceback': tb}
+                if('title' in self.request.session):
+                    del self.request.session['title']
+                return render_to_response(templatePath, response, request=self.request)
+
+            self.request.session.flash(message)
+            return HTTPFound(location=self.request.route_url('preview'))
+        
+        elif presentationform.validate():
+            self.process_presentation_data(request, presentationform, session)
+"""
+

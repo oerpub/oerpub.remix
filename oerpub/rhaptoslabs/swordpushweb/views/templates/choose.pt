@@ -47,9 +47,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                 Choose one of the following to import the contents of a new or existing module.
               </p>
 
-            ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
-            ${form.csrf_token()}
-
             <table style="width: 100%; border-collapse: collapse; border-width: 0;">
               <tbody>
                 <tr>
@@ -58,6 +55,12 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                     <h3>Importer tools</h3>
 
                     <ul class="create-new-list">
+
+                    ${neworexisting_form.begin(request.route_url('choose'),
+                                               multipart='multipart',
+                                               id='neworexisting_form')}
+                    ${neworexisting_form.csrf_token()}
+
                         <li id="editor">
                             <label>
                                 <span style="visibility: hidden; display: none;" class="or-bullet">or</span> 
@@ -75,11 +78,16 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     title="Choose an existing module and edit."> <br />
                             </div>
                         </li>
+                    ${neworexisting_form.end()}
+
                     </ul>
 
                     <div><strong>Or use one of our importer tools:</strong></div>
 
                     <ul class="create-new-list">
+
+                    ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
+                    ${form.csrf_token()}
 
                         <li id="doc-importer">
                             <!-- div style="margin: 0 0 1em -1.5em;">
@@ -105,6 +113,10 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 <input id="newmodule" name="newmodule" value="" type="hidden" />
                             </div>
                         </li>
+                    ${form.end()}
+
+                    ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
+                    ${form.csrf_token()}
 
                         <li id="gdoc-importer">
                             <label>
@@ -145,12 +157,10 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             </div>
                         
                           </li>
+                    ${form.end()}
 
                     </ul>
                      
-            ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
-            ${form.csrf_token()}
-
                       <div style="display: block;">
 
                         <br/>
@@ -158,7 +168,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                         
                         <ul class="create-new-list">
                           <li>
-                              ${form.end()}
                               ${presentationform.begin(request.route_url('choose'), multipart='multipart', id='presentationform')}
                               ${presentationform.csrf_token()}
                               
@@ -175,6 +184,9 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               </div>    
                               ${presentationform.end()}
                           </li>                          
+
+                    ${form.begin(request.route_url('choose'), multipart='multipart', id='uploadform')}
+                    ${form.csrf_token()}
                           <li id="latex-zip-importer">
                             <label>
                               <span style="visibility: hidden;" class="or-bullet">or</span>
@@ -190,6 +202,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
                             </div>
                           </li>
+                    ${form.end()}
+
                         </ul>
                       </div>
 
@@ -197,7 +211,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                 </tr>
               </tbody>
             </table>
-            ${form.end()}
 
               <div class="pleasewait" id="upload-wait" style="display: none;">
                 Your document is being processed. This may take a few moments.

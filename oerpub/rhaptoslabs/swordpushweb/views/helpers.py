@@ -75,4 +75,4 @@ class BaseHelper(object):
         self.request.session['source'] = source
 
     def get_source(self):
-        return self.request.session['source'] if 'source' in self.request.session else 'undefined'
+        return self.request.session.get('source', 'undefined')
