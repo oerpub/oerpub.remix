@@ -22,6 +22,8 @@ from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_html
 
 current_dir = os.path.dirname(__file__)
 ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
+LATEX_PACKAGING = 'http://purl.org/net/sword/package/Latex'
+UNKNOWN_PACKAGING = 'unknown'
 
 NAMESPACES = {'sword'   : 'http://purl.org/net/sword/',
               'dcterms' : 'http://purl.org/dc/terms/',
