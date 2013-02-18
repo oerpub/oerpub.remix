@@ -31,6 +31,7 @@ from helpers import BaseHelper
 from oerpub.rhaptoslabs.swordpushweb import convert as JOD
 #Imports script which checks to see if JOD is running
 from oerpub.rhaptoslabs.swordpushweb import jod_check
+from oerpub.rhaptoslabs.swordpushweb.interfaces import IWorkflowSteps
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     load_config,
     save_zip,
@@ -359,6 +360,12 @@ class BaseFormProcessor(object):
 
     def get_source(self):
         return self.request.session.get('source', 'undefined')
+    
+    def nextStep(self):
+        workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
+        wf_name = self.get_source()
+        current_step = 'choose'
+        return workflowsteps.getNextStep(wf_name, current_step)
 
 class NewOrExistingModuleProcessor(BaseFormProcessor):
     def __init__(self, request, form):
@@ -381,7 +388,8 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
 
         except ConversionError as e:
             return render_conversionerror(self.request, e.msg)
-
+        
+        # TODO: add a process decorator that has this bit of error handling
         except Exception:
             tb = traceback.format_exc()
             self.write_traceback_to_zipfile(tb)
@@ -392,7 +400,7 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url('preview'))
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
         
     def empty_cnxml(self):
         config = load_config(self.request)
@@ -442,7 +450,7 @@ class ZipOrLatexModuleProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url('preview'))
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
     
     def get_type(self):
         # Check if it is a ZIP file with at least index.cnxml or a LaTeX file in it
@@ -509,7 +517,7 @@ class ZipFileProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url('preview'))
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
 
 class LatexProcessor(BaseFormProcessor):
     def __init__(self, request, form):
@@ -541,7 +549,7 @@ class LatexProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url('preview'))
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
 
 class OfficeDocumentProcessor(BaseFormProcessor):
     def __init__(self, request, form):
@@ -589,7 +597,7 @@ class OfficeDocumentProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url('preview'))
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
     
     def _convert_to_odt(self,filename):
         converter = JOD.DocumentConverterClient()
@@ -649,7 +657,7 @@ class GoogleDocProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url('preview'))
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
     
     def process_gdocs_resource(self, save_dir, gdocs_resource_id, gdocs_access_token=None):
 
