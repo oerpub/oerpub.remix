@@ -19,10 +19,11 @@ class Provider(object):
 class WorkflowStepsUtility(object):
     implements(IWorkflowSteps)
 
-    workflows = {'new_module'               : ['', '', ''],
-                 'edit_existing_module'     : [],
-                 'import_new_module'        : [],
-                 'overwrite_existing_module': []}
+    workflows = {'newemptymodule' : ['choose', 'preview', 'metadata'],
+                 'existingmodule' : ['choose', 'preview', 'metadata'],
+                 'cnxinputs'      : ['choose', 'preview', 'metadata'],
+                 'gdocupload'     : ['choose', 'preview', 'metadata'],
+                 'fileupload'     : ['choose', 'preview', 'metadata']}
    
     def getWorkflowSteps(self, workflow):
         steps = self.workflows.get(workflow)
@@ -30,10 +31,8 @@ class WorkflowStepsUtility(object):
             raise NotFound('Workflow %s could not be found.' % workflow)
         return steps
 
-    def _getCurrentIdx(self, workflow, step):
-        current_idx = steps.index(current_step)
-        if not current_idx:
-            raise NotFound('Missing workflow step %d.' % current_step)
+    def _getCurrentIdx(self, steps, step):
+        current_idx = steps.index(step)
         return current_idx
     
     def getNextStep(self, workflow, current_step):
@@ -42,7 +41,7 @@ class WorkflowStepsUtility(object):
         step +1. That way we don't try to go beyond the end of the steps.
         """
         steps = self.getWorkflowSteps(workflow)
-        current_idx = self._getCurrentIdx(workflow,current_step) 
+        current_idx = self._getCurrentIdx(steps, current_step) 
         next_idx = min(current_idx+1, len(steps)+1)
         return steps[next_idx]
 
@@ -52,6 +51,6 @@ class WorkflowStepsUtility(object):
         step -1. That way we don't try to go beyond the beginning of the steps.
         """
         steps = self.getWorkflowSteps(workflow)
-        current_idx = self._getCurrentIdx(workflow,current_step) 
+        current_idx = self._getCurrentIdx(workflow, current_step) 
         next_idx = max(current_idx-1, 0)
         return steps[next_idx]
