@@ -1,5 +1,6 @@
 from zope.interface import implements
 from pyramid.view import render_view
+from pyramid.exceptions import NotFound
 
 from .interfaces import IWorkflowSteps
 
@@ -18,12 +19,20 @@ class Provider(object):
 
 class WorkflowStepsUtility(object):
     implements(IWorkflowSteps)
+    
+    DEFAULT_WORKFLOW = ['choose', 'preview', 'metadata', 'summary']
 
-    workflows = {'newemptymodule' : ['choose', 'preview', 'metadata'],
-                 'existingmodule' : ['choose', 'preview', 'metadata'],
-                 'cnxinputs'      : ['choose', 'preview', 'metadata'],
-                 'gdocupload'     : ['choose', 'preview', 'metadata'],
-                 'fileupload'     : ['choose', 'preview', 'metadata']}
+    workflows = {'newemptymodule' : DEFAULT_WORKFLOW,
+                 'existingmodule' : DEFAULT_WORKFLOW,
+                 'cnxinputs'      : DEFAULT_WORKFLOW,
+                 'gdocupload'     : DEFAULT_WORKFLOW,
+                 'fileupload'     : DEFAULT_WORKFLOW}
+    
+    def setWorkflowSteps(self, wf_name, steps):
+        wf = self.workflows.get(wf_name)
+        if not wf:
+            raise NotFound('Workflow %s could not be found.' % wf_name)
+        self.workflows[wf_name] = steps
    
     def getWorkflowSteps(self, workflow):
         steps = self.workflows.get(workflow)
@@ -51,6 +60,6 @@ class WorkflowStepsUtility(object):
         step -1. That way we don't try to go beyond the beginning of the steps.
         """
         steps = self.getWorkflowSteps(workflow)
-        current_idx = self._getCurrentIdx(workflow, current_step) 
+        current_idx = self._getCurrentIdx(steps, current_step) 
         next_idx = max(current_idx-1, 0)
         return steps[next_idx]
