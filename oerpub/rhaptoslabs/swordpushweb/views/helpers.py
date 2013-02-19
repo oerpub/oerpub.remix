@@ -1,7 +1,7 @@
 from pyramid.renderers import get_renderer
 from pyramid.decorator import reify
 
-
+from oerpub.rhaptoslabs.swordpushweb.interfaces import IWorkflowSteps
 from utils import check_login as utils_check_login
 from utils import get_connection as utils_get_connection
 
@@ -57,12 +57,16 @@ class BaseHelper(object):
         return self.macro_renderer.implementation().macros['forward_navigation_warning']
 
     def get_next_action(self):
-        url = self.request.route_url(self.navigation_actions['next'])
-        return url
+        workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
+        wf_name = self.get_source()
+        current_step = self.request.matched_route.name
+        return workflowsteps.getNextStep(wf_name, current_step)
 
     def get_previous_action(self):
-        url = self.request.route_url(self.navigation_actions['previous'])
-        return url
+        workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
+        wf_name = self.get_source()
+        current_step = self.request.matched_route.name
+        return workflowsteps.getPreviousStep(wf_name, current_step)
     
     def get_batch_link(self, b_start, selected_workspace):
         params = {"b_start": b_start,

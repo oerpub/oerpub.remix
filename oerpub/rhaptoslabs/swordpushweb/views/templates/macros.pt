@@ -297,7 +297,7 @@
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
         <button id="btn-navigate-back" class="btn btn-primary"
-            tal:attributes="href string:${request.route_url('choose')}">OK</button>
+            tal:attributes="href string:${request.route_url(view.get_previous_action())}">OK</button>
     </div>
 </div>
 </metal:back_navigation_warning>
