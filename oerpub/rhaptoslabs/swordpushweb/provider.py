@@ -21,11 +21,13 @@ class WorkflowStepsUtility(object):
     implements(IWorkflowSteps)
     
     DEFAULT_WORKFLOW = ['choose', 'preview', 'metadata', 'summary']
+    EXISTING_MODULE_WORKFLOW = ['choose', 'choose-module', 'preview', 'metadata', 'summary']
 
     workflows = {'newemptymodule' : DEFAULT_WORKFLOW,
-                 'existingmodule' : DEFAULT_WORKFLOW,
+                 'existingmodule' : EXISTING_MODULE_WORKFLOW,
                  'cnxinputs'      : DEFAULT_WORKFLOW,
                  'gdocupload'     : DEFAULT_WORKFLOW,
+                 'presentation'   : DEFAULT_WORKFLOW,
                  'fileupload'     : DEFAULT_WORKFLOW}
     
     def setWorkflowSteps(self, wf_name, steps):
