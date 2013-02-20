@@ -221,57 +221,6 @@ class Choose_Document_Source(BaseHelper):
                                           response,
                                           request=request)
 
-    def process_presentation_data(self, request, form, session):
-        print "Inside presentation form"
-        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        cnxml_now_string = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
-        save_dir = os.path.join(
-            request.registry.settings['slideshare_import_dir'],
-            temp_dir_name
-        )
-        os.mkdir(save_dir)
-        uploaded_filename = form.data['importer'].filename.replace(os.sep, '_')
-        original_filename = os.path.join(save_dir, uploaded_filename)
-        saved_file = open(original_filename, 'wb')
-        input_file = form.data['importer'].file
-        shutil.copyfileobj(input_file, saved_file)
-        saved_file.close()
-        input_file.close()
-        username = session['username']
-
-        zipped_filepath = os.path.join(save_dir,"cnxupload.zip")
-        print "Ziiped filepath",zipped_filepath
-        session['userfilepath'] = zipped_filepath
-        zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
-        zip_archive.write(original_filename,uploaded_filename)
-        zip_archive.close()
-        session['uploaded_filename'] = uploaded_filename
-        session['original_filename'] = original_filename
-        print "Original filename ",original_filename
-        username = session['username']
-        #slideshare_details = get_details(slideshow_id)
-        #slideshare_download_url = get_slideshow_download_url(slideshare_details)
-        #session['transcript'] = get_transcript(slideshare_details)
-        session['title'] = uploaded_filename.split(".")[0]
-        metadata = {}
-        metadata['dcterms:title'] = uploaded_filename.split(".")[0]
-        cnxml = self.slide_importer_cnxml(cnxml_now_string, username)
-        print cnxml
-        session['cnxml'] = cnxml
-        return HTTPFound(location=request.route_url('importer'))
-
-    def slide_importer_cnxml(self, now_string, username):
-        config = load_config(self.request)
-        filepath = config['slide_importer_cnxml_file'] 
-        with open(filepath, 'rb') as cnxmlfile:
-            content = cnxmlfile.read()
-        return content % (now_string,
-                          username,
-                          username,
-                          username,
-                          username)
-
 class BaseFormProcessor(object):
     def __init__(self, request, form):
         self.request = request
@@ -718,18 +667,53 @@ class PresentationProcessor(BaseFormProcessor):
         self.original_filename = os.path.join(self.save_dir, ufname)
         self.request.session['filename'] = self.form.data['upload_file'].filename
 
-        # Save the original file so that we can convert, plus keep it.
+        self.username = self.request.session['username']
+        self.uploaded_filename = \
+            self.form.data['importer'].filename.replace(os.sep, '_')
+        self.original_filename = \
+            os.path.join(self.save_dir, self.uploaded_filename)
+    
+    def create_work_dir(self, request):
+        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        temp_dir_name = '%s-%s' % (self.username, now_string)
+        save_dir = os.path.join(
+            request.registry.settings['slideshare_import_dir'],
+            temp_dir_name
+        )
+        os.mkdir(save_dir)
+        return temp_dir_name, save_dir
+    
+    def save_original_file(self):
         saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['upload_file'].file
+        input_file = self.form.data['importer'].file
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
         input_file.close()
 
-        self.username = session['username']
-
     def process(self):
         try:
-            import pdb;pdb.set_trace()
+            print "Inside presentation form"
+            zipped_filepath = os.path.join(self.save_dir,"cnxupload.zip")
+            print "Zipped filepath",zipped_filepath
+            self.session['userfilepath'] = zipped_filepath
+            zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
+            zip_archive.write(self.original_filename, self.uploaded_filename)
+            zip_archive.close()
+            self.session['uploaded_filename'] = self.uploaded_filename
+            self.session['original_filename'] = self.original_filename
+            print "Original filename ", self.original_filename
+            self.session['title'] = self.uploaded_filename.split(".")[0]
+            metadata = {}
+            metadata['dcterms:title'] = self.uploaded_filename.split(".")[0]
+            cnxml_now_string = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+            cnxml = self.slide_importer_cnxml(cnxml_now_string, self.username)
+            self.request.session['cnxml'] = cnxml
+
+            # do a little metadata cleanup before we go to the metadata view
+            for key in metadata.keys():
+                if metadata[key] == '':
+                    del metadata[key]
+            self.request.session['metadata'] = metadata
 
         except ConversionError as e:
             return render_conversionerror(self.request, e.msg)
@@ -745,3 +729,14 @@ class PresentationProcessor(BaseFormProcessor):
 
         self.request.session.flash(self.message)
         return HTTPFound(location=self.request.route_url(self.nextStep()))
+
+    def slide_importer_cnxml(self, now_string, username):
+        config = load_config(self.request)
+        filepath = config['slide_importer_cnxml_file'] 
+        with open(filepath, 'rb') as cnxmlfile:
+            content = cnxmlfile.read()
+        return content % (now_string,
+                          username,
+                          username,
+                          username,
+                          username)
