@@ -1,12 +1,13 @@
 import os
 import re
+import time
 import shutil
 import zipfile
 import urllib2
 import datetime
 import traceback
 import formencode
-import subprocess
+import shlex, subprocess
 
 from lxml import etree
 
@@ -73,7 +74,7 @@ class UploadSchema(formencode.Schema):
     allow_extra_fields = True
     upload_file = formencode.validators.FieldStorageUploadConverter()
 
-class ImporterSchema(formencode.Schema):
+class PresentationSchema(formencode.Schema):
     allow_extra_fields = True
     importer = formencode.validators.FieldStorageUploadConverter()
     #upload_to_ss = formencode.validators.String()
@@ -103,7 +104,7 @@ class Choose_Document_Source(BaseHelper):
         officedocument_form = Form(request, schema=OfficeDocumentUploadSchema)
         googledocs_form = Form(request, schema=GoogleDocsSchema)
         url_form = Form(request, schema=URLSchema)
-        presentationform = Form(request, schema=ImporterSchema)
+        presentationform = Form(request, schema=PresentationSchema)
         zip_or_latex_form = Form(request, schema=ZipOrLatexSchema)
 
         # clear the session
@@ -163,7 +164,7 @@ class Choose_Document_Source(BaseHelper):
 
     def _process_presentationform_submit(self, request, form):
         print 'process presentation submit'
-        processor = BaseFormProcessor(request, form)
+        processor = PresentationProcessor(request, form)
         return processor.process()
     
     def _process_zip_or_latex_form(self, request, form):
@@ -280,6 +281,14 @@ class BaseFormProcessor(object):
         self.temp_dir_name, self.save_dir = self.create_work_dir(self.request)
         self.upload_dir = self.temp_dir_name
         self.request.session['upload_dir'] = self.temp_dir_name
+
+    def save_original_file(self):
+        # Save the original file so that we can convert, plus keep it.
+        saved_file = open(self.original_filename, 'wb')
+        input_file = self.form.data['upload_file'].file
+        shutil.copyfileobj(input_file, saved_file)
+        saved_file.close()
+        input_file.close()
 
     def create_work_dir(self, request):
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -558,13 +567,7 @@ class OfficeDocumentProcessor(BaseFormProcessor):
         ufname = self.form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
         self.request.session['filename'] = self.form.data['upload_file'].filename
-
-        # Save the original file so that we can convert, plus keep it.
-        saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['upload_file'].file
-        shutil.copyfileobj(input_file, saved_file)
-        saved_file.close()
-        input_file.close()
+        self.save_original_file()
 
     def process(self):
         try:
@@ -611,10 +614,27 @@ class OfficeDocumentProcessor(BaseFormProcessor):
                 print e
                 raise ConversionError(e)
         else:
+            escaped_ofn = escape_system(self.original_filename)[1:-1]
             odt_filename= '%s.odt' % filename
-            command = '/usr/bin/soffice -headless -nologo -nofirststartwizard "macro:///Standard.Module1.SaveAsOOO(' + escape_system(self.original_filename)[1:-1] + ',' + odt_filename + ')"'
-            os.system(command)
+            macro = 'macro:///Standard.Module1.SaveAsOOO(%s,%s)' % (escaped_ofn, odt_filename)
+            command = '%s %s %s %s %s' % ('/usr/bin/soffice',
+                                          '--headless',
+                                          '--nologo',
+                                          '--nofirststartwizard',
+                                          macro)
+            command = shlex.split(command.encode('utf-8'))
+            process = subprocess.Popen(command,
+                                       stdin=subprocess.PIPE,
+                                       stdout=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+
         try:
+            # wait for the file to exist
+            count = 0
+            while not os.path.isfile(odt_filename) and count < 10:
+                count += 1
+                print 'Waiting for file, retry count:%s' % count
+                time.sleep(1) 
             fp = open(odt_filename, 'r')
             fp.close()
         except IOError as io:
@@ -690,3 +710,38 @@ class GoogleDocProcessor(BaseFormProcessor):
         # onto the form again.
         return (gd_entry.title.text, "Google Document")
 
+class PresentationProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(PresentationProcessor, self).__init__(request, form)
+        self.set_source('presentation')
+        ufname = form.data['importer'].filename.replace(os.sep, '_')
+        self.original_filename = os.path.join(self.save_dir, ufname)
+        self.request.session['filename'] = self.form.data['upload_file'].filename
+
+        # Save the original file so that we can convert, plus keep it.
+        saved_file = open(self.original_filename, 'wb')
+        input_file = self.form.data['upload_file'].file
+        shutil.copyfileobj(input_file, saved_file)
+        saved_file.close()
+        input_file.close()
+
+        self.username = session['username']
+
+    def process(self):
+        try:
+            import pdb;pdb.set_trace()
+
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
