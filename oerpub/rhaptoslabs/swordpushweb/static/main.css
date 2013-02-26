@@ -1,3 +1,4 @@
+
 body{
   font-size: .8em;
   font-family: Verdana, DejaVu Sans, Tahoma;
@@ -48,6 +49,15 @@ span .button{
 
 #header-wrap a, #header-wrap{
   color: white;
+}
+
+.toolbar .dropdown-menu a {
+    color: #333333 !important;
+}
+
+.toolbar .dropdown-menu .disabled a, 
+.toolbar .dropdown-menu .disabled a:hover {
+    color: #999999 !important;
 }
 
 #header-container{
@@ -587,6 +597,11 @@ body.preview {
     background: url(images/preview-bg-03.png);
 }
 
+div.preview-block {
+    height: 100%;
+    border: 1px dotted #bbb;
+}
+
 .hidden {
     width:0;
     height:0;
@@ -901,4 +916,18 @@ ul.popOut a:hover{
 
 .selected-row {
     background-color: #FFDD66 !important;
+}
+
+#upload-wait {
+    z-index: 9999;
+}
+
+.create-new-list .highlight-buttons {
+  padding: .4em .7em .5em;
+  border: 5px solid #ff0;
+  background-color: #fff;
+  float: left;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  
 }

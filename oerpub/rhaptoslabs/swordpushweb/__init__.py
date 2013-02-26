@@ -23,16 +23,22 @@ def add_routes(config):
     config.add_route('cnxlogin', '/cnxlogin')
     config.add_route('choose', '/choose')
     config.add_route('preview', '/preview')
-    config.add_route('preview_header', '/preview_header')
-    config.add_route('preview_body', '/preview_body')
+    config.add_route('preview_save', '/preview_save')
     config.add_route('cnxml', '/cnxml')
     config.add_route('metadata', '/metadata')
     config.add_route('summary', '/summary')
     config.add_route('logout', '/logout')
+    config.add_route('importer', '/importer')
+    config.add_route('google_oauth', '/google_oauth')
     config.add_route('module_association', '/module_association')
     config.add_route('modules_list', '/modules_list')
+    config.add_route('download_zip', '/download_zip')
+    config.add_route('oauth2callback', '/oauth2callback')
     config.add_route('choose-module', '/choose-module')
-    
+    config.add_route('upload_dnd', '/upload_dnd')
+    config.add_route('updatecnx', '/updatecnx')
+    config.add_route('enhance', '/enhance')
+
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
     config.add_route('catchall_static', '/preview_css/*subpath', 'oerpub.rhaptoslabs.swordpushweb.static.static_view')
@@ -56,4 +62,7 @@ def add_static_resources(config):
 
     config.add_subscriber(
         '.subscribers.add_base_template',
+        'pyramid.events.BeforeRender')
+    config.add_subscriber(
+        '.subscribers.add_provider',
         'pyramid.events.BeforeRender')

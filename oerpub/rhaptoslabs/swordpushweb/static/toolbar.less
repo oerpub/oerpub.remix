@@ -1,0 +1,213 @@
+/* Remove the annoying WAI button in tables */
+.aloha-table-wrapper div.aloha-wai-red { background-image: none !important; }
+
+/* Hide the annoying floating toolbar */
+.aloha-toolbar { display: none !important; }
+
+/* Add some padding on the top so the toolbar has room to float in */
+.document { margin: 4em; }
+
+/* Needs to occur AFTER the bootstrap.css */
+/* Allows the popover to grow in size */
+.popover {
+  width: auto;
+}
+
+/* We don't use the title in popovers so hide it... */
+.popover .popover-title { display: none; }
+
+figure {
+  counter-increment: figure;
+  /* Set inline-block so the figure popover shows up directly under instead of 1/2-way in the page */
+  display: inline-block;
+}
+figure figcaption::before { content: "Figure " counter(figure) " "; font-weight: bold; }
+
+.aloha-image-upload-drop-box {
+  text-align: center;
+  border: 1px dashed #ccc;
+  width: 400px;
+  padding: 100px 0;
+  cursor: pointer;
+}
+
+/* Metadata fields that occur around the image */
+.aloha-image-attrib .aloha-image-attr-alt::before {
+  content: "Please provide a description of this image for the visually impaired";
+  color: #ccc;
+  display: block;
+}
+/* Just some formatting of the input boxes */
+.aloha-image-attrib input { display: block; }
+.aloha-image-attrib .aloha-image-attr-alt {
+  width: 400px;
+  display: block;
+}
+
+/* Toolbar icons */
+.toolbar {
+    background-color: whiteSmoke;
+    opacity: 0.95;
+    
+    position: fixed;
+    top: 104px;
+    
+    width: 100%;
+    padding-left: 1em;
+    box-shadow: 0 2px 3px 0 #CCC;
+    z-index: 1010;
+    [class^="icon-"] {
+        margin: 0;
+        height: 33px;
+        width: 33px;
+        background-image: url("images/toolbar.png");
+    }
+    .btn {
+        padding: 0;
+        background-image: none;
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+    }
+    .btn-toolbar {
+        margin: 3px 0;
+    }
+    .btn-group > .btn + .dropdown-toggle {
+        height: 37px;
+        width: 20px;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+    }
+    .icon-undo {
+        background-position: -518px 0;
+    }
+    .icon-redo {
+        background-position: -288px 0;
+    }
+    .icon-bold {
+        background-position: -56px 0;
+    }
+    .icon-italic {
+        background-position: -155px 0;
+    }
+    .icon-superscript {
+        background-position: -419px 0;
+    }           
+    .icon-subscript {
+        background-position: -386px 0;
+    }           
+    .icon-underline {
+        background-position: -485px 0;
+    }
+    .icon-image-insert {
+        background-position: -122px 0;
+    }
+    .icon-link-insert {
+        background-position: -188px 0;
+    }
+    .icon-unordered-list {
+        background-position: -584px 0;
+    }
+    .icon-ordered-list {
+        background-position: -254px 0;
+    }
+    .icon-indent-list {
+        background-position: -650px 0;
+    }
+    .icon-outdent-list {
+        background-position: -683px 0;
+    }
+    .icon-table-insert {
+        background-position: -452px 0;
+    }
+    .icon-math-insert {
+        background-position: -221px 0;
+    }
+    .btn.heading {
+        width: 9em;
+        height: 24px;
+        border: 1px solid #999999;
+        text-align: left;
+        padding: 0 0.5em;
+        .caret {
+            position: absolute;
+            right: 0.5em;
+        }
+        .currentHeading {
+            text-align: left;
+        }
+    }
+    .btn.save {
+        height: 24px;
+        width: 4em;
+        border: 1px solid #999999;
+    }
+    .dropdown-menu a {
+        padding: 3px 0.5em;
+    }
+}
+
+.toolbar .btn-group > .btn:hover,
+.toolbar .btn-group > .btn:focus,
+.toolbar .btn-group > .btn:active,
+.toolbar .btn-group > .btn.active {
+    .icon-undo {
+        background-position: -518px -66px;
+    }
+    .icon-redo {
+        background-position: -288px -66px;
+    }
+    .icon-bold {
+        background-position: -56px -66px;
+    }
+    .icon-italic {
+        background-position: -155px -66px;
+    }
+    .icon-superscript {
+        background-position: -419px -66px;
+    }           
+    .icon-subscript {
+        background-position: -386px -66px;
+    }           
+    .icon-underline {
+        background-position: -485px -66px;
+    }
+    .icon-image-insert {
+        background-position: -122px -66px;
+    }
+    .icon-link-insert {
+        background-position: -188px -66px;
+    }
+    .icon-unordered-list {
+        background-position: -584px -66px;
+    }
+    .icon-ordered-list {
+        background-position: -254px -66px;
+    }
+    .icon-indent-list {
+        background-position: -650px -66px;
+    }
+    .icon-outdent-list {
+        background-position: -683px -66px;
+    }
+    .icon-table-insert {
+        background-position: -452px -66px;
+    }
+    .icon-math-insert {
+        background-position: -221px -66px;
+    }
+}
+
+.separator {
+    background-image: url("images/toolbar.png");
+    background-position: -3px 0;
+    display: inline-block;
+    height: 33px;
+    letter-spacing: normal;
+    width: 20px;
+    word-spacing: normal;
+    vertical-align: middle;
+}

@@ -1,12 +1,77 @@
 <metal:use use-macro="base">
 
+    <metal:script fill-slot="script-slot">
+
+        <metal:m use-macro="editor.css" />
+        <link rel="stylesheet" type="text/css" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.css')}"> <!-- xhtml workaround --></link>
+
+        <metal:m use-macro="editor.javascript" />
+        <script type="text/javascript">
+            Aloha.ready(function(){
+                Aloha.require(['PubSub'], function(PubSub){
+                    $('#neworexisting').on('show', function(evt) {
+                        if(Aloha.getEditableById('canvas').isModified()){
+                            // show the info slider
+                            $('#upload-wait').center().slideDown('slow');
+                            $('#btn-newmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
+                            $('#btn-existingmodule').attr('disabled', 'disabled')
+                                .removeClass('btn-primary');
+                            PubSub.pub('swordpushweb.save');
+                        };
+                    });
+                    // Subscribe to the 'swordpushweb.save' event.
+                    // It is fired by the the AlohaEditor when someone clicks
+                    // the 'Save' button.
+                    // Disable the navigation buttons.
+                    PubSub.sub('swordpushweb.save', function(data) {
+                        $('#back-to-chooser').attr('disabled', 'disabled');
+                        $('#show-neworexisting').attr('disabled', 'disabled');
+                    });
+                    // subscribe to the 'swordpusweb.saved' event. It is fired
+                    // by the 'savePreview' function in the AlohaEditor.oerpub
+                    // index.html page.
+                    // Here we re-enable the navigation buttons.
+                    PubSub.sub('swordpushweb.saved', function(data) {
+                        var btn = $('#back-to-chooser');
+                        btn.removeAttr('disabled');
+
+                        var btn = $('#show-neworexisting');
+                        btn.removeAttr('disabled');
+
+                        var btn = $('#btn-newmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
+                        
+                        var btn = $('#btn-existingmodule');
+                        btn.removeAttr('disabled');
+                        btn.addClass('btn-primary');
+
+                        $('#upload-wait').slideUp('slow');
+                    });
+                });
+                $('#neworexisting').on('hidden', function() {
+                    $('#upload-wait').slideUp('slow');
+
+                    var btn = $('#btn-newmodule');
+                    $(btn).removeAttr('disabled');
+                    $(btn).addClass('btn-primary');
+                   
+                    var btn = $('#btn-exsitingmodule');
+                    $(btn).removeAttr('disabled');
+                    $(btn).addClass('btn-primary');
+                });
+            });
+        </script>
+    </metal:script>
+
     <metal:workflownav fill-slot="workflownav">
     ${form.begin(request.route_url('metadata'), name="preview_form")}
     ${form.csrf_token()}
     <div id="workflownav-wrap">
         <div id="workflownav-container">
             <div id="back-steps">
-                <input type="button" class="button"
+                <input type="button" class="btn"
                 value="&#171; Back: Return to start page"
                 id="back-to-chooser"
                 title="Return to the previous screen to choose a different import or editing option"
@@ -15,7 +80,10 @@
 
             <div id="forward-steps">
                 <input id="show-neworexisting"
-                class="button forward-button"
+                href="#neworexisting"
+                role="button"
+                class="btn button forward-button"
+                data-toggle="modal"
                 type="button"
                 value="Next Step &#187;"
                 url="${request.route_url('module_association')}"
@@ -24,92 +92,93 @@
 
         </div>
     </div>
+    ${form.end()}
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
         tal:define="filename python:request.session.get('filename')">
-    <div id="ie6-container-wrap">
-        <div id="container">
-            <div id="content">
-                <div id="pageheader-wrap">
+        <div id="ie6-container-wrap">
+            <div id="container">
+                <!-- ================= -->
+                <!--  Toolbar Buttons  -->
+                <!-- ================= -->
+                <metal:m use-macro="editor.toolbar" />
+                <div id="content">
+                    <div id="artboard">
+                        <div id="pageheader-wrap">
+                            <div id="module-actions">
+                                <div class="advanced" style="display: block;">
+                                    <h2 class="advanced-label">
+                                        Advanced
+                                    </h2>
+                                    <strong>Module actions: </strong>
+                                    <a id="download-copy"
+                                        title="Save a ZIP file containing the module's XML and metadata to your local computer."
+                                        href="#asdfaasdf"
+                                        tal:attributes="href request.route_url('download_zip')">
+                                        <span class="button">Download a copy</span>
+                                    </a>
+                                    <a id="edit-xml"
+                                        title="Make changes to the module by editing its XML code."
+                                        href="${request.route_url('cnxml')}">
+                                        <span class="button">Edit XML</span>
+                                    </a>
+                                </div>
+                            </div>
 
-                    <div id="module-actions">
-                        <div class="advanced" style="display: block;">
-                            <h2 class="advanced-label">
-                                Advanced
-                            </h2>
-                            <strong>Module actions: </strong>
-                            <a id="download-copy"
-                                title="Save a ZIP file containing the module's XML and metadata to your local computer."
-                                href="#asdfaasdf"
-                                tal:attributes="href '%s%s/upload.zip'%(request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'), request.session['upload_dir'])">
-                                <span class="button">Download a copy</span>
-                            </a>
-                            <a id="edit-xml"
-                                title="Make changes to the module by editing its XML code."
-                                href="${request.route_url('cnxml')}">
-                                <span class="button">Edit XML</span>
-                            </a>
+                            <div id="page-title">
+                                <h1>
+                                    Preview:
+                                    <span class="metatitle">
+                                        Conversion of <span tal:content="filename">Filename</span>
+                                    </span>
+                                </h1>
+                            </div>
+
                         </div>
-                    </div>                    
-
-                    <div id="page-title">
-                        <h1>
-                            Preview:
-                            <span class="metatitle">
-                                Conversion of <span>${filename}</span>
-                            </span>
-                        </h1>
+                        <metal:m use-macro="editor.editor" />
                     </div>
-
-                    <div id="page-description">
-                        <p class="forminfo">
-                            View below how the module will appear in Connexions.
-                        </p>
-                    </div>
-
                 </div>
-
-                <iframe class="preview fitted" id="preview-frame" src="#" preview_url="${body_url}" id="preview_frame"
-                    frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
-                </iframe>
-
             </div>
         </div>
-    </div>
-    ${form.end()}
 
-    <div id="neworexisting" style="display: none;">
-        <p>
-            <strong>Is this for a new module or will it override an existing one?</strong>
-        </p>
-        <div>
-            <span class="button submit-neworexisting" 
-                url="${request.route_url('metadata')}">New module</span>
+
+
+
+
+    <!-- Modal -->
+    <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
+        aria-labelledby="New or existing" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="neworexistingLabel">
+                Is this for a new module or will it override an existing one?
+            </h3>
+        </div>
+        <div class="modal-body">
             <div class="forminfo" style="margin: .5em 0 1em;">
-                <div>
-                    This is an entirely new module. 
-                </div>
+                <button id="btn-newmodule" class="btn btn-primary submit-neworexisting" 
+                    url="${request.route_url('metadata')}">
+                    New module
+                </button>
+                This is an entirely new module. 
             </div>
-            <div>
-                <span class="button submit-neworexisting" 
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <button id="btn-existingmodule" class="btn btn-primary submit-neworexisting" 
                     url="${request.route_url('module_association')}">
                     Override existing module
-                </span>
-                <div class="forminfo" style="margin: .5em 0 1em;">
-                    <div>
-                        Choose an existing module to apply your import to, replacing its contents.  
-                    </div>
-                </div>
-                <div class="headeraction" style="margin: 1.5em 0 0; text-align: center;">
-                    <div>
-                        <span class="button" id="cancel-neworexisting">Cancel</span>
-                    </div>
-                </div>
+                </button>
+                Choose an existing module to apply your import to, replacing its contents.  
             </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
         </div>
     </div>
 
+    <div class="pleasewait" id="upload-wait" style="display: none;">
+        Your document is being saved. This may take a few moments.
+    </div>
     </metal:content-slot>
 
     <metal:footer-slot fill-slot="footer-slot" />

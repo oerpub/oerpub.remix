@@ -15,8 +15,11 @@ requires = [
     'pyramid_beaker',
     'pycrypto==2.5',
     'Markdown',
+    'BeautifulSoup==3.2.1',
+    'MySQL-python==1.2.4',
     'peppercorn',
     'z3c.batching',
+
     ]
 
 tests_requires = requires.extend(

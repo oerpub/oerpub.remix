@@ -1,0 +1,29 @@
+#page-title {
+    display: none !important;
+}
+
+#content {
+    padding: 1em 1em;
+    background-color: #CCC;
+}
+
+#module-actions {
+    position: fixed;
+    right: 8px;
+    top: 128px;
+    z-index: 1011;
+}
+
+.toolbar {
+  top: 104px;
+}
+
+pre {
+	  padding: 2px 4px;
+	  background-color: #f7f7f9;
+ 	  border: 1px solid #e1e1e8;
+ 	  font-family: courier, courier new, monospace;
+	  font-size: 1.18em;
+      color: #060;
+      font-style: normal;
+}

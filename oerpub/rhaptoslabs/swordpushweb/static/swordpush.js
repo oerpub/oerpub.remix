@@ -129,7 +129,7 @@ $(document).ready(function()
 
     // A friendly message confirming that the upload is happening.
     // Max: added #url-submit and .forward-button (metadata page) too
-    $('#file-submit, #url-submit, #metadata .forward-button').click(function(e) {
+    $('#file-submit, #url-submit, #presentation-submit, #metadata .forward-button').click(function(e) {
         $('#upload-wait').center();
         $('#upload-wait').slideDown('slow');
     });
@@ -202,7 +202,7 @@ $(document).ready(function()
             return _doAction(confirmMsg4, e);
         } else if ($("iframe").length != 0 || $("#metadata").length != 0) {
             return _doAction(confirmMsg2, e);
-        } else if ($("textarea#cnxml").length != 0) {
+        } else if ($("div#canvas").length != 0) {
             return _doAction(confirmMsg3, e);
         } else {
             return true;
@@ -334,22 +334,46 @@ $(document).ready(function()
         event.preventDefault();
         $('input#upload').click();
     });
+    
+    $('input#presentation-submit').click(function(event){
+        event.preventDefault();
+        $('input#importer').click();
+    });
 
     $('input#upload').change(function(event){
         showWaitMessage();
         $('form#uploadform').submit(); 
     });
 
+    $('input#importer').change(function(event){
+        showWaitMessage();
+        $('form#presentationform').submit(); 
+    });
     $('input#url-submit').click(function(event){
         showWaitMessage();
     });
 
-    // Show the "New or existing module?" overlay.
-    $('#show-neworexisting').click(function(e) {
-        e.preventDefault();
-        $('#neworexisting').modal();
+    $('input#choose-importer').click(function(event){
+        if ($('#import-to-google').is(':checked')) {
+            $('input#upload-to-google').val("true");
+        
+        } 
+        if ($('#import-to-ss').is(':checked')) {
+            $('input#upload-to-ss').val("true");
+        }  
     });
 
+    // Show the "New or existing module?" overlay.
+    $('#show-neworexisting').click(function(e) {
+        if(!e.isDefaultPrevented()){
+            //$('#neworexisting').modal();
+        }
+        e.preventDefault();
+    });
+
+	$('#options-submit').click(function(e){
+		$('form#optionsform').submit(); 
+	});
     // Hide the "New or existing module?" overlay.
     $('#cancel-neworexisting').click(function(e) {
         e.preventDefault();
