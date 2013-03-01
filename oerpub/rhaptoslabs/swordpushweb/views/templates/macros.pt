@@ -359,3 +359,36 @@
     </div>
 </div>
 </metal:neworexisting_dialog>
+
+<metal:workflow-nav define-macro="workflow_nav">
+${form.begin(request.route_url(view.form_action), name=view.form_action)}
+${form.csrf_token()}
+<div id="workflownav-wrap">
+    <div id="workflownav-container">
+        <div id="back-steps">
+            <input id="btn-back" name="btn-back"
+                type="button"
+                value="&laquo; Back: Return to start page"
+                class="btn"
+                role="button"
+                tal:attributes="href view.get_previous_action()"
+                data-toggle="modal"
+                title="Return to the initial page" />
+        </div>
+
+        <input id="workspace" type="hidden" name="workspace" />
+        <input name="workflownav.form.submitted" type="hidden" value="submitted" />
+
+        <div id="forward-steps">
+            <input id="btn-forward" name="btn-forward" disabled="disabled"
+                type="submit"
+                value="Next: Edit selected module &raquo;" 
+                class="btn forward-button" 
+                role="button"
+                tal:attributes="href view.get_next_action()"
+                title="Select a module below and then click 'Next' to start editing it" />
+        </div>
+    </div>
+</div>
+${form.end()}
+</metal:workflow-nav>

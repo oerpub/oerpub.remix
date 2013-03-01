@@ -21,12 +21,6 @@ class ModuleAssociationSchema(formencode.Schema):
 
 class Module_Association_View(BaseHelper):
 
-    # NOTE: Your implementation class *must* define these actions if you want
-    # to reuse the navigation and batch macros.
-    navigation_actions = {'next': 'metadata', 
-                          'previous': 'preview',
-                          'batch': 'module_association'}
-
     @view_config(route_name='module_association',
                  renderer='templates/module_association.pt')
     def generate_html_view(self):

@@ -11,21 +11,6 @@
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-        <link rel="stylesheet"
-            href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css"
-            tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap.css" type="text/css">
-            <!-- xhtml workaround -->
-        </link>
-        <link rel="stylesheet"
-            href=""
-            tal:attributes="href string:${request.application_url}/bootstrap/docs/assets/css/bootstrap-responsive.css" type="text/css">
-            <!-- xhtml workaround -->
-        </link>
-        <link rel="stylesheet" type="text/css" 
-            href="${request.application_url}/aloha/oerpub/css/bootstrap.css"> 
-            <!-- xhtml workaround -->
-        </link>
-
         <div tal:omit-tag="" tal:condition="econtext.get('codemirror', False)">
           <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:codemirror/lib/codemirror.js')}"></script>
           <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cnxml.js')}"></script>
@@ -44,13 +29,6 @@
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/googlejsapi.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cookie.js')}"></script>
-
-        <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js">
-            <!-- xhtml workaround -->
-        </script>
-        <script src="${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> 
-            <!-- xhtml workaround -->
-        </script>
 
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
         <!--[if IE 6]>

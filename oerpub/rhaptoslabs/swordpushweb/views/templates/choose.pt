@@ -71,11 +71,10 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                             <div class="upload-form" style="width: 556px; ">
                                 <input class="btn" id="newmodule"
                                     name="newmodule" value="Create a new module »" type="submit"
-                                    title="This is an entirely new module."> <br/>
-                                <br/>
+                                    title="This is an entirely new module."> 
                                 <input class="btn" id="existingmodule"
                                     name="existingmodule" value="Edit an existing module »" type="submit"
-                                    title="Choose an existing module and edit."> <br />
+                                    title="Choose an existing module and edit.">
                                 <input type="hidden" id="neworexistingmodule"
                                     name="neworexistingmodule" value="neworexistingmodule">
                             </div>
@@ -238,28 +237,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
     </div>
 </div>
 
-  <div id="neworexisting" style="display: none;">
-    <div style="margin-top: .5em;">
-      <div>
-        <span class="button submit-neworexisting">New module</span>
-      </div>
-      <div class="forminfo">
-        Work on a brand new module, starting from scratch.
-      </div>
-    </div>
-    <div style="margin-top: 1em;">
-      <div>
-          <span class="button submit-neworexisting"
-              tal:attributes="url request.route_url('choose-module')">Existing module</span>
-      </div>
-      <div class="forminfo">
-        Choose an existing module to edit, whether or not it is already in your Personal Workspace.
-      </div>
-    </div>
-    <div style="text-align: center; margin: 1.5em 0 0;">
-      <span class="button" id="cancel-neworexisting">Cancel</span>
-    </div>
-  </div>
 <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
 </iframe>

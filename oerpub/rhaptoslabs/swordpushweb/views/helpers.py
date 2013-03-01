@@ -7,12 +7,6 @@ from utils import get_connection as utils_get_connection
 
 class BaseHelper(object):
     
-    # NOTE: Your implementation class *must* define these 2 actions or
-    # any macros that depend on them for creating navigation links will fail.
-    navigation_actions = {'next': None, 
-                          'previous': None,
-                          'batch': None}
-
     def __init__(self, request):
         """ Sets the following:
             request
@@ -39,6 +33,13 @@ class BaseHelper(object):
         """
         return utils_get_connection(self.session)
 
+    def navigate(self):
+        if self.request.get('workflownav.form.submitted', '') == 'submitted':
+            action = self.get_next_action()
+            if self.request.has_key('btn-back'):
+                action = self.get_previous_action()
+            self.request.response.redirect(action)    
+
     @reify
     def base(self):
         """ Base macro renderer.
@@ -55,6 +56,10 @@ class BaseHelper(object):
     @reify
     def forward_navigation_warning(self):
         return self.macro_renderer.implementation().macros['forward_navigation_warning']
+
+    @reify
+    def workflow_nav(self):
+        return self.macro_renderer.implementation().macros['workflow_nav']
 
     def get_next_action(self):
         workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
@@ -80,3 +85,7 @@ class BaseHelper(object):
 
     def get_source(self):
         return self.request.session.get('source', 'undefined')
+    
+    @reify
+    def form_action(self):
+        return self.request.matched_route.name

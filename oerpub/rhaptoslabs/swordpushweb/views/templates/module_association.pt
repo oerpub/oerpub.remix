@@ -20,38 +20,9 @@
 
 </metal:script-slot>    
 
-<metal:workflownav fill-slot="workflownav">
-${form.begin(request.route_url('metadata'), name="metadata")}
-${form.csrf_token()}
-
-<div id="workflownav-wrap">
-    <div id="workflownav-container">
-        <div id="back-steps">
-            <input id="back-to-chooser"
-                type="button"
-                class="button"
-                value="&laquo; Back: Return to preview"
-                title="Return to the module preview"
-                tal:attributes="url view.get_previous_action()">
-        </div>
-
-        <input id="workspace" type="hidden" name="workspace"
-            tal:attributes="value selected_workspace|string:">
-        <input id="module" type="hidden" name="module">
-
-        <div id="forward-steps">
-            <input type="submit"
-                name="form.submitted"
-                disabled="disabled"
-                class="button forward-button" 
-                value="Next: Review module description &raquo;" 
-                tal:attributes="url view.get_next_action()"
-                title="Select a module below and then click 'Next' to edit the module's title and other metadata">
-
-        </div>
-    </div>
-</div>
 </metal:workflownav>
+    <span metal:use-macro="view.workflow_nav">Workflow navigation</span>
+<metal:workflownav fill-slot="workflownav">
 
 <tal:body metal:fill-slot="content-slot"
     tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
@@ -59,6 +30,8 @@ ${form.csrf_token()}
     b_start python:modules.start + b_size;
     previous_b_start python:modules.start - b_size;
     ">
+${form.begin(request.route_url('metadata'), name="metadata")}
+${form.csrf_token()}
 <div id="ie6-container-wrap">
     <div id="container">
         <div id="content">
