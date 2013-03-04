@@ -49,7 +49,7 @@
                     // the 'Save' button.
                     // Disable the navigation buttons.
                     PubSub.sub('swordpushweb.save', function(data) {
-                        $('#back-to-chooser').attr('disabled', 'disabled');
+                        $('#btn-back').attr('disabled', 'disabled');
                         $('#show-neworexisting').attr('disabled', 'disabled');
                     });
                     // subscribe to the 'swordpusweb.saved' event. It is fired
@@ -57,7 +57,7 @@
                     // index.html page.
                     // Here we re-enable the navigation buttons.
                     PubSub.sub('swordpushweb.saved', function(data) {
-                        var btn = $('#back-to-chooser');
+                        var btn = $('#btn-back');
                         btn.removeAttr('disabled');
 
                         var btn = $('#show-neworexisting');

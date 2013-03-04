@@ -373,7 +373,7 @@ ${form.csrf_token()}
                 role="button"
                 data-toggle="modal"
                 title="Return to the initial page"
-                tal:attributes="href view.get_previous_action();
+                tal:attributes="href string:/${view.get_previous_action()};
                                 value structure:view.back_step_label;
                                 title view.back_step_title"/>
         </div>
@@ -388,7 +388,7 @@ ${form.csrf_token()}
                 class="forward-button" 
                 role="button"
                 title="Select a module below and then click 'Next' to start editing it"
-                tal:attributes="href view.get_next_action();
+                tal:attributes="href string:/${view.get_next_action()};
                                 value structure:view.next_step_label;
                                 title view.next_step_title"/>
         </div>

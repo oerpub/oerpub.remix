@@ -195,8 +195,8 @@ $(document).ready(function()
         return true;
     });
 
-    $("#back-to-chooser, #start-over input").click(function(e){
-        if ($("#edit-frame").length != 0 || $("#metadata").length != 0 && $(this).attr("id") == 'back-to-chooser') {
+    $("#btn-back, #start-over input").click(function(e){
+        if ($("#edit-frame").length != 0 || $("#metadata").length != 0 && $(this).attr("id") == 'btn-back') {
             return _doAction(confirmMsg3, e);
         } else if ($("#see-error").length != 0) {
             return _doAction(confirmMsg4, e);
