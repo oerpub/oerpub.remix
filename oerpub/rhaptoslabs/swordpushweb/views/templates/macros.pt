@@ -368,12 +368,14 @@ ${form.csrf_token()}
         <div id="back-steps">
             <input id="btn-back" name="btn-back"
                 type="button"
-                value="&laquo; Back: Return to start page"
-                class="btn"
+                value="back step"
+                class=""
                 role="button"
-                tal:attributes="href view.get_previous_action()"
                 data-toggle="modal"
-                title="Return to the initial page" />
+                title="Return to the initial page"
+                tal:attributes="href view.get_previous_action();
+                                value structure:view.back_step_label;
+                                title view.back_step_title"/>
         </div>
 
         <input id="workspace" type="hidden" name="workspace" />
@@ -382,11 +384,13 @@ ${form.csrf_token()}
         <div id="forward-steps">
             <input id="btn-forward" name="btn-forward" disabled="disabled"
                 type="submit"
-                value="Next: Edit selected module &raquo;" 
-                class="btn forward-button" 
+                value="next step" 
+                class="forward-button" 
                 role="button"
-                tal:attributes="href view.get_next_action()"
-                title="Select a module below and then click 'Next' to start editing it" />
+                title="Select a module below and then click 'Next' to start editing it"
+                tal:attributes="href view.get_next_action();
+                                value structure:view.next_step_label;
+                                title view.next_step_title"/>
         </div>
     </div>
 </div>

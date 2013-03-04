@@ -96,19 +96,33 @@ class PreviewView(BaseHelper):
                          request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
                          request.session['upload_dir']),
             'form': FormRenderer(form),
-            'editor': EditorHelper(request)
+            'editor': EditorHelper(request),
+            'view': self,
         }
 
     @reify
     def neworexisting_dialog(self):
         return self.macro_renderer.implementation().macros['neworexisting_dialog']
 
-    def get_NextButtonToolTip(self):
-      source = self.get_source()
-      if source == 'newemptymodule':
-          return 'Add module description and save module to cnx.org'
-      elif source == 'existingmodule':
-          return 'Review module description and save module to cnx.org'
-      else:
-          return 'Select whether this will be used for a new module or to override the contents of an existing module'
+    @reify
+    def back_step_label(self):
+        return "&laquo; Back: Return to start page"
+    
+    @reify
+    def next_step_label(self):
+        return "Next: Edit selected module &raquo;" 
 
+    @reify
+    def next_step_title(self):
+        source = self.session['source']
+        if source == 'newemptymodule':
+            return 'Add module description and save module to cnx.org'
+        elif source == 'existingmodule':
+            return 'Review module description and save module to cnx.org'
+        elif source == 'importmodule':
+              return 'Select whether this will be used for a new module or to override the contents of an existing module'
+        return 'Select whether this will be used for a new module or to override the contents of an existing module'
+
+    @reify
+    def back_step_title(self):
+        return "Return to the initial page"
