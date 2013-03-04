@@ -21,4 +21,25 @@ class Choose_Module(Module_Association_View):
     def content_macro(self):
         return self.macro_renderer.implementation().macros['content_macro']
 
+    @reify
+    def back_step_label(self):
+        return "&laquo; Back: Return to start page"
+    
+    @reify
+    def next_step_label(self):
+        return "Next: Edit selected module &raquo;" 
 
+    @reify
+    def next_step_title(self):
+        source = self.session['source']
+        if source == 'newemptymodule':
+            return 'Add module description and save module to cnx.org'
+        elif source == 'existingmodule':
+            return 'Review module description and save module to cnx.org'
+        elif source == 'importmodule':
+              return 'Select whether this will be used for a new module or to override the contents of an existing module'
+        return 'Select whether this will be used for a new module or to override the contents of an existing module'
+
+    @reify
+    def back_step_title(self):
+        return "Return to the initial page"
