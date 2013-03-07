@@ -8,6 +8,7 @@ from pyramid.decorator import reify
 from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid_simpleform.renderers import FormRenderer
+from pyramid.httpexceptions import HTTPFound
 
 from oerpub.rhaptoslabs import sword2cnx
 
@@ -36,9 +37,13 @@ class PreviewView(BaseHelper):
 
     @view_config(route_name='preview', renderer='templates/preview.pt',
         http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
-    def generate_html_view(self):
-        self.check_login()
-        
+    def process(self):
+        super(PreviewView, self)._process()
+        errors = self.do_transition()
+        return self.navigate(errors)
+
+    def do_transition(self):
+        errors = []
         request = self.request
         session = request.session
         module = request.params.get('module')
@@ -75,30 +80,40 @@ class PreviewView(BaseHelper):
                 conversionerror = traceback.format_exc()
                 raise ConversionError(conversionerror)
             
-        defaults = {}
-        defaults['title'] = request.session.get('title', '')
-        form = Form(request,
-                    schema=PreviewSchema,
-                    defaults=defaults
-                   )
-
         body_filename = request.session.get('preview-no-cache')
         if body_filename is None:
             body_filename = 'index.xhtml'
         else:
             del request.session['preview-no-cache']
+        return errors
+    
+    def navigate(self, errors):
+        request = self.request
+        # this was a plain navigation attempt
+        if request.params.get('workflownav.form.submitted', '') == 'submitted':
+            action = self.get_next_action()
+            if request.has_key('btn-back'):
+                action = self.get_previous_action()
+            return HTTPFound(location=self.request.route_url(action))
+        else:
+            defaults = {}
+            defaults['title'] = request.session.get('title', '')
+            form = Form(request,
+                        schema=PreviewSchema,
+                        defaults=defaults
+                       )
 
-        return {
-            'body_base': '%s%s/' % (
-                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                         request.session['upload_dir']),
-            'body_url': '%s%s/index.html'% (
-                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                         request.session['upload_dir']),
-            'form': FormRenderer(form),
-            'editor': EditorHelper(request),
-            'view': self,
-        }
+            return {
+                'body_base': '%s%s/' % (
+                             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                             request.session['upload_dir']),
+                'body_url': '%s%s/index.html'% (
+                             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                             request.session['upload_dir']),
+                'form': FormRenderer(form),
+                'editor': EditorHelper(request),
+                'view': self,
+            }
 
     @reify
     def neworexisting_dialog(self):
@@ -110,7 +125,7 @@ class PreviewView(BaseHelper):
     
     @reify
     def next_step_label(self):
-        return "Next: Edit selected module &raquo;" 
+        return "Next: Describe module &raquo;" 
 
     @reify
     def next_step_title(self):
