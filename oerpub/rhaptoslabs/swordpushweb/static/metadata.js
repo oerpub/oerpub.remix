@@ -419,3 +419,18 @@ $(document).ready(function()
     });
 
 });
+
+//
+//  Next and Back button futzing
+//
+
+$(document).ready(function()
+{
+    // "Finish: Upload" button ("Describe your module" page)
+    $("#metadata .forward-button").click(function(){
+      $('.forward-button').attr('disabled','disabled');
+      $('.forward-button').val('Uploading to Connexions ...');
+      $('#back-steps .button').attr('disabled','disabled');
+    });
+
+});

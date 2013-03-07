@@ -134,13 +134,6 @@ $(document).ready(function()
       popMenu.removeClass("hover");
     });
 
-    // "Finish: Upload" button ("Describe your module" page)
-    $("#metadata .forward-button").click(function(){
-      $('.forward-button').attr('disabled','disabled');
-      $('.forward-button').val('Uploading to Connexions ...');
-      $('#back-steps .button').attr('disabled','disabled');
-    });
-
     $('input#google-submit').click(function(e) {
         e.preventDefault();
         return newPicker();
