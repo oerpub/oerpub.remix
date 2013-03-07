@@ -1,6 +1,8 @@
 <metal:use use-macro="base">
     <metal:script-slot fill-slot="script-slot">    
 
+        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/metadata.js')}"></script>
+
         <script type="text/javascript">
             $(document).ready(function(){
                 $('.forward-button').removeAttr('disabled');
