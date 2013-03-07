@@ -97,9 +97,9 @@ class Choose_Document_Source(BaseHelper):
 
     @view_config(route_name='choose')
     def process(self):
-        super(Choose_Document_Source, self)._process()
-        errors = self.do_transition()
-        return self.navigate(errors)
+        super(Choose_Document_Source, self).process()
+        self.do_transition()
+        return self.navigate()
 
     def do_transition(self):
         request = self.request
@@ -110,7 +110,7 @@ class Choose_Document_Source(BaseHelper):
         if 'title' in session:
             del session['title']
         
-    def navigate(self, errors):
+    def navigate(self, errors=None, form=None):
         request = self.request
         neworexisting_form = Form(request, schema=ModuleEditorSchema)
         officedocument_form = Form(request, schema=OfficeDocumentUploadSchema)
