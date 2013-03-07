@@ -2,6 +2,12 @@
     <head>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.7.1.min.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
+        <script type="text/javascript">
+          /* this submits the hidden login form to cnx. */
+          function submitloginform(event) {
+              $('#submit').click();
+          }
+        </script>
     </head>
     <body onload="submitloginform(event);">
         <form action="${login_url}" name="loginform" id="loginform" method="post">

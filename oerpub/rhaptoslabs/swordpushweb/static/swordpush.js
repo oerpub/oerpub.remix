@@ -185,11 +185,6 @@ $(window).resize(function(){
 
 });
 
-/* this submits the hidden login form to cnx. */
-function submitloginform(event) {
-    document.getElementById('submit').click();
-}
-
 // Max: added this for the swooshy wait message
 jQuery.fn.center = function () {
     this.css("position","fixed");
