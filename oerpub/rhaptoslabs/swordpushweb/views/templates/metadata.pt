@@ -22,7 +22,7 @@
                 $("#fl-field").hide();
                 $('.edit-link').click(editFeaturedLink);
                 //$('.remove-link').click(showYesNoDialog);
-                $('#btn-remove-featuredlink').click(removelink);
+                //$('#btn-remove-featuredlink').click(removelink);
 
                 if ($('table#featured-links-table tr').length > 0) {
                     $("#formentry-fl .formlabel").click();
