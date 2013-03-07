@@ -185,30 +185,6 @@ $(window).resize(function(){
 
 });
 
-// Google Picker API for the Google Docs import
-function newPicker() {
-google.load('picker', '1', {"callback" : createPicker});
-}       
-
-// Create and render a Picker object for selecting documents
-function createPicker() {
-var picker = new google.picker.PickerBuilder().
-    addView(google.picker.ViewId.DOCUMENTS).
-    setCallback(pickerCallback).
-    build();
-picker.setVisible(true);
-}
-
-// A simple callback implementation for Picker.
-function pickerCallback(data) {
-    if(data.action == google.picker.Action.PICKED){
-        document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
-        document.getElementById('gdocs_access_token').value = data.docs[0].accessToken;
-        showWaitMessage();
-        $('form#googledocs_form').submit(); 
-    }
-}
-
 function keyDown(event) {
     if ($(event.target).val() != '') {
         $('#url-submit').removeAttr('disabled');
