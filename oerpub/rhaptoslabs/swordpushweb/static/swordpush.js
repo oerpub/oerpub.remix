@@ -14,7 +14,6 @@ var selected_row = null;
 
 $(document).ready(function()
 {
-
     // A friendly message confirming that the upload is happening.
     // Max: added #url-submit and .forward-button (metadata page) too
     $('#file-submit, #url-submit, #presentation-submit, #metadata .forward-button').click(function(e) {
@@ -55,15 +54,7 @@ $(document).ready(function()
     // Display advanced mode notice on click
     $("#expertmode").toggle(enableExpertMode, disableExpertMode);
 
-    $("#start-from-beginning").click(function(e){
-        var target = $(this).attr('href');
-        if (!target) {
-            target = $(this).attr('url');
-        }
-        window.location = target;
-        return true;
-    });
-
+    
   // Reveal error message ("Failure" page)
   $("#see-error").click(function(){
     if ($("#error_message").css('display') == 'none') {
