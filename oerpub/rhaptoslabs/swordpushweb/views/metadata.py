@@ -398,3 +398,25 @@ class Metadata_View(BaseHelper):
         }
         return render_to_response(self.templatePath, response, request=request)
 
+    @reify
+    def back_step_label(self):
+        return "&laquo; Back: Return to preview page"
+    
+    @reify
+    def next_step_label(self):
+        return "Next: Upload module to Connexions&raquo;" 
+
+    @reify
+    def next_step_title(self):
+        source = self.session['source']
+        if source == 'newemptymodule':
+            return 'Add module description and save module to cnx.org'
+        elif source == 'existingmodule':
+            return 'Review module description and save module to cnx.org'
+        elif source == 'importmodule':
+              return 'Select whether this will be used for a new module or to override the contents of an existing module'
+        return 'Select whether this will be used for a new module or to override the contents of an existing module'
+
+    @reify
+    def back_step_title(self):
+        return "Return to the preview page"

@@ -33,37 +33,7 @@
     </metal:script-slot>    
 
     <metal:workflownav fill-slot="workflownav">
-    <div id="workflownav-wrap">
-        <div id="workflownav-container">
-            <div id="back-steps">
-                <input type="button" class="btn"
-                    id="btn-back-to-chooser"
-                    href="#go-back-or-stay-dialog"
-                    role="button"
-                    data-toggle="modal"
-                    type="button"
-                    title="Return to the previous page"
-                    value="&laquo; Back"
-                    url="${request.route_url('preview')}">
-            </div>
-
-            <div id="forward-steps">
-                <span id="uploading-to">
-                    Uploading to 
-                    <ul metal:use-macro="view.workspace_popup">
-                    </ul>
-                    in Connexions
-                </span>
-                
-                <input id="top-upload-to-cnx"
-                    class="btn forward-button"
-                    type="button"
-                    title="Click 'Finish' to add the module as edited to the designated work area. Further steps are required before the module can be published in the Connexions repository." 
-                    value="Finish: Upload &raquo;">
-
-            </div>
-        </div>
-    </div>
+        <span metal:use-macro="view.workflow_nav">workflow buttons</span>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
@@ -519,10 +489,6 @@
             <button id="btn-remove-featuredlink" class="btn btn-primary" data-dismiss="modal">OK</button>
         </div>
     </div>
-
-    <span metal:use-macro="view.back_navigation_warning">
-        back navigation warning
-    </span>
 
     </metal:hidden-slot>
 
