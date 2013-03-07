@@ -1,5 +1,6 @@
 from pyramid.renderers import get_renderer
 from pyramid.decorator import reify
+from pyramid.httpexceptions import HTTPFound
 
 from oerpub.rhaptoslabs.swordpushweb.interfaces import IWorkflowSteps
 from utils import check_login as utils_check_login
@@ -19,7 +20,7 @@ class BaseHelper(object):
         # BeforeRenderEvent in ../subscribers.py
         self.macro_renderer = get_renderer("templates/macros.pt")
     
-    def _process(self):
+    def process(self):
         self.check_login()
 
     def check_login(self, raise_exception=True):
@@ -38,12 +39,19 @@ class BaseHelper(object):
         """
         return utils_get_connection(self.session)
 
-    def navigate(self):
-        if self.request.get('workflownav.form.submitted', '') == 'submitted':
-            action = self.get_next_action()
-            if self.request.has_key('btn-back'):
+    def navigate(self, errors=None, form=None):
+        request = self.request
+        if request.params.get('workflownav.form.submitted', '') == 'submitted':
+            if request.has_key('btn-back'):
                 action = self.get_previous_action()
-            self.request.response.redirect(action)    
+                return HTTPFound(location=self.request.route_url(action))
+            elif request.has_key('btn-forward'):
+                # we cannot go forward in the process while there are errors
+                if errors:
+                    return None
+                action = self.get_next_action()
+                return HTTPFound(location=self.request.route_url(action))
+        return None
 
     @reify
     def base(self):

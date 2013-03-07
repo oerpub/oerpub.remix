@@ -7,15 +7,20 @@ from oerpub.rhaptoslabs.swordpushweb import parse_sword_treatment
 class SummaryView(BaseHelper):
 
     @view_config(route_name='summary')
-    def generate_html_view(self):
-        self.check_login()
+    def process(self):
+        super(SummaryView, self).process()
+        self.navigate()
+    
+    def navigate(self, errors=None, form=None):
+        # See if this was a plain navigation attempt
+        view = super(SummaryView, self).navigate()
+        if view:
+            return view
+
+        # It was not, let's prepare the default view.
         templatePath = 'templates/summary.pt'
-        
         request = self.request
         deposit_receipt = request.session['deposit_receipt']
         response = parse_sword_treatment.get_requirements(deposit_receipt)
         response['view'] = self
-        return render_to_response(
-            templatePath, response, request=request)
-
-
+        return render_to_response(templatePath, response, request=request)

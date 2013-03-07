@@ -6,7 +6,6 @@ import peppercorn
 from pyramid.decorator import reify
 from pyramid_simpleform import Form
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 from pyramid_simpleform.renderers import FormRenderer
 
@@ -295,27 +294,30 @@ class Metadata_View(BaseHelper):
         return 'strength%s.png' % link.strength
 
     @view_config(route_name='metadata')
-    def generate_html_view(self):
+    def process(self):
         """
         Handle metadata adding and uploads
         """
-        session = self.session
+        super(Metadata_View, self).process()
         request = self.request
-        config = self.config
-        workspaces = self.workspaces
-        subjects = self.subjects
-        field_list = self.field_list
-        remember_fields = self.remember_fields
         defaults = self.defaults
-
         form = Form(request,
                     schema=MetadataSchema,
                     defaults=defaults
                    )
 
+        errors = self.do_transition(form)
+        return self.navigate(errors, form)
+
+    def do_transition(self, form=None):
+        errors = {}
+        session = self.session
+        request = self.request
+        workspaces = self.workspaces
+
         # Check for successful form completion
         if form.validate():
-            self.update_session(session, remember_fields, form)
+            self.update_session(session, self.remember_fields, form)
 
             # Reconstruct the path to the saved files
             save_dir = os.path.join(
@@ -357,14 +359,28 @@ class Metadata_View(BaseHelper):
 
             # The deposit receipt cannot be pickled, so we pickle the xml
             session['deposit_receipt'] = deposit_receipt.to_xml()
+        else:
+            errors.update(form.errors)
+            return errors
 
-            # Go to the upload page
-            return HTTPFound(location=request.route_url('summary'))
+    def navigate(self, errors=None, form=None):
+        # See if this was a plain navigation attempt
+        view = super(Metadata_View, self).navigate(errors)
+        if view:
+            return view 
+        
+        # It was not, let's prepare the default view.
+        session = self.session
+        request = self.request
+        config = self.config
+        workspaces = self.workspaces
+        subjects = self.subjects
+        field_list = self.field_list
 
         module_url = request.POST.get('module', None)
         metadata = config['metadata']
-        username = self.session['username']
-        password = self.session['password']
+        username = session['username']
+        password = session['password']
         if module_url:
             metadata.update(get_metadata_from_repo(session, module_url, username, password))
         else:

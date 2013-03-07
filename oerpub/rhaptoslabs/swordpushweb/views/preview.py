@@ -38,12 +38,11 @@ class PreviewView(BaseHelper):
     @view_config(route_name='preview', renderer='templates/preview.pt',
         http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
     def process(self):
-        super(PreviewView, self)._process()
-        errors = self.do_transition()
-        return self.navigate(errors)
+        super(PreviewView, self).process()
+        self.do_transition()
+        return self.navigate()
 
-    def do_transition(self):
-        errors = []
+    def do_transition(self, form=None):
         request = self.request
         session = request.session
         module = request.params.get('module')
@@ -85,35 +84,32 @@ class PreviewView(BaseHelper):
             body_filename = 'index.xhtml'
         else:
             del request.session['preview-no-cache']
-        return errors
     
-    def navigate(self, errors):
-        request = self.request
-        # this was a plain navigation attempt
-        if request.params.get('workflownav.form.submitted', '') == 'submitted':
-            action = self.get_next_action()
-            if request.has_key('btn-back'):
-                action = self.get_previous_action()
-            return HTTPFound(location=self.request.route_url(action))
-        else:
-            defaults = {}
-            defaults['title'] = request.session.get('title', '')
-            form = Form(request,
-                        schema=PreviewSchema,
-                        defaults=defaults
-                       )
+    def navigate(self, errors=None, form=None):
+        # See if this was a plain navigation attempt
+        view = super(PreviewView, self).navigate()
+        if view:
+            return view
 
-            return {
-                'body_base': '%s%s/' % (
-                             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                             request.session['upload_dir']),
-                'body_url': '%s%s/index.html'% (
-                             request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                             request.session['upload_dir']),
-                'form': FormRenderer(form),
-                'editor': EditorHelper(request),
-                'view': self,
-            }
+        request = self.request
+        defaults = {}
+        defaults['title'] = request.session.get('title', '')
+        form = Form(request,
+                    schema=PreviewSchema,
+                    defaults=defaults
+                   )
+
+        return {
+            'body_base': '%s%s/' % (
+                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                         request.session['upload_dir']),
+            'body_url': '%s%s/index.html'% (
+                         request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
+                         request.session['upload_dir']),
+            'form': FormRenderer(form),
+            'editor': EditorHelper(request),
+            'view': self,
+        }
 
     @reify
     def neworexisting_dialog(self):
