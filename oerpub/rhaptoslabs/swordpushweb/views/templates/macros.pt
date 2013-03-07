@@ -24,7 +24,7 @@
                     <div style="margin: 0 0 .5em;" class="forminfo">
                         Enter the URL of a module to check it out to
 
-                        <div metal:use-macro="view.workspace_popup">
+                        <div metal:use-macro="dialogs.workspace_popup">
                         </div>
 
                     </div>
@@ -46,7 +46,7 @@
             <div id="workspace-list">
                 <div class="workarea-contents-label">
                     Showing contents of
-                    <ul metal:use-macro="view.workspace_popup">
+                    <ul metal:use-macro="dialogs.workspace_popup">
                     </ul>
                 </div>
             </div>
@@ -184,30 +184,6 @@
     
 </metal:modules_list>
 
-<metal:workspace_popup define-macro="workspace_popup"
-    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
-                module_url module_url|nothing;">
-<ul class="popMenu">
-    <li class="popMenu">
-        <a id="selected_workspace" href="#" class="popMenu"
-            tal:attributes="href selected_workspace">
-            <span class="workarea-choice" tal:content="workspace_title">Personal Workspace</span>
-            <img tal:condition="not:module_url" src="${images_url}/down-arrow-05.png"> 
-        </a>
-        
-        <ul class="popOut" tal:condition="not:module_url">
-            <li tal:repeat="ws workspaces">
-                <a href="#" class="workspace-link"
-                    tal:content="ws[1]"
-                    tal:attributes="href ws[0]">
-                    Personal Workspace
-                </a>
-            </li>
-        </ul>
-    </li>
-</ul>
-</metal:workspace_popup>
-
 <metal:featured_link define-macro="featured_link"
     tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');">
             <tal:featured_link_groups tal:repeat="group view.get_featured_link_groups">
@@ -281,93 +257,16 @@
 </table>
 </metal:featured_links_table>
 
-<metal:back_navigation_warning define-macro="back_navigation_warning">
-<!-- Back navigation warning -->
-<div id="go-back-or-stay-dialog" class="modal hide fade" tabindex="-1" role="dialog"
-    aria-labelledby="Go or stay" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="go-or-stay-label">
-            Are you sure you want to leave this page? 
-        </h3>
-    </div>
-    <div class="modal-body">
-        Your changes have not been saved and any work will be lost if you leave this page.
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-        <button id="btn-navigate-back" class="btn btn-primary"
-            tal:attributes="href string:${request.route_url(view.get_previous_action())}">OK</button>
-    </div>
-</div>
-</metal:back_navigation_warning>
-
-<metal:forward_navigation_warning define-macro="forward_navigation_warning">
-<!-- Forward navigation warning -->
-<div id="go-forward-or-stay-dialog" class="modal hide fade" tabindex="-1" role="dialog"
-    aria-labelledby="Go or stay" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="go-or-stay-label">
-            Are you sure you want to continue? 
-        </h3>
-    </div>
-    <div class="modal-body">
-        Your changes have not been saved and any work will be lost if you leave this page.
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-        <button id="btn-navigate-forward" class="btn btn-primary"
-            tal:attributes="href string:${view.get_next_action()}">OK</button>
-    </div>
-</div>
-</metal:forward_navigation_warning>
-
-<metal:neworexisting_dialog define-macro="neworexisting_dialog">
-<!-- Modal dialogs -->
-<div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
-    aria-labelledby="New or existing" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="neworexistingLabel">
-            Is this for a new module or will it override an existing one?
-        </h3>
-    </div>
-    <div class="modal-body">
-        ${form.begin(request.route_url('metadata'), id='neworexisting-form')}
-        ${form.csrf_token()}
-        ${form.hidden('upload', value='')}
-        <div class="forminfo" style="margin: .5em 0 1em;">
-            <input class="btn btn-primary" id="newmodule"
-                name="newmodule" value="New module" type="submit"> <br/>
-            This is an entirely new module. 
-        </div>
-        ${form.end()}
-
-        ${form.begin(request.route_url('choose-module'), id='neworexisting-form')}
-        ${form.csrf_token()}
-        <div class="forminfo" style="margin: .5em 0 1em;">
-            <input class="btn btn-primary" id="existingmodule"
-                name="existingmodule" value="Existing module" type="submit"> <br />
-            Choose an existing module to apply your import to, replacing its contents.  
-        </div>
-        ${form.end()}
-
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    </div>
-</div>
-</metal:neworexisting_dialog>
-
 <metal:workflow-nav define-macro="workflow_nav">
-${form.begin(request.route_url(view.form_action), name=view.form_action)}
+${form.begin(request.route_url(view.form_action),
+                               name=view.form_action,
+                               id="workflownav-form")}
 ${form.csrf_token()}
 <div id="workflownav-wrap">
     <div id="workflownav-container">
         <div id="back-steps">
             <input id="btn-back" name="btn-back"
-                type="button"
+                type="submit"
                 value="back step"
                 class=""
                 role="button"
@@ -382,7 +281,7 @@ ${form.csrf_token()}
         <input name="workflownav.form.submitted" type="hidden" value="submitted" />
 
         <div id="forward-steps">
-            <input id="btn-forward" name="btn-forward" disabled="disabled"
+            <input id="btn-forward" name="btn-forward"
                 type="submit"
                 value="next step" 
                 class="forward-button" 

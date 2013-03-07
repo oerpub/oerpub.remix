@@ -28,6 +28,7 @@
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/polyfiller.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/googlejsapi.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
+        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/navigation.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/cookie.js')}"></script>
 
         <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />

@@ -4,14 +4,18 @@ from .interfaces import IWorkflowSteps
 
 def add_base_template(event):
     """
-    Expose the base template as per the Pyramid cookbook:
+    Expose the several macro templates as per the Pyramid cookbook:
 
     https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/templates.html#using-a-beforerender-event-to-expose-chameleon-base-template
     """
     base = get_renderer('views/templates/base.pt').implementation()
     event.update({'base': base})
-    base = get_renderer('views/templates/base_bare.pt').implementation()
-    event.update({'basebare': base})
+
+    dialogs = get_renderer('views/templates/dialogs.pt').implementation()
+    event.update({'dialogs': dialogs})
+
+    macros = get_renderer('views/templates/macros.pt').implementation()
+    event.update({'macros': macros})
 
 def add_provider(event):
     """

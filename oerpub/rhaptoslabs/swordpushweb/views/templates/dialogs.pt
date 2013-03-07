@@ -1,0 +1,23 @@
+<metal:workspace_popup define-macro="workspace_popup"
+    tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
+                module_url module_url|nothing;">
+<ul class="popMenu">
+    <li class="popMenu">
+        <a id="selected_workspace" href="#" class="popMenu"
+            tal:attributes="href selected_workspace">
+            <span class="workarea-choice" tal:content="workspace_title">Personal Workspace</span>
+            <img tal:condition="not:module_url" src="${images_url}/down-arrow-05.png"> 
+        </a>
+        
+        <ul class="popOut" tal:condition="not:module_url">
+            <li tal:repeat="ws workspaces">
+                <a href="#" class="workspace-link"
+                    tal:content="ws[1]"
+                    tal:attributes="href ws[0]">
+                    Personal Workspace
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>
+</metal:workspace_popup>
