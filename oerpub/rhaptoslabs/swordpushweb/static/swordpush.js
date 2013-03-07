@@ -185,17 +185,6 @@ $(window).resize(function(){
 
 });
 
-function keyDown(event) {
-    if ($(event.target).val() != '') {
-        $('#url-submit').removeAttr('disabled');
-    }
-    if (event.keyCode == 13) {
-        showWaitMessage();
-        $('#url-submit').removeAttr('disabled');
-        $('#url-submit').click();
-    }
-}
-
 /* this submits the hidden login form to cnx. */
 function submitloginform(event) {
     document.getElementById('submit').click();

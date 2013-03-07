@@ -1,6 +1,17 @@
 // JavaScript for the choose page template
 
 
+function keyDown(event) {
+    if ($(event.target).val() != '') {
+        $('#url-submit').removeAttr('disabled');
+    }
+    if (event.keyCode == 13) {
+        showWaitMessage();
+        $('#url-submit').removeAttr('disabled');
+        $('#url-submit').click();
+    }
+}
+
 $(document).ready(function()
 {
     $('input#presentation-submit').click(function(event){
