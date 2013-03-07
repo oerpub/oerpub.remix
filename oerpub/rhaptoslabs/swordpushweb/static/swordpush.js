@@ -1,4 +1,14 @@
 
+function showWaitMessage(slideSpeed) {
+    $('#upload-wait').center();
+    if ( typeof slideSpeed !== 'undefined' ) {
+        $('#upload-wait').slideDown(slideSpeed);
+    }
+    else {
+        $('#upload-wait').slideDown();
+    }
+}
+
 var em_cookie = 'oerpushweb.expertmode';
 var selected_row = null;
 
@@ -8,8 +18,7 @@ $(document).ready(function()
     // A friendly message confirming that the upload is happening.
     // Max: added #url-submit and .forward-button (metadata page) too
     $('#file-submit, #url-submit, #presentation-submit, #metadata .forward-button').click(function(e) {
-        $('#upload-wait').center();
-        $('#upload-wait').slideDown('slow');
+        showWaitMessage('slow');
     });
 
     // Truncate the title if it gets too long
@@ -405,11 +414,6 @@ jQuery.fn.center = function () {
     this.css("top", $("#content h1").offset().top + "px");
     this.css("left", (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft() + "px");
     return this;
-}
-
-function showWaitMessage() {
-    $('#upload-wait').center();
-    $('#upload-wait').slideDown();
 }
 
 /* Update cookie depends on the javascript 'cookie.js' in the static folder
