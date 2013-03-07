@@ -1,0 +1,78 @@
+<metal:back_navigation_warning define-macro="back_navigation_warning">
+<!-- Back navigation warning -->
+<div id="go-back-or-stay-dialog" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="Go or stay" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="go-or-stay-label">
+            Are you sure you want to leave this page? 
+        </h3>
+    </div>
+    <div class="modal-body">
+        Your changes have not been saved and any work will be lost if you leave this page.
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button id="btn-navigate-back" class="btn btn-primary"
+            tal:attributes="href string:${request.route_url(view.get_previous_action())}">OK</button>
+    </div>
+</div>
+</metal:back_navigation_warning>
+
+<metal:neworexisting_dialog define-macro="neworexisting_dialog">
+<!-- Modal dialogs -->
+<div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="New or existing" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="neworexistingLabel">
+            Is this for a new module or will it override an existing one?
+        </h3>
+    </div>
+    <div class="modal-body">
+        ${form.begin(request.route_url('metadata'), id='neworexisting-form')}
+        ${form.csrf_token()}
+        ${form.hidden('upload', value='')}
+        <div class="forminfo" style="margin: .5em 0 1em;">
+            <input class="btn btn-primary" id="newmodule"
+                name="newmodule" value="New module" type="submit"> <br/>
+            This is an entirely new module. 
+        </div>
+        ${form.end()}
+
+        ${form.begin(request.route_url('choose-module'), id='neworexisting-form')}
+        ${form.csrf_token()}
+        <div class="forminfo" style="margin: .5em 0 1em;">
+            <input class="btn btn-primary" id="existingmodule"
+                name="existingmodule" value="Existing module" type="submit"> <br />
+            Choose an existing module to apply your import to, replacing its contents.  
+        </div>
+        ${form.end()}
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+</metal:neworexisting_dialog>
+
+<metal:forward_navigation_warning define-macro="forward_navigation_warning">
+<!-- Forward navigation warning -->
+<div id="go-forward-or-stay-dialog" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="Go or stay" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="go-or-stay-label">
+            Are you sure you want to continue? 
+        </h3>
+    </div>
+    <div class="modal-body">
+        Your changes have not been saved and any work will be lost if you leave this page.
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button id="btn-navigate-forward" class="btn btn-primary"
+            tal:attributes="href string:${view.get_next_action()}">OK</button>
+    </div>
+</div>
+</metal:forward_navigation_warning>
