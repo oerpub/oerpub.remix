@@ -15,7 +15,12 @@ class BaseHelper(object):
         """
         self.request = request
         self.session = self.request.session
+        # this is not strictly necessary as we already add 'macros' to the
+        # BeforeRenderEvent in ../subscribers.py
         self.macro_renderer = get_renderer("templates/macros.pt")
+    
+    def _process(self):
+        self.check_login()
 
     def check_login(self, raise_exception=True):
         """ Default login behaviour.
