@@ -8,6 +8,7 @@ import datetime
 import traceback
 import formencode
 import shlex, subprocess
+from logging import getLogger
 
 from lxml import etree
 
@@ -49,6 +50,8 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
 from oerpub.rhaptoslabs.swordpushweb.errors import (
     ConversionError,
     UnknownPackagingError)
+
+LOG = getLogger('%s' % __name__)
 
 
 class ModuleEditorSchema(formencode.Schema):
@@ -93,13 +96,22 @@ class Choose_Document_Source(BaseHelper):
                           'batch': ''}
 
     @view_config(route_name='choose')
-    def generate_html_view(self):
-        self.check_login()
+    def process(self):
+        super(Choose_Document_Source, self)._process()
+        errors = self.do_transition()
+        return self.navigate(errors)
+
+    def do_transition(self):
         request = self.request
         session = request.session
-
-        templatePath = 'templates/choose.pt'
-
+        # clear the session
+        if 'transformerror' in session:
+            del session['transformerror']
+        if 'title' in session:
+            del session['title']
+        
+    def navigate(self, errors):
+        request = self.request
         neworexisting_form = Form(request, schema=ModuleEditorSchema)
         officedocument_form = Form(request, schema=OfficeDocumentUploadSchema)
         googledocs_form = Form(request, schema=GoogleDocsSchema)
@@ -107,16 +119,10 @@ class Choose_Document_Source(BaseHelper):
         presentationform = Form(request, schema=PresentationSchema)
         zip_or_latex_form = Form(request, schema=ZipOrLatexSchema)
 
-        # clear the session
-        if 'transformerror' in self.request.session:
-            del self.request.session['transformerror']
-        if 'title' in self.request.session:
-            del self.request.session['title']
+        LOG.info(presentationform.all_errors())
 
-        # Check for successful form completion
-        print presentationform.all_errors()
-        
         #TODO: This can be replaced by utility/adapter lookups
+        # Check for successful form completion
         if neworexisting_form.validate():
             return self._process_neworexisting_submit(request, neworexisting_form)
         elif officedocument_form.validate():
@@ -130,6 +136,7 @@ class Choose_Document_Source(BaseHelper):
         elif zip_or_latex_form.validate():
             return self._process_zip_or_latex_form(request, zip_or_latex_form)
 
+        templatePath = 'templates/choose.pt'
         # First view or errors
         response = {
             'neworexisting_form': FormRenderer(neworexisting_form),
@@ -143,32 +150,32 @@ class Choose_Document_Source(BaseHelper):
         return render_to_response(templatePath, response, request=self.request)
 
     def _process_neworexisting_submit(self, request, form):
-        print 'process new or existing submit'
+        LOG.info('process new or existing submit')
         processor = NewOrExistingModuleProcessor(request, form)
         return processor.process()
 
     def _process_officedocument_submit(self, request, form):
-        print 'process wordprocessor submit'
+        LOG.info('process wordprocessor submit')
         processor = OfficeDocumentProcessor(request, form)
         return processor.process()
     
     def _process_googledocs_submit(self, request, form):
-        print 'process google doc submit'
+        LOG.info('process google doc submit')
         processor = GoogleDocProcessor(request, form)
         return processor.process()
     
     def _process_url_submit(self, request, form):
-        print 'process URL submit'
+        LOG.info('process URL submit')
         processor = BaseFormProcessor(request, form)
         return processor.process()
 
     def _process_presentationform_submit(self, request, form):
-        print 'process presentation submit'
+        LOG.info('process presentation submit')
         processor = PresentationProcessor(request, form)
         return processor.process()
     
     def _process_zip_or_latex_form(self, request, form):
-        print 'process zip or latex submit'
+        LOG.info('process zip or latex submit')
         processor = ZipOrLatexModuleProcessor(request, form)
         return processor.process()
 
@@ -560,7 +567,7 @@ class OfficeDocumentProcessor(BaseFormProcessor):
             try:
                 converter.convert(self.original_filename, 'odt', filename + '.odt')
             except Exception as e:
-                print e
+                LOG.error(e)
                 raise ConversionError(e)
         else:
             escaped_ofn = escape_system(self.original_filename)[1:-1]
@@ -582,7 +589,7 @@ class OfficeDocumentProcessor(BaseFormProcessor):
             count = 0
             while not os.path.isfile(odt_filename) and count < 10:
                 count += 1
-                print 'Waiting for file, retry count:%s' % count
+                LOG.info('Waiting for file, retry count:%s' % count)
                 time.sleep(1) 
             fp = open(odt_filename, 'r')
             fp.close()
@@ -692,16 +699,16 @@ class PresentationProcessor(BaseFormProcessor):
 
     def process(self):
         try:
-            print "Inside presentation form"
+            LOG.info("Inside presentation form")
             zipped_filepath = os.path.join(self.save_dir,"cnxupload.zip")
-            print "Zipped filepath",zipped_filepath
+            LOG.info("Zipped filepath",zipped_filepath)
             self.session['userfilepath'] = zipped_filepath
             zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
             zip_archive.write(self.original_filename, self.uploaded_filename)
             zip_archive.close()
             self.session['uploaded_filename'] = self.uploaded_filename
             self.session['original_filename'] = self.original_filename
-            print "Original filename ", self.original_filename
+            LOG.info("Original filename ", self.original_filename)
             self.session['title'] = self.uploaded_filename.split(".")[0]
             metadata = {}
             metadata['dcterms:title'] = self.uploaded_filename.split(".")[0]
