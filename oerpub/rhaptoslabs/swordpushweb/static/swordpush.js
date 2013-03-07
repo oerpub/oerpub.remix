@@ -134,11 +134,6 @@ $(document).ready(function()
       popMenu.removeClass("hover");
     });
 
-    $('input#google-submit').click(function(e) {
-        e.preventDefault();
-        return newPicker();
-    });
-
     // To reveal the "Not finding your module?" link
     $("#not-finding-link").toggle(function(){
         $("#not-finding").show();

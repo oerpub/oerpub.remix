@@ -18,4 +18,9 @@ $(document).ready(function()
         $('form#presentationform').submit(); 
     });
 
+    $('input#google-submit').click(function(e) {
+        e.preventDefault();
+        return newPicker();
+    });
+
 });
