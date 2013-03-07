@@ -1,4 +1,12 @@
 
+// Max: added this for the swooshy wait message
+jQuery.fn.center = function () {
+    this.css("position","fixed");
+    this.css("top", $("#content h1").offset().top + "px");
+    this.css("left", (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft() + "px");
+    return this;
+}
+
 function showWaitMessage(slideSpeed) {
     $('#upload-wait').center();
     if ( typeof slideSpeed !== 'undefined' ) {
@@ -184,14 +192,6 @@ $(window).resize(function(){
   }
 
 });
-
-// Max: added this for the swooshy wait message
-jQuery.fn.center = function () {
-    this.css("position","fixed");
-    this.css("top", $("#content h1").offset().top + "px");
-    this.css("left", (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft() + "px");
-    return this;
-}
 
 /* Update cookie depends on the javascript 'cookie.js' in the static folder
  * sibling to this file. */
