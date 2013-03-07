@@ -21,12 +21,6 @@ $(document).ready(function()
         showWaitMessage('slow');
     });
 
-    // Truncate the title if it gets too long
-    var ma = $("#module-actions .advanced").outerWidth();
-    if ($("iframe").length != 0) {
-      $("#page-title").css({'white-space': 'nowrap', 'max-width': $(window).width() - ma - 100});
-    }
-
     // Toggle advanced mode explanation on hover
     $("#expertmode").mouseover(function(){
       if ($("#advanced-message").css("display") == 'none') {
@@ -622,5 +616,13 @@ $(document).ready(function()
         $('#sd-picker').slideUp('slow');
         $('#login-line').slideDown('slow');
     });
+
+    // BNW; can not grok the precondition for title truncation
+    // BNW: don't think below code ever truncates title
+    // Truncate the title if it gets too long
+    var ma = $("#module-actions .advanced").outerWidth();
+    if ($("iframe").length != 0) {
+      $("#page-title").css({'white-space': 'nowrap', 'max-width': $(window).width() - ma - 100});
+    }
 
 });
