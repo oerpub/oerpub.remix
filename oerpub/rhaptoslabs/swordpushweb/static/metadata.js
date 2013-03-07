@@ -1,5 +1,6 @@
 // JavaScript for the metadata page template
 
+
 //
 // Edit Roles dialog box
 //
@@ -152,3 +153,269 @@ $(document).ready(function()
 
 });
 
+
+//
+// Google Analtyics logic
+//
+
+$(document).ready(function()
+{
+  // Reveal Google Analtyics field ("Describe your module" page)
+  $("#formentry-ga .formlabel").click(function(){
+    if ($("#ga-field").css('display') == 'none') {
+      $("#ga-field").show();
+      $("input[name='google_code_opener']").attr('checked', true);
+    } else {
+      $("#ga-field").hide();
+      $("input[name='google_code_opener']").attr('checked', false);
+    }
+  });
+
+});
+
+//
+// Upload to CNX handler
+//
+
+$(document).ready(function()
+{
+    // potentially dead ... #top-upload-to-cnx and #bottom-upload-to-cnx are MIA
+    $("#top-upload-to-cnx, #bottom-upload-to-cnx").click(function(e){
+        // reset the warnings
+        $("#formentry-title").removeClass("error");
+        $("#formentry-title .errortext").hide();
+        $("#formentry-ga").removeClass("error");
+        $("#formentry-ga .errortext").hide();
+
+        // check required fields
+        var valid = true;
+        title = $("input[name='title']").val();
+        if (title == '(Untitled)' || title.length == 0) {
+            $('#formentry-title').addClass('error')
+            $("#formentry-title .errortext").show();
+            valid = false;
+        }
+        use_ga_code = $("input#google_code_opener").attr('checked');
+        ga_code = $("input[name='google_code']").val();
+        if (use_ga_code && ga_code.length == 0) {
+            $("#formentry-ga").addClass("error");
+            $("#formentry-ga .errortext").show();
+            $('#formentry-title').addClass('error')
+            $("#formentry-title .errortext").show();
+            valid = false;
+        }
+        if (!valid) {
+            return false;
+        }
+
+        showWaitMessage();
+        $('.forward-button').attr('disabled','disabled');
+        $('.forward-button').val('Uploading to Connexions ...');
+        $('#back-steps .button').attr('disabled','disabled');
+        // the submit here is necessary, because without it, chrome will
+        // not submit the form. This has to do with the fact that we are
+        // disabling the submit butt
+        $('form[name="metadata_form"]').submit();
+    });
+
+});
+
+//
+// Featured Links logic
+//
+
+function addFeaturedLink(){
+    template = $('#fl-field-template tr').first().clone();
+    // get the new element title and clean the template
+    title = $('input#create-fl-title').val();
+    $('input#create-fl-title').removeAttr('value');
+    $(template).find('div.edit-link-title span').html(title);
+    $(template).find('input.edit-link-title').attr('value', title);
+
+    // get the category
+    category = $('select#create-fl-category').val();
+    $('select#create-fl-category').removeAttr('value');
+    $(template).find('input.edit-link-category').attr('value', category);
+   
+    // compute strength
+    strength = $('select#create-fl-strength').val();
+    $('select#create-fl-strength').removeAttr('value');
+    $(template).find('input.edit-link-strength').attr('value', strength);
+    base_url = 'static/images/';
+    img_prefix = 'strength';
+    img_suffix = '.png';
+    url = base_url + img_prefix + strength + img_suffix;
+    $(template).find('img#edit-link-strength-image')
+        .attr('src', url);
+
+    // Use url or module
+    useurl = $('input#create-fl-useurl').attr('checked');
+    usemodule = $('input#create-fl-usemodule').attr('checked');
+    if (useurl == 'checked') {
+        value = $('input#create-fl-url').val();
+        $('input#create-fl-url').removeAttr('value');
+        $(template).find('div.edit-link-title a').attr('href', value);
+        $(template).find('input.edit-link-url').attr('value', value);
+        $(template).find('input[name="fl_cnxmodule"]').remove();
+    }
+    if (usemodule == 'checked') {
+        module = $('input#create-fl-cnxmoduleid').val();
+        $('input#create-fl-cnxmoduleid').removeAttr('value');
+        $(template).find('input.edit-link-cnxmodule').attr('value', module);
+        $(template).find('div.edit-link-title a').attr('href', module);
+
+        version = $('input#create-fl-cnxversion').val();
+        $('input#create-fl-cnxversion').removeAttr('value');
+        $(template).find('input.edit-link-cnxversion').attr('value', version);
+        $(template).find('input[name="url"]').remove();
+    }
+
+    $(template).find('.edit-link').click(editFeaturedLink);
+    $(template).find('.remove-link').click(removeFeaturedLink);
+
+    // add the new row to the list of featured links
+    $('table#featured-links-table tbody').append(template);
+}
+
+function editFeaturedLink(event) {
+    event.preventDefault();
+
+    template = $('div#featuredlinks');
+    selected_row = $(this).parent().parent();
+
+    title = $(selected_row).find('input.edit-link-title').val();
+    $(template).find('input#create-fl-title').attr('value', title);
+
+    type = $(selected_row).find('input.edit-link-category').val();
+    $(template).find('option[value="'+type+'"]')
+        .attr('selected', 'selected');
+
+    strength = $(selected_row).find('input.edit-link-strength').val();
+    $(template).find('option[value="'+strength+'"]')
+        .attr('selected', 'selected');
+
+    url = $(selected_row).find('input.edit-link-url').val();
+    $(template).find('input#create-fl-url').attr('value', url);
+
+    cnxmodule = $(selected_row).find('input.edit-link-cnxmodule').val();
+    $(template).find('input#create-fl-cnxmoduleid')
+        .attr('value', cnxmodule);
+
+    cnxversion =  $(selected_row).find('input.edit-link-cnxversion').val();
+    $(template).find('input#create-fl-cnxversion')
+        .attr('value', cnxversion);
+
+    if (url) {
+        $(template).find('input#create-fl-useurl').click();
+    } else {
+        $(template).find('input#create-fl-usemodule').click();
+    }
+
+    $('#featuredlinks span#create-featuredlinks').hide();
+    $('#featuredlinks span#edit-featuredlinks').show();
+    $('#featuredlinks').modal();
+}
+
+function removeFeaturedLink(event) {
+    // Remove individual Featured Links ("Describe your module" page).
+    // When they're all gone, you can click the checkbox / hide the div again.
+    event.preventDefault();
+    var c = confirm("Are you sure you want to remove this link?\n\nYou cannot undo its removal, but you can always manually add it again.");
+    if (c == true) {
+        $(this).closest("tr").hide('fast', function(){
+            $(this).remove();
+            if ($("#featured-links-table tr").length == 0) {
+                $('#show-featuredlinks-form').click();
+                $('#show-featuredlinks-form').removeAttr("checked");
+            }
+        });
+    } else {
+        return false;
+    }
+}
+
+$(document).ready(function()
+{
+    // Reveal Featured Links field ("Describe your module" page)
+    $("#formentry-fl .formlabel").click(function(){
+      if ($("#fl-field").css('display') == 'none') {
+        $("#fl-field").show();
+        $("input[name='fl_opener']").attr('checked', true);
+      } else {
+        $("#fl-field").hide();
+        $("input[name='fl_opener']").attr('checked', false);
+      }
+    });
+
+    // Show the "Add Featured Links" form.
+    $('#show-featuredlinks').click(function(e) {
+        e.preventDefault();
+        $('#featuredlinks span#create-featuredlinks').show();
+        $('#featuredlinks span#edit-featuredlinks').hide();
+
+        template = $('div#featuredlinks');
+        $(template).find('input#create-fl-title').removeAttr('value');
+        $(template).find('option').each(function(i) {
+            $(this).removeAttr('selected');
+        });
+        $(template).find('input#create-fl-url').removeAttr('value');
+        $(template).find('input#create-fl-cnxmoduleid').removeAttr('value');
+        $(template).find('input#create-fl-cnxversion').removeAttr('value');
+        $(template).find('input#create-fl-useurl').click();
+
+        $(template).find('span#create-featuredlinks').hide();
+        $(template).find('span#edit-featuredlinks').show();
+
+        $(template).modal();
+    });
+
+    // Hide the "Add Featured Link" form.
+    $('#cancel-featuredlinks').click(function(e) {
+        e.preventDefault();
+        $.modal.close();
+    });
+
+    // Apply the "Create or Edit Featured Link" form
+    $('#submit-featuredlinks').click(function(e) {
+        e.preventDefault();
+
+        // first remove the row
+        if (selected_row) {
+          $(selected_row).remove();
+          selected_row = null;
+        }
+
+        // then we add a new row with the changed values
+        addFeaturedLink();
+        
+        $("#show-featuredlinks-form").attr('checked', 'checked');
+
+        $.modal.close();
+    });
+
+    // Show the "About Featured Links" overlay
+    $('#show-featuredlinks-help').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('#featuredlinks-help').modal();
+    });
+
+    // Close the "About Featured Links" overlay
+    $('#close-featuredlinks-help').click(function(e) {
+        e.preventDefault();
+        $.modal.close();
+    });
+
+    $('input#create-fl-useurl').click(function(e) {
+        $('input#create-fl-cnxmoduleid').attr('disabled', '');
+        $('input#create-fl-cnxversion').attr('disabled', '');
+        $('input#create-fl-url').removeAttr('disabled');
+    });
+
+    $('input#create-fl-usemodule').click(function(e) {
+        $('input#create-fl-url').attr('disabled', '');
+        $('input#create-fl-cnxmoduleid').removeAttr('disabled');
+        $('input#create-fl-cnxversion').removeAttr('disabled');
+    });
+
+});
