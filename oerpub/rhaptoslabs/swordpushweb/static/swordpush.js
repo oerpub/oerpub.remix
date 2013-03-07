@@ -53,7 +53,6 @@ $(document).ready(function()
 
     // Display advanced mode notice on click
     $("#expertmode").toggle(enableExpertMode, disableExpertMode);
-
     
   // Reveal error message ("Failure" page)
   $("#see-error").click(function(){
@@ -72,11 +71,6 @@ $(document).ready(function()
         $('input#upload_file').click();
     });
     
-    $('input#presentation-submit').click(function(event){
-        event.preventDefault();
-        $('input#importer').click();
-    });
-
     $('input#upload_file').change(function(event){
         showWaitMessage();
         $('form#officedocument_form').submit(); 
