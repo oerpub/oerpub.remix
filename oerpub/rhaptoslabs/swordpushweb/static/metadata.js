@@ -313,7 +313,7 @@ function editFeaturedLink(event) {
 
     $('#featuredlinks span#create-featuredlinks').hide();
     $('#featuredlinks span#edit-featuredlinks').show();
-    $('#featuredlinks').modal({'minHeight':'514px'});
+    $('#featuredlinks').modal({'minHeight':'210px'});
 }
 
 function removeFeaturedLink(event) {
