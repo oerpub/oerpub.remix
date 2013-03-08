@@ -562,7 +562,7 @@ iframe{
     background-color:#000;
 }
 
-#simplemodal-container {
+.simplemodal-container {
     display: none;
     background-color:#ffffff;
     border:8px solid #444;
@@ -575,28 +575,28 @@ iframe{
     top: -15px;">
 }
 
-#simplemodal-container td.table-row-top {
+.simplemodal-container td.table-row-top {
     border: none;
     border-top: 2px solid black;
     text-align: center;
 }
 
-#simplemodal-container td.table-row-mid {
+.simplemodal-container td.table-row-mid {
     border: none;
     border-bottom: 1px solid black;
     text-align: center;
 }
 
-#simplemodal-container td.table-row-bottom {
+.simplemodal-container td.table-row-bottom {
     border: none;
     border-bottom: 2px solid black;
 }
 
-#simplemodal-container td.table-row-general {
+.simplemodal-container td.table-row-general {
     border: none;
 }
 
-#simplemodal-container td {
+.simplemodal-container td {
     border: none
 }
 
@@ -937,4 +937,11 @@ ul.popOut a:hover{
   -moz-border-radius: 4px;
   border-radius: 4px;
   
+}
+
+#featuredlinks-container {
+    height: 100%;
+    outline: 0px;
+    width: 100%;
+    overflow: visible;
 }

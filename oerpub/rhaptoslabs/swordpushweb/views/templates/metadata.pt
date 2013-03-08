@@ -268,8 +268,9 @@
     </metal:content-slot>
 
     <metal:hidden-slot fill-slot="hidden-slot">
-    <div id="simplemodal-container" class="simplemodal-container">
-        <a class="modalCloseImg simplemodal-close" title="Close"></a><div tabindex="-1" class="simplemodal-wrap" style="height: 100%; outline: 0px; width: 100%; overflow: visible;"><div id="featuredlinks-help" style="" class="simplemodal-data">
+    <div id="featuredlinks-help-container" class="simplemodal-container">
+        <a class="modalCloseImg simplemodal-close" title="Close"></a>
+        <div tabindex="-1" class="simplemodal-wrap" style="height: 100%; outline: 0px; width: 100%; overflow: visible;"><div id="featuredlinks-help" style="" class="simplemodal-data">
 
                 <div>
                     <span class="button" id="close-featuredlinks-help">Close X</span>
@@ -287,6 +288,103 @@
                 </div>
 
     </div></div></div>
+
+    <div id="featuredlinks-container" class="simplemodal-container">
+        <a class="modalCloseImg simplemodal-close" title="Close"></a>
+        <div class="simplemodal-wrap">
+            <div id="featuredlinks" class="simplemodal-data">
+                <strong>
+                    <span id="create-featuredlinks" style="display: none;">
+                        Create a new Featured Link for this module
+                    </span>
+                    <span id="edit-featuredlinks" style="">
+                        Edit this Featured Link
+                    </span>
+                </strong>
+
+                <div class="fl-controls">
+
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <th style="padding-right: 0.5em; text-align: left;">
+                                    <span>Link title</span>:
+                                </th>
+                                <td colspan="2">
+                                    <div></div>
+                                    <input id="create-fl-title" type="text" size="30" name="title">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <th style="padding-right: 0.5em; text-align: left;">
+                                    <span>Type</span>:
+                                </th>
+                                <td colspan="2">
+                                    <select id="create-fl-category" name="category">
+                                        <option value="example">Example</option>
+                                        <option value="prerequisite">Prerequisite</option>
+                                        <option value="supplemental">Supplemental</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <th style="padding-right: 0.5em; text-align: left;">
+                                    <span>Strength</span>:
+                                </th>
+                                <td colspan="2">
+                                    <select id="create-fl-strength" name="strength">
+                                        <option value="3"> 3 : Strongly related link </option>
+                                        <option value="2"> 2 : Related link </option>
+                                        <option value="1"> 1 : Weakly related link </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr></tr>
+                            <tr>
+                                <td style="">
+                                    <input id="create-fl-useurl" name="create-fl-useurlormodule" value="create-fl-useurl" type="radio" class="noborder">
+                                </td>
+                                <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                                    <span>Enter either a URL ...</span>
+                                </th>
+                                <td colspan="2">
+                                    <div></div>
+                                    <input id="create-fl-url" name="create-fl-url" type="text" size="30">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="">
+                                    <input id="create-fl-usemodule" name="create-fl-useurlormodule" value="create-fl-usemodule" type="radio" class="noborder">
+                                </td>
+                                <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                                    <span>... or a Connexions ID</span>:
+                                </th>
+                                <td style="padding-bottom: 1em; padding-right: 0.5em;" colspan="2">
+                                    <div></div>
+                                    <input id="create-fl-cnxmoduleid" name="create-fl-cnxmoduleid" disabled="disabled" type="text" size="8">
+                                    <span style="padding: 0pt 0.25em; font-weight: bold;">
+                                        <span>Version</span> 
+                                        <span style="font-weight: normal;">(<span>optional</span>)</span>
+                                    </span>:
+                                    <input id="create-fl-cnxversion" name="create-fl-cnxversion" disabled="disabled" type="text" size="3">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="text-align: center; margin: 0.5em 0px;">
+                        <span id="submit-featuredlinks" class="button">Add New Link</span> 
+                        <span id="cancel-featuredlinks" class="button">Cancel</span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     </metal:hidden-slot>
 
