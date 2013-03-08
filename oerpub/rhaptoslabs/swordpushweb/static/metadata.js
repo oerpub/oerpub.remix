@@ -397,7 +397,7 @@ $(document).ready(function()
     $('#show-featuredlinks-help').click(function(e) {
         e.preventDefault();
         e.stopPropagation();
-        $('#featuredlinks-help').modal();
+        $('#featuredlinks-help').modal({'minHeight':'514px'});
     });
 
     // Close the "About Featured Links" overlay
