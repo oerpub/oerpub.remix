@@ -125,7 +125,7 @@ $(document).ready(function()
             $('#roles-table tbody').append(create_row(users[i]));
         };
         populate_roles_checkboxes();
-        $('#roles-picker').modal();
+        $('#roles-picker').modal({'minHeight':'514px'});
     });
         // Hide the edit roles form.
     $('#cancel-roles').click(function(e) {
@@ -313,7 +313,7 @@ function editFeaturedLink(event) {
 
     $('#featuredlinks span#create-featuredlinks').hide();
     $('#featuredlinks span#edit-featuredlinks').show();
-    $('#featuredlinks').modal();
+    $('#featuredlinks').modal({'minHeight':'514px'});
 }
 
 function removeFeaturedLink(event) {
@@ -366,7 +366,7 @@ $(document).ready(function()
         $(template).find('span#create-featuredlinks').hide();
         $(template).find('span#edit-featuredlinks').show();
 
-        $(template).modal();
+        $(template).modal({'minHeight':'210px'});
     });
 
     // Hide the "Add Featured Link" form.
