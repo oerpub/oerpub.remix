@@ -42,10 +42,10 @@ class BaseHelper(object):
     def navigate(self, errors=None, form=None):
         request = self.request
         if request.params.get('workflownav.form.submitted', '') == 'submitted':
-            if request.has_key('btn-back'):
+            if request.params.has_key('btn-back'):
                 action = self.get_previous_action()
                 return HTTPFound(location=self.request.route_url(action))
-            elif request.has_key('btn-forward'):
+            elif request.params.has_key('btn-forward'):
                 # we cannot go forward in the process while there are errors
                 if errors:
                     return None

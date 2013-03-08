@@ -59,8 +59,6 @@ function _doAction(message, event) {
     var element = event.target;
     var c = confirm(message);
     if (c == true) { 
-        form = $('form#workflownav-form');
-        form.submit();
         return true;
     } else {
         event.preventDefault(); 

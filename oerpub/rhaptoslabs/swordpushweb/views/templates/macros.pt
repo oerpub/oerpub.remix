@@ -267,11 +267,10 @@ ${form.csrf_token()}
         <div id="back-steps">
             <input id="btn-back" name="btn-back"
                 type="submit"
-                value="back step"
-                class=""
+                value="back step" 
+                class="back-button" 
                 role="button"
-                data-toggle="modal"
-                title="Return to the initial page"
+                title="Back"
                 tal:attributes="href string:/${view.get_previous_action()};
                                 value structure:view.back_step_label;
                                 title view.back_step_title"/>
