@@ -563,9 +563,16 @@ iframe{
 }
 
 #simplemodal-container {
+    display: none;
     background-color:#ffffff;
     border:8px solid #444;
     padding:12px;
+    position: fixed;
+    z-index: 1002;
+    height: 514px;
+    width: 600px;
+    left: 512.5px;
+    top: -15px;">
 }
 
 #simplemodal-container td.table-row-top {
