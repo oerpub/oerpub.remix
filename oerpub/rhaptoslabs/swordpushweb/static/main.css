@@ -731,7 +731,7 @@ a.popMenu{
   padding: .4em .5em;
   border: 1px solid #7e9ab4;
 }
-#header-wrap ul.popMenu a{
+#header-wrap ul.popMenu, ul.popMenu a{
   text-decoration: none;
   outline: 0;
   color: black;

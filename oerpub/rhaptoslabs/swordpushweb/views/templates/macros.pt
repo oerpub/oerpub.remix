@@ -258,10 +258,13 @@
 </metal:featured_links_table>
 
 <metal:workflow-nav define-macro="workflow_nav">
+<metal:workflow_nav_form_begin define-macro="workflow_nav_form_begin">
 ${form.begin(request.route_url(view.form_action),
                                name=view.form_action,
                                id="workflownav-form")}
 ${form.csrf_token()}
+</metal:workflow_nav_form_begin>
+<metal:workflow_nav_form define-macro="workflow_nav_form">
 <div id="workflownav-wrap">
     <div id="workflownav-container">
         <div id="back-steps">
@@ -276,10 +279,12 @@ ${form.csrf_token()}
                                 title view.back_step_title"/>
         </div>
 
-        <input id="workspace" type="hidden" name="workspace" />
+        <input id="workspace" type="hidden" name="workspace"
+            tal:attributes="value selected_workspace|nothing">
         <input name="workflownav.form.submitted" type="hidden" value="submitted" />
-
+        
         <div id="forward-steps">
+            <metal:extras define-slot="extras"/>
             <input id="btn-forward" name="btn-forward"
                 type="submit"
                 value="next step" 
@@ -292,5 +297,8 @@ ${form.csrf_token()}
         </div>
     </div>
 </div>
+</metal:workflow_nav_form>
+<metal:workflow_nav_form_end define-macro="workflow_nav_form_end">
 ${form.end()}
+</metal:workflow_nav_form_end>
 </metal:workflow-nav>

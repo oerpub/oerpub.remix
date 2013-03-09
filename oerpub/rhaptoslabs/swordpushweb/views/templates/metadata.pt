@@ -13,7 +13,7 @@
                 $("#formentry-ga").removeClass("error");
                 $("#formentry-ga .errortext").hide();
 
-                $(".workspace-link").click(function(event) {
+                $("a.workspace-link").click(function(event) {
                     event.preventDefault();
                     href = $(this).attr("href");
                     $("#selected_workspace").attr("href", href);
@@ -32,26 +32,31 @@
     </metal:script-slot>    
 
     <metal:workflownav fill-slot="workflownav">
-        <span metal:use-macro="view.workflow_nav">workflow buttons</span>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
-    ${form.begin(request.route_url('metadata'), name="metadata_form")}
-    ${form.csrf_token()}
+    <span metal:use-macro="view.workflow_nav_form_begin">workflow buttons</span>
+    <span metal:use-macro="view.workflow_nav_form">
+        <metal:extras fill-slot="extras">
+        <span id="uploading-to">
+            Uploading to 
+            <ul metal:use-macro="dialogs.workspace_popup">
+            </ul>
+            in Connexions
+        </span>
+        </metal:extras>
+    </span>
 
     <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
         <tal:hidden>${form.hidden(field, value=view.get_values(field))}</tal:hidden>
     </tal:field>
 
-    <input id="workspace" type="hidden" name="workspace"
-        tal:attributes="value selected_workspace">
     <input id="module" type="hidden" name="associated_module_url"
         tal:attributes="value module_url|nothing">
 
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
-
 
                 <div id="pageheader-wrap">
 
@@ -264,8 +269,8 @@
             </div>
         </div>
     </div>
-    ${form.end()}
     </metal:content-slot>
+    <span metal:use-macro="view.workflow_nav_form_end">workflow buttons</span>
 
     <metal:hidden-slot fill-slot="hidden-slot">
     <div id="featuredlinks-help">
@@ -309,7 +314,7 @@
                             <input id="create-fl-title"
                                 type="text"
                                 size="30" 
-                                name="title">
+                                name="fl_title">
                         </td>
                     </tr>
                     <tr>

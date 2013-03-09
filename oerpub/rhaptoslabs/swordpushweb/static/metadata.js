@@ -150,7 +150,6 @@ $(document).ready(function()
         $(window).trigger('resize.simplemodal');
 	    $('#edit-new-username').focus();
     });
-
 });
 
 
