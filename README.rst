@@ -3,11 +3,10 @@ What this is
 
 The sword push web client is a Pyramid webapp designed to let a user upload a MS Word or OpenOffice document, do a conversion to CNXML, and push it to the cnx.org site as a module, using the sword v2 interface. It will be generalised to enable pushing to any sword-compliant service.
 
-Quick Start
-===========
+Where the documentation is
+===========================
 
-Since this is still in development, and depends on lots of in-development packages, I recommend that you install it via the following buildout:
-
-https://github.com/oerpub/oerpub.rhaptoslabs.swordpushweb-buildout
-
-Instructions are in that readme.
+The documentation for this repo lives in the oerpub documentation wiki repo.
+ * Main site : https://github.com/oerpub/documentation/wiki
+ * Development main page : https://github.com/oerpub/documentation/wiki/Development
+ * Documentation for this repo : https://github.com/oerpub/documentation/wiki/Remix-Application
