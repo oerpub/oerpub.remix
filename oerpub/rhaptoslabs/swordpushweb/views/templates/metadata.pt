@@ -13,7 +13,7 @@
                 $("#formentry-ga").removeClass("error");
                 $("#formentry-ga .errortext").hide();
 
-                $(".workspace-link").click(function(event) {
+                $("a.workspace-link").click(function(event) {
                     event.preventDefault();
                     href = $(this).attr("href");
                     $("#selected_workspace").attr("href", href);
@@ -32,26 +32,31 @@
     </metal:script-slot>    
 
     <metal:workflownav fill-slot="workflownav">
-        <span metal:use-macro="view.workflow_nav">workflow buttons</span>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot">
-    ${form.begin(request.route_url('metadata'), name="metadata_form")}
-    ${form.csrf_token()}
+    <span metal:use-macro="view.workflow_nav_form_begin">workflow buttons</span>
+    <span metal:use-macro="view.workflow_nav_form">
+        <metal:extras fill-slot="extras">
+        <span id="uploading-to">
+            Uploading to 
+            <ul metal:use-macro="dialogs.workspace_popup">
+            </ul>
+            in Connexions
+        </span>
+        </metal:extras>
+    </span>
 
     <tal:field tal:repeat="field ['authors','maintainers','copyright','editors','translators']">
         <tal:hidden>${form.hidden(field, value=view.get_values(field))}</tal:hidden>
     </tal:field>
 
-    <input id="workspace" type="hidden" name="workspace"
-        tal:attributes="value selected_workspace">
     <input id="module" type="hidden" name="associated_module_url"
         tal:attributes="value module_url|nothing">
 
     <div id="ie6-container-wrap">
         <div id="container">
             <div id="content">
-
 
                 <div id="pageheader-wrap">
 
@@ -264,126 +269,189 @@
             </div>
         </div>
     </div>
-    ${form.end()}
     </metal:content-slot>
+    <span metal:use-macro="view.workflow_nav_form_end">workflow buttons</span>
 
     <metal:hidden-slot fill-slot="hidden-slot">
-    <div id="featuredlinks-help-container" class="simplemodal-container">
-        <a class="modalCloseImg simplemodal-close" title="Close"></a>
-        <div tabindex="-1" class="simplemodal-wrap" style="height: 100%; outline: 0px; width: 100%; overflow: visible;"><div id="featuredlinks-help" style="" class="simplemodal-data">
-
-                <div>
-                    <span class="button" id="close-featuredlinks-help">Close X</span>
-                </div>
-
-                <strong>About Featured Links</strong>
-
-                <p>
-                    "Featured Links" provide a way for authors to prominently display links in their modules.  
-                    These can be links to example, supplemental, or prerequisite materials, such as other modules, outside resources, or files for downloading. 
-                    They are featured in a special box in the upper-right-hand corner of the module when viewed online, as seen in this example:
-                </p>
-                <div style="text-align: center;">
-                    <img src="${images_url}/featured-links-02.png"/>
-                </div>
-
-    </div></div></div>
-
-    <div id="featuredlinks-container" class="simplemodal-container">
-        <a class="modalCloseImg simplemodal-close" title="Close"></a>
-        <div class="simplemodal-wrap">
-            <div id="featuredlinks" class="simplemodal-data">
-                <strong>
-                    <span id="create-featuredlinks" style="display: none;">
-                        Create a new Featured Link for this module
-                    </span>
-                    <span id="edit-featuredlinks" style="">
-                        Edit this Featured Link
-                    </span>
-                </strong>
-
-                <div class="fl-controls">
-
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                                <th style="padding-right: 0.5em; text-align: left;">
-                                    <span>Link title</span>:
-                                </th>
-                                <td colspan="2">
-                                    <div></div>
-                                    <input id="create-fl-title" type="text" size="30" name="title">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <th style="padding-right: 0.5em; text-align: left;">
-                                    <span>Type</span>:
-                                </th>
-                                <td colspan="2">
-                                    <select id="create-fl-category" name="category">
-                                        <option value="example">Example</option>
-                                        <option value="prerequisite">Prerequisite</option>
-                                        <option value="supplemental">Supplemental</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <th style="padding-right: 0.5em; text-align: left;">
-                                    <span>Strength</span>:
-                                </th>
-                                <td colspan="2">
-                                    <select id="create-fl-strength" name="strength">
-                                        <option value="3"> 3 : Strongly related link </option>
-                                        <option value="2"> 2 : Related link </option>
-                                        <option value="1"> 1 : Weakly related link </option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr></tr>
-                            <tr>
-                                <td style="">
-                                    <input id="create-fl-useurl" name="create-fl-useurlormodule" value="create-fl-useurl" type="radio" class="noborder">
-                                </td>
-                                <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
-                                    <span>Enter either a URL ...</span>
-                                </th>
-                                <td colspan="2">
-                                    <div></div>
-                                    <input id="create-fl-url" name="create-fl-url" type="text" size="30">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="">
-                                    <input id="create-fl-usemodule" name="create-fl-useurlormodule" value="create-fl-usemodule" type="radio" class="noborder">
-                                </td>
-                                <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
-                                    <span>... or a Connexions ID</span>:
-                                </th>
-                                <td style="padding-bottom: 1em; padding-right: 0.5em;" colspan="2">
-                                    <div></div>
-                                    <input id="create-fl-cnxmoduleid" name="create-fl-cnxmoduleid" disabled="disabled" type="text" size="8">
-                                    <span style="padding: 0pt 0.25em; font-weight: bold;">
-                                        <span>Version</span> 
-                                        <span style="font-weight: normal;">(<span>optional</span>)</span>
-                                    </span>:
-                                    <input id="create-fl-cnxversion" name="create-fl-cnxversion" disabled="disabled" type="text" size="3">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div style="text-align: center; margin: 0.5em 0px;">
-                        <span id="submit-featuredlinks" class="button">Add New Link</span> 
-                        <span id="cancel-featuredlinks" class="button">Cancel</span>
-                    </div>
-
-                </div>
-
-            </div>
+    <div id="featuredlinks-help">
+        <div>
+            <span class="button" id="close-featuredlinks-help">Close X</span>
         </div>
+
+        <strong>About Featured Links</strong>
+
+        <p>
+            "Featured Links" provide a way for authors to prominently display links in their modules.  
+            These can be links to example, supplemental, or prerequisite materials, such as other modules, outside resources, or files for downloading. 
+            They are featured in a special box in the upper-right-hand corner of the module when viewed online, as seen in this example:
+        </p>
+        <div style="text-align: center;">
+            <img src="${images_url}/featured-links-02.png"/>
+        </div>
+    </div>
+    
+    <div id="featuredlinks">
+        <strong>
+            <span id="create-featuredlinks">
+                Create a new Featured Link for this module
+            </span>
+            <span id="edit-featuredlinks" style="display: none;">
+                Edit this Featured Link
+            </span>
+        </strong>
+
+        <div class="fl-controls">
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span>Link title</span>:
+                        </th>
+                        <td colspan="2">
+                            <div></div>
+                            <input id="create-fl-title"
+                                type="text"
+                                size="30" 
+                                name="fl_title">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span>Type</span>:
+                        </th>
+                        <td colspan="2">
+                            <select id="create-fl-category" name="category">
+                                <option value="example">Example</option>
+                                <option value="prerequisite">Prerequisite</option>
+                                <option value="supplemental">Supplemental</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th style="padding-right: 0.5em; text-align: left;">
+                            <span>Strength</span>:
+                        </th>
+                        <td colspan="2">
+                            <select id="create-fl-strength" name="strength">
+                                <option value="3"> 3 : Strongly related link </option>
+                                <option value="2"> 2 : Related link </option>
+                                <option value="1"> 1 : Weakly related link </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td style="">
+                            <input id="create-fl-useurl"
+                                name="create-fl-useurlormodule"
+                                value="create-fl-useurl"
+                                type="radio"
+                                class="noborder">
+                        </td>
+                        <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                            <span>Enter either a URL ...</span>
+                        </th>
+                        <td colspan="2">
+                            <div></div>
+                            <input id="create-fl-url"
+                                name="create-fl-url"
+                                type="text"
+                                size="30">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="">
+                            <input id="create-fl-usemodule" 
+                                name="create-fl-useurlormodule"
+                                value="create-fl-usemodule" 
+                                type="radio"
+                                class="noborder">
+                        </td>
+                        <th style="padding-right: 0.25em; text-align: left; white-space: nowrap;">
+                            <span>... or a Connexions ID</span>:
+                        </th>
+                        <td style="padding-bottom: 1em; padding-right: 0.5em;" colspan="2">
+                            <div></div>
+                            <input id="create-fl-cnxmoduleid"
+                                name="create-fl-cnxmoduleid"
+                                disabled="disabled" 
+                                type="text"
+                                size="8">
+                            <span style="padding: 0pt 0.25em; font-weight: bold;">
+                                <span>Version</span> 
+                                <span style="font-weight: normal;">(<span>optional</span>)</span>
+                            </span>:
+                            <input id="create-fl-cnxversion"
+                                name="create-fl-cnxversion"
+                                disabled="disabled" 
+                                type="text"
+                                size="3">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin: 0.5em 0px;">
+                <span id="submit-featuredlinks" class="button">Add New Link</span> 
+                <span id="cancel-featuredlinks" class="button">Cancel</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="fl-field-template" style="display: none">
+        <table class="listing" id="featured-links-table-template">
+            <tbody>
+                <tr class="edit-link-tr">
+                    <input type="hidden" name="__start__" value=":mapping" />
+                    <td class="edit-link-td" style="width: 100%;">
+                        <div class="edit-link-title">
+                            <img id="edit-link-strength-image"
+                                src="${images_url}/strength3.png">
+                            <span>Example text</span>
+                            <a href="#"
+                                title="Visit link in new window"
+                                class="icon" target="_blank">
+                                <img src="${images_url}/external-link.png">
+                            </a>
+
+                            <input type="hidden" name="fl_title"
+                                class="edit-link-title" />
+
+                            <input type="hidden" name="fl_category"
+                                class="edit-link-category" />
+                                
+                            <input type="hidden" name="fl_strength"
+                                class="edit-link-strength" />
+                                
+                            <input type="hidden" name="url"
+                                class="edit-link-url" />
+                            
+                            <input type="hidden" name="fl_cnxmodule"
+                                class="edit-link-cnxmodule" />
+                            
+                            <input type="hidden" name="fl_cnxversion"
+                                class="edit-link-cnxversion" />
+                        </div>
+                    </td>
+                    <td nowrap="nowrap" class="link-edit-link">
+                        <a class="edit-link" href="#">
+                            Edit link
+                        </a>
+                    </td>
+                    <td nowrap="nowrap" id="example-id" class="link-edit-link">
+                        <a href="#" class="remove-link">
+                            Remove
+                        </a>
+                    </td>
+                    <input type="hidden" name="__end__" />
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     </metal:hidden-slot>

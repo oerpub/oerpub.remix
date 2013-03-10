@@ -74,6 +74,18 @@ class BaseHelper(object):
     def workflow_nav(self):
         return self.macro_renderer.implementation().macros['workflow_nav']
 
+    @reify
+    def workflow_nav_form_begin(self):
+        return self.macro_renderer.implementation().macros['workflow_nav_form_begin']
+
+    @reify
+    def workflow_nav_form(self):
+        return self.macro_renderer.implementation().macros['workflow_nav_form']
+
+    @reify
+    def workflow_nav_form_end(self):
+        return self.macro_renderer.implementation().macros['workflow_nav_form_end']
+
     def get_next_action(self):
         workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
         wf_name = self.get_source()

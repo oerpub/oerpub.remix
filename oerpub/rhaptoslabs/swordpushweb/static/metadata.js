@@ -125,7 +125,7 @@ $(document).ready(function()
             $('#roles-table tbody').append(create_row(users[i]));
         };
         populate_roles_checkboxes();
-        $('#roles-picker').modal();
+        $('#roles-picker').modal({'minHeight':'514px'});
     });
         // Hide the edit roles form.
     $('#cancel-roles').click(function(e) {
@@ -150,7 +150,6 @@ $(document).ready(function()
         $(window).trigger('resize.simplemodal');
 	    $('#edit-new-username').focus();
     });
-
 });
 
 
@@ -313,7 +312,7 @@ function editFeaturedLink(event) {
 
     $('#featuredlinks span#create-featuredlinks').hide();
     $('#featuredlinks span#edit-featuredlinks').show();
-    $('#featuredlinks').modal();
+    $('#featuredlinks').modal({'minHeight':'210px'});
 }
 
 function removeFeaturedLink(event) {
@@ -366,7 +365,7 @@ $(document).ready(function()
         $(template).find('span#create-featuredlinks').hide();
         $(template).find('span#edit-featuredlinks').show();
 
-        $(template).modal();
+        $(template).modal({'minHeight':'210px'});
     });
 
     // Hide the "Add Featured Link" form.
@@ -397,7 +396,7 @@ $(document).ready(function()
     $('#show-featuredlinks-help').click(function(e) {
         e.preventDefault();
         e.stopPropagation();
-        $('#featuredlinks-help').modal();
+        $('#featuredlinks-help').modal({'minHeight':'514px'});
     });
 
     // Close the "About Featured Links" overlay
