@@ -30,14 +30,6 @@ $(document).ready(function()
         return _doAction(confirmMsg3, e);
     });
 
-    $("button#btn-navigate-back").click(function(e){
-        _doNavAction(e);
-    });
-
-    $("input#btn-forward").click(function(e){
-        _doNavAction(e);
-    });
-
     ///////////////////////////////////////////////////////////////////////////
     // Not sure this is still used. Validate and delete if unused.
     ///////////////////////////////////////////////////////////////////////////
