@@ -8,12 +8,12 @@ class SummaryView(BaseHelper):
 
     @view_config(route_name='summary')
     def process(self):
-        super(SummaryView, self).process()
+        super(SummaryView, self)._process()
         return self.navigate()
     
     def navigate(self, errors=None, form=None):
         # See if this was a plain navigation attempt
-        view = super(SummaryView, self).navigate()
+        view = super(SummaryView, self)._navigate(errors, form)
         if view:
             return view
 

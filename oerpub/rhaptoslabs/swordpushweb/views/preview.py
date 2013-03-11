@@ -38,7 +38,7 @@ class PreviewView(BaseHelper):
     @view_config(route_name='preview', renderer='templates/preview.pt',
         http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
     def process(self):
-        super(PreviewView, self).process()
+        super(PreviewView, self)._process()
         self.do_transition()
         return self.navigate()
 
@@ -87,7 +87,7 @@ class PreviewView(BaseHelper):
     
     def navigate(self, errors=None, form=None):
         # See if this was a plain navigation attempt
-        view = super(PreviewView, self).navigate()
+        view = super(PreviewView, self)._navigate(errors, form)
         if view:
             return view
 

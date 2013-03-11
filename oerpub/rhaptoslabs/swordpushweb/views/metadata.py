@@ -299,7 +299,7 @@ class Metadata_View(BaseHelper):
         """
         Handle metadata adding and uploads
         """
-        super(Metadata_View, self).process()
+        super(Metadata_View, self)._process()
         request = self.request
         defaults = self.defaults
         form = Form(request,
@@ -310,7 +310,7 @@ class Metadata_View(BaseHelper):
         errors = self.do_transition(form)
         return self.navigate(errors, form)
 
-    def do_transition(self, form=None):
+    def do_transition(self, form=None, request=None):
         errors = {}
         session = self.session
         request = self.request
@@ -366,7 +366,7 @@ class Metadata_View(BaseHelper):
 
     def navigate(self, errors=None, form=None):
         # See if this was a plain navigation attempt
-        view = super(Metadata_View, self).navigate(errors)
+        view = super(Metadata_View, self)._navigate(errors, form)
         if view:
             return view 
         
