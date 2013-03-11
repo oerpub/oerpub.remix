@@ -23,10 +23,16 @@ class Module_Association_View(BaseHelper):
 
     @view_config(route_name='module_association',
                  renderer='templates/module_association.pt')
-    def generate_html_view(self):
-        request = self.request
+    def process(self):
+        super(Module_Association_View, self)._process(self.request)
+        return self.navigate()
+    
+    def navigate(self, errors=None, form=None):
+        view = super(Module_Association_View, self)._navigate(errors, form)
+        if view:
+            return view 
 
-        self.check_login()
+        request = self.request
         config = load_config(request)
         conn = self.get_connection()
 
