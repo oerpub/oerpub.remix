@@ -285,7 +285,7 @@ ${form.csrf_token()}
         
         <div id="forward-steps">
             <metal:extras define-slot="extras"/>
-            <input id="btn-forward" name="btn-forward"
+            <input id="btn-forward1" name="btn-forward"
                 type="submit"
                 value="next step" 
                 class="forward-button" 
