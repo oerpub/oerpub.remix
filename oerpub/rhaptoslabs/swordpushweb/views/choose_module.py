@@ -23,6 +23,10 @@ class Choose_Module(Module_Association_View):
         return self.macro_renderer.implementation().macros['content_macro']
 
     @reify
+    def form_action(self):
+        return self.get_next_action()
+
+    @reify
     def back_step_label(self):
         return "&laquo; Back: Return to start page"
     

@@ -39,10 +39,10 @@ class BaseHelper(object):
         """
         return utils_get_connection(self.session)
 
-    def _navigate(self, errors, form):
+    def _navigate(self, errors, form, marker='workflownav.form.submitted'):
         # makes the rest of the lines a couple-a-chars shorter
         request = self.request
-        if request.params.get('workflownav.form.submitted', '') == 'submitted':
+        if request.params.get(marker, '') == 'submitted':
             if request.params.has_key('btn-back'):
                 action = self.get_previous_action()
                 return HTTPFound(location=self.request.route_url(action))

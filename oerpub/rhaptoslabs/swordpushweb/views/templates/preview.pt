@@ -92,7 +92,11 @@
     </metal:script>
 
     <metal:workflownav fill-slot="workflownav">
-        <span metal:use-macro="view.workflow_nav">workflow buttons</span>
+    <span metal:use-macro="view.workflow_nav">workflow buttons
+        <span metal:fill-slot="extras">
+            <input name="workflownav.preview.submitted" type="hidden" value="submitted" />
+        </span>
+    </span>
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"

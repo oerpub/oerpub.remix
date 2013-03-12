@@ -87,7 +87,7 @@ class PreviewView(BaseHelper):
     
     def navigate(self, errors=None, form=None):
         # See if this was a plain navigation attempt
-        view = super(PreviewView, self)._navigate(errors, form)
+        view = super(PreviewView, self)._navigate(errors, form, 'workflownav.preview.submitted')
         if view:
             return view
 
