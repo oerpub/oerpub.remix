@@ -97,7 +97,7 @@ class Choose_Document_Source(BaseHelper):
 
     @view_config(route_name='choose')
     def process(self):
-        super(Choose_Document_Source, self).process()
+        super(Choose_Document_Source, self)._process()
         self.do_transition()
         return self.navigate()
 

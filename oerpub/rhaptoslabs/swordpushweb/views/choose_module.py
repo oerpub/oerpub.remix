@@ -14,12 +14,17 @@ class Choose_Module(Module_Association_View):
 
     @view_config(
         route_name='choose-module', renderer="templates/choose_module.pt")
-    def generate_html_view(self):
-        return super(Choose_Module, self).generate_html_view()
+    def process(self):
+        super(Choose_Module, self)._process()
+        return self.navigate()
 
     @reify
     def content_macro(self):
         return self.macro_renderer.implementation().macros['content_macro']
+
+    @reify
+    def form_action(self):
+        return self.get_next_action()
 
     @reify
     def back_step_label(self):

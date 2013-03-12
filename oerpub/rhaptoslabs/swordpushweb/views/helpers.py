@@ -20,7 +20,7 @@ class BaseHelper(object):
         # BeforeRenderEvent in ../subscribers.py
         self.macro_renderer = get_renderer("templates/macros.pt")
     
-    def process(self):
+    def _process(self):
         self.check_login()
 
     def check_login(self, raise_exception=True):
@@ -39,9 +39,10 @@ class BaseHelper(object):
         """
         return utils_get_connection(self.session)
 
-    def navigate(self, errors=None, form=None):
+    def _navigate(self, errors, form, marker='workflownav.form.submitted'):
+        # makes the rest of the lines a couple-a-chars shorter
         request = self.request
-        if request.params.get('workflownav.form.submitted', '') == 'submitted':
+        if request.params.get(marker, '') == 'submitted':
             if request.params.has_key('btn-back'):
                 action = self.get_previous_action()
                 return HTTPFound(location=self.request.route_url(action))
