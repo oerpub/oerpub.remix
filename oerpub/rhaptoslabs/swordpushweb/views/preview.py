@@ -56,10 +56,10 @@ class PreviewView(BaseHelper):
             parts = urlparse.urlsplit(module)
             path = parts.path.split('/')
             path = path[:path.index('sword')]
-            module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
+            self.module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
 
             # example: http://cnx.org/Members/user001/m17222/sword/editmedia
-            zip_file = conn.get_cnx_module(module_url = module_url,
+            zip_file = conn.get_cnx_module(module_url = self.module_url,
                                            packaging = 'zip')
             
             save_dir = os.path.join(request.registry.settings['transform_dir'],
@@ -110,6 +110,10 @@ class PreviewView(BaseHelper):
             'editor': EditorHelper(request),
             'view': self,
         }
+
+    @reify
+    def form_action(self):
+        return self.get_next_action()
 
     @reify
     def neworexisting_dialog(self):
