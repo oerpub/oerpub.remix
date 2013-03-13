@@ -95,6 +95,8 @@
     <span metal:use-macro="view.workflow_nav">workflow buttons
         <span metal:fill-slot="extras">
             <input name="workflownav.preview.submitted" type="hidden" value="submitted" />
+            <input id="module" type="hidden" name="module_url"
+                tal:attributes="value view.module_url">
         </span>
     </span>
     </metal:workflownav>
