@@ -1,0 +1,7 @@
+window_sizes 1680 1026 393 1281 832 120
+show_stereotypes
+selected componentdiagram_ref 128127 // Sequence of calls between views
+open
+  componentview_ref 128255 // Sequence view
+end
+end
