@@ -45,15 +45,15 @@ class PreviewView(BaseHelper):
     def do_transition(self, form=None):
         request = self.request
         session = request.session
-        module = request.params.get('module')
-        if module:
+        module_url = session.get('module_url')
+        if module_url:
             conn = sword2cnx.Connection(session['service_document_url'],
                                         user_name=session['username'],
                                         user_pass=session['password'],
                                         always_authenticate=True,
                                         download_service_document=False)
 
-            parts = urlparse.urlsplit(module)
+            parts = urlparse.urlsplit(module_url)
             path = parts.path.split('/')
             path = path[:path.index('sword')]
             self.module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
@@ -110,10 +110,6 @@ class PreviewView(BaseHelper):
             'editor': EditorHelper(request),
             'view': self,
         }
-
-    @reify
-    def form_action(self):
-        return self.get_next_action()
 
     @reify
     def neworexisting_dialog(self):

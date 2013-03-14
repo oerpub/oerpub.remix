@@ -188,14 +188,24 @@ class Metadata_View(BaseHelper):
 
     def update_module(self, save_dir, connection, metadata, module_url):
         zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
+        
+        # We cannot be sure whether the '/sword' will be there or not,
+        # so we remove it, which works fine even if it is not there.
+        # This gives us a predictable base to start from.
+        base_url = module_url.strip('/sword')
+        # Now we add it back, but only for the edit-iri.
+        edit_iri = base_url + '/sword'
+        # The editmedia-iri does not want '/sword' in it.
+        edit_media_iri = base_url + '/editmedia'
+
         deposit_receipt = connection.update(
             metadata_entry = metadata,
             payload = zip_file,
             filename = 'upload.zip',
             mimetype = 'application/zip',
             packaging = ZIP_PACKAGING,
-            edit_iri = module_url + '/sword',
-            edit_media_iri = module_url + '/editmedia',
+            edit_iri = edit_iri,
+            edit_media_iri = edit_media_iri,
             metadata_relevant=False,
             in_progress=True)
         zip_file.close()
@@ -315,7 +325,7 @@ class Metadata_View(BaseHelper):
         session = self.session
         request = self.request
         workspaces = self.workspaces
-        self.module_url = request.params.get('module_url', None)
+        self.module_url = session.get('module_url', None)
 
         # Check for successful form completion
         if form.validate():
@@ -365,7 +375,7 @@ class Metadata_View(BaseHelper):
 
     def navigate(self, errors=None, form=None):
         # See if this was a plain navigation attempt
-        view = super(Metadata_View, self)._navigate(errors, form, 'workflownav.metadata.submitted')
+        view = super(Metadata_View, self)._navigate(errors, form)
         if view:
             return view 
         
@@ -381,7 +391,11 @@ class Metadata_View(BaseHelper):
         username = session['username']
         password = session['password']
         if self.module_url:
-            dr_url = self.module_url + '/sword'
+
+            if self.module_url.endswith('/sword'):
+                dr_url = self.module_url
+            else:
+                dr_url = self.module_url + '/sword'
             metadata.update(get_metadata_from_repo(session, dr_url, username, password))
         else:
             for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:

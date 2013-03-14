@@ -16,15 +16,17 @@ class Choose_Module(Module_Association_View):
         route_name='choose-module', renderer="templates/choose_module.pt")
     def process(self):
         super(Choose_Module, self)._process()
+        self.do_transition()
         return self.navigate()
 
+    def do_transition(self):
+        request = self.request
+        module_url = request.params.get('module_url')
+        request.session['module_url'] = module_url
+    
     @reify
     def content_macro(self):
         return self.macro_renderer.implementation().macros['content_macro']
-
-    @reify
-    def form_action(self):
-        return self.get_next_action()
 
     @reify
     def back_step_label(self):
