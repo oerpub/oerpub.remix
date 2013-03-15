@@ -119,7 +119,7 @@
                     class="draggable odd">
 
                     <td style="text-align: center;" class="notDraggable checkCol">
-                        <input type="radio" name="module"
+                        <input type="radio" name="module_url"
                         value="/GroupWorkspaces/wg1438/m33469"
                         tal:attributes="value details[1]">
                     </td>

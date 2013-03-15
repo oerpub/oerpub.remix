@@ -45,21 +45,21 @@ class PreviewView(BaseHelper):
     def do_transition(self, form=None):
         request = self.request
         session = request.session
-        module = request.params.get('module')
-        if module:
+        module_url = session.get('module_url')
+        if module_url:
             conn = sword2cnx.Connection(session['service_document_url'],
                                         user_name=session['username'],
                                         user_pass=session['password'],
                                         always_authenticate=True,
                                         download_service_document=False)
 
-            parts = urlparse.urlsplit(module)
+            parts = urlparse.urlsplit(module_url)
             path = parts.path.split('/')
             path = path[:path.index('sword')]
-            module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
+            self.module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
 
             # example: http://cnx.org/Members/user001/m17222/sword/editmedia
-            zip_file = conn.get_cnx_module(module_url = module_url,
+            zip_file = conn.get_cnx_module(module_url = self.module_url,
                                            packaging = 'zip')
             
             save_dir = os.path.join(request.registry.settings['transform_dir'],

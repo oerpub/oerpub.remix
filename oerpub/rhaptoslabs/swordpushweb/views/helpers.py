@@ -89,15 +89,17 @@ class BaseHelper(object):
 
     def get_next_action(self):
         workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
-        wf_name = self.get_source()
+        source = self.get_source()
+        target = self.get_target()
         current_step = self.request.matched_route.name
-        return workflowsteps.getNextStep(wf_name, current_step)
+        return workflowsteps.getNextStep(source, target, current_step)
 
     def get_previous_action(self):
         workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
-        wf_name = self.get_source()
+        source = self.get_source()
+        target = self.get_target()
         current_step = self.request.matched_route.name
-        return workflowsteps.getPreviousStep(wf_name, current_step)
+        return workflowsteps.getPreviousStep(source, target, current_step)
     
     def get_batch_link(self, b_start, selected_workspace):
         params = {"b_start": b_start,
@@ -111,6 +113,12 @@ class BaseHelper(object):
 
     def get_source(self):
         return self.request.session.get('source', 'undefined')
+    
+    def set_target(self, target):
+        self.request.session['target'] = target
+
+    def get_target(self):
+        return self.request.session.get('target', 'undefined')
     
     @reify
     def form_action(self):

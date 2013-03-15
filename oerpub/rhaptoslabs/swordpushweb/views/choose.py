@@ -54,7 +54,7 @@ from oerpub.rhaptoslabs.swordpushweb.errors import (
 LOG = getLogger('%s' % __name__)
 
 
-class ModuleEditorSchema(formencode.Schema):
+class NewOrExistingSchema(formencode.Schema):
     allow_extra_fields = True
     newmodule = formencode.validators.Bool()
     existingmodule = formencode.validators.Bool()
@@ -71,7 +71,7 @@ class GoogleDocsSchema(formencode.Schema):
 
 class URLSchema(formencode.Schema):
     allow_extra_fields = True
-    upload_url = formencode.validators.URL()
+    url_text = formencode.validators.URL()
 
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
@@ -104,15 +104,19 @@ class Choose_Document_Source(BaseHelper):
     def do_transition(self):
         request = self.request
         session = request.session
-        # clear the session
-        if 'transformerror' in session:
-            del session['transformerror']
-        if 'title' in session:
-            del session['title']
+        self.clear_session(session)
+    
+    def clear_session(self, session):
+        ''' Remove all known application specific state from the session.
+        '''
+        keys = ['transformerror', 'title', 'source', 'target', 'module_url']
+        for key in keys:
+            if key in session:
+                del session[key]
         
     def navigate(self, errors=None, form=None):
         request = self.request
-        neworexisting_form = Form(request, schema=ModuleEditorSchema)
+        neworexisting_form = Form(request, schema=NewOrExistingSchema)
         officedocument_form = Form(request, schema=OfficeDocumentUploadSchema)
         googledocs_form = Form(request, schema=GoogleDocsSchema)
         url_form = Form(request, schema=URLSchema)
@@ -164,11 +168,6 @@ class Choose_Document_Source(BaseHelper):
         processor = GoogleDocProcessor(request, form)
         return processor.process()
     
-    def _process_url_submit(self, request, form):
-        LOG.info('process URL submit')
-        processor = BaseFormProcessor(request, form)
-        return processor.process()
-
     def _process_presentationform_submit(self, request, form):
         LOG.info('process presentation submit')
         processor = PresentationProcessor(request, form)
@@ -179,61 +178,17 @@ class Choose_Document_Source(BaseHelper):
         processor = ZipOrLatexModuleProcessor(request, form)
         return processor.process()
 
-    def process_url_data(self, form, request, save_dir):
-        url = form.data['url_text']
-
-        form.data['url_text'] = None
-
-        # Build a regex for Google Docs URLs
-        regex = re.compile("^https:\/\/docs\.google\.com\/.*document\/[^\/]\/([^\/]+)\/")
-        r = regex.search(url)
-
-        # Take special action for Google Docs URLs
-        if r:
-            gdocs_resource_id = r.groups()[0]
-            title, filename = self.process_gdocs_resource(
-                    save_dir, "document:" + gdocs_resource_id)
-
-            request.session['title'] = title
-            request.session['filename'] = filename
-        else:
-            # download html:
-            # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
-            import_opener = urllib2.build_opener()
-            import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-            try:
-                import_request = import_opener.open(url)
-                html = import_request.read()
-
-                # transformation
-                cnxml, objects, html_title = htmlsoup_to_cnxml(
-                        html, bDownloadImages=True, base_or_source_url=url)
-                request.session['title'] = html_title
-
-                cnxml = clean_cnxml(cnxml)
-                save_cnxml(save_dir, cnxml, objects.items())
-
-                # Keep the info we need for next uploads.  Note that
-                # this might kill the ability to do multiple tabs in
-                # parallel, unless it gets offloaded onto the form
-                # again.
-                request.session['filename'] = "HTML Document"
-
-                validate_cnxml(cnxml)
-
-            except urllib2.URLError, e:
-                return ['The URL %s could not be opened' %url,]
-                response = {'form': FormRenderer(form),}
-                return render_to_response(self.templatePath,
-                                          response,
-                                          request=request)
+    def _process_url_submit(self, request, form):
+        LOG.info('process URL submit')
+        processor = URLProcessor(request, form)
+        return processor.process()
 
 class BaseFormProcessor(object):
     def __init__(self, request, form):
         self.request = request
         self.form = form
         self.message = 'The file was successfully converted.'
-        self.source = 'undefined'
+        request.session['source'] = 'undefined'
         self.temp_dir_name, self.save_dir = self.create_work_dir(self.request)
         self.upload_dir = self.temp_dir_name
         self.request.session['upload_dir'] = self.temp_dir_name
@@ -325,22 +280,31 @@ class BaseFormProcessor(object):
 
     def get_source(self):
         return self.request.session.get('source', 'undefined')
+
+    def set_target(self, target):
+        self.request.session['target'] = target
+
+    def get_target(self):
+        return self.request.session.get('target', 'undefined')
     
     def nextStep(self):
         workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
-        wf_name = self.get_source()
+        source = self.get_source()
+        target = self.get_target()
         current_step = 'choose'
-        return workflowsteps.getNextStep(wf_name, current_step)
+        return workflowsteps.getNextStep(source, target, current_step)
 
 class NewOrExistingModuleProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(NewOrExistingModuleProcessor, self).__init__(request, form)
-        self.set_source('')
+        self.set_source('new')
+        self.set_target('new')
 
     def process(self):
         try:
             if self.form.data.get('newmodule'):
-                self.set_source('newemptymodule')
+                self.set_source('new')
+                self.set_target('new')
                 # save empty cnxml and html files
                 cnxml = self.empty_cnxml()
                 files = []
@@ -348,6 +312,7 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
             
             elif self.form.data.get('existingmodule'):
                 self.set_source('existingmodule')
+                self.set_target('existingmodule')
                 return HTTPFound(
                     location=self.request.route_url('choose-module'))
 
@@ -390,6 +355,7 @@ class ZipOrLatexModuleProcessor(BaseFormProcessor):
         self.zip_archive = zipfile.ZipFile(self.original_filename, 'r')
         self.form.data['upload'] = None
         self.set_source('cnxinputs')
+        self.set_target('new')
 
     def process(self):
         try:
@@ -447,6 +413,7 @@ class ZipFileProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(ZipFileProcessor, self).__init__(request, form)
         self.set_source('cnxinputs')
+        self.set_target('new')
 
     def process(self):
         try:
@@ -488,6 +455,7 @@ class LatexProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(LatexProcessor, self).__init__(request, form)
         self.set_source('cnxinputs')
+        self.set_target('new')
 
     def process(self):
         try:
@@ -520,6 +488,7 @@ class OfficeDocumentProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(OfficeDocumentProcessor, self).__init__(request, form)
         self.set_source('fileupload')
+        self.set_target('new')
         ufname = self.form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
         self.request.session['filename'] = self.form.data['upload_file'].filename
@@ -606,6 +575,7 @@ class GoogleDocProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(GoogleDocProcessor, self).__init__(request, form)
         self.set_source('gdocupload')
+        self.set_target('new')
     
     def process(self):
         try:
@@ -670,6 +640,7 @@ class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(PresentationProcessor, self).__init__(request, form)
         self.set_source('presentation')
+        self.set_target('new')
         ufname = form.data['importer'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
         self.request.session['filename'] = self.form.data['upload_file'].filename
@@ -747,3 +718,67 @@ class PresentationProcessor(BaseFormProcessor):
                           username,
                           username,
                           username)
+
+class URLProcessor(BaseFormProcessor):
+    
+    def __init__(self, request, form):
+        super(URLProcessor, self).__init__(request, form)
+        self.set_source('url')
+        self.set_target('new')
+
+    def process(self):
+        try:
+            url = self.form.data['url_text']
+
+            # Build a regex for Google Docs URLs
+            regex = re.compile(
+                "^https:\/\/docs\.google\.com\/.*document\/[^\/]\/([^\/]+)\/")
+            r = regex.search(url)
+
+            # Take special action for Google Docs URLs
+            if r:
+                gdocs_resource_id = r.groups()[0]
+                doc_id = "document:" + gdocs_resource_id
+                title, filename = self.process_gdocs_resource(self.save_dir,
+                                                              doc_id)
+
+                self.request.session['title'] = title
+                self.request.session['filename'] = filename
+            else:
+                # download html:
+                # Simple urlopen() will fail on mediawiki websites eg. Wikipedia!
+                import_opener = urllib2.build_opener()
+                import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                import_request = import_opener.open(url)
+                html = import_request.read()
+
+                # transformation
+                cnxml, objects, html_title = htmlsoup_to_cnxml(
+                        html, bDownloadImages=True, base_or_source_url=url)
+                self.request.session['title'] = html_title
+
+                cnxml = clean_cnxml(cnxml)
+                save_cnxml(self.save_dir, cnxml, objects.items())
+
+                # Keep the info we need for next uploads.  Note that
+                # this might kill the ability to do multiple tabs in
+                # parallel, unless it gets offloaded onto the form
+                # again.
+                self.request.session['filename'] = "HTML Document"
+
+                validate_cnxml(cnxml)
+
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url(self.nextStep()))

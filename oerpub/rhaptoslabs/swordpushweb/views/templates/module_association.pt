@@ -4,7 +4,7 @@
     <script type="text/javascript">
 
         $(document).ready(function(){
-            $('input[name="module"]').each(function(index) {
+            $('input[name="module_url"]').each(function(index) {
                 if ($(this).attr('checked') == 'checked') {
                     $(this).closest('tr').addClass("selected-row");
                     $('input.forward-button').removeAttr('disabled');

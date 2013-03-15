@@ -22,13 +22,17 @@ class WorkflowStepsUtility(object):
     
     DEFAULT_WORKFLOW = ['choose', 'preview', 'metadata', 'summary']
     EXISTING_MODULE_WORKFLOW = ['choose', 'choose-module', 'preview', 'metadata', 'summary']
+    EXISTING_MODULE_NEW_WORKFLOW = ['choose', 'choose-module', 'preview', 'metadata', 'summary']
 
-    workflows = {'newemptymodule' : DEFAULT_WORKFLOW,
-                 'existingmodule' : EXISTING_MODULE_WORKFLOW,
-                 'cnxinputs'      : DEFAULT_WORKFLOW,
-                 'gdocupload'     : DEFAULT_WORKFLOW,
-                 'presentation'   : DEFAULT_WORKFLOW,
-                 'fileupload'     : DEFAULT_WORKFLOW}
+    workflows = {'new:new'                       : DEFAULT_WORKFLOW,
+                 'existingmodule:existingmodule' : EXISTING_MODULE_WORKFLOW,
+                 'existingmodule:new'            : EXISTING_MODULE_NEW_WORKFLOW,
+                 'fileupload:new'                : DEFAULT_WORKFLOW,
+                 'gdocupload:new'                : DEFAULT_WORKFLOW,
+                 'url:new'                       : DEFAULT_WORKFLOW,
+                 'cnxinputs:new'                 : DEFAULT_WORKFLOW,
+                 'newemptymodule:new'            : DEFAULT_WORKFLOW,
+                 'presentation:new'              : DEFAULT_WORKFLOW,}
     
     def setWorkflowSteps(self, wf_name, steps):
         wf = self.workflows.get(wf_name)
@@ -36,32 +40,37 @@ class WorkflowStepsUtility(object):
             raise NotFound('Workflow %s could not be found.' % wf_name)
         self.workflows[wf_name] = steps
    
-    def getWorkflowSteps(self, workflow):
-        steps = self.workflows.get(workflow)
+    def getWorkflowSteps(self, wf_name):
+        steps = self.workflows.get(wf_name)
         if not steps:
-            raise NotFound('Workflow %s could not be found.' % workflow)
+            raise NotFound('Workflow %s could not be found.' % wf_name)
         return steps
 
     def _getCurrentIdx(self, steps, step):
         current_idx = steps.index(step)
         return current_idx
     
-    def getNextStep(self, workflow, current_step):
+    def getNextStep(self, source, target, current_step):
         """
         We use whatever is less the last index in the steps or the current
         step +1. That way we don't try to go beyond the end of the steps.
         """
-        steps = self.getWorkflowSteps(workflow)
+        wf_name = self.getWorkflowName(source, target)
+        steps = self.getWorkflowSteps(wf_name)
         current_idx = self._getCurrentIdx(steps, current_step) 
         next_idx = min(current_idx+1, len(steps)+1)
         return steps[next_idx]
 
-    def getPreviousStep(self, workflow, current_step):
+    def getPreviousStep(self, source, target, current_step):
         """
         We use whatever is bigger the first index in the steps or the current
         step -1. That way we don't try to go beyond the beginning of the steps.
         """
-        steps = self.getWorkflowSteps(workflow)
+        wf_name = self.getWorkflowName(source, target)
+        steps = self.getWorkflowSteps(wf_name)
         current_idx = self._getCurrentIdx(steps, current_step) 
         next_idx = max(current_idx-1, 0)
         return steps[next_idx]
+    
+    def getWorkflowName(self, source, target):
+        return '%s:%s' % (source, target)
