@@ -71,7 +71,7 @@ class GoogleDocsSchema(formencode.Schema):
 
 class URLSchema(formencode.Schema):
     allow_extra_fields = True
-    upload_url = formencode.validators.URL()
+    url_text = formencode.validators.URL()
 
 class UploadSchema(formencode.Schema):
     allow_extra_fields = True
@@ -168,11 +168,6 @@ class Choose_Document_Source(BaseHelper):
         processor = GoogleDocProcessor(request, form)
         return processor.process()
     
-    def _process_url_submit(self, request, form):
-        LOG.info('process URL submit')
-        processor = BaseFormProcessor(request, form)
-        return processor.process()
-
     def _process_presentationform_submit(self, request, form):
         LOG.info('process presentation submit')
         processor = PresentationProcessor(request, form)
@@ -183,54 +178,10 @@ class Choose_Document_Source(BaseHelper):
         processor = ZipOrLatexModuleProcessor(request, form)
         return processor.process()
 
-    def process_url_data(self, form, request, save_dir):
-        url = form.data['url_text']
-
-        form.data['url_text'] = None
-
-        # Build a regex for Google Docs URLs
-        regex = re.compile("^https:\/\/docs\.google\.com\/.*document\/[^\/]\/([^\/]+)\/")
-        r = regex.search(url)
-
-        # Take special action for Google Docs URLs
-        if r:
-            gdocs_resource_id = r.groups()[0]
-            title, filename = self.process_gdocs_resource(
-                    save_dir, "document:" + gdocs_resource_id)
-
-            request.session['title'] = title
-            request.session['filename'] = filename
-        else:
-            # download html:
-            # Simple urlopen() will fail on mediawiki websites like e.g. Wikipedia!
-            import_opener = urllib2.build_opener()
-            import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-            try:
-                import_request = import_opener.open(url)
-                html = import_request.read()
-
-                # transformation
-                cnxml, objects, html_title = htmlsoup_to_cnxml(
-                        html, bDownloadImages=True, base_or_source_url=url)
-                request.session['title'] = html_title
-
-                cnxml = clean_cnxml(cnxml)
-                save_cnxml(save_dir, cnxml, objects.items())
-
-                # Keep the info we need for next uploads.  Note that
-                # this might kill the ability to do multiple tabs in
-                # parallel, unless it gets offloaded onto the form
-                # again.
-                request.session['filename'] = "HTML Document"
-
-                validate_cnxml(cnxml)
-
-            except urllib2.URLError, e:
-                return ['The URL %s could not be opened' %url,]
-                response = {'form': FormRenderer(form),}
-                return render_to_response(self.templatePath,
-                                          response,
-                                          request=request)
+    def _process_url_submit(self, request, form):
+        LOG.info('process URL submit')
+        processor = URLProcessor(request, form)
+        return processor.process()
 
 class BaseFormProcessor(object):
     def __init__(self, request, form):
@@ -767,3 +718,67 @@ class PresentationProcessor(BaseFormProcessor):
                           username,
                           username,
                           username)
+
+class URLProcessor(BaseFormProcessor):
+    
+    def __init__(self, request, form):
+        super(URLProcessor, self).__init__(request, form)
+        self.set_source('url')
+        self.set_target('new')
+
+    def process(self):
+        try:
+            url = self.form.data['url_text']
+
+            # Build a regex for Google Docs URLs
+            regex = re.compile(
+                "^https:\/\/docs\.google\.com\/.*document\/[^\/]\/([^\/]+)\/")
+            r = regex.search(url)
+
+            # Take special action for Google Docs URLs
+            if r:
+                gdocs_resource_id = r.groups()[0]
+                doc_id = "document:" + gdocs_resource_id
+                title, filename = self.process_gdocs_resource(self.save_dir,
+                                                              doc_id)
+
+                self.request.session['title'] = title
+                self.request.session['filename'] = filename
+            else:
+                # download html:
+                # Simple urlopen() will fail on mediawiki websites eg. Wikipedia!
+                import_opener = urllib2.build_opener()
+                import_opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                import_request = import_opener.open(url)
+                html = import_request.read()
+
+                # transformation
+                cnxml, objects, html_title = htmlsoup_to_cnxml(
+                        html, bDownloadImages=True, base_or_source_url=url)
+                self.request.session['title'] = html_title
+
+                cnxml = clean_cnxml(cnxml)
+                save_cnxml(self.save_dir, cnxml, objects.items())
+
+                # Keep the info we need for next uploads.  Note that
+                # this might kill the ability to do multiple tabs in
+                # parallel, unless it gets offloaded onto the form
+                # again.
+                self.request.session['filename'] = "HTML Document"
+
+                validate_cnxml(cnxml)
+
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            self.write_traceback_to_zipfile(tb)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
