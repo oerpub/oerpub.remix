@@ -27,11 +27,12 @@ class WorkflowStepsUtility(object):
     workflows = {'new:new'                       : DEFAULT_WORKFLOW,
                  'existingmodule:existingmodule' : EXISTING_MODULE_WORKFLOW,
                  'existingmodule:new'            : EXISTING_MODULE_NEW_WORKFLOW,
-                 'newemptymodule' : DEFAULT_WORKFLOW,
-                 'cnxinputs'      : DEFAULT_WORKFLOW,
-                 'gdocupload'     : DEFAULT_WORKFLOW,
-                 'presentation'   : DEFAULT_WORKFLOW,
-                 'fileupload'     : DEFAULT_WORKFLOW}
+                 'fileupload:new'                : DEFAULT_WORKFLOW,
+                 'gdocupload:new'                : DEFAULT_WORKFLOW,
+                 'url:new'                       : DEFAULT_WORKFLOW,
+                 'cnxinputs:new'                 : DEFAULT_WORKFLOW,
+                 'newemptymodule:new'            : DEFAULT_WORKFLOW,
+                 'presentation:new'              : DEFAULT_WORKFLOW,}
     
     def setWorkflowSteps(self, wf_name, steps):
         wf = self.workflows.get(wf_name)
