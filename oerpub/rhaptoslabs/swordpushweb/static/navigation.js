@@ -31,7 +31,7 @@ $(document).ready(function()
     });
 
 
-    $('a#cnxlogo_link, img.cnxlogo, #header h1').click(function(e) {
+    $('a#cnxlogo_link, img.cnxlogo, #header h1 a').click(function(e) {
         return _doAction(confirmMsg2, e);
     });
 
