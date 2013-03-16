@@ -146,11 +146,13 @@
                 </div>
 
                 <div id="header">
-                    <img class="cnxlogo" src="/static/images/connexions_icon.png"/>
                     <h1>
-                        <a id="cnxlogo-link"
-                            href="#go-back-or-stay-dialog" role="button"
-                            data-toggle="modal">OERPUB Connexions Importer</a>
+                        <a id="cnxlogo_link" href="http://localhost:6543">
+                            <img class="cnxlogo" 
+                                src="/static/images/connexions_icon.png"
+                                alt="OERPUB Connexions Importer" />
+                            OERPUB Connexions Importer
+                        </a>
                     </h1>
                 </div>
                 
