@@ -109,7 +109,12 @@ class Choose_Document_Source(BaseHelper):
     def clear_session(self, session):
         ''' Remove all known application specific state from the session.
         '''
-        keys = ['transformerror', 'title', 'source', 'target', 'module_url']
+        keys = ['transformerror',
+                'title',
+                'source',
+                'target',
+                'module_url',
+                'preview-no-cache']
         for key in keys:
             if key in session:
                 del session[key]

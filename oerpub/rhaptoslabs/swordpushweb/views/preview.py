@@ -82,8 +82,6 @@ class PreviewView(BaseHelper):
         body_filename = request.session.get('preview-no-cache')
         if body_filename is None:
             body_filename = 'index.xhtml'
-        else:
-            del request.session['preview-no-cache']
     
     def navigate(self, errors=None, form=None):
         # See if this was a plain navigation attempt
