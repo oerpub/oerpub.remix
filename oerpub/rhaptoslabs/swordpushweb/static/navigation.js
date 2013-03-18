@@ -30,6 +30,11 @@ $(document).ready(function()
         return _doAction(confirmMsg3, e);
     });
 
+
+    $('a#cnxlogo_link, img.cnxlogo, #header h1 a').click(function(e) {
+        return _doAction(confirmMsg2, e);
+    });
+
     ///////////////////////////////////////////////////////////////////////////
     // Not sure this is still used. Validate and delete if unused.
     ///////////////////////////////////////////////////////////////////////////
