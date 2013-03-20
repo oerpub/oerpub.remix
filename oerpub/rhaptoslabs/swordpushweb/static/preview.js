@@ -46,6 +46,38 @@ Aloha.ready(function(){
                 return true;
             }
         });
-	
+
+        $('#download-copy').click(function(event) {
+            if (Aloha.getEditableById('canvas').isModified()) {
+                var promise = saveEditableArea();
+                $.when(promise).done(function() {
+                    //alert('promised fulfilled!!!');
+                    // delayed propagation of event ... wait until the editable is saved
+                    var href = $('#download-copy').attr('href');
+                    window.location = href;
+                });
+                event.stopPropagation();
+                event.preventDefault();
+            } else {
+                return true;
+            }
+        });
+
+        $('#edit-xml').click(function(event) {
+            if (Aloha.getEditableById('canvas').isModified()) {
+                var promise = saveEditableArea();
+                $.when(promise).done(function() {
+                    //alert('promised fulfilled!!!');
+                    // delayed propagation of event ... wait until the editable is saved
+                    var href = $('#edit-xml').attr('href');
+                    window.location = href;
+                });
+                event.stopPropagation();
+                event.preventDefault();
+            } else {
+                return true;
+            }
+        });
+
     });
 });
