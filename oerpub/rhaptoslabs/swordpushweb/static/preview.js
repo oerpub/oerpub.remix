@@ -21,10 +21,31 @@ Aloha.ready(function(){
             $('#upload-wait').slideUp('slow');
         });
 
-        $('#btn-forward').click(function(e) {
-            var editor = Aloha.getEditableById('canvas');
-            editor.savePreview();
-            return true;
+        function saveEditableArea() {
+            var deferred = $.Deferred();
+            var subscriptionId;
+            PubSub.pub('swordpushweb.save');
+            subscriptionId = PubSub.sub('swordpushweb.saved', function() {
+                deferred.resolve();
+                PubSub.unsub(subscriptionId);
+            });
+            return deferred.promise();
+        }
+
+        $('#btn-forward').click(function(event) {
+            if (Aloha.getEditableById('canvas').isModified()) {
+                var promise = saveEditableArea();
+                $.when(promise).done(function() {
+                    // alert('promised fulfilled!!!');
+                    // delayed propagation of event ... wait until the editable is saved
+                    $('#btn-forward').click();
+                });
+                event.stopPropagation();
+                event.preventDefault();
+            } else {
+                return true;
+            }
         });
+	
     });
 });
