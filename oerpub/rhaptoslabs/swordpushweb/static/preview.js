@@ -4,7 +4,7 @@ Aloha.ready(function(){
         // It is fired by the the AlohaEditor when someone clicks
         // the 'Save' button.
         // Disable the navigation buttons.
-        PubSub.sub('swordpushweb.saving', function(data) {
+        PubSub.sub('swordpushweb.save', function(data) {
             $('#statusmessage').data('message')('Saving...');
             $('#btn-back').attr('disabled', 'disabled');
             $('#btn-forward').attr('disabled', 'disabled');
