@@ -6,7 +6,7 @@ from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid_simpleform.renderers import FormRenderer
 
-from choose import save_cnxml
+from choose import save_cnxml, validate_cnxml
 from utils import check_login, get_files_from_zipfile, clean_cnxml
 
 
