@@ -5,14 +5,11 @@
           mdml-version="0.5">
 </metadata>
 
-<title>Untitled</title>
+<title>Enter title here</title>
 <content>
-    <section id="gd-temp-section001">
-      <title>Untitled</title>
-      <para id="gd-temp-para001">
-        <newline/>
-      </para>
-    </section>
+   <para id="gd-temp-para001">
+      <newline/>
+   </para>
 </content>
 
 </document>
