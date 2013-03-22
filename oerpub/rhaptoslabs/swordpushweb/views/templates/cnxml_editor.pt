@@ -89,6 +89,22 @@ ${form.end()}
     $('#undo-button').click(function(event) {
         editor.undo();     
     });
+    
+    // for other other views, clicking the Back button forces a Confirm dbox and
+    // iff the user clicks OK will the click event propagate to the containing form element.
+    // we have no such form element on this page, so we catch the confirmed click event here.
+    $('#back-steps').click(function(event) {
+        var $back = $(event.target);
+        target = $back.attr('url');
+        if ( target ) {
+            window.location = target;
+            event.stopPropagation();
+            return false; 
+        }
+        else {
+            return true; 
+        }
+    });
 </script>
 </tal:body>
 
