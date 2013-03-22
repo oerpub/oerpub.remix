@@ -54,8 +54,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                 <tr>
                   <td style="vertical-align: top; padding-right: 2em; width: 60%;">
 
-                    <h3>Importer tools</h3>
-
                     <ul class="create-new-list">
 
                     ${neworexisting_form.begin(request.route_url('choose'),
@@ -71,10 +69,10 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 </span>
                             </label>
                             <div class="upload-form" style="width: 556px; ">
-                                <input class="btn" id="newmodule"
+                                <input class="button" id="newmodule"
                                     name="newmodule" value="Create a new module »" type="submit"
                                     title="This is an entirely new module."> 
-                                <input class="btn" id="existingmodule"
+                                <input class="button" id="existingmodule"
                                     name="existingmodule" value="Edit an existing module »" type="submit"
                                     title="Choose an existing module and edit.">
                                 <input type="hidden" id="neworexistingmodule"
@@ -85,7 +83,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
                     </ul>
 
-                    <div><strong>Or use one of our importer tools:</strong></div>
+                    <div><strong>Or use one of our importer tools</strong></div>
 
                     <ul class="create-new-list">
 
@@ -108,7 +106,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 
                             <div class="upload-form">
                                 <input id="file-submit"
-                                    class="btn"
+                                    class="button"
                                     role="button"
                                     value="Choose file and preview &#187;"
                                     name="form.submitted"
@@ -139,7 +137,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                 ${googledocs_form.hidden('gdocs_access_token', value=None, id='gdocs_access_token')}
                                 <input id="google-submit"
                                     type="submit"
-                                    class="btn" 
+                                    class="button" 
                                     name="googledocs_form.submitted"
                                     value="Select and preview &#187;">
                             </div>
@@ -163,7 +161,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     placeholder="http://www.example.com" type="url" 
                                     onkeydown="keyDown(event)" />
 
-                                <input class="btn"
+                                <input class="button"
                                     id="url-submit"
                                     name="url.submitted"
                                     value="Convert and preview &#187;"
@@ -178,8 +176,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                      
                       <div style="display: block;">
 
-                        <br/>
-                        <h3>Alpha importer tools</h3>
+                        <div><strong>Alpha importer tools</strong></div>
                         
                         <ul class="create-new-list">
                     ${presentationform.begin(request.route_url('choose'),
