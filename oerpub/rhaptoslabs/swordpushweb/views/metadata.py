@@ -186,13 +186,13 @@ class Metadata_View(BaseHelper):
                          in_progress = True)
         return dr
 
-    def update_module(self, save_dir, connection, metadata, module_url):
+    def update_module(self, save_dir, connection, metadata, target_module_url):
         zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
         
         # We cannot be sure whether the '/sword' will be there or not,
         # so we remove it, which works fine even if it is not there.
         # This gives us a predictable base to start from.
-        base_url = module_url.strip('/sword')
+        base_url = target_module_url.strip('/sword')
         # Now we add it back, but only for the edit-iri.
         edit_iri = base_url + '/sword'
         # The editmedia-iri does not want '/sword' in it.
@@ -325,7 +325,7 @@ class Metadata_View(BaseHelper):
         session = self.session
         request = self.request
         workspaces = self.workspaces
-        self.module_url = session.get('module_url', None)
+        self.target_module_url = session.get('target_module_url', None)
 
         # Check for successful form completion
         if form.validate():
@@ -347,10 +347,10 @@ class Metadata_View(BaseHelper):
                 self.featured_links = self.add_featured_links(request,
                                                               zip_file,
                                                               save_dir)
-                if self.module_url:
+                if self.target_module_url:
                     # this is an update not a create
                     deposit_receipt = self.update_module(
-                        save_dir, conn, metadata_entry, self.module_url)
+                        save_dir, conn, metadata_entry, self.target_module_url)
                 else:
                     # this is a workaround until I can determine why the 
                     # featured links don't upload correcly with a multipart
@@ -390,12 +390,12 @@ class Metadata_View(BaseHelper):
         metadata = config['metadata']
         username = session['username']
         password = session['password']
-        if self.module_url:
+        if self.target_module_url:
 
-            if self.module_url.endswith('/sword'):
-                dr_url = self.module_url
+            if self.target_module_url.endswith('/sword'):
+                dr_url = self.target_module_url
             else:
-                dr_url = self.module_url + '/sword'
+                dr_url = self.target_module_url + '/sword'
             metadata.update(get_metadata_from_repo(session, dr_url, username, password))
         else:
             for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
@@ -417,7 +417,6 @@ class Metadata_View(BaseHelper):
             'workspaces': workspaces,
             'selected_workspace': selected_workspace,
             'workspace_title': workspace_title,
-            'module_url': self.module_url,
             'languages': languages,
             'subjects': subjects,
             'config': config,
