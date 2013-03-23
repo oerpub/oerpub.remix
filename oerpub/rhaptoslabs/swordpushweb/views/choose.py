@@ -91,10 +91,6 @@ class ZipOrLatexSchema(formencode.Schema):
 
 class Choose_Document_Source(BaseHelper):
 
-    navigation_actions = {'next': '', 
-                          'previous': '/',
-                          'batch': ''}
-
     @view_config(route_name='choose')
     def process(self):
         super(Choose_Document_Source, self)._process()
@@ -114,7 +110,9 @@ class Choose_Document_Source(BaseHelper):
                 'source',
                 'target',
                 'module_url',
-                'preview-no-cache']
+                'source_module_url',
+                'target_module_url',
+                'preview-no-cache',]
         for key in keys:
             if key in session:
                 del session[key]
