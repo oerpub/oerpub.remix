@@ -8,11 +8,6 @@ from helpers import BaseHelper
 from module_association import get_module_list
 
 class Modules_List_View(BaseHelper):
-    # NOTE: Your implementation class *must* define these actions if you want
-    # to reuse the navigation and batch macros.
-    navigation_actions = {'next': 'choose', 
-                          'previous': 'metadata',
-                          'batch': 'module_association'}
 
     """ Show a list of all the modules in a workspace.
     """

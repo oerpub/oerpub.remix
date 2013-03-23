@@ -45,8 +45,6 @@
             in Connexions
         </span>
         <input name="workflownav.metadata.submitted" type="hidden" value="submitted" />
-        <input id="module" type="hidden" name="module_url"
-            tal:attributes="value view.module_url">
         </metal:extras>
     </span>
 
