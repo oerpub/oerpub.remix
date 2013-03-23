@@ -104,8 +104,7 @@ class BaseHelper(object):
     def get_batch_link(self, b_start, selected_workspace):
         params = {"b_start": b_start,
                   "workspace": selected_workspace}
-        url = self.request.route_url(self.navigation_actions['batch'],
-                                     _query=params)
+        url = self.request.route_url(self.form_action, _query=params)
         return url
 
     def set_source(self, source):
