@@ -1,17 +1,9 @@
-import os
-import libxml2
-import urlparse
-import traceback
 import formencode
 
 from pyramid.decorator import reify
 from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid_simpleform.renderers import FormRenderer
-from pyramid.httpexceptions import HTTPFound
-
-from oerpub.rhaptoslabs import sword2cnx
-
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
 
 from helpers import BaseHelper 
@@ -21,9 +13,6 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_zip,
     ConversionError)
 
-from utils import get_files
-from utils import extract_to_save_dir
-
 
 class PreviewSchema(formencode.Schema):
     allow_extra_fields = True
@@ -31,9 +20,6 @@ class PreviewSchema(formencode.Schema):
 
 
 class PreviewView(BaseHelper):
-
-    navigation_actions = {'next': 'metadata', 
-                          'previous': 'choose',}
 
     @view_config(route_name='preview', renderer='templates/preview.pt',
         http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
@@ -45,41 +31,7 @@ class PreviewView(BaseHelper):
     def do_transition(self, form=None):
         request = self.request
         session = request.session
-        module_url = session.get('module_url')
-        if module_url:
-            conn = sword2cnx.Connection(session['service_document_url'],
-                                        user_name=session['username'],
-                                        user_pass=session['password'],
-                                        always_authenticate=True,
-                                        download_service_document=False)
-
-            parts = urlparse.urlsplit(module_url)
-            path = parts.path.split('/')
-            path = path[:path.index('sword')]
-            self.module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
-
-            # example: http://cnx.org/Members/user001/m17222/sword/editmedia
-            zip_file = conn.get_cnx_module(module_url = self.module_url,
-                                           packaging = 'zip')
-            
-            save_dir = os.path.join(request.registry.settings['transform_dir'],
-                                    request.session['upload_dir'])
-            extract_to_save_dir(zip_file, save_dir)
-
-            cnxml_file = open(os.path.join(save_dir, 'index.cnxml'), 'rb')
-            cnxml = cnxml_file.read()
-            cnxml_file.close()
-            conversionerror = None
-            try:
-                htmlpreview = cnxml_to_htmlpreview(cnxml)
-                save_and_backup_file(save_dir, 'index.html', htmlpreview)
-                files = get_files(save_dir)
-                save_zip(save_dir, cnxml, htmlpreview, files)
-            except libxml2.parserError:
-                conversionerror = traceback.format_exc()
-                raise ConversionError(conversionerror)
-            
-        body_filename = request.session.get('preview-no-cache')
+        body_filename = session.get('preview-no-cache')
         if body_filename is None:
             body_filename = 'index.xhtml'
     
