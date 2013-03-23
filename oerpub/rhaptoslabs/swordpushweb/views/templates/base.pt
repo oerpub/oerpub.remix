@@ -147,7 +147,7 @@
 
                 <div id="header">
                     <h1>
-                        <a id="cnxlogo_link" href="http://localhost:6543">
+                        <a id="cnxlogo_link" href="${request.route_url('login')}">
                             <img class="cnxlogo" 
                                 src="/static/images/connexions_icon.png"
                                 alt="OERPUB Connexions Importer" />
