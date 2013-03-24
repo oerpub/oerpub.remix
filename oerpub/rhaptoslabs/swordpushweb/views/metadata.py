@@ -329,46 +329,51 @@ class Metadata_View(BaseHelper):
 
         # Check for successful form completion
         if form.validate():
-            self.update_session(session, self.remember_fields, form)
+            # Find what the user actually wanted to do.
+            # This is important since we don't want to upload the module to cnx
+            # if the user clicked on the back button.
+            action = self.request.params.get('btn-forward') and 'forward' or 'back'
+            if action == 'forward':
+                self.update_session(session, self.remember_fields, form)
 
-            # Reconstruct the path to the saved files
-            save_dir = os.path.join(
-                request.registry.settings['transform_dir'],
-                session['upload_dir']
-            )
+                # Reconstruct the path to the saved files
+                save_dir = os.path.join(
+                    request.registry.settings['transform_dir'],
+                    session['upload_dir']
+                )
 
-            # Create a connection to the sword service
-            conn = self.get_connection()
+                # Create a connection to the sword service
+                conn = self.get_connection()
 
-            # Send zip file to Connexions through SWORD interface
-            with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                # Create the metadata entry
-                metadata_entry = self.get_metadata_entry(form, session)
-                self.featured_links = self.add_featured_links(request,
-                                                              zip_file,
-                                                              save_dir)
-                if self.target_module_url:
-                    # this is an update not a create
-                    deposit_receipt = self.update_module(
-                        save_dir, conn, metadata_entry, self.target_module_url)
-                else:
-                    # this is a workaround until I can determine why the 
-                    # featured links don't upload correcly with a multipart
-                    # upload during module creation. See redmine issue 40
-                    # TODO:
-                    # Fix me properly!
-                    if self.featured_links:
-                        deposit_receipt = create_module_in_2_steps(
-                            form, conn, metadata_entry, zip_file, save_dir)
+                # Send zip file to Connexions through SWORD interface
+                with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
+                    # Create the metadata entry
+                    metadata_entry = self.get_metadata_entry(form, session)
+                    self.featured_links = self.add_featured_links(request,
+                                                                  zip_file,
+                                                                  save_dir)
+                    if self.target_module_url:
+                        # this is an update not a create
+                        deposit_receipt = self.update_module(
+                            save_dir, conn, metadata_entry, self.target_module_url)
                     else:
-                        deposit_receipt = self.create_module(
-                            form, conn, metadata_entry, zip_file)
+                        # this is a workaround until I can determine why the 
+                        # featured links don't upload correcly with a multipart
+                        # upload during module creation. See redmine issue 40
+                        # TODO:
+                        # Fix me properly!
+                        if self.featured_links:
+                            deposit_receipt = create_module_in_2_steps(
+                                form, conn, metadata_entry, zip_file, save_dir)
+                        else:
+                            deposit_receipt = self.create_module(
+                                form, conn, metadata_entry, zip_file)
 
-            # Remember to which workspace we submitted
-            session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
+                # Remember to which workspace we submitted
+                session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
 
-            # The deposit receipt cannot be pickled, so we pickle the xml
-            session['deposit_receipt'] = deposit_receipt.to_xml()
+                # The deposit receipt cannot be pickled, so we pickle the xml
+                session['deposit_receipt'] = deposit_receipt.to_xml()
         else:
             errors.update(form.errors)
             return errors
