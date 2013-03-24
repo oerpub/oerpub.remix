@@ -238,7 +238,7 @@ class Metadata_View(BaseHelper):
         return self.metadata.get('featured_link_groups', '') and 'checked' or ''
 
     def get_title(self, metadata, session):
-        return metadata.get('dcterms:title', session.get('title', ''))
+        return session.get('title', metadata.get('dcterms:title'))
 
     def get_subjects(self, metadata):
         return metadata.get('subjects', [])
