@@ -26,10 +26,6 @@
             <!-- xhtml workaround -->
         </script>
 
-        <script src="${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> 
-            <!-- xhtml workaround -->
-        </script>
-
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/preview.js')}">
             <!-- xhtml workaround -->
         </script>
