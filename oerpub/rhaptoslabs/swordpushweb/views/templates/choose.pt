@@ -46,7 +46,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                 Create, edit, and adapt content in Connexions
               </h1>
               <p class="forminfo">
-                Choose one of the following to import the contents of a new or existing module.
+                Choose one of the following to create, import, or edit the contents of a new or existing module.
               </p>
 
             <table style="width: 100%; border-collapse: collapse; border-width: 0;">
@@ -176,7 +176,7 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                      
                       <div style="display: block;">
 
-                        <div><strong>Alpha importer tools</strong></div>
+                        <div><strong>Or try our alpha importer tools</strong></div>
                         
                         <ul class="create-new-list">
                     ${presentationform.begin(request.route_url('choose'),
