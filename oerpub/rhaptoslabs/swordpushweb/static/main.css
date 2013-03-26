@@ -154,6 +154,7 @@ span .button{
   top: 56px;
   z-index: 2;
   width: 100%;
+  height: 48px;
 }
 
 #workflownav-wrap .advanced2{
