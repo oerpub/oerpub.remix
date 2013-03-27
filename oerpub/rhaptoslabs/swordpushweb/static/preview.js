@@ -81,3 +81,30 @@ Aloha.ready(function(){
 
     });
 });
+
+//Aloha.bind('aloha-editable-activated', function($event, activateObj) {
+Aloha.bind('aloha-selection-changed', function($event, rangeObject) {
+    // not getting the activate event for the title editable area
+    // until focus is placed there (tcket 308)
+    // we do get a selection change event, so that's have we'll roll
+    var $start; 
+    var editable; 
+    $start = $(rangeObject.startContainer);
+    // this did not work as advertised ... could be something deeply wrong with our title editable area
+    // editable = Aloha.getEditableHost($start);
+    if ( !$start.is('.title-editor') ) {
+      $start = $start.parents('.title-editor');
+    }
+    if ( $start.is('.title-editor') ) {
+      var $title = $start;
+      var title = $title.text();
+      if ( title == 'Enter title here' ) {
+        var range;
+        range = new GENTICS.Utils.RangeObject();;
+        range.startContainer = range.endContainer = $title.get(0);
+        range.startOffset = 0;
+        range.endOffset = 1;
+        range.select();
+       }
+    }
+});
