@@ -5,7 +5,10 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-                $("#header h1 a").attr('href', '/choose');
+            $("#header h1 a").attr('href', '/choose');
+            $('a#cnxlogo_link, img.cnxlogo, #header h1 a').off('click').on('click', function() { 
+                return true; 
+            });
         });
     </script>
 
