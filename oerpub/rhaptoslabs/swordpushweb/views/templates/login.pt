@@ -1,4 +1,13 @@
 <metal:use use-macro="base">
+
+<metal:script-slot fill-slot="script-slot">
+<script type="text/javascript">
+    $(document).ready(function(){
+       $('input[name="username"]').focus();
+    });
+</script>
+</metal:script-slot>
+
 <tal:body metal:fill-slot="content-slot">
 
 <div id="ie6-container-wrap">
