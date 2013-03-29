@@ -105,3 +105,15 @@ class Choose_Module(Module_Association_View):
     @reify
     def back_step_title(self):
         return "Return to the initial page"
+
+    @reify
+    def get_prologue(self):
+        source = self.session['source']
+        if source == 'newemptymodule':
+            return 'You have chosen to create new content.  You must also chose whether you want to download the content or to upload the content to a new or existing module.'
+        elif source == 'existingmodule':
+            return 'You have chosen to base your edit session on existing module.  You must now chose which module and whether you want to download the module or to upload the module back to Connexions.'
+        elif source == 'importmodule':
+            return 'You have chosen to import content.  You must now chose whether you want to download the content or to upload the content to a new or existing module.'
+        else:
+            return ''

@@ -70,23 +70,14 @@
     <metal:page_prologue metal:fill-slot="page_prologue">
         <!-- Summarize the source decision here.  
              Also could contextualize the individual radio choices below. -->
-             <span id="session-source" style="display: none;"
-                   tal:content="python:view.get_source()">session source</span>
-             <p id="page-introduction" style="font-size: 1.2em">
-               <metal:introduction tal:condition="python: view.get_source()=='newemptymodule'">
-               You have chosen to create new content.  You must also chose whether you want
-               to download the content or to upload the content to a new or existing module.
-               </metal:introduction>
-               <metal:introduction tal:condition="python: view.get_source()=='existingmodule'">
-               You have chosen to base your edit session on existing module.  You must
-               now chose which module and whether you want to download the
-               module or to upload the module back to Connexions.
-               </metal:introduction>
-               <metal:introduction tal:condition="python: view.get_source()=='importmodule'">
-               You have chosen to import content.  You must now chose whether you want
-               to download the content or to upload the content to a new or existing module.
-               </metal:introduction>
-             </p>
+        <span id="session-source" style="display: none;"
+              tal:content="python:view.get_source()">session source</span>
+        <p id="page-introduction" style="font-size: 1.2em">
+            <metal:introduction tal:content="python: view.get_prologue">
+                Image a context sensitve introduction about the choices the user
+                has to make on this page.
+            </metal:introduction>
+        </p>
         <!-- { source=new-content target={new-module, existing-module, download-module},
                source=existing-module target={existing_module, download-module},
                source=import module={new-module, existing-module, download-module}
