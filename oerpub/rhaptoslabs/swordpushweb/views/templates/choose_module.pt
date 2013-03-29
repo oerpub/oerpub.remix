@@ -31,7 +31,8 @@
             }
             $('#pageheader-wrap').hide();
 
-            $('#module-selection').block({ message: null }); 
+            blockOpts = { message: null, overlayCSS: {cursor: 'default'} };
+            $('#module-selection').block(blockOpts);
             $('#target-radios').on('click', function(event) {
               // get the currently selected radio button's id
               var value = $("input[@name=target-choice]:checked").attr('value');
@@ -41,9 +42,9 @@
                   $('#module-selection').unblock(); 
                 } else {
                   if ( value == 'newemptymodule' ) {
-                    $('#module-selection').block({ message: null }); 
+                    $('#module-selection').block(blockOpts); 
                   } else if ( value = 'downloadmodule' ) {
-                    $('#module-selection').block({ message: null }); 
+                    $('#module-selection').block(blockOpts); 
                   } else if ( value =='existingmodule' ) {
                     $('#module-selection').unblock(); 
                   }
