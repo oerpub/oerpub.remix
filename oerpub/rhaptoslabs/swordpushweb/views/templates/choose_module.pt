@@ -31,8 +31,9 @@
             }
             $('#pageheader-wrap').hide();
 
-            blockOpts = { message: null, overlayCSS: {cursor: 'default'} };
+            blockOpts = { message: null, overlayCSS: {cursor: 'default', opacity: 0.30} };
             $('#module-selection').block(blockOpts);
+            //$('#module-selection').fadeTo('fast', 0.25);
             $('#target-radios').on('click', function(event) {
               // get the currently selected radio button's id
               var value = $("input[@name=target-choice]:checked").attr('value');
@@ -40,13 +41,17 @@
                 // base on value, we can block and unblock module selection
                 if ( sessionSource == 'existingmodule' ) {
                   $('#module-selection').unblock(); 
+                  //$('#module-selection').fadeTo('fast', 1.0);
                 } else {
                   if ( value == 'newemptymodule' ) {
                     $('#module-selection').block(blockOpts); 
+                    //$('#module-selection').fadeTo('fast', 0.25);
                   } else if ( value = 'downloadmodule' ) {
                     $('#module-selection').block(blockOpts); 
+                    //$('#module-selection').fadeTo('fast', 0.25);
                   } else if ( value =='existingmodule' ) {
                     $('#module-selection').unblock(); 
+                    //$('#module-selection').fadeTo('fast', 0.25);
                   }
                 }
               }
