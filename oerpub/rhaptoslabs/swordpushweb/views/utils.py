@@ -11,6 +11,8 @@ import logging
 import traceback
 from lxml import etree
 
+from pyramid.view import view_config
+from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 from pyramid.threadlocal import get_current_registry
@@ -640,3 +642,21 @@ def save_and_backup_file(save_dir, filename, content, mode='w'):
     f = open(filename, mode)
     f.write(content)
     f.close()
+
+@view_config(route_name='json_get_source_from_session', renderer="json")
+def json_get_source_from_session(request):
+    error = ''
+    source = request.session.get('source', None)
+    if not source:
+        error = 'Session has no "source" value.'
+    return {'source': source,
+            'error': error}
+
+@view_config(route_name='json_get_target_from_session', renderer="json")
+def json_get_target_from_session(request):
+    error = ''
+    target = request.session.get('target', None)
+    if not target:
+        error = 'Session has no "target" value.'
+    return {'target': target,
+            'error': error}
