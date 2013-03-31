@@ -20,19 +20,40 @@ class Provider(object):
 class WorkflowStepsUtility(object):
     implements(IWorkflowSteps)
     
-    DEFAULT_WORKFLOW = ['choose', 'preview', 'metadata', 'summary']
-    EXISTING_MODULE_WORKFLOW = ['choose', 'choose-module', 'preview', 'metadata', 'summary']
-    EXISTING_MODULE_NEW_WORKFLOW = ['choose', 'choose-module', 'preview', 'metadata', 'summary']
-
-    workflows = {'new:new'                       : DEFAULT_WORKFLOW,
-                 'existingmodule:existingmodule' : EXISTING_MODULE_WORKFLOW,
-                 'existingmodule:new'            : EXISTING_MODULE_NEW_WORKFLOW,
-                 'fileupload:new'                : DEFAULT_WORKFLOW,
-                 'gdocupload:new'                : DEFAULT_WORKFLOW,
-                 'url:new'                       : DEFAULT_WORKFLOW,
-                 'cnxinputs:new'                 : DEFAULT_WORKFLOW,
-                 'newemptymodule:new'            : DEFAULT_WORKFLOW,
-                 'presentation:new'              : DEFAULT_WORKFLOW,}
+    # Take new content, allow some editing and then create a new module in cnx
+    # from this new content.
+    DEFAULT = ['choose',
+               'preview',
+               'metadata',
+               'summary']
+    
+    # Totally new module content that will replace the chosen module in cnx.
+    REPLACE_EXISTING_WITH_NEW = ['choose',
+                                 'preview',
+                                 'module_association',
+                                 'metadata',
+                                 'summary']
+    
+    # Select a module form cnx, download, edit it and then replace the old one
+    # in cnx with the newly edited content.
+    REPLACE_EXISTING_WITH_EDITED = ['choose',
+                                    'choose-module',
+                                    'preview',
+                                    'metadata',
+                                    'summary']
+    
+    # These workflow names are in the format [source]:[target]
+    # The 'source' and 'target' values are currently kept on the session.
+    workflows = {'new:new'                       : DEFAULT,
+                 'new:existingmodule'            : REPLACE_EXISTING_WITH_NEW,
+                 'existingmodule:existingmodule' : REPLACE_EXISTING_WITH_EDITED,
+                 'existingmodule:new'            : REPLACE_EXISTING_WITH_NEW,
+                 'fileupload:new'                : DEFAULT,
+                 'gdocupload:new'                : DEFAULT,
+                 'url:new'                       : DEFAULT,
+                 'cnxinputs:new'                 : DEFAULT,
+                 'newemptymodule:new'            : DEFAULT,
+                 'presentation:new'              : DEFAULT,}
     
     def setWorkflowSteps(self, wf_name, steps):
         wf = self.workflows.get(wf_name)
