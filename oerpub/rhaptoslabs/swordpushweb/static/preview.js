@@ -113,12 +113,7 @@ Aloha.ready(function(){
             $('#upload-wait').slideUp('slow');
         });
 
-        $('#btn-newmodule').click(function(evt) {
-            alert('new');
-        });
-
         $('#btn-existingmodule').click(function(evt) {
-            alert('hrere');
             $.ajax({
               dataType: "json",
               type: 'POST',
@@ -126,13 +121,13 @@ Aloha.ready(function(){
               url: '/json_set_target_on_session',
               data: {target: 'existingmodule'},
               success: function(data) {
-                alert(data);
+                //alert(data);
               },
               fail: function(data) {
-                alert(data);
+                //alert(data);
               },
               error: function(data) {
-                alert(data);
+                //alert(data);
               }
             });
             evt.stopPropagation();
