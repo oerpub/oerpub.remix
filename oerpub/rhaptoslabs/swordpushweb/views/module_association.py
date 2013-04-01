@@ -24,7 +24,7 @@ class Module_Association_View(BaseHelper):
     @view_config(route_name='module_association',
                  renderer='templates/module_association.pt')
     def process(self):
-        super(Module_Association_View, self)._process(self.request)
+        super(Module_Association_View, self)._process()
         return self.navigate()
     
     def navigate(self, errors=None, form=None):
@@ -78,6 +78,27 @@ class Module_Association_View(BaseHelper):
     def modules_list(self):
         return self.macro_renderer.implementation().macros['modules_list']
 
+    @reify
+    def back_step_label(self):
+        return "&laquo; Back: Return to preview page"
+    
+    @reify
+    def next_step_label(self):
+        return "Next: Describe module &raquo;" 
+
+    @reify
+    def next_step_title(self):
+        source = self.session['source']
+        if source == 'newemptymodule':
+            return 'Add module description and save module to cnx.org'
+        elif source == 'existingmodule':
+            return 'Review module description and save module to cnx.org'
+        return 'Add module description and save module to cnx.org'
+
+    @reify
+    def back_step_title(self):
+        return "Return to the preview page"
+
 
 def get_module_list(connection, workspace):
     xml = sword2cnx.get_module_list(connection, workspace)
@@ -103,4 +124,3 @@ def get_module_list(connection, workspace):
 
         modules.append([uid, edit_link, title, view_link])
     return modules
-
