@@ -4,9 +4,6 @@
 
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/choose_module.js')}"></script>
 
-    <!-- EVIL: need to host this or replace this with something we host -->
-    <script src="https://raw.github.com/malsup/blockui/master/jquery.blockUI.js"></script>
-
     <script type="text/javascript">
 
         $(document).ready(function(){
@@ -21,41 +18,6 @@
             
             workspace = $("ul.popOut li a").first().attr('href');
             $("#workspace").attr("value", workspace);
-
-            var sessionSource;
-            sessionSource = $('#session-source').text();
-            if ( sessionSource === 'existingmodule' ) {
-              var $newModuleRadioInput;
-              $newModuleRadioInput = $('input[type="radio"][value="newemptymodule"]');
-              $newModuleRadioInput.hide();
-            }
-            $('#pageheader-wrap').hide();
-
-            blockOpts = { message: null, overlayCSS: {cursor: 'default', opacity: 0.30} };
-            $('#module-selection').block(blockOpts);
-            //$('#module-selection').fadeTo('fast', 0.25);
-            $('#target-radios').on('click', function(event) {
-              // get the currently selected radio button's id
-              var value = $("input[@name=target-choice]:checked").attr('value');
-              if ( value ) {
-                // base on value, we can block and unblock module selection
-                if ( sessionSource == 'existingmodule' ) {
-                  $('#module-selection').unblock(); 
-                  //$('#module-selection').fadeTo('fast', 1.0);
-                } else {
-                  if ( value == 'newemptymodule' ) {
-                    $('#module-selection').block(blockOpts); 
-                    //$('#module-selection').fadeTo('fast', 0.25);
-                  } else if ( value = 'downloadmodule' ) {
-                    $('#module-selection').block(blockOpts); 
-                    //$('#module-selection').fadeTo('fast', 0.25);
-                  } else if ( value =='existingmodule' ) {
-                    $('#module-selection').unblock(); 
-                    //$('#module-selection').fadeTo('fast', 0.25);
-                  }
-                }
-              }
-            });
         });
 
     </script>
@@ -72,40 +34,6 @@
 <span metal:use-macro="view.workflow_nav_form">form</span>
 
 <metal:content use-macro="view.content_macro">
-    <metal:page_prologue metal:fill-slot="page_prologue">
-        <!-- Summarize the source decision here.  
-             Also could contextualize the individual radio choices below. -->
-        <span id="session-source" style="display: none;"
-              tal:content="python:view.get_source()">session source</span>
-        <p id="page-introduction" style="font-size: 1.2em">
-            <metal:introduction tal:content="python: view.get_prologue">
-                Image a context sensitve introduction about the choices the user
-                has to make on this page.
-            </metal:introduction>
-        </p>
-        <!-- { source=new-content target={new-module, existing-module, download-module},
-               source=existing-module target={existing_module, download-module},
-               source=import module={new-module, existing-module, download-module}
-             caveats:
-             if source and target is existing-module, we are editing and uploading the same module
-             if the source is an existing-module, we can not upload to a new module
-             this is a rights issue.  Connexions supports a derviced copy workflow for this.
-        -->
-        <h1 id="target-title" style="margin-bottom: .7em;">
-            Upload your edited module to Connexions or download it?
-        </h1>
-        <div id="target-radios">
-            <input type="radio" name="target-choice" value="newemptymodule">
-              <span id="upload-new-module">Upload a new module to Connexions</span><br/>
-            <input type="radio" name="target-choice" value="existingmodule">
-              <span id="upload-existing-module">Upload an existing module to Connexions<br/>
-            <input type="radio" name="target-choice" value="downloadmodule">
-              <span id="download-module">Download the module<br/>
-        </div>
-        <br/>
-        <br/>
-    </metal:page_prologue>
-
     <metal:page_title fill-slot="page_title">
     Which module are you making a new version of? 
     </metal:page_title>

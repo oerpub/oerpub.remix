@@ -1,17 +1,9 @@
 <metal:content_macro define-macro="content_macro">
 <div id="ie6-container-wrap">
     <div id="container">
-
         <div id="content">
             <div id="pageheader-wrap"></div>
             
-            <div id="page-prologue">
-                <metal:prologue_macro metal:define-slot="page_prologue">
-                    Page prologue ... replace
-                </metal:prologue_macro>
-            </div>
-
-          <div id="module-selection">
             <div id="page-title">
                 <h1 style="margin-bottom: .7em;">
                     <span metal:define-slot="page_title">
@@ -62,8 +54,6 @@
             <!-- now the list of modules -->
             <metal:modules use-macro="view.modules_list" />
 
-          </div>
- 
         </div>
     </div>
 
