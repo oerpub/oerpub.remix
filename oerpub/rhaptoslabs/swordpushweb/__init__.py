@@ -45,6 +45,8 @@ def add_routes(config):
     config.add_route('enhance', '/enhance')
     config.add_route('json_get_source_from_session', '/json_get_source_from_session')
     config.add_route('json_get_target_from_session', '/json_get_target_from_session')
+    config.add_route('json_set_source_on_session', '/json_set_source_on_session')
+    config.add_route('json_set_target_on_session', '/json_set_target_on_session')
 
     # every other add_route declaration should come
     # before this one, as it will, by default, catch all requests
