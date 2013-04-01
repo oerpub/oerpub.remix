@@ -30,7 +30,6 @@ class WorkflowStepsUtility(object):
     # Totally new module content that will replace the chosen module in cnx.
     REPLACE_EXISTING_WITH_NEW = ['choose',
                                  'preview',
-                                 'module_association',
                                  'metadata',
                                  'summary']
     
@@ -39,6 +38,7 @@ class WorkflowStepsUtility(object):
     REPLACE_EXISTING_WITH_EDITED = ['choose',
                                     'choose-module',
                                     'preview',
+                                    'module_association',
                                     'metadata',
                                     'summary']
     
@@ -46,7 +46,6 @@ class WorkflowStepsUtility(object):
     # The 'source' and 'target' values are currently kept on the session.
     workflows = {'new:new'                       : DEFAULT,
                  'new:existingmodule'            : REPLACE_EXISTING_WITH_NEW,
-                 'existingmodule:new'            : REPLACE_EXISTING_WITH_NEW,
                  'existingmodule:existingmodule' : REPLACE_EXISTING_WITH_EDITED,
                  'fileupload:new'                : DEFAULT,
                  'gdocupload:new'                : DEFAULT,
