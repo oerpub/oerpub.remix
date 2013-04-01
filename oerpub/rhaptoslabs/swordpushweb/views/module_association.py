@@ -48,6 +48,7 @@ class Module_Association_View(BaseHelper):
         modules = get_module_list(conn, selected_workspace)
         modules = Batch(modules, start=b_start, size=b_size)
         module_macros = get_renderer('templates/modules_list.pt').implementation()
+        dialog_macros = get_renderer('templates/dialogs.pt').implementation()
 
         form = Form(request, schema=ModuleAssociationSchema)
         response = {'form': FormRenderer(form),
@@ -58,6 +59,7 @@ class Module_Association_View(BaseHelper):
                     'request': request,
                     'config': config,
                     'module_macros': module_macros,
+                    'dialog_macros': dialog_macros,
                     'view': self,
         }
         return response

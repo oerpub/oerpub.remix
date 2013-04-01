@@ -59,7 +59,7 @@ ${form.csrf_token()}
                     <div style="margin: 0 0 .5em;" class="forminfo">
                         Enter the URL of a module to check it out to
 
-                        <div metal:use-macro="view.workspace_popup">
+                        <div metal:use-macro="dialog_macros.macros.workspace_popup">
                         </div>
 
                     </div>
@@ -81,7 +81,7 @@ ${form.csrf_token()}
             <div id="workspace-list">
                 <div class="workarea-contents-label">
                     Showing contents of
-                    <ul metal:use-macro="view.workspace_popup">
+                    <ul metal:use-macro="dialog_macros.macros.workspace_popup">
                     </ul>
                 </div>
             </div>
