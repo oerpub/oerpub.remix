@@ -20,9 +20,9 @@
 
 </metal:script-slot>    
 
-</metal:workflownav>
-    <span metal:use-macro="view.workflow_nav">Workflow navigation</span>
 <metal:workflownav fill-slot="workflownav">
+    <span metal:use-macro="view.workflow_nav">Workflow navigation</span>
+</metal:workflownav>
 
 <tal:body metal:fill-slot="content-slot"
     tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:static/images');
