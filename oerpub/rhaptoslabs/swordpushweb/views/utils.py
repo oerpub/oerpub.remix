@@ -660,3 +660,30 @@ def json_get_target_from_session(request):
         error = 'Session has no "target" value.'
     return {'target': target,
             'error': error}
+
+@view_config(route_name='json_set_target_on_session', renderer="json")
+def json_set_target_on_session(request):
+    error = ''
+    target = request.params.get('target')
+    if target:
+        target = target.encode('utf-8')
+        request.session['target'] = target
+    else:
+        error = 'Session has no "target" value.'
+    
+    return {'target': target,
+            'error': error}
+
+@view_config(route_name='json_set_source_on_session', renderer="json")
+def json_set_source_on_session(request):
+    error = ''
+    source = request.params.get('source')
+    if source:
+        source = source.encode('utf-8')
+        request.session['source'] = source
+    else:
+        error = 'Session has no "source" value.'
+    
+    return {'source': source,
+            'error': error}
+
