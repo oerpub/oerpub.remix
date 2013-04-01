@@ -79,6 +79,65 @@ Aloha.ready(function(){
             }
         });
 
+        $('#neworexisting').on('hidden', function() {
+            $('#upload-wait').slideUp('slow');
+
+            var btn = $('#btn-newmodule');
+            $(btn).removeAttr('disabled');
+            $(btn).addClass('btn-primary');
+           
+            var btn = $('#btn-exsitingmodule');
+            $(btn).removeAttr('disabled');
+            $(btn).addClass('btn-primary');
+        });
+
+        // subscribe to the 'swordpusweb.saved' event. It is fired
+        // by the 'savePreview' function in the AlohaEditor.oerpub
+        // index.html page.
+        // Here we re-enable the navigation buttons.
+        PubSub.sub('swordpushweb.saved', function(data) {
+            var btn = $('#back-to-chooser');
+            btn.removeAttr('disabled');
+
+            var btn = $('#show-neworexisting');
+            btn.removeAttr('disabled');
+
+            var btn = $('#btn-newmodule');
+            btn.removeAttr('disabled');
+            btn.addClass('btn-primary');
+            
+            var btn = $('#btn-existingmodule');
+            btn.removeAttr('disabled');
+            btn.addClass('btn-primary');
+
+            $('#upload-wait').slideUp('slow');
+        });
+
+        $('#btn-newmodule').click(function(evt) {
+            alert('new');
+        });
+
+        $('#btn-existingmodule').click(function(evt) {
+            alert('hrere');
+            $.ajax({
+              dataType: "json",
+              type: 'POST',
+              async: false,
+              url: '/json_set_target_on_session',
+              data: {target: 'existingmodule'},
+              success: function(data) {
+                alert(data);
+              },
+              fail: function(data) {
+                alert(data);
+              },
+              error: function(data) {
+                alert(data);
+              }
+            });
+            evt.stopPropagation();
+        });
+
     });
 });
 
