@@ -46,8 +46,8 @@ class WorkflowStepsUtility(object):
     # The 'source' and 'target' values are currently kept on the session.
     workflows = {'new:new'                       : DEFAULT,
                  'new:existingmodule'            : REPLACE_EXISTING_WITH_NEW,
-                 'existingmodule:existingmodule' : REPLACE_EXISTING_WITH_EDITED,
                  'existingmodule:new'            : REPLACE_EXISTING_WITH_NEW,
+                 'existingmodule:existingmodule' : REPLACE_EXISTING_WITH_EDITED,
                  'fileupload:new'                : DEFAULT,
                  'gdocupload:new'                : DEFAULT,
                  'url:new'                       : DEFAULT,
