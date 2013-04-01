@@ -219,3 +219,35 @@
         </div>
     </div>
 </metal:featured-links>
+
+<metal:neworexisting_dialog define-macro="neworexisting_dialog">
+    <!-- Modal -->
+    <div id="neworexisting" class="modal hide fade" tabindex="-1" role="dialog"
+        aria-labelledby="New or existing" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="neworexistingLabel">
+                Is this for a new module or will it override an existing one?
+            </h3>
+        </div>
+        <div class="modal-body">
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <button id="btn-newmodule" class="btn btn-primary submit-neworexisting" 
+                    url="${request.route_url('metadata')}">
+                    New module
+                </button>
+                This is an entirely new module. 
+            </div>
+            <div class="forminfo" style="margin: .5em 0 1em;">
+                <button id="btn-existingmodule" class="btn btn-primary submit-neworexisting" 
+                    url="${request.route_url('module_association')}">
+                    Override existing module
+                </button>
+                Choose an existing module to apply your import to, replacing its contents.  
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+    </div>
+</metal:neworexisting_dialog>

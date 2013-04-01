@@ -17,11 +17,49 @@
     </metal:script>
 
     <metal:workflownav fill-slot="workflownav">
-    <span metal:use-macro="view.workflow_nav">
-        <span metal:fill-slot="extras">
-            <input name="workflownav.preview.submitted" type="hidden" value="submitted" />
-        </span>
-    </span>
+    
+    <metal:workflow_nav_form_begin use-macro="view.workflow_nav_form_begin" />
+    <input name="workflownav.preview.submitted" type="hidden" value="submitted" />
+    <div id="workflownav-wrap">
+        <div id="workflownav-container">
+            <div id="back-steps">
+                <input id="btn-back" name="btn-back"
+                    type="submit"
+                    value="back step" 
+                    class="back-button" 
+                    role="button"
+                    title="Back"
+                    tal:attributes="href string:/${view.get_previous_action()};
+                                    value structure:view.back_step_label;
+                                    title view.back_step_title"/>
+            </div>
+
+            <input id="source" type="hidden" name="source"
+                tal:attributes="value request.session.get('source')">
+            <input id="target" type="hidden" name="target"
+                tal:attributes="value request.session.get('target')">
+            <input id="workspace" type="hidden" name="workspace"
+                tal:attributes="value selected_workspace|nothing">
+            <input name="workflownav.form.submitted" type="hidden" value="submitted" />
+            
+            <div id="forward-steps">
+                <metal:extras define-slot="extras"/>
+                <input id="btn-forward"
+                    name="btn-forward"
+                    href="#neworexisting"
+                    role="button"
+                    class="button forward-button"
+                    data-toggle="modal"
+                    type="button"
+                    value="next step" 
+                    title="Select a module below and then click 'Next' to start editing it"
+                    tal:attributes="value structure:view.next_step_label;
+                                    title view.next_step_title"/>
+            </div>
+        </div>
+    </div>
+    <metal:workflow_nav_form_end use-macro="view.workflow_nav_form_end" />
+
     </metal:workflownav>
 
     <metal:content-slot fill-slot="content-slot"
@@ -74,6 +112,9 @@
     <div class="pleasewait" id="upload-wait" style="display: none;">
         Your document is being saved. This may take a few moments.
     </div>
+
+    <metal:neworexisting use-macro="view.neworexisting_dialog" />
+
     </metal:content-slot>
 
     <metal:footer-slot fill-slot="footer-slot" />

@@ -3,6 +3,7 @@ import formencode
 from pyramid.decorator import reify
 from pyramid_simpleform import Form
 from pyramid.view import view_config
+from pyramid.renderers import get_renderer
 from pyramid_simpleform.renderers import FormRenderer
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
 
@@ -20,7 +21,11 @@ class PreviewSchema(formencode.Schema):
 
 
 class PreviewView(BaseHelper):
-
+    
+    def __init__(self, request):
+        super(PreviewView, self).__init__(request)
+        self.bootstrap_macro_renderer = get_renderer("templates/bootstrap_macros.pt")
+    
     @view_config(route_name='preview', renderer='templates/preview.pt',
         http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
     def process(self):
@@ -63,7 +68,7 @@ class PreviewView(BaseHelper):
 
     @reify
     def neworexisting_dialog(self):
-        return self.macro_renderer.implementation().macros['neworexisting_dialog']
+        return self.bootstrap_macro_renderer.implementation().macros['neworexisting_dialog']
 
     @reify
     def back_step_label(self):
