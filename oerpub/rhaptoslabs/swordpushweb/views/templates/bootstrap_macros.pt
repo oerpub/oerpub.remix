@@ -233,14 +233,14 @@
         <div class="modal-body">
             <div class="forminfo" style="margin: .5em 0 1em;">
                 <button id="btn-newmodule" class="btn btn-primary submit-neworexisting" 
-                    url="${request.route_url(view.get_next_action(target='new'))}">
+                    url="${request.route_url(view.get_new_module_destination)}">
                     New module
                 </button>
                 This is an entirely new module. 
             </div>
             <div class="forminfo" style="margin: .5em 0 1em;">
                 <button id="btn-existingmodule" class="btn btn-primary submit-neworexisting" 
-                    url="${request.route_url(view.get_next_action(target='existingmodule'))}">
+                    url="${request.route_url(view.get_existing_module_destination)}">
                     Override existing module
                 </button>
                 Choose an existing module to apply your import to, replacing its contents.  

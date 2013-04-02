@@ -92,3 +92,25 @@ class PreviewView(BaseHelper):
     @reify
     def back_step_title(self):
         return "Return to the initial page"
+        
+    @reify
+    def get_new_module_destination(self):
+        # where does the New Module button from the New or Existing Module
+        # dialog box take you?
+        source = self.session['source']
+        if source == 'new' or source == 'existingmodule':
+            # the New or Existing Module dialog box will not be shown
+            return 'preview'
+        else:
+	   return super(PreviewView, self).get_next_action(target='new')
+
+    @reify
+    def get_existing_module_destination(self):
+        # where does the New Module button from the New or Existing Module
+        # dialog box take you?
+        source = self.session['source']
+        if source == 'new' or source == 'existingmodule':
+            # the New or Existing Module dialog box will not be shown
+            return 'preview'
+        else:
+	   return super(PreviewView, self).get_next_action(target='existingmodule')
