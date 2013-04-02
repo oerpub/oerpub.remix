@@ -87,11 +87,11 @@ class BaseHelper(object):
     def workflow_nav_form_end(self):
         return self.macro_renderer.implementation().macros['workflow_nav_form_end']
 
-    def get_next_action(self):
+    def get_next_action(self, source=None, target=None, current_step=None):
         workflowsteps = self.request.registry.getUtility(IWorkflowSteps)
-        source = self.get_source()
-        target = self.get_target()
-        current_step = self.request.matched_route.name
+        source = source or self.get_source()
+        target = target or self.get_target()
+        current_step = current_step or self.request.matched_route.name
         return workflowsteps.getNextStep(source, target, current_step)
 
     def get_previous_action(self):
