@@ -34,6 +34,8 @@ Aloha.ready(function(){
 
         $('#btn-forward').click(function(event) {
             if (Aloha.getEditableById('canvas').isModified()) {
+	        // make sure that the document is saved before
+	        // leaving the page
                 var promise = saveEditableArea();
                 $.when(promise).done(function() {
                     // alert('promised fulfilled!!!');
@@ -43,6 +45,17 @@ Aloha.ready(function(){
                 event.stopPropagation();
                 event.preventDefault();
             } else {
+                // clicking #btn-forward will pop a bootstrap dbox
+                // asking whether to upload to a new or existing module.
+                // there are two workflows where this is not necessary
+                // since the new or existing decision has already been made.
+                source = $('#source').attr('value');
+                if ( source === 'new' || source === 'existingmodule' ) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    window.location = '/metadata';
+                    return false;
+                }
                 return true;
             }
         });
