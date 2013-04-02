@@ -30,6 +30,7 @@ class WorkflowStepsUtility(object):
     # Totally new module content that will replace the chosen module in cnx.
     REPLACE_EXISTING_WITH_NEW = ['choose',
                                  'preview',
+                                 'module_association',
                                  'metadata',
                                  'summary']
     
@@ -38,21 +39,26 @@ class WorkflowStepsUtility(object):
     REPLACE_EXISTING_WITH_EDITED = ['choose',
                                     'choose-module',
                                     'preview',
-                                    'module_association',
                                     'metadata',
                                     'summary']
     
     # These workflow names are in the format [source]:[target]
     # The 'source' and 'target' values are currently kept on the session.
     workflows = {'new:new'                       : DEFAULT,
+                 'newemptymodule:new'            : DEFAULT,
                  'new:existingmodule'            : REPLACE_EXISTING_WITH_NEW,
                  'existingmodule:existingmodule' : REPLACE_EXISTING_WITH_EDITED,
                  'fileupload:new'                : DEFAULT,
+                 'fileupload:existingmodule'     : REPLACE_EXISTING_WITH_NEW,
                  'gdocupload:new'                : DEFAULT,
+                 'gdocupload:existingmodule'     : REPLACE_EXISTING_WITH_NEW,
                  'url:new'                       : DEFAULT,
+                 'url:existingmodule'            : REPLACE_EXISTING_WITH_NEW,
                  'cnxinputs:new'                 : DEFAULT,
-                 'newemptymodule:new'            : DEFAULT,
-                 'presentation:new'              : DEFAULT,}
+                 'cnxinputs:existingmodule'      : REPLACE_EXISTING_WITH_NEW,
+                 'presentation:new'              : DEFAULT,
+                 'presentation:existingmodule'   : REPLACE_EXISTING_WITH_NEW,
+                }
     
     def setWorkflowSteps(self, wf_name, steps):
         wf = self.workflows.get(wf_name)
