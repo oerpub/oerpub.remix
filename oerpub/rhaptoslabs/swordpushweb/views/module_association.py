@@ -126,6 +126,6 @@ def get_module_list(connection, workspace):
 
         # element can either be a module or collections
         # want modules and not collections
-        if uid.startswith('m'):
-          modules.append([uid, edit_link, title, view_link])
+        if uid.startswith('m') or uid.find('module') >= 0:
+            modules.append([uid, edit_link, title, view_link])
     return modules
