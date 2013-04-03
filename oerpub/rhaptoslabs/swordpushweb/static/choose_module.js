@@ -28,3 +28,8 @@ function updateModules(data, textStatus, jqXHR) {
 function showError(jqXHR, textStatus, errorThrown) {
     alert(textStatus);
 }
+
+$(document).ready(function()
+{
+    $('div#workspace-list a.workspace-link').click(onWorkspaceChange);
+});
