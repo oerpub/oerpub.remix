@@ -124,5 +124,8 @@ def get_module_list(connection, workspace):
         path_elements.reverse()
         uid = path_elements[1]
 
-        modules.append([uid, edit_link, title, view_link])
+        # element can either be a module or collections
+        # want modules and not collections
+        if uid.startswith('m'):
+          modules.append([uid, edit_link, title, view_link])
     return modules
