@@ -1,5 +1,10 @@
+import os
 import lxml
+import libxml2
+import urlparse
+import traceback
 import formencode
+
 
 from z3c.batching.batch import Batch
 
@@ -13,11 +18,19 @@ from oerpub.rhaptoslabs import sword2cnx
 
 from utils import load_config
 from helpers import BaseHelper
+from utils import get_files, extract_to_save_dir
+from oerpub.rhaptoslabs.swordpushweb.views.utils import (
+    save_and_backup_file,
+    save_zip,
+    ConversionError)
+from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import \
+    cnxml_to_htmlpreview
 
-class ModuleAssociationSchema(formencode.Schema):
+
+
+class ChooseModuleSchema(formencode.Schema):
     allow_extra_fields = True
-    module = formencode.validators.String()
-
+    module_url = formencode.validators.URL()
 
 class Module_Association_View(BaseHelper):
 
@@ -25,7 +38,17 @@ class Module_Association_View(BaseHelper):
                  renderer='templates/module_association.pt')
     def process(self):
         super(Module_Association_View, self)._process()
+        self.do_transition()
         return self.navigate()
+    
+    def do_transition(self):
+        request = self.request
+        form = Form(request, schema=ChooseModuleSchema)
+        if form.validate():
+            module_url = form.data['module_url']
+            request.session['source_module_url'] = module_url
+            request.session['target_module_url'] = module_url
+            self._download_module(module_url)
     
     def navigate(self, errors=None, form=None):
         view = super(Module_Association_View, self)._navigate(errors, form)
@@ -50,7 +73,7 @@ class Module_Association_View(BaseHelper):
         module_macros = get_renderer('templates/modules_list.pt').implementation()
         dialog_macros = get_renderer('templates/dialogs.pt').implementation()
 
-        form = Form(request, schema=ModuleAssociationSchema)
+        form = Form(request, schema=ChooseModuleSchema)
         response = {'form': FormRenderer(form),
                     'workspaces': workspaces,
                     'selected_workspace': selected_workspace,
@@ -63,6 +86,41 @@ class Module_Association_View(BaseHelper):
                     'view': self,
         }
         return response
+
+    def _download_module(self, module_url):
+        request = self.request
+        session = request.session
+        conn = sword2cnx.Connection(session['service_document_url'],
+                                    user_name=session['username'],
+                                    user_pass=session['password'],
+                                    always_authenticate=True,
+                                    download_service_document=False)
+
+        parts = urlparse.urlsplit(module_url)
+        path = parts.path.split('/')
+        path = path[:path.index('sword')]
+        module_url = '%s://%s%s' % (parts.scheme, parts.netloc, '/'.join(path))
+
+        # example: http://cnx.org/Members/user001/m17222/sword/editmedia
+        zip_file = conn.get_cnx_module(module_url = module_url,
+                                       packaging = 'zip')
+        
+        save_dir = os.path.join(request.registry.settings['transform_dir'],
+                                request.session['upload_dir'])
+        extract_to_save_dir(zip_file, save_dir)
+
+        cnxml_file = open(os.path.join(save_dir, 'index.cnxml'), 'rb')
+        cnxml = cnxml_file.read()
+        cnxml_file.close()
+        conversionerror = None
+        try:
+            htmlpreview = cnxml_to_htmlpreview(cnxml)
+            save_and_backup_file(save_dir, 'index.html', htmlpreview)
+            files = get_files(save_dir)
+            save_zip(save_dir, cnxml, htmlpreview, files)
+        except libxml2.parserError:
+            conversionerror = traceback.format_exc()
+            raise ConversionError(conversionerror)
 
     @reify
     def macros(self):

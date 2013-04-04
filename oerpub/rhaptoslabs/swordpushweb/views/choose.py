@@ -110,6 +110,7 @@ class Choose_Document_Source(BaseHelper):
                 'source',
                 'target',
                 'module_url',
+                'upload_dir',
                 'source_module_url',
                 'target_module_url',
                 'preview-no-cache',]

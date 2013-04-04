@@ -23,7 +23,6 @@
 </metal:script-slot>    
 
 <metal:workflownav fill-slot="workflownav">
-    <span metal:use-macro="view.workflow_nav">Workflow navigation</span>
 </metal:workflownav>
 
 <tal:body metal:fill-slot="content-slot"
@@ -32,8 +31,10 @@
     b_start python:modules.start + b_size;
     previous_b_start python:modules.start - b_size;
     ">
-${form.begin(request.route_url('metadata'), name="metadata")}
-${form.csrf_token()}
+
+<span metal:use-macro="view.workflow_nav_form_begin">workflow buttons</span>
+<span metal:use-macro="view.workflow_nav_form">form</span>
+
 <div id="ie6-container-wrap">
     <div id="container">
         <div id="content">
@@ -95,7 +96,7 @@ ${form.csrf_token()}
     </div>
 
 </div>
-${form.end()}
+<span metal:use-macro="view.workflow_nav_form_end">workflow buttons</span>
 
 <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
