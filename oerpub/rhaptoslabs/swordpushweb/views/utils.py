@@ -1,3 +1,4 @@
+import re
 import shutil
 import cStringIO
 import types
@@ -35,12 +36,17 @@ NAMESPACES = {'sword'   : 'http://purl.org/net/sword/',
               'cnxml'   : 'http://cnx.rice.edu/cnxml',
               }
 
+TEMP_FILES_RE = re.compile('.~$|.tar$|.tgz$|.zip$', re.I)
+
 log = logging.getLogger('utils')
 
-def get_files(save_dir):
+def get_files(save_dir, file_filter=TEMP_FILES_RE):
     files = []
     names = os.listdir(save_dir)
     for name in names:
+        # skip all temp files
+        if file_filter.search(name) is not None:
+            continue
         tmpfile = open(os.path.join(save_dir, name), 'rb')
         content = tmpfile.read()
         tmpfile.close()
