@@ -32,6 +32,7 @@ def preview_save(request):
     cnxml = None
     try:
         structured_html = aloha_to_html(html)           #1 create structured HTML5
+        # parse the new title from structured HTML
         tree = etree.fromstring(structured_html, etree.HTMLParser())
         try:
             edited_title = tree.xpath('/html/head/title/text()')[0]
@@ -40,14 +41,6 @@ def preview_save(request):
             request.session['title'] = 'Untitled Document'
 
         cnxml = html_to_valid_cnxml(structured_html)    #2 create cnxml from structured HTML5
-
-        # parse the new title from structured HTML
-        tree = etree.fromstring(structured_html, etree.HTMLParser())
-        try:
-            edited_title = tree.xpath('/html/head/title/text()')[0]
-            request.session['title'] = edited_title
-        except:
-            request.session['title'] = 'Untitled Document'
     except Exception as e:
         #return render_conversionerror(request, str(e))
         conversionerror = str(e)
