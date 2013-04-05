@@ -86,7 +86,7 @@ class PresentationSchema(formencode.Schema):
 
 class ZipOrLatexSchema(formencode.Schema):
     allow_extra_fields = True
-    upload_file = formencode.validators.FieldStorageUploadConverter()
+    upload_zip_file = formencode.validators.FieldStorageUploadConverter()
 
 
 class Choose_Document_Source(BaseHelper):
@@ -346,18 +346,18 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
 class ZipOrLatexModuleProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(ZipOrLatexModuleProcessor, self).__init__(request, form)
-        ufname = self.form.data['upload'].filename.replace(os.sep, '_')
+        ufname = self.form.data['upload_zip_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
 
         # Save the original file so that we can convert, plus keep it.
         saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['upload'].file
+        input_file = self.form.data['upload_zip_file'].file
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
         input_file.close()
 
         self.zip_archive = zipfile.ZipFile(self.original_filename, 'r')
-        self.form.data['upload'] = None
+        self.form.data['upload_zip_file'] = None
         self.set_source('cnxinputs')
         self.set_target('new')
 
@@ -367,7 +367,7 @@ class ZipOrLatexModuleProcessor(BaseFormProcessor):
             packaging = self.get_type()
             if packaging == ZIP_PACKAGING:
                 processor = ZipFileProcessor(self.request, self.form)
-                return processor.process()
+                return processor.process(self.original_filename)
             elif packaging == LATEX_PACKAGING:
                 processor = LatexProcessor(self.request, self.form)
                 return processor.process()
@@ -419,13 +419,15 @@ class ZipFileProcessor(BaseFormProcessor):
         self.set_source('cnxinputs')
         self.set_target('new')
 
-    def process(self):
+    def process(self, zip_filename):
         try:
+            self.zip_archive = zipfile.ZipFile(zip_filename, 'r')
+
             # Unzip into transform directory
             self.zip_archive.extractall(path=self.save_dir)
 
             # Rename ZIP file so that the user can download it again
-            os.rename(self.original_filename,
+            os.rename(zip_filename,
                       os.path.join(self.save_dir, 'upload.zip'))
 
             # Read CNXML
