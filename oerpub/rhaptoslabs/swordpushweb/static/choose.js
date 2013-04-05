@@ -29,6 +29,28 @@ $(document).ready(function()
         $('form#presentationform').submit(); 
     });
 
+    // Zip file upload
+    $('input#zip-file-submit').click(function(event) {
+        // user clicks the input button to upload and edit a zip file
+        // we redirect that click to a hidden file input 
+        // which launches an OS specific Open File dbox 
+        // which loads the value attribute of the file input 
+        // on successful file upload
+        event.preventDefault();
+	// front end of the async file upload to client
+        $('input#upload_zip_file').click();
+    });
+
+    $('#zip-file-submit').click(function(e) {
+        showWaitMessage('slow');
+    });
+
+    $('input#upload_zip_file').change(function(event){
+	// back end of the async file upload to client
+        showWaitMessage();
+        $('form#zip_or_latex_form').submit(); 
+    });
+
 });
 
 //

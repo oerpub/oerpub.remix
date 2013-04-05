@@ -214,7 +214,15 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               <p class="forminfo">
                                 Convert a LaTeX document or a module's previously downloaded ZIP.
                               </p>
-                              <input class="button" id="file-submit" name="form.submitted" value="Choose file and preview &#187;" type="submit">
+                              <input class="button" 
+                                     id="zip-file-submit" 
+                                     name="form.submitted" 
+                                     value="Choose file and preview &#187;" 
+                                     type="submit">
+                                <input id="upload_zip_file" 
+                                       name="upload_zip_file"
+                                       style="visibility: hidden;" 
+                                       type="file" />
                             </div>
                           </li>
                     ${zip_or_latex_form.end()}

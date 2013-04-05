@@ -57,7 +57,10 @@ def extract_to_save_dir(zip_file, save_dir):
         fileparts = zinfo.filename.split('/')
         src = os.path.join(tmp_dir, zinfo.filename)
         dest = os.path.join(save_dir, fileparts[-1])
-        shutil.move(src, dest)
+        if os.path.exists(dest):
+            os.remove(src)
+        else:
+            shutil.move(src, dest)
     shutil.rmtree(tmp_dir, ignore_errors=True)
 
 def create_module_in_2_steps(form, connection, metadata_entry, zip_file, save_dir):
