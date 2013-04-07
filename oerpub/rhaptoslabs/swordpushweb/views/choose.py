@@ -213,7 +213,8 @@ class BaseFormProcessor(object):
             request.registry.settings['transform_dir'],
             temp_dir_name
             )
-        os.mkdir(save_dir)
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
         return temp_dir_name, save_dir
 
     def write_traceback_to_zipfile(self, traceback):
