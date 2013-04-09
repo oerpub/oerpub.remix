@@ -46,7 +46,9 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     render_conversionerror,
     ZIP_PACKAGING,
     LATEX_PACKAGING,
-    UNKNOWN_PACKAGING,)
+    UNKNOWN_PACKAGING,
+    remove_save_dir,
+    create_save_dir,)
 from oerpub.rhaptoslabs.swordpushweb.errors import (
     ConversionError,
     UnknownPackagingError)
@@ -100,9 +102,9 @@ class Choose_Document_Source(BaseHelper):
     def do_transition(self):
         request = self.request
         session = request.session
-        self.clear_session(session)
+        self.clear_session(request, session)
     
-    def clear_session(self, session):
+    def clear_session(self, request, session):
         ''' Remove all known application specific state from the session.
         '''
         keys = ['transformerror',
@@ -117,6 +119,10 @@ class Choose_Document_Source(BaseHelper):
         for key in keys:
             if key in session:
                 del session[key]
+
+        # cleanup the temporary work areas too
+        remove_save_dir(request)
+
         
     def navigate(self, errors=None, form=None):
         request = self.request
@@ -193,7 +199,7 @@ class BaseFormProcessor(object):
         self.form = form
         self.message = 'The file was successfully converted.'
         request.session['source'] = 'undefined'
-        self.temp_dir_name, self.save_dir = self.create_work_dir(self.request)
+        self.temp_dir_name, self.save_dir = self.create_save_dir(self.request)
         self.upload_dir = self.temp_dir_name
         self.request.session['upload_dir'] = self.temp_dir_name
 
@@ -205,16 +211,8 @@ class BaseFormProcessor(object):
         saved_file.close()
         input_file.close()
 
-    def create_work_dir(self, request):
-        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        # TODO: This has a good chance of being unique, but even so...
-        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
-        save_dir = os.path.join(
-            request.registry.settings['transform_dir'],
-            temp_dir_name
-            )
-        os.mkdir(save_dir)
-        return temp_dir_name, save_dir
+    def create_save_dir(self, request):
+        return create_save_dir(request)
 
     def write_traceback_to_zipfile(self, traceback):
         # Record traceback
@@ -657,15 +655,8 @@ class PresentationProcessor(BaseFormProcessor):
         self.original_filename = \
             os.path.join(self.save_dir, self.uploaded_filename)
     
-    def create_work_dir(self, request):
-        now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        temp_dir_name = '%s-%s' % (self.username, now_string)
-        save_dir = os.path.join(
-            request.registry.settings['slideshare_import_dir'],
-            temp_dir_name
-        )
-        os.mkdir(save_dir)
-        return temp_dir_name, save_dir
+    def create_save_dir(self, request):
+        return create_save_dir(registry_key='slideshare_import_dir')
     
     def save_original_file(self):
         saved_file = open(self.original_filename, 'wb')

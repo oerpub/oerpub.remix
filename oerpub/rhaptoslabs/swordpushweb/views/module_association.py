@@ -18,7 +18,11 @@ from oerpub.rhaptoslabs import sword2cnx
 
 from utils import load_config
 from helpers import BaseHelper
-from utils import get_files, extract_to_save_dir
+from utils import (
+    get_files,
+    get_save_dir,
+    extract_to_save_dir,
+    cleanup_save_dir)
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_and_backup_file,
     save_zip,
@@ -44,6 +48,7 @@ class Module_Association_View(BaseHelper):
     def do_transition(self):
         request = self.request
         form = Form(request, schema=ChooseModuleSchema)
+        cleanup_save_dir(request)
         if form.validate():
             module_url = form.data['module_url']
             request.session['source_module_url'] = module_url
@@ -104,9 +109,8 @@ class Module_Association_View(BaseHelper):
         # example: http://cnx.org/Members/user001/m17222/sword/editmedia
         zip_file = conn.get_cnx_module(module_url = module_url,
                                        packaging = 'zip')
-        
-        save_dir = os.path.join(request.registry.settings['transform_dir'],
-                                request.session['upload_dir'])
+         
+        save_dir = get_save_dir(request)
         extract_to_save_dir(zip_file, save_dir)
 
         cnxml_file = open(os.path.join(save_dir, 'index.cnxml'), 'rb')

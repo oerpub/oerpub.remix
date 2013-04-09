@@ -9,6 +9,7 @@ import zipfile
 import lxml
 import pycurl
 import logging
+import datetime
 import traceback
 from lxml import etree
 
@@ -696,3 +697,38 @@ def json_set_source_on_session(request):
     return {'source': source,
             'error': error}
 
+def cleanup_save_dir(request):
+    remove_save_dir(request)
+    create_save_dir(request)
+
+def create_save_dir(request, register_key='transform_dir'):
+    log.debug('Creating save_dir...')
+    now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    # TODO: This has a good chance of being unique, but even so...
+    temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+    save_dir = os.path.join(
+        request.registry.settings[register_key],
+        temp_dir_name
+        )
+    os.mkdir(save_dir)
+
+    log.debug('temp_dir_name:%s' %temp_dir_name)
+    log.debug('save_dir:%s' %save_dir)
+
+    return temp_dir_name, save_dir
+
+def remove_save_dir(request):
+    save_dir = get_save_dir(request)
+    log.debug('Removing save_dir:%s' %save_dir)
+    if save_dir:
+        shutil.rmtree(save_dir, ignore_errors=True)
+
+def get_save_dir(request):
+    log.debug('Getting save_dir')
+    save_dir = None
+    transform_dir = request.registry.settings['transform_dir']
+    upload_dir = request.session.get('upload_dir', None)
+    if transform_dir and upload_dir:
+        save_dir = os.path.join(transform_dir, upload_dir)
+    log.debug('save_dir:%s' %save_dir)
+    return save_dir
