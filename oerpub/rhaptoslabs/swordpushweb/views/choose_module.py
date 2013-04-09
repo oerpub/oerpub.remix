@@ -29,7 +29,7 @@ class Choose_Module(Module_Association_View):
         if source == 'newemptymodule':
             return 'Add module description and save module to cnx.org'
         elif source == 'existingmodule':
-            return 'Review module description and save module to cnx.org'
+            return "Select a module below and then click 'Next' to start editing it"
         elif source == 'importmodule':
               return 'Select whether this will be used for a new module or to override the contents of an existing module'
         return 'Select whether this will be used for a new module or to override the contents of an existing module'

@@ -75,10 +75,6 @@ class URLSchema(formencode.Schema):
     allow_extra_fields = True
     url_text = formencode.validators.URL()
 
-class UploadSchema(formencode.Schema):
-    allow_extra_fields = True
-    upload_file = formencode.validators.FieldStorageUploadConverter()
-
 class PresentationSchema(formencode.Schema):
     allow_extra_fields = True
     importer = formencode.validators.FieldStorageUploadConverter()

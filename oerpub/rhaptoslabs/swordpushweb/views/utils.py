@@ -710,7 +710,8 @@ def create_save_dir(request, register_key='transform_dir'):
         request.registry.settings[register_key],
         temp_dir_name
         )
-    os.mkdir(save_dir)
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
 
     log.debug('temp_dir_name:%s' %temp_dir_name)
     log.debug('save_dir:%s' %save_dir)

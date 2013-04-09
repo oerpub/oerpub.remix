@@ -42,6 +42,7 @@ $(document).ready(function()
     });
 
     // Display advanced mode notice on click
+    // FIXME: This way of using toggle() is deprecated in Jquery 1.7
     $("#expertmode").toggle(function(){
       $("#advanced-message").show();
       $("#basic-message").hide();

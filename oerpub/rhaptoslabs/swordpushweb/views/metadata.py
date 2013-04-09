@@ -442,14 +442,7 @@ class Metadata_View(BaseHelper):
 
     @reify
     def next_step_title(self):
-        source = self.session['source']
-        if source == 'newemptymodule':
-            return 'Add module description and save module to cnx.org'
-        elif source == 'existingmodule':
-            return 'Review module description and save module to cnx.org'
-        elif source == 'importmodule':
-              return 'Select whether this will be used for a new module or to override the contents of an existing module'
-        return 'Select whether this will be used for a new module or to override the contents of an existing module'
+        return "Click 'Finish' to add the module as edited to the designated work area. Further steps are required before the module can be published in the Connexions repository."
 
     @reify
     def back_step_title(self):

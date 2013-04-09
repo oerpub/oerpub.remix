@@ -9,8 +9,10 @@
 
 #module-actions {
     position: fixed;
-    right: 8px;
-    top: 128px;
+    left: 50%;
+    margin-left: -25%;
+    top: 32px;
+    width: 50%;
     z-index: 1011;
 }
 
