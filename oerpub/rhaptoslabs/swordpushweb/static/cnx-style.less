@@ -1,0 +1,523 @@
+#editor {
+    .section{
+      margin: 3em 0;
+    }
+
+    .section-header, .glossary-header, .references-header, .footnotes-header{
+      font-size: 150%;
+      font-family: "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif;
+      font-weight: normal;
+      border-bottom: 1px solid #8cacbb;
+      padding-top: .5em;
+      margin: 0;
+      line-height: 1.5em;
+    }
+
+    .section .section{
+      margin-left: 4em;
+    }
+
+    .section .section .section-header{
+      font-size: 140%;
+      border-bottom: none;
+      font-weight: bold;
+    }
+
+    .section .section .section .section-header{
+      font-size: 120%;
+      border-bottom: none;
+      font-weight: bold;
+    }
+
+    .example .section-header, .proof .section-header, .problem .section-header, .solution .section-header, .statement .section-header{
+      font-size: 105%;
+      font-weight: bold;
+      border-bottom-width: 0;
+    }
+
+    .example .section, .problem .section, .solution .section, .statement .section, .proof .section{
+      margin-left: 4em;
+      margin-top: .5em;
+      margin-bottom: 1.5em;
+    }
+
+    .section-header .title{
+      font-weight: normal;
+    }
+
+    .section .section .section-header .title{
+      font-weight: bold;
+    }
+
+    .qmlitem .section{
+      margin-top: 0;
+    }
+
+    // ========== Para ==========
+
+    .para{
+      margin: 1em 0;
+    }
+
+    .para-header{
+      margin: 1em 0 -.5em;
+    }
+
+    #cnx_main{
+      line-height: 1.5em;
+    }
+
+    // ========== diff higlighting ==========
+
+    ins{
+      color: #060;
+    }
+
+    del{                                         
+      color: #c00;          
+    }
+
+    // ========== text treatments ===========
+
+    .cnxn, .term, .title, th, .equation-number, em, .cnx_label, .footnote-reference{
+      font-weight: bold;
+    }
+
+    .smallcaps{
+      font-variant: small-caps;
+    }
+
+    .foreign{
+      font-style: italic;
+    }
+
+    .term, .foreign i, i .foreign{
+      font-style: normal;
+    }
+
+    cite, em, i.emphasis .cite-title i{
+      font-style: normal;
+    }
+
+    i em, i cite, .foreign cite, .foreign em, .term em, em .term{
+      font-style: italic;
+    }
+
+    .normal{
+      font-weight: normal;
+      font-style: normal;
+      font-variant: normal;
+      text-decoration: none;
+    }
+
+    .normal em{
+      font-style: normal;
+    }
+
+    a, code{
+      color: #436976;
+    }
+
+    #cnx_main a{
+      text-decoration: none;
+      border-bottom: 1px #cccccc solid;
+    }
+
+    .cnxn-target{
+      text-transform: capitalize;
+    }
+
+    // ========== exercises ===========
+
+    .problemset-header{
+      margin: 2em 0;
+    }
+
+    .exercise .title, .solution-toggles{
+      display: block;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .exercise * .title{
+      text-align: left;
+      display: inline;
+    }
+
+    .solution-toggles a{
+      text-decoration: none;             
+    }
+
+    .solution-toggles{
+      margin-top: 1em;
+    }         
+
+    .commentary{
+      margin-top: 1em;
+    }
+
+    // ========== <code> ===========
+
+    code{
+      font-family: Courier, "Courier New", monospace;
+      font-size: 118%;
+      background-color: #dee7ec;
+    }
+
+    div.code{
+      margin: 1em 0;
+    }
+
+    pre.codeblock{
+      padding: .8em;
+      border: 1px solid #8cacbb;
+      background-color: #dee7ec;
+      text-align: left;
+      font-family: Courier, "Courier New", monospace;
+      font-size: 100%;
+      margin: 1em 0;
+    }
+
+    // ======== preformat ========
+
+    div.preformat{
+      margin: .5em 0;
+    }
+
+    pre.preformatted{
+      font-family: "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif;
+      font-size: 1em;
+      margin: .5em 0;
+    }
+
+    span.preformat{
+      font-family: Courier, "Courier New", monospace;  
+      font-size: 118%;
+    }
+
+    // ========== quote ==========
+
+    blockquote{
+      padding-left: .5em;
+      border-left: 4px solid #8cacbb;
+      color: #76797c;
+      margin: 1em 0; 
+    }
+
+    .quote-header{
+      margin: 1em 0 -.5em;
+    }
+
+    // =========== <table> ===========
+
+    .table{
+      margin: 1em 0;
+      text-align: center;
+      width: 100%;
+    }
+
+    .table table{
+      border: 1px solid #666 !important;
+      border-collapse: collapse;
+    }
+
+    .table-name{
+      padding-bottom: .5em;
+      text-align: center;
+    }
+
+    .table td, .table th{
+      padding: .3em !important;
+      border: 1px solid #666 !important;
+    }
+
+    .table-text{
+      padding-top: .3em;
+      text-align: left;
+    }
+
+    .table-caption, .code-caption{
+      font-size: .9em;
+      text-align: left;
+      padding-top: .3em;
+    }
+
+    .code-caption{
+      border-top: 1px solid #8cacbb;
+      margin: .8em auto;
+    }
+
+    p.table-caption{
+      width: 50%;
+    }
+
+    .code td{
+      padding: 0;
+    }
+
+    // =========== Boxed Elements ==============
+
+    .example, .rule, .definition, div.note, .exercise, .problemset .qmlitem{
+      border: 1px solid #8cacbb;
+      padding: 1em;
+      margin: 1em 0;
+    }
+
+    .statement, .meaning{
+      margin: 1em 0;
+    }
+
+    .rule-header, .note-header{
+      text-transform: capitalize;
+    }
+
+    .note-header, .note-contents{
+      display: inline;
+    }
+
+    .example, .definition, .rule{
+      margin-top: 2em;
+    }
+
+    .example-header, .definition dt, .rule-header{
+      padding: .5em;
+      background-color: white;
+      margin-top: -2.2em;
+      margin-left: -.5em;
+      float: left;
+    }
+
+    * html .example-header, * html .definition dt, * html .rule-header{
+      margin-left: -.25em;
+    }
+
+    .definition .example{
+      padding: .5em 1em;
+    }
+
+    .definition .example-header{
+      margin-top: -1.8em;
+    }
+
+    // =========== <media> ===========
+
+    div.media, .block{
+      display: block;
+      margin: .5em 0; 
+      text-align: center;
+    }
+
+    .none{
+      display: none;
+    }
+
+    // ============ <glossary> ============
+
+    .glossary div, .glossary h3, .glossary h4, .glossary h5, .glossary h6, .glossary p, .glossary dt, .glossary dd, .glossary .example{
+      display: inline;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      float: none;
+    }
+
+    .glossary{
+      margin: 1em 0 1em 4em;
+      border: 0;
+      padding: 0;
+    }
+
+    dl.glossary dt{
+      margin-left: -4em;
+    }
+
+    .glossary dd, .glossary .example-header{
+      margin-left: .5em;
+    }
+
+    .glossary .seealso{
+      display: block;
+      margin: .25em 0 0;
+    }
+
+    // ============== <equation> =============
+
+    .equation{
+      margin: 1em 0;
+      position: relative;
+    }
+
+    * html .equation{
+      width: 100%;
+      z-index: -1;
+    }
+    *+html .equation{
+      z-index: -1;
+    }
+
+    .equation-number{
+      position: absolute;
+      top: 50%;
+      right: 0;
+    }
+
+    .equation .title{
+      display: block;
+      padding-bottom: .5em;
+    }
+
+    semantics annotation-xml{
+      display: none;
+    }
+
+    .MathJax{
+      cursor: pointer;
+    }
+
+
+    // =========== <list> =========
+
+    div.list{
+      margin: 1em 0;
+    }
+
+    .list ul, .list ol{
+      margin: 0 0 0 2.5em;
+      padding: 0;
+      list-style-image: none;
+    }
+
+    .list ol{
+      margin-left: 3em;
+    }
+
+    ol.arabic{ list-style-type: decimal; }
+    ol.upper-roman{ list-style-type: upper-roman; }
+    ol.lower-roman{ list-style-type: lower-roman; }     
+    ol.upper-alpha{ list-style-type: upper-alpha; }                  
+    ol.lower-alpha{ list-style-type: lower-alpha; }
+    ul.bullet{ list-style-type: disc; }
+    ul.open-circle{ list-style-type: circle; }
+    ul.other{ list-style-type: none; }
+    ol.other{ list-style-type: none; }
+    ul.labeled-item{ list-style-type: none; }
+
+    ol.other, ul.other, ul.labeled-item{
+      margin-left: 1.5em;
+    }
+
+    .list-header{
+      margin: 1em 0 .5em;
+    }
+
+    span .list-header{
+      display: inline;
+    }
+
+    div.list .item-decoration{
+      margin-right: .5em;
+    }
+
+    // ========== Footnote Reference ==========
+
+    .footnote-reference{
+      vertical-align: .4em;
+      font-size: .8em;
+      line-height: .1em;
+    }
+
+    // =========== <figure> ===========
+
+    .figure{
+      margin: 1em auto;
+    }
+
+    .figure td, .figure th{
+      text-align: center;
+    }
+
+    .inner-figure{
+      border: 1px solid #8cacbb;
+      padding: 1em;
+    }
+
+    .horizontal-subfigure, .vertical-subfigure{
+      margin: auto;
+    }
+
+    .figure-name, .horizontal-subfigure-name, .vertical-subfigure-name{
+      padding-bottom: .5em;
+    }
+
+    .figure-caption, .horizontal-subfigure-caption, .vertical-subfigure-caption{
+      padding: .5em 0 1em;
+      text-align: left;
+      font-size: .9em;
+      font-weight: normal;
+    }
+
+    .figure pre, .figure .table{
+      margin: 0;
+    }
+
+    // ===== <newline> and <space> =====
+
+    .newline hr{
+      height: 0;
+      margin: 1.4em 0 .25em;
+      border: 0 solid black;
+      border-width: 0 0 1px;
+    }
+
+    * html .newline hr{ margin: .5em 0 -.2em; }
+    *+html .newline hr{ margin: .5em 0 -.2em; }
+
+    pre.underline{
+      text-decoration: underline;
+    }
+
+    pre.space{
+      display: inline;
+    }
+
+    // ============= QML =============
+
+    .hint, .feedback{
+      display: none;
+      margin: .5em 0;
+    }
+
+    .hint{
+      font-style: italic;
+    }
+
+    .feedback{
+      color: #436976;
+    }
+
+    .qmlitem input{
+      margin: 0 .5em 0 0;
+    }
+
+    .answer, .qmlitem input.button{
+      margin: .5em 0;
+    }
+
+    .qmlitem textarea{
+      border: 1px solid #8cacbb;
+    }
+
+    .incorrect{
+      color: #ffa500;
+    }
+
+    .radio, .checkbox{
+      border-width: 0;
+    }
+
+    // Make a list display inline
+    ul.linear li {
+        display: inline;
+    }
+}

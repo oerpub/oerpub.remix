@@ -1,0 +1,478 @@
+#editor .section {
+  margin: 3em 0;
+}
+#editor .section-header,
+#editor .glossary-header,
+#editor .references-header,
+#editor .footnotes-header {
+  font-size: 150%;
+  font-family: "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  border-bottom: 1px solid #8cacbb;
+  padding-top: .5em;
+  margin: 0;
+  line-height: 1.5em;
+}
+#editor .section .section {
+  margin-left: 4em;
+}
+#editor .section .section .section-header {
+  font-size: 140%;
+  border-bottom: none;
+  font-weight: bold;
+}
+#editor .section .section .section .section-header {
+  font-size: 120%;
+  border-bottom: none;
+  font-weight: bold;
+}
+#editor .example .section-header,
+#editor .proof .section-header,
+#editor .problem .section-header,
+#editor .solution .section-header,
+#editor .statement .section-header {
+  font-size: 105%;
+  font-weight: bold;
+  border-bottom-width: 0;
+}
+#editor .example .section,
+#editor .problem .section,
+#editor .solution .section,
+#editor .statement .section,
+#editor .proof .section {
+  margin-left: 4em;
+  margin-top: .5em;
+  margin-bottom: 1.5em;
+}
+#editor .section-header .title {
+  font-weight: normal;
+}
+#editor .section .section .section-header .title {
+  font-weight: bold;
+}
+#editor .qmlitem .section {
+  margin-top: 0;
+}
+#editor .para {
+  margin: 1em 0;
+}
+#editor .para-header {
+  margin: 1em 0 -0.5em;
+}
+#editor #cnx_main {
+  line-height: 1.5em;
+}
+#editor ins {
+  color: #060;
+}
+#editor del {
+  color: #c00;
+}
+#editor .cnxn,
+#editor .term,
+#editor .title,
+#editor th,
+#editor .equation-number,
+#editor em,
+#editor .cnx_label,
+#editor .footnote-reference {
+  font-weight: bold;
+}
+#editor .smallcaps {
+  font-variant: small-caps;
+}
+#editor .foreign {
+  font-style: italic;
+}
+#editor .term,
+#editor .foreign i,
+#editor i .foreign {
+  font-style: normal;
+}
+#editor cite,
+#editor em,
+#editor i.emphasis .cite-title i {
+  font-style: normal;
+}
+#editor i em,
+#editor i cite,
+#editor .foreign cite,
+#editor .foreign em,
+#editor .term em,
+#editor em .term {
+  font-style: italic;
+}
+#editor .normal {
+  font-weight: normal;
+  font-style: normal;
+  font-variant: normal;
+  text-decoration: none;
+}
+#editor .normal em {
+  font-style: normal;
+}
+#editor a,
+#editor code {
+  color: #436976;
+}
+#editor #cnx_main a {
+  text-decoration: none;
+  border-bottom: 1px #cccccc solid;
+}
+#editor .cnxn-target {
+  text-transform: capitalize;
+}
+#editor .problemset-header {
+  margin: 2em 0;
+}
+#editor .exercise .title,
+#editor .solution-toggles {
+  display: block;
+  text-align: center;
+  font-weight: bold;
+}
+#editor .exercise * .title {
+  text-align: left;
+  display: inline;
+}
+#editor .solution-toggles a {
+  text-decoration: none;
+}
+#editor .solution-toggles {
+  margin-top: 1em;
+}
+#editor .commentary {
+  margin-top: 1em;
+}
+#editor code {
+  font-family: Courier, "Courier New", monospace;
+  font-size: 118%;
+  background-color: #dee7ec;
+}
+#editor div.code {
+  margin: 1em 0;
+}
+#editor pre.codeblock {
+  padding: .8em;
+  border: 1px solid #8cacbb;
+  background-color: #dee7ec;
+  text-align: left;
+  font-family: Courier, "Courier New", monospace;
+  font-size: 100%;
+  margin: 1em 0;
+}
+#editor div.preformat {
+  margin: .5em 0;
+}
+#editor pre.preformatted {
+  font-family: "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  margin: .5em 0;
+}
+#editor span.preformat {
+  font-family: Courier, "Courier New", monospace;
+  font-size: 118%;
+}
+#editor blockquote {
+  padding-left: .5em;
+  border-left: 4px solid #8cacbb;
+  color: #76797c;
+  margin: 1em 0;
+}
+#editor .quote-header {
+  margin: 1em 0 -0.5em;
+}
+#editor .table {
+  margin: 1em 0;
+  text-align: center;
+  width: 100%;
+}
+#editor .table table {
+  border: 1px solid #666 !important;
+  border-collapse: collapse;
+}
+#editor .table-name {
+  padding-bottom: .5em;
+  text-align: center;
+}
+#editor .table td,
+#editor .table th {
+  padding: .3em !important;
+  border: 1px solid #666 !important;
+}
+#editor .table-text {
+  padding-top: .3em;
+  text-align: left;
+}
+#editor .table-caption,
+#editor .code-caption {
+  font-size: .9em;
+  text-align: left;
+  padding-top: .3em;
+}
+#editor .code-caption {
+  border-top: 1px solid #8cacbb;
+  margin: .8em auto;
+}
+#editor p.table-caption {
+  width: 50%;
+}
+#editor .code td {
+  padding: 0;
+}
+#editor .example,
+#editor .rule,
+#editor .definition,
+#editor div.note,
+#editor .exercise,
+#editor .problemset .qmlitem {
+  border: 1px solid #8cacbb;
+  padding: 1em;
+  margin: 1em 0;
+}
+#editor .statement,
+#editor .meaning {
+  margin: 1em 0;
+}
+#editor .rule-header,
+#editor .note-header {
+  text-transform: capitalize;
+}
+#editor .note-header,
+#editor .note-contents {
+  display: inline;
+}
+#editor .example,
+#editor .definition,
+#editor .rule {
+  margin-top: 2em;
+}
+#editor .example-header,
+#editor .definition dt,
+#editor .rule-header {
+  padding: .5em;
+  background-color: white;
+  margin-top: -2.2em;
+  margin-left: -0.5em;
+  float: left;
+}
+#editor * html .example-header,
+#editor * html .definition dt,
+#editor * html .rule-header {
+  margin-left: -0.25em;
+}
+#editor .definition .example {
+  padding: .5em 1em;
+}
+#editor .definition .example-header {
+  margin-top: -1.8em;
+}
+#editor div.media,
+#editor .block {
+  display: block;
+  margin: .5em 0;
+  text-align: center;
+}
+#editor .none {
+  display: none;
+}
+#editor .glossary div,
+#editor .glossary h3,
+#editor .glossary h4,
+#editor .glossary h5,
+#editor .glossary h6,
+#editor .glossary p,
+#editor .glossary dt,
+#editor .glossary dd,
+#editor .glossary .example {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  float: none;
+}
+#editor .glossary {
+  margin: 1em 0 1em 4em;
+  border: 0;
+  padding: 0;
+}
+#editor dl.glossary dt {
+  margin-left: -4em;
+}
+#editor .glossary dd,
+#editor .glossary .example-header {
+  margin-left: .5em;
+}
+#editor .glossary .seealso {
+  display: block;
+  margin: .25em 0 0;
+}
+#editor .equation {
+  margin: 1em 0;
+  position: relative;
+}
+#editor * html .equation {
+  width: 100%;
+  z-index: -1;
+}
+#editor * + html .equation {
+  z-index: -1;
+}
+#editor .equation-number {
+  position: absolute;
+  top: 50%;
+  right: 0;
+}
+#editor .equation .title {
+  display: block;
+  padding-bottom: .5em;
+}
+#editor semantics annotation-xml {
+  display: none;
+}
+#editor .MathJax {
+  cursor: pointer;
+}
+#editor div.list {
+  margin: 1em 0;
+}
+#editor .list ul,
+#editor .list ol {
+  margin: 0 0 0 2.5em;
+  padding: 0;
+  list-style-image: none;
+}
+#editor .list ol {
+  margin-left: 3em;
+}
+#editor ol.arabic {
+  list-style-type: decimal;
+}
+#editor ol.upper-roman {
+  list-style-type: upper-roman;
+}
+#editor ol.lower-roman {
+  list-style-type: lower-roman;
+}
+#editor ol.upper-alpha {
+  list-style-type: upper-alpha;
+}
+#editor ol.lower-alpha {
+  list-style-type: lower-alpha;
+}
+#editor ul.bullet {
+  list-style-type: disc;
+}
+#editor ul.open-circle {
+  list-style-type: circle;
+}
+#editor ul.other {
+  list-style-type: none;
+}
+#editor ol.other {
+  list-style-type: none;
+}
+#editor ul.labeled-item {
+  list-style-type: none;
+}
+#editor ol.other,
+#editor ul.other,
+#editor ul.labeled-item {
+  margin-left: 1.5em;
+}
+#editor .list-header {
+  margin: 1em 0 .5em;
+}
+#editor span .list-header {
+  display: inline;
+}
+#editor div.list .item-decoration {
+  margin-right: .5em;
+}
+#editor .footnote-reference {
+  vertical-align: .4em;
+  font-size: .8em;
+  line-height: .1em;
+}
+#editor .figure {
+  margin: 1em auto;
+}
+#editor .figure td,
+#editor .figure th {
+  text-align: center;
+}
+#editor .inner-figure {
+  border: 1px solid #8cacbb;
+  padding: 1em;
+}
+#editor .horizontal-subfigure,
+#editor .vertical-subfigure {
+  margin: auto;
+}
+#editor .figure-name,
+#editor .horizontal-subfigure-name,
+#editor .vertical-subfigure-name {
+  padding-bottom: .5em;
+}
+#editor .figure-caption,
+#editor .horizontal-subfigure-caption,
+#editor .vertical-subfigure-caption {
+  padding: .5em 0 1em;
+  text-align: left;
+  font-size: .9em;
+  font-weight: normal;
+}
+#editor .figure pre,
+#editor .figure .table {
+  margin: 0;
+}
+#editor .newline hr {
+  height: 0;
+  margin: 1.4em 0 .25em;
+  border: 0 solid black;
+  border-width: 0 0 1px;
+}
+#editor * html .newline hr {
+  margin: 0.5em 0 -0.2em;
+}
+#editor * + html .newline hr {
+  margin: 0.5em 0 -0.2em;
+}
+#editor pre.underline {
+  text-decoration: underline;
+}
+#editor pre.space {
+  display: inline;
+}
+#editor .hint,
+#editor .feedback {
+  display: none;
+  margin: .5em 0;
+}
+#editor .hint {
+  font-style: italic;
+}
+#editor .feedback {
+  color: #436976;
+}
+#editor .qmlitem input {
+  margin: 0 .5em 0 0;
+}
+#editor .answer,
+#editor .qmlitem input.button {
+  margin: .5em 0;
+}
+#editor .qmlitem textarea {
+  border: 1px solid #8cacbb;
+}
+#editor .incorrect {
+  color: #ffa500;
+}
+#editor .radio,
+#editor .checkbox {
+  border-width: 0;
+}
+#editor ul.linear li {
+  display: inline;
+}
