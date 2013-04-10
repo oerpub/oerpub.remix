@@ -532,15 +532,16 @@ class OfficeDocumentProcessor(BaseFormProcessor):
         # Checks to see if JOD is active on the machine. If it is the
         # conversion occurs using JOD else it converts using OO headless
         command = None
+        odt_filename = '%s.odt' % filename
         if jod_check.check('office[0-9]'):
             try:
-                converter.convert(self.original_filename, 'odt', filename + '.odt')
+                converter.convert(self.original_filename, 'odt', odt_filename)
             except Exception as e:
                 LOG.error(e)
                 raise ConversionError(e)
         else:
             escaped_ofn = escape_system(self.original_filename)[1:-1]
-            odt_filename= '%s.odt' % filename
+            # XXX Should we not also escape odt_filename?
             macro = 'macro:///Standard.Module1.SaveAsOOO(%s,%s)' % (escaped_ofn, odt_filename)
             command = '%s %s %s %s %s' % ('/usr/bin/soffice',
                                           '--headless',
