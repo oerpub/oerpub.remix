@@ -5,7 +5,7 @@ import formencode
 from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid_simpleform.renderers import FormRenderer
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from choose import save_cnxml, validate_cnxml
 from utils import check_login, get_files_from_zipfile, clean_cnxml
@@ -55,8 +55,11 @@ def cnxml_view(request):
         return HTTPFound(location=request.route_url('preview'), request=request)
 
     # Read CNXML
-    with open(cnxml_filename, 'rt') as fp:
-        cnxml = fp.read()
+    try:
+        with open(cnxml_filename, 'rt') as fp:
+            cnxml = fp.read()
+    except IOError:
+        raise HTTPNotFound('index.cnxml not found')
 
     # Clean CNXML
     cnxml = clean_cnxml(cnxml)
