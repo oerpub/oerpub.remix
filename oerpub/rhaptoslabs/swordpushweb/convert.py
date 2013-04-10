@@ -36,10 +36,10 @@ class MultiPartForm(object):
         """Add a file to be uploaded."""
         file_handle.seek(0)
         body = file_handle.read()
-	#body = base64.b64encode(body)
-	#body = body.decode('ISO_8859_1')
         if mimetype is None:
             mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+        if isinstance(filename, unicode):
+            filename = filename.encode('ascii', 'ignore')
         self.files.append((fieldname, filename, mimetype, body))
         return
 
@@ -67,6 +67,7 @@ class MultiPartForm(object):
               'Content-Disposition: form-data; name="%s"; filename="%s"' % \
                  (field_name, filename),
               'Content-Type: %s' % content_type,
+              'Content-Transfer-Encoding: binary',
               '',
               body,
             ]
@@ -90,7 +91,7 @@ class DocumentConverterClient:
         multi_form = MultiPartForm()
         # Adds the Document location and the output format
         file_handle = open(filename,  'rb')
-        multi_form.add_file('inputDocument', filename, 
+        multi_form.add_file('inputDocument', os.path.basename(filename),
                 file_handle)
         multi_form.add_field('outputFormat', output_type)
         body = str(multi_form)
