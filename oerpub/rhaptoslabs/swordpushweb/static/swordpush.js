@@ -136,7 +136,10 @@ $(document).ready(function()
       e.preventDefault();
       var popMenu = $(this).closest("li.popMenu");
       element = $(this).find("a");
+      // update the workspace form value
       $('input#workspace').attr('value', $(element).attr('href'));
+      // update the displayed workspace selection
+      popMenu.find("#selected_workspace").attr('href', $(element).attr('href'));
       popMenu.find(".workarea-choice").text($(element).text());
       popMenu.find("ul.popOut").hide();
       popMenu.removeClass("hover");

@@ -122,3 +122,17 @@ class BaseHelper(object):
     @reify
     def form_action(self):
         return self.request.matched_route.name
+
+    def set_selected_workspace(self, selected_workspace):
+        self.request.session['selected_workspace'] = selected_workspace
+
+    def get_selected_workspace(self):
+        selected_workspace = self.request.session.get('selected_workspace', 'undefined')
+        if selected_workspace is 'undefined':
+            selected_workspace = self.session['collections'][0]['href']
+        return selected_workspace
+
+    def get_selected_workspace_title(self):
+        selected_workspace = self.get_selected_workspace()
+        selected_workspace_title = [entry['title'] for entry in self.session['collections'] if entry['href'] == selected_workspace][0]
+        return selected_workspace_title
