@@ -226,7 +226,6 @@ function selectModuleRow(event) {
         $(this).addClass("selected-row");
         module = $(this).find("input").val();
         $("input#module").attr("value", module);
-        $("#workspace").attr("value", $("a#selected_workspace").attr('href'));
         $(".forward-button").removeAttr("disabled");
     }
 }
