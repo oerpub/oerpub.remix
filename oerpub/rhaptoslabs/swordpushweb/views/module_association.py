@@ -44,7 +44,6 @@ class Module_Association_View(BaseHelper):
     def do_transition(self):
         request = self.request
         form = Form(request, schema=ChooseModuleSchema)
-        import pdb; pdb.set_trace()
         if form.validate():
             selected_workspace = form.data['workspace']
             self.set_selected_workspace(selected_workspace)
@@ -65,10 +64,7 @@ class Module_Association_View(BaseHelper):
         workspaces = [
             (i['href'], i['title']) for i in self.session['collections']
         ]
-        import pdb; pdb.set_trace()
-        #selected_workspace = request.params.get('workspace', workspaces[0][0])
         selected_workspace = self.get_selected_workspace()
-        #workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
         workspace_title = self.get_selected_workspace_title()
 
         b_start = int(request.GET.get('b_start', '0'))
