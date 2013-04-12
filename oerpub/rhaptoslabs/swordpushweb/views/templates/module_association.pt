@@ -14,8 +14,6 @@
                 }
             });
             
-            workspace = $("ul.popOut li a").first().attr('href');
-            $("#workspace").attr("value", workspace);
         });
 
     </script>
