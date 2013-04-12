@@ -14,6 +14,7 @@
                 }
             });
             
+            $('input.forward-button').attr('disabled', 'disabled');
             workspace = $("ul.popOut li a").first().attr('href');
             $("#workspace").attr("value", workspace);
         });
