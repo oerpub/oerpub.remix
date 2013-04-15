@@ -653,7 +653,7 @@ class PresentationProcessor(BaseFormProcessor):
             os.path.join(self.save_dir, self.uploaded_filename)
     
     def create_save_dir(self, request):
-        return create_save_dir(registry_key='slideshare_import_dir')
+        return create_save_dir(request, registry_key='slideshare_import_dir')
     
     def save_original_file(self):
         saved_file = open(self.original_filename, 'wb')
