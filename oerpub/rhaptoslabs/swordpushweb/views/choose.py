@@ -642,13 +642,13 @@ class PresentationProcessor(BaseFormProcessor):
         super(PresentationProcessor, self).__init__(request, form)
         self.set_source('presentation')
         self.set_target('new')
-        ufname = form.data['importer'].filename.replace(os.sep, '_')
+        ufname = form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
-        self.request.session['filename'] = form.data['importer'].filename
+        self.request.session['filename'] = form.data['upload_file'].filename
 
         self.username = self.request.session['username']
         self.uploaded_filename = \
-            self.form.data['importer'].filename.replace(os.sep, '_')
+            self.form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = \
             os.path.join(self.save_dir, self.uploaded_filename)
     
@@ -657,7 +657,7 @@ class PresentationProcessor(BaseFormProcessor):
     
     def save_original_file(self):
         saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['importer'].file
+        input_file = self.form.data['upload_file'].file
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
         input_file.close()
