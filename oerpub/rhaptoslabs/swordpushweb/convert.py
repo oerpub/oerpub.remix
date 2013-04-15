@@ -1,4 +1,4 @@
-import httplib, urllib, urllib2
+import urllib2
 import os
 import itertools
 import subprocess
@@ -7,12 +7,8 @@ import mimetools
 import mimetypes
 import socket
 import time
-import base64
-from urllib2 import urlopen
-#from keepalive import HTTPHandler
-from cStringIO import StringIO
 from multiprocessing import Process
-import threading
+from pyramid.threadlocal import get_current_registry
 
 '''
  This class definition was taken from http://www.doughellmann.com/PyMOTW/urllib2/#uploading-files. 
@@ -96,7 +92,7 @@ class DocumentConverterClient:
         multi_form.add_field('outputFormat', output_type)
         body = str(multi_form)
         # Build the request
-        url = 'http://localhost:8185/converter/converted/document.' + output_type
+        url = get_current_registry().settings.jod_url + '/converter/converted/document.' + output_type
         request= urllib2.Request(url, data=body)
         # Header to specify that the request contains multipart/form  data
         request.add_header('Content-type', multi_form.get_content_type())
