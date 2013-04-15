@@ -334,6 +334,7 @@ class Metadata_View(BaseHelper):
             # if the user clicked on the back button.
             action = self.request.params.get('btn-forward') and 'forward' or 'back'
             if action == 'forward':
+                self.set_selected_workspace(form.data['workspace'])
                 self.update_session(session, self.remember_fields, form)
 
                 # Reconstruct the path to the saved files
@@ -413,9 +414,8 @@ class Metadata_View(BaseHelper):
                 self.defaults['language'] = \
                     self.config['metadata'].get('language', u'en')
 
-        selected_workspace = request.POST.get('workspace', None)
-        selected_workspace = selected_workspace or workspaces[0][0]
-        workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
+        selected_workspace = self.get_selected_workspace()
+        workspace_title = self.get_selected_workspace_title()
         response =  {
             'form': FormRenderer(form),
             'field_list': field_list,

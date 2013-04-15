@@ -50,6 +50,8 @@ class Module_Association_View(BaseHelper):
         form = Form(request, schema=ChooseModuleSchema)
         cleanup_save_dir(request)
         if form.validate():
+            selected_workspace = form.data['workspace']
+            self.set_selected_workspace(selected_workspace)
             module_url = form.data['module_url']
             request.session['source_module_url'] = module_url
             request.session['target_module_url'] = module_url
@@ -67,8 +69,8 @@ class Module_Association_View(BaseHelper):
         workspaces = [
             (i['href'], i['title']) for i in self.session['collections']
         ]
-        selected_workspace = request.params.get('workspace', workspaces[0][0])
-        workspace_title = [w[1] for w in workspaces if w[0] == selected_workspace][0]
+        selected_workspace = self.get_selected_workspace()
+        workspace_title = self.get_selected_workspace_title()
 
         b_start = int(request.GET.get('b_start', '0'))
         b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
