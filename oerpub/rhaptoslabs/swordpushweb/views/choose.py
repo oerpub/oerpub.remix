@@ -642,22 +642,22 @@ class PresentationProcessor(BaseFormProcessor):
         super(PresentationProcessor, self).__init__(request, form)
         self.set_source('presentation')
         self.set_target('new')
-        ufname = form.data['importer'].filename.replace(os.sep, '_')
+        ufname = form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
-        self.request.session['filename'] = self.form.data['upload_file'].filename
+        self.request.session['filename'] = form.data['upload_file'].filename
 
         self.username = self.request.session['username']
         self.uploaded_filename = \
-            self.form.data['importer'].filename.replace(os.sep, '_')
+            self.form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = \
             os.path.join(self.save_dir, self.uploaded_filename)
     
     def create_save_dir(self, request):
-        return create_save_dir(registry_key='slideshare_import_dir')
+        return create_save_dir(request, registry_key='slideshare_import_dir')
     
     def save_original_file(self):
         saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['importer'].file
+        input_file = self.form.data['upload_file'].file
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
         input_file.close()
@@ -665,16 +665,16 @@ class PresentationProcessor(BaseFormProcessor):
     def process(self):
         try:
             LOG.info("Inside presentation form")
-            zipped_filepath = os.path.join(self.save_dir,"cnxupload.zip")
-            LOG.info("Zipped filepath",zipped_filepath)
-            self.session['userfilepath'] = zipped_filepath
+            zipped_filepath = os.path.join(self.save_dir, "cnxupload.zip")
+            LOG.info("Zipped filepath", zipped_filepath)
+            self.request.session['userfilepath'] = zipped_filepath
             zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
             zip_archive.write(self.original_filename, self.uploaded_filename)
             zip_archive.close()
-            self.session['uploaded_filename'] = self.uploaded_filename
-            self.session['original_filename'] = self.original_filename
+            self.request.session['uploaded_filename'] = self.uploaded_filename
+            self.request.session['original_filename'] = self.original_filename
             LOG.info("Original filename ", self.original_filename)
-            self.session['title'] = self.uploaded_filename.split(".")[0]
+            self.request.session['title'] = self.uploaded_filename.split(".")[0]
             metadata = {}
             metadata['dcterms:title'] = self.uploaded_filename.split(".")[0]
             cnxml_now_string = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')

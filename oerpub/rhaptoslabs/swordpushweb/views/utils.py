@@ -701,13 +701,13 @@ def cleanup_save_dir(request):
     remove_save_dir(request)
     create_save_dir(request)
 
-def create_save_dir(request, register_key='transform_dir'):
+def create_save_dir(request, registry_key='transform_dir'):
     log.debug('Creating save_dir...')
     now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     # TODO: This has a good chance of being unique, but even so...
     temp_dir_name = '%s-%s' % (request.session['username'], now_string)
     save_dir = os.path.join(
-        request.registry.settings[register_key],
+        request.registry.settings[registry_key],
         temp_dir_name
         )
     if not os.path.exists(save_dir):

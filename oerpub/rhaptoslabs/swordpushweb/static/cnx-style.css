@@ -73,7 +73,6 @@
 #editor .title,
 #editor th,
 #editor .equation-number,
-#editor em,
 #editor .cnx_label,
 #editor .footnote-reference {
   font-weight: bold;
@@ -90,7 +89,6 @@
   font-style: normal;
 }
 #editor cite,
-#editor em,
 #editor i.emphasis .cite-title i {
   font-style: normal;
 }
