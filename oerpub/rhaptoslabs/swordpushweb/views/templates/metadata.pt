@@ -28,6 +28,18 @@
                 }
             });
         </script>
+
+        <script type="text/javascript"
+                tal:condition="python: view.get_source() == 'existingmodule'">
+            $(document).ready(function(){
+                // when editing an existing module, the user should not be allowed
+                // to change the workgroup.   they can see it, but not change it. 
+                $("a.popMenu").off('click').on('click', function(event){
+                    event.stopPropagation();
+                    event.preventDefault();
+                });
+            });
+        </script>
     
     </metal:script-slot>    
 
