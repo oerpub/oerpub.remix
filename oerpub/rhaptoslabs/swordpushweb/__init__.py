@@ -18,10 +18,6 @@ def main(global_config, **settings):
     add_subscribers(config)
     register_utilities(config)
 
-    # Configure Velruse
-    config.include('velruse.providers.google_oauth2')
-    config.add_google_oauth2_login_from_settings(prefix='velruse.google.')
-
     config.scan()
     return config.make_wsgi_app()
 
