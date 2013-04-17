@@ -28,7 +28,7 @@
                 }
             });
         </script>
-    
+
     </metal:script-slot>    
 
     <metal:workflownav fill-slot="workflownav">
@@ -38,13 +38,19 @@
     <span metal:use-macro="view.workflow_nav_form_begin">workflow buttons</span>
     <span metal:use-macro="view.workflow_nav_form">
         <metal:extras fill-slot="extras">
-        <span id="uploading-to">
-            Uploading to 
-            <ul metal:use-macro="dialogs.workspace_popup">
-            </ul>
-            in Connexions
-        </span>
-        <input name="workflownav.metadata.submitted" type="hidden" value="submitted" />
+          <span id="uploading-to">
+              Uploading to 
+              <tal:workspace tal:condition="python: view.get_target() == 'existingmodule'">
+                <span style="color: black"
+                  tal:content="python: view.get_selected_workspace_title()" />
+              </tal:workspace>
+              <tal:workspace tal:condition="python: view.get_target() != 'existingmodule'">
+                <ul metal:use-macro="dialogs.workspace_popup">
+                </ul>
+              </tal:workspace>
+              in Connexions
+          </span>
+          <input name="workflownav.metadata.submitted" type="hidden" value="submitted" />
         </metal:extras>
     </span>
 
