@@ -122,3 +122,24 @@ def login_view(request):
 
     # Go to the upload page
     return HTTPFound(location=request.route_url('choose'))
+
+@view_config(context='velruse.AuthenticationComplete')
+def google_login_complete(request):
+    context = request.context
+    result = {
+        'provider_type': context.provider_type,
+        'provider_name': context.provider_name,
+        'profile': context.profile,
+        'credentials': context.credentials,
+    }
+
+    # Since we're already using beaker for session data, we might as well
+    # store the oauth tokens on our session.
+    request.session['oauth2_credentials'] = context.credentials
+
+    import json
+    from pyramid.response import Response
+    response = Response(json.dumps(result, indent=4))
+    response.content_type = 'application/json'
+    return response
+
