@@ -73,8 +73,7 @@ var picker = new google.picker.PickerBuilder().
 // A simple callback implementation for Picker.
 function pickerCallback(data) {
     if(data.action == google.picker.Action.PICKED){
-        document.getElementById('gdocs_resource_id').value = google.picker.ResourceId.generate(data.docs[0]);
-        document.getElementById('gdocs_access_token').value = data.docs[0].accessToken;
+        $('#gdocs_resource_id').val(data.docs[0].id);
         showWaitMessage();
         $('form#googledocs_form').submit(); 
     }
