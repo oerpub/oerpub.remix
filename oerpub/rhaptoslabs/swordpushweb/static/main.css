@@ -939,3 +939,28 @@ ul.popOut a:hover{
   border-radius: 4px;
   
 }
+
+#flashmessages {
+    background-color: #ffffe0;
+    background-image: url(images/info.gif);
+    background-repeat: no-repeat;
+    background-position: 5px 50%;
+    border: 1px solid #f0f000;
+    border-radius: 5px 5px 5px 5px;
+    display: block;
+    list-style: none outside none;
+    margin: -36px auto;
+    padding: 15px 25px;
+    position: relative;
+    width: 45%;
+    color: #333333;
+    font-weight: bold;
+    -moz-box-shadow:    3px 3px 2px 2px #ddd;
+    -webkit-box-shadow: 3px 3px 2px 2px #ddd;
+    box-shadow:         3px 3px 2px 2px #ddd;
+    z-index: 4;
+}
+
+#flashmessages li {
+    line-height: 1.5em;
+}
