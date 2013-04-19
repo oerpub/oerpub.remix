@@ -148,3 +148,8 @@ def google_login_complete(request):
             context.credentials['oauthAccessToken'])
 
     return HTTPFound(location=request.route_url('choose'))
+
+@view_config(context='velruse.AuthenticationDenied')
+def google_login_denied(request):
+    request.session.flash('OAuth2 authorization failed.')
+    return HTTPFound(location=request.route_url('choose'))
