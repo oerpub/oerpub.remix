@@ -11,10 +11,13 @@ import shlex, subprocess
 from logging import getLogger
 
 from lxml import etree
+import httplib2
+from apiclient.discovery import build
+from oauth2client.client import AccessTokenCredentials
 
 from pyramid_simpleform import Form
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.renderers import render_to_response
 from pyramid_simpleform.renderers import FormRenderer
 
@@ -213,6 +216,10 @@ class BaseFormProcessor(object):
     def write_traceback_to_zipfile(self, traceback):
         # Record traceback
 
+        if self.temp_dir_name is None:
+            # No files to zip just yet, just return
+            return
+
         # Get software version from git
         commit_hash = self.get_commit_hash()
         
@@ -225,8 +232,9 @@ class BaseFormProcessor(object):
         # Zip up error report, form data, uploaded file (if any)  and
         # temporary transform directory
         zip_archive = zipfile.ZipFile(zip_filename, 'w')
-        info = self.format_info(traceback, commit_hash, self.request, self.form)
-        zip_archive.writestr("info.txt", info)
+        if self.form is not None:
+            info = self.format_info(traceback, commit_hash, self.request, self.form)
+            zip_archive.writestr("info.txt", info)
 
         basePath = self.request.registry.settings['transform_dir']
         add_directory_to_zip(self.temp_dir_name,
@@ -573,21 +581,55 @@ class OfficeDocumentProcessor(BaseFormProcessor):
                     (odt_filename,command) )
         
 class GoogleDocProcessor(BaseFormProcessor):
+    """ This processor is a little insane. In working with the existing scheme
+        here, it has a process() method, but all that does is send you over to
+        google for authentication. The actual processing is implemented in the
+        callback() method, so this class overrides create_save_dir() to avoid
+        creating empty directories. It can be initialised with form=None, but
+        then you cannot call process(), only callback(). This is done so the
+        callback does not have to make up a new form. This developer thinks
+        form should be passed to process as parameter, not persisted on the
+        object. FIXME?
+    """
     def __init__(self, request, form):
         super(GoogleDocProcessor, self).__init__(request, form)
         self.set_source('gdocupload')
         self.set_target('new')
     
+    def create_save_dir(self, request):
+        # We override this, because we don't want to go create a save dir just
+        # yet. We don't have any content to save yet and stashing away all
+        # that detail about the location of the temporary storage can be
+        # delayed until later. With all due respect to my colleagues, this
+        # is all a little insane already. Why do we even have to pass `request`
+        # as a parameter, we already persisted it as self.request? FIXME!
+        return None, None
+
     def process(self):
+        gdocs_resource_id = self.form.data['gdocs_resource_id']
+
+        # Redirect to google oath immediately. Because we overrode
+        # create_save_dir, we will not leave behind any crud because of this.
+        # This will eventually redirect to callback() below.
+        return self.request.registry.velruse_providers['google'].login(
+            self.request, docid=gdocs_resource_id)
+
+    def callback(self, request, gdocs_resource_id, gdocs_access_token):
+        # This is called when we return from google auth
+
+        # In keeping with the scheme above, update the request on which we
+        # operate.
+        self.request = request
+
+        # We now have enough info to create a working directory, and update
+        # like BaseFormProcessor does above.
+        self.temp_dir_name, self.save_dir = create_save_dir(request)
+        self.upload_dir = self.temp_dir_name
+        self.request.session['upload_dir'] = self.temp_dir_name
+
         try:
-            gdocs_resource_id = self.form.data['gdocs_resource_id']
-            gdocs_access_token = self.form.data['gdocs_access_token']
-
-            self.form.data['gdocs_resource_id'] = None
-            self.form.data['gdocs_access_token'] = None
-
             title, filename = self.process_gdocs_resource(
-                self.save_dir, gdocs_resource_id)
+                self.save_dir, gdocs_resource_id, gdocs_access_token)
 
             self.request.session['title'] = title
             self.request.session['filename'] = filename
@@ -606,22 +648,21 @@ class GoogleDocProcessor(BaseFormProcessor):
         self.request.session.flash(self.message)
         return HTTPFound(location=self.request.route_url(self.nextStep()))
     
-    def process_gdocs_resource(self, save_dir, gdocs_resource_id, gdocs_access_token=None):
+    @classmethod
+    def process_gdocs_resource(klass, save_dir, gdocs_resource_id, gdocs_access_token=None):
+        http = httplib2.Http()
+        credentials = AccessTokenCredentials(gdocs_access_token, 'remix-client')
+        credentials.authorize(http)
+        drive = build('drive', 'v2', http=http)
 
-        # login to gdocs and get a client object
-        gd_client = getAuthorizedGoogleDocsClient()
+        # Get the html version of the file
+        md = drive.files().get(fileId=gdocs_resource_id).execute()
+        uri = md['exportLinks']['text/html']
+        resp, html = drive._http.request(uri)
 
-        # Create a AuthSub Token based on gdocs_access_token String
-        auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token) \
-                         if gdocs_access_token \
-                         else None
-
-        # get the Google Docs Entry
-        gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
-
-        # Get the contents of the document
-        gd_entry_url = gd_entry.content.src
-        html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
+        if resp.status / 100 != 2:
+            # TODO, we can handle this a bit better.
+            raise HTTPNotFound('Could not download google document')
 
         # Transformation and get images
         cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
@@ -635,7 +676,7 @@ class GoogleDocProcessor(BaseFormProcessor):
         # that returning this filename might kill the ability to
         # do multiple tabs in parallel, unless it gets offloaded
         # onto the form again.
-        return (gd_entry.title.text, "Google Document")
+        return (md['title'], "Google Document")
 
 class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):

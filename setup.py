@@ -19,7 +19,8 @@ requires = [
     'MySQL-python==1.2.4',
     'peppercorn',
     'z3c.batching',
-
+    'velruse',
+    'google-api-python-client'
     ]
 
 tests_requires = requires.extend(
