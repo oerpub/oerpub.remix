@@ -608,31 +608,37 @@ class GoogleDocProcessor(BaseFormProcessor):
     def process(self):
         gdocs_resource_id = self.form.data['gdocs_resource_id']
 
-        # Redirect to google oath immediately. Because we overrode
+        # First attempt to get the document without auth. It is unclear
+        # how one would do that, but in theory you could call get_gdoc_resource
+        # with no auth details. TODO.
+
+        # Redirect google oath immediately. Because we overrode
         # create_save_dir, we will not leave behind any crud because of this.
         # This will eventually redirect to callback() below.
         return self.request.registry.velruse_providers['google'].login(
             self.request, docid=gdocs_resource_id)
 
     def callback(self, request, gdocs_resource_id, gdocs_access_token):
-        # This is called when we return from google auth
+        # This is called when we return from google auth. Fetch the document.
+        resp, html, title = self.get_gdoc_resource(gdocs_resource_id,
+            gdocs_access_token)
+        if resp.status / 100 != 2:
+            # TODO, we can handle this a bit better.
+            raise HTTPNotFound('Could not download google document')
 
+        # We have the content, now we can create a temporary workspace.
         # In keeping with the scheme above, update the request on which we
-        # operate.
+        # operate, and update like BaseFormProcessor does above.
         self.request = request
-
-        # We now have enough info to create a working directory, and update
-        # like BaseFormProcessor does above.
         self.temp_dir_name, self.save_dir = create_save_dir(request)
         self.upload_dir = self.temp_dir_name
         self.request.session['upload_dir'] = self.temp_dir_name
+        return self.process_gdocs_resource(html, title)
 
+    def process_gdocs_resource(self, html, title):
         try:
-            title, filename = self.process_gdocs_resource(
-                self.save_dir, gdocs_resource_id, gdocs_access_token)
-
-            self.request.session['title'] = title
-            self.request.session['filename'] = filename
+            filename = self._process_gdocs_resource(
+                self.save_dir, html)
         except ConversionError as e:
             return render_conversionerror(self.request, e.msg)
 
@@ -645,38 +651,34 @@ class GoogleDocProcessor(BaseFormProcessor):
                 del self.request.session['title']
             return render_to_response(templatePath, response, request=self.request)
 
+        self.request.session['title'] = title
+        self.request.session['filename'] = filename
         self.request.session.flash(self.message)
         return HTTPFound(location=self.request.route_url(self.nextStep()))
-    
+
     @classmethod
-    def process_gdocs_resource(klass, save_dir, gdocs_resource_id, gdocs_access_token=None):
+    def _process_gdocs_resource(klass, save_dir, html):
+        # Transformation and get images
+        cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
+        cnxml = clean_cnxml(cnxml)
+        save_cnxml(save_dir, cnxml, objects.items())
+        validate_cnxml(cnxml)
+        return "Google Document"
+
+    @classmethod
+    def get_gdoc_resource(klass, gdocs_resource_id, gdocs_access_token=None):
         http = httplib2.Http()
-        credentials = AccessTokenCredentials(gdocs_access_token, 'remix-client')
-        credentials.authorize(http)
+        if gdocs_access_token is not None:
+            credentials = AccessTokenCredentials(gdocs_access_token, 'remix-client')
+            credentials.authorize(http)
         drive = build('drive', 'v2', http=http)
 
         # Get the html version of the file
         md = drive.files().get(fileId=gdocs_resource_id).execute()
         uri = md['exportLinks']['text/html']
-        resp, html = drive._http.request(uri)
 
-        if resp.status / 100 != 2:
-            # TODO, we can handle this a bit better.
-            raise HTTPNotFound('Could not download google document')
-
-        # Transformation and get images
-        cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
-
-        cnxml = clean_cnxml(cnxml)
-        save_cnxml(save_dir, cnxml, objects.items())
-
-        validate_cnxml(cnxml)
-
-        # Return the title and filename.  Old comment states
-        # that returning this filename might kill the ability to
-        # do multiple tabs in parallel, unless it gets offloaded
-        # onto the form again.
-        return (md['title'], "Google Document")
+        resp, content = drive._http.request(uri)
+        return resp, content, md['title']
 
 class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):
@@ -774,6 +776,7 @@ class URLProcessor(BaseFormProcessor):
             if r:
                 gdocs_resource_id = r.groups()[0]
                 doc_id = "document:" + gdocs_resource_id
+                # FIXME process_gdocs_resource has changed
                 title, filename = self.process_gdocs_resource(self.save_dir,
                                                               doc_id)
 
