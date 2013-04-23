@@ -618,9 +618,12 @@ class GoogleDocProcessor(BaseFormProcessor):
         http = httplib2.Http()
         http.follow_redirects = False
         try:
-            # TODO: Make sure gdocs_resource_id is safe, we're injecting it
+            # Make sure gdocs_resource_id is safe, we're injecting it
             # into an url and this could potentially be used for all sorts of
-            # remote attacks.
+            # insertion attacks. This checks that all characters in the
+            # resource id is allowed as per RFC 1738.
+            assert re.compile("(^[\w$-.+!*'(),]+$)").match(
+                gdocs_resource_id) is not None, "Possible insertion attack"
             resp, html = http.request(
                 'https://docs.google.com/document/d/%s/export?format=html&confirm=no_antivirus' % gdocs_resource_id)
         except HttpError:
