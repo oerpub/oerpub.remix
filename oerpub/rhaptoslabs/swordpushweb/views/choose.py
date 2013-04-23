@@ -13,6 +13,7 @@ from logging import getLogger
 from lxml import etree
 import httplib2
 from apiclient.discovery import build
+from apiclient.errors import HttpError
 from oauth2client.client import AccessTokenCredentials
 
 from pyramid_simpleform import Form
@@ -609,12 +610,35 @@ class GoogleDocProcessor(BaseFormProcessor):
         gdocs_resource_id = self.form.data['gdocs_resource_id']
 
         # First attempt to get the document without auth. It is unclear
-        # how one would do that, but in theory you could call get_gdoc_resource
-        # with no auth details. TODO.
+        # what the official way to do that is, but this works. Fetch the
+        # document using the docs export url. If we get a redirect, we assume
+        # that is a redirect to a login page and move on to real
+        # authentication. Research on the subject suggest that a redirect might
+        # also occur if the imported document is too large.
+        http = httplib2.Http()
+        http.follow_redirects = False
+        try:
+            # TODO: Make sure gdocs_resource_id is safe, we're injecting it
+            # into an url and this could potentially be used for all sorts of
+            # remote attacks.
+            resp, html = http.request(
+                'https://docs.google.com/document/d/%s/export?format=html&confirm=no_antivirus' % gdocs_resource_id)
+        except HttpError:
+            pass
+        else:
+            # Check that status was OK, google docs sends a redirect to a login
+            # page if not.
+            if resp.status / 100 == 2:
+                self.temp_dir_name, self.save_dir = create_save_dir(
+                    self.request)
+                self.upload_dir = self.temp_dir_name
+                self.request.session['upload_dir'] = self.temp_dir_name
+                return self.process_gdocs_resource(html,
+                    "Public Google Document")
 
-        # Redirect google oath immediately. Because we overrode
-        # create_save_dir, we will not leave behind any crud because of this.
-        # This will eventually redirect to callback() below.
+        # Doc is not public or could not import. Redirect google oath. Because
+        # we overrode create_save_dir, we will not leave behind any crud
+        # because of this.  This will eventually redirect to callback() below.
         return self.request.registry.velruse_providers['google'].login(
             self.request, docid=gdocs_resource_id)
 
