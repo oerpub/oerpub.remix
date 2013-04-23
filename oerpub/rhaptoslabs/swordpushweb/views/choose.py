@@ -596,6 +596,12 @@ class GoogleDocProcessor(BaseFormProcessor):
         super(GoogleDocProcessor, self).__init__(request, form)
         self.set_source('gdocupload')
         self.set_target('new')
+
+    def reinit(self, request):
+        self.request = request
+        self.temp_dir_name, self.save_dir = create_save_dir(request)
+        self.upload_dir = self.temp_dir_name
+        self.request.session['upload_dir'] = self.temp_dir_name
     
     def create_save_dir(self, request):
         # We override this, because we don't want to go create a save dir just
@@ -632,10 +638,7 @@ class GoogleDocProcessor(BaseFormProcessor):
             # Check that status was OK, google docs sends a redirect to a login
             # page if not.
             if resp.status / 100 == 2:
-                self.temp_dir_name, self.save_dir = create_save_dir(
-                    self.request)
-                self.upload_dir = self.temp_dir_name
-                self.request.session['upload_dir'] = self.temp_dir_name
+                self.reinit(self.request)
                 return self.process_gdocs_resource(html,
                     "Public Google Document")
 
@@ -656,10 +659,7 @@ class GoogleDocProcessor(BaseFormProcessor):
         # We have the content, now we can create a temporary workspace.
         # In keeping with the scheme above, update the request on which we
         # operate, and update like BaseFormProcessor does above.
-        self.request = request
-        self.temp_dir_name, self.save_dir = create_save_dir(request)
-        self.upload_dir = self.temp_dir_name
-        self.request.session['upload_dir'] = self.temp_dir_name
+        self.reinit(request)
         return self.process_gdocs_resource(html, title)
 
     def process_gdocs_resource(self, html, title):
@@ -800,15 +800,25 @@ class URLProcessor(BaseFormProcessor):
             r = regex.search(url)
 
             # Take special action for Google Docs URLs
-            if r:
+            if r is not None:
                 gdocs_resource_id = r.groups()[0]
-                doc_id = "document:" + gdocs_resource_id
-                # FIXME process_gdocs_resource has changed
-                title, filename = self.process_gdocs_resource(self.save_dir,
-                                                              doc_id)
-
-                self.request.session['title'] = title
-                self.request.session['filename'] = filename
+                http = httplib2.Http()
+                http.follow_redirects = False
+                try:
+                    resp, html = http.request(
+                        'https://docs.google.com/document/d/%s/export?format=html&confirm=no_antivirus' % gdocs_resource_id)
+                except HttpError:
+                    pass
+                else:
+                    # Check that status was OK, google docs sends a redirect to a login
+                    # page if not.
+                    if resp.status / 100 == 2:
+                        P = GoogleDocProcessor(self.request, None)
+                        P.reinit(self.request)
+                        return P.process_gdocs_resource(html,
+                            "Public Google Document")
+                self.request.session.flash('Failed to convert google document')
+                return HTTPFound(location=self.request.route_url('choose'))
             else:
                 # download html:
                 # Simple urlopen() will fail on mediawiki websites eg. Wikipedia!
