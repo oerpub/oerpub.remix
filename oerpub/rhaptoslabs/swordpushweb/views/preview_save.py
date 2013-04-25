@@ -36,7 +36,11 @@ def preview_save(request):
             edited_title = tree.xpath('/html/head/title/text()')[0]
             request.session['title'] = edited_title
         except IndexError:
-            request.session['title'] = 'Untitled Document'
+            # If we don't have a title yet, set a default. Most importers
+            # will set one, we don't want to lose it because it isn't
+            # in the html Aloha returns.
+            if not request.session.get('title', None):
+                request.session['title'] = 'Untitled Document'
 
         cnxml = html_to_valid_cnxml(
             etree.tostring(tree, pretty_print=True))
