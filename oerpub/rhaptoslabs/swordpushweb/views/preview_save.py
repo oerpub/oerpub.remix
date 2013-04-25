@@ -5,7 +5,7 @@ from lxml import etree
 from pyramid.view import view_config
 from pyramid.response import Response
 
-from rhaptos.cnxmlutils.utils import aloha_to_html, html_to_valid_cnxml
+from rhaptos.cnxmlutils.utils import aloha_to_etree, html_to_valid_cnxml
 
 from choose import validate_cnxml
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
@@ -31,16 +31,15 @@ def preview_save(request):
     #transform preview html to cnxml
     cnxml = None
     try:
-        structured_html = aloha_to_html(html)           #1 create structured HTML5
-        # parse the new title from structured HTML
-        tree = etree.fromstring(structured_html, etree.HTMLParser())
+        tree = aloha_to_etree(html)           #1 create structured HTML5 tree
         try:
             edited_title = tree.xpath('/html/head/title/text()')[0]
             request.session['title'] = edited_title
         except IndexError:
             request.session['title'] = 'Untitled Document'
 
-        cnxml = html_to_valid_cnxml(structured_html)    #2 create cnxml from structured HTML5
+        cnxml = html_to_valid_cnxml(
+            etree.tostring(tree, pretty_print=True))
     except Exception as e:
         #return render_conversionerror(request, str(e))
         conversionerror = str(e)
