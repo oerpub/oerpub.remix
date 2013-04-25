@@ -37,7 +37,7 @@ def preview_save(request):
         try:
             edited_title = tree.xpath('/html/head/title/text()')[0]
             request.session['title'] = edited_title
-        except:
+        except IndexError:
             request.session['title'] = 'Untitled Document'
 
         cnxml = html_to_valid_cnxml(structured_html)    #2 create cnxml from structured HTML5
