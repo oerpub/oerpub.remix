@@ -638,9 +638,14 @@ class GoogleDocProcessor(BaseFormProcessor):
             # Check that status was OK, google docs sends a redirect to a login
             # page if not.
             if resp.status / 100 == 2:
+                # Get the title
+                title = etree.fromstring(html,
+                    etree.HTMLParser()).xpath(
+                    '/html/head/title/text()')[0] or \
+                    'Untitled Google Document'
+
                 self.reinit(self.request)
-                return self.process_gdocs_resource(html,
-                    "Public Google Document")
+                return self.process_gdocs_resource(html, title)
 
         # Doc is not public or could not import. Redirect google oath. Because
         # we overrode create_save_dir, we will not leave behind any crud
@@ -813,10 +818,16 @@ class URLProcessor(BaseFormProcessor):
                     # Check that status was OK, google docs sends a redirect to a login
                     # page if not.
                     if resp.status / 100 == 2:
+                        # Get the title
+                        title = etree.fromstring(html,
+                            etree.HTMLParser()).xpath(
+                            '/html/head/title/text()')[0] or \
+                            'Untitled Google Document'
+
+                        # Process it
                         P = GoogleDocProcessor(self.request, None)
                         P.reinit(self.request)
-                        return P.process_gdocs_resource(html,
-                            "Public Google Document")
+                        return P.process_gdocs_resource(html, title)
                 self.request.session.flash('Failed to convert google document')
                 return HTTPFound(location=self.request.route_url('choose'))
             else:
