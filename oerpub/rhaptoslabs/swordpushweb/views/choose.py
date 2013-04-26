@@ -202,6 +202,7 @@ class BaseFormProcessor(object):
         self.upload_dir = self.temp_dir_name
         self.request.session['upload_dir'] = self.temp_dir_name
 
+    @classmethod
     def save_original_file(self, filename, input_file):
         # Save the original file so that we can convert, plus keep it.
         saved_file = open(filename, 'wb')
