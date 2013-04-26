@@ -143,7 +143,7 @@ def google_login_complete(request):
     if docid is not None:
         # Google login was done because we want to import the document
         # identified by docid. Go ahead and import it.
-        processor = GoogleDocProcessor(request, None)
+        processor = GoogleDocProcessor(request)
         return processor.callback(request, docid,
             context.credentials['oauthAccessToken'])
 
