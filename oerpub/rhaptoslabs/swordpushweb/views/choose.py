@@ -198,9 +198,35 @@ class BaseFormProcessor(object):
         self.request = request
         self.message = 'The file was successfully converted.'
         request.session['source'] = 'undefined'
-        self.temp_dir_name, self.save_dir = self.create_save_dir(self.request)
-        self.upload_dir = self.temp_dir_name
-        self.request.session['upload_dir'] = self.temp_dir_name
+
+        # Leave these empty at first
+        self._temp_dir_name = None
+        self._save_dir = None
+        self._upload_dir = None
+
+    def _tmp(self):
+        """ This is called by the temp_dir_name, upload_dir and save_dir
+            properties below. The idea is that you allocate temporary space
+            the second one of these properties is touched and no sooner. """
+        if self._upload_dir is None:
+            self._temp_dir_name, self._save_dir = self.create_save_dir(
+                self.request)
+            self._upload_dir = self._temp_dir_name
+            self.request.session['upload_dir'] = self._upload_dir
+        return (self._upload_dir, self._save_dir)
+
+    @property
+    def temp_dir_name(self):
+        return self.upload_dir
+
+    @property
+    def upload_dir(self):
+        return self._tmp()[0]
+
+    @property
+    def save_dir(self):
+        return self._tmp()[1]
+        
 
     @classmethod
     def save_original_file(self, filename, input_file):
@@ -215,7 +241,7 @@ class BaseFormProcessor(object):
     def write_traceback_to_zipfile(self, traceback, form=None):
         # Record traceback
 
-        if self.temp_dir_name is None:
+        if self._temp_dir_name is None:
             # No files to zip just yet, just return
             return
 
@@ -225,7 +251,7 @@ class BaseFormProcessor(object):
         # get the path to the error zip file
         zip_filename = os.path.join(
             self.request.registry.settings['errors_dir'],
-            self.temp_dir_name + '.zip'
+            self._temp_dir_name + '.zip'
         )
 
         # Zip up error report, form data, uploaded file (if any)  and
@@ -236,7 +262,7 @@ class BaseFormProcessor(object):
             zip_archive.writestr("info.txt", info)
 
         basePath = self.request.registry.settings['transform_dir']
-        add_directory_to_zip(self.temp_dir_name,
+        add_directory_to_zip(self._temp_dir_name,
                              zip_archive,
                              basePath=basePath)
 
@@ -583,32 +609,12 @@ class GoogleDocProcessor(BaseFormProcessor):
     """ This processor is a little insane. In working with the existing scheme
         here, it has a process() method, but all that does is send you over to
         google for authentication. The actual processing is implemented in the
-        callback() method, so this class overrides create_save_dir() to avoid
-        creating empty directories. It can be initialised with form=None, but
-        then you cannot call process(), only callback(). This is done so the
-        callback does not have to make up a new form. This developer thinks
-        form should be passed to process as parameter, not persisted on the
-        object. FIXME?
-    """
+        callback() method. """
+
     def __init__(self, request):
         super(GoogleDocProcessor, self).__init__(request)
         self.set_source('gdocupload')
         self.set_target('new')
-
-    def reinit(self, request):
-        self.request = request
-        self.temp_dir_name, self.save_dir = create_save_dir(request)
-        self.upload_dir = self.temp_dir_name
-        self.request.session['upload_dir'] = self.temp_dir_name
-    
-    def create_save_dir(self, request):
-        # We override this, because we don't want to go create a save dir just
-        # yet. We don't have any content to save yet and stashing away all
-        # that detail about the location of the temporary storage can be
-        # delayed until later. With all due respect to my colleagues, this
-        # is all a little insane already. Why do we even have to pass `request`
-        # as a parameter, we already persisted it as self.request? FIXME!
-        return None, None
 
     def process(self, form):
         gdocs_resource_id = form.data['gdocs_resource_id']
@@ -642,8 +648,7 @@ class GoogleDocProcessor(BaseFormProcessor):
                     '/html/head/title/text()')[0] or \
                     'Untitled Google Document'
 
-                self.reinit(self.request)
-                return self.process_gdocs_resource(html, title)
+                return self.process_gdocs_resource(html, title, form)
 
         # Doc is not public or could not import. Redirect google oath. Because
         # we overrode create_save_dir, we will not leave behind any crud
@@ -662,10 +667,9 @@ class GoogleDocProcessor(BaseFormProcessor):
         # We have the content, now we can create a temporary workspace.
         # In keeping with the scheme above, update the request on which we
         # operate, and update like BaseFormProcessor does above.
-        self.reinit(request)
         return self.process_gdocs_resource(html, title)
 
-    def process_gdocs_resource(self, html, title):
+    def process_gdocs_resource(self, html, title, form=None):
         try:
             filename = self._process_gdocs_resource(
                 self.save_dir, html)
@@ -821,9 +825,8 @@ class URLProcessor(BaseFormProcessor):
                             'Untitled Google Document'
 
                         # Process it
-                        P = GoogleDocProcessor(self.request, None)
-                        P.reinit(self.request)
-                        return P.process_gdocs_resource(html, title)
+                        P = GoogleDocProcessor(self.request)
+                        return P.process_gdocs_resource(html, title, form)
                 self.request.session.flash('Failed to convert google document')
                 return HTTPFound(location=self.request.route_url('choose'))
             else:
