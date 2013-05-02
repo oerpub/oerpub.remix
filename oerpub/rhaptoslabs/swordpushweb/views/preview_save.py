@@ -30,7 +30,7 @@ def preview_save(request):
 
     # Get the title from aloha html. We have to do this using a separate
     # parse operation, because aloha_to_etree below does not give us a
-    # tree on which path() works. A bug or this developer is just stumped.
+    # tree on which xpath() works. A bug or this developer is just stumped.
     tree = etree.fromstring(html, etree.HTMLParser())
     try:
         edited_title = tree.xpath('/html/head/title/text()')[0]
@@ -61,4 +61,3 @@ def preview_save(request):
     response = Response(json.dumps({'saved': True, 'error': conversionerror}))
     response.content_type = 'application/json'
     return response
-
