@@ -21,6 +21,7 @@ from helpers import BaseHelper
 from utils import (
     get_files,
     get_save_dir,
+    create_save_dir,
     extract_to_save_dir,
     cleanup_save_dir)
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
@@ -113,6 +114,8 @@ class Module_Association_View(BaseHelper):
                                        packaging = 'zip')
          
         save_dir = get_save_dir(request)
+        if save_dir is None:
+            request.session['upload_dir'], save_dir = create_save_dir(request)
         extract_to_save_dir(zip_file, save_dir)
 
         cnxml_file = open(os.path.join(save_dir, 'index.cnxml'), 'rb')

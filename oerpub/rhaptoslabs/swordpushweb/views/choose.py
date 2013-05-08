@@ -11,10 +11,14 @@ import shlex, subprocess
 from logging import getLogger
 
 from lxml import etree
+import httplib2
+from apiclient.discovery import build
+from apiclient.errors import HttpError
+from oauth2client.client import AccessTokenCredentials
 
 from pyramid_simpleform import Form
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.renderers import render_to_response
 from pyramid_simpleform.renderers import FormRenderer
 
@@ -161,57 +165,85 @@ class Choose_Document_Source(BaseHelper):
 
     def _process_neworexisting_submit(self, request, form):
         LOG.info('process new or existing submit')
-        processor = NewOrExistingModuleProcessor(request, form)
-        return processor.process()
+        processor = NewOrExistingModuleProcessor(request)
+        return processor.process(form)
 
     def _process_officedocument_submit(self, request, form):
         LOG.info('process wordprocessor submit')
         processor = OfficeDocumentProcessor(request, form)
-        return processor.process()
+        return processor.process(form)
     
     def _process_googledocs_submit(self, request, form):
         LOG.info('process google doc submit')
-        processor = GoogleDocProcessor(request, form)
-        return processor.process()
+        processor = GoogleDocProcessor(request)
+        return processor.process(form)
     
     def _process_presentationform_submit(self, request, form):
         LOG.info('process presentation submit')
         processor = PresentationProcessor(request, form)
-        return processor.process()
+        return processor.process(form)
     
     def _process_zip_or_latex_form(self, request, form):
         LOG.info('process zip or latex submit')
         processor = ZipOrLatexModuleProcessor(request, form)
-        return processor.process()
+        return processor.process(form)
 
     def _process_url_submit(self, request, form):
         LOG.info('process URL submit')
-        processor = URLProcessor(request, form)
-        return processor.process()
+        processor = URLProcessor(request)
+        return processor.process(form)
 
 class BaseFormProcessor(object):
-    def __init__(self, request, form):
+    def __init__(self, request):
         self.request = request
-        self.form = form
         self.message = 'The file was successfully converted.'
         request.session['source'] = 'undefined'
-        self.temp_dir_name, self.save_dir = self.create_save_dir(self.request)
-        self.upload_dir = self.temp_dir_name
-        self.request.session['upload_dir'] = self.temp_dir_name
 
-    def save_original_file(self):
+        # Leave these empty at first
+        self._temp_dir_name = None
+        self._save_dir = None
+        self._upload_dir = None
+
+    def _tmp(self):
+        """ This is called by the temp_dir_name, upload_dir and save_dir
+            properties below. The idea is that you allocate temporary space
+            the second one of these properties is touched and no sooner. """
+        if self._upload_dir is None:
+            self._temp_dir_name, self._save_dir = self.create_save_dir(
+                self.request)
+            self._upload_dir = self._temp_dir_name
+            self.request.session['upload_dir'] = self._upload_dir
+        return (self._upload_dir, self._save_dir)
+
+    @property
+    def temp_dir_name(self):
+        return self.upload_dir
+
+    @property
+    def upload_dir(self):
+        return self._tmp()[0]
+
+    @property
+    def save_dir(self):
+        return self._tmp()[1]
+        
+
+    @classmethod
+    def save_original_file(self, filename, input_file):
         # Save the original file so that we can convert, plus keep it.
-        saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['upload_file'].file
+        saved_file = open(filename, 'wb')
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
-        input_file.close()
 
     def create_save_dir(self, request):
         return create_save_dir(request)
 
-    def write_traceback_to_zipfile(self, traceback):
+    def write_traceback_to_zipfile(self, traceback, form=None):
         # Record traceback
+
+        if self._temp_dir_name is None:
+            # No files to zip just yet, just return
+            return
 
         # Get software version from git
         commit_hash = self.get_commit_hash()
@@ -219,17 +251,18 @@ class BaseFormProcessor(object):
         # get the path to the error zip file
         zip_filename = os.path.join(
             self.request.registry.settings['errors_dir'],
-            self.temp_dir_name + '.zip'
+            self._temp_dir_name + '.zip'
         )
 
         # Zip up error report, form data, uploaded file (if any)  and
         # temporary transform directory
         zip_archive = zipfile.ZipFile(zip_filename, 'w')
-        info = self.format_info(traceback, commit_hash, self.request, self.form)
-        zip_archive.writestr("info.txt", info)
+        if form is not None:
+            info = self.format_info(traceback, commit_hash, self.request, form)
+            zip_archive.writestr("info.txt", info)
 
         basePath = self.request.registry.settings['transform_dir']
-        add_directory_to_zip(self.temp_dir_name,
+        add_directory_to_zip(self._temp_dir_name,
                              zip_archive,
                              basePath=basePath)
 
@@ -293,14 +326,14 @@ class BaseFormProcessor(object):
         return workflowsteps.getNextStep(source, target, current_step)
 
 class NewOrExistingModuleProcessor(BaseFormProcessor):
-    def __init__(self, request, form):
-        super(NewOrExistingModuleProcessor, self).__init__(request, form)
+    def __init__(self, request):
+        super(NewOrExistingModuleProcessor, self).__init__(request)
         self.set_source('new')
         self.set_target('new')
 
-    def process(self):
+    def process(self, form):
         try:
-            if self.form.data.get('newmodule'):
+            if form.data.get('newmodule'):
                 self.set_source('new')
                 self.set_target('new')
                 # save empty cnxml and html files
@@ -308,7 +341,7 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
                 files = []
                 save_cnxml(self.save_dir, cnxml, files)
             
-            elif self.form.data.get('existingmodule'):
+            elif form.data.get('existingmodule'):
                 self.set_source('existingmodule')
                 self.set_target('existingmodule')
                 return HTTPFound(
@@ -320,7 +353,7 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
         # TODO: add a process decorator that has this bit of error handling
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
@@ -339,39 +372,39 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
 
 class ZipOrLatexModuleProcessor(BaseFormProcessor):
     def __init__(self, request, form):
-        super(ZipOrLatexModuleProcessor, self).__init__(request, form)
-        ufname = self.form.data['upload_zip_file'].filename.replace(os.sep, '_')
+        super(ZipOrLatexModuleProcessor, self).__init__(request)
+        ufname = form.data['upload_zip_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
 
         # Save the original file so that we can convert, plus keep it.
         saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['upload_zip_file'].file
+        input_file = form.data['upload_zip_file'].file
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
         input_file.close()
 
         self.zip_archive = zipfile.ZipFile(self.original_filename, 'r')
-        self.form.data['upload_zip_file'] = None
+        form.data['upload_zip_file'] = None
         self.set_source('cnxinputs')
         self.set_target('new')
 
-    def process(self):
+    def process(self, form):
         try:
             processor = None
             packaging = self.get_type()
             if packaging == ZIP_PACKAGING:
-                processor = ZipFileProcessor(self.request, self.form)
+                processor = ZipFileProcessor(self.request, form)
                 return processor.process(self.original_filename)
             elif packaging == LATEX_PACKAGING:
-                processor = LatexProcessor(self.request, self.form)
-                return processor.process()
+                processor = LatexProcessor(self.request)
+                return processor.process(form)
 
         except UnknownPackagingError as e:
             return render_conversionerror(self.request, e.msg)
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
@@ -409,7 +442,7 @@ class ZipOrLatexModuleProcessor(BaseFormProcessor):
 
 class ZipFileProcessor(BaseFormProcessor):
     def __init__(self, request, form):
-        super(ZipFileProcessor, self).__init__(request, form)
+        super(ZipFileProcessor, self).__init__(request)
         self.set_source('cnxinputs')
         self.set_target('new')
 
@@ -441,7 +474,7 @@ class ZipFileProcessor(BaseFormProcessor):
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
@@ -452,12 +485,12 @@ class ZipFileProcessor(BaseFormProcessor):
         return HTTPFound(location=self.request.route_url(self.nextStep()))
 
 class LatexProcessor(BaseFormProcessor):
-    def __init__(self, request, form):
-        super(LatexProcessor, self).__init__(request, form)
+    def __init__(self, request):
+        super(LatexProcessor, self).__init__(request)
         self.set_source('cnxinputs')
         self.set_target('new')
 
-    def process(self):
+    def process(self, form):
         try:
             f = open(self.original_filename)
             latex_archive = f.read()
@@ -474,7 +507,7 @@ class LatexProcessor(BaseFormProcessor):
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
@@ -486,15 +519,15 @@ class LatexProcessor(BaseFormProcessor):
 
 class OfficeDocumentProcessor(BaseFormProcessor):
     def __init__(self, request, form):
-        super(OfficeDocumentProcessor, self).__init__(request, form)
+        super(OfficeDocumentProcessor, self).__init__(request)
         self.set_source('fileupload')
         self.set_target('new')
-        ufname = self.form.data['upload_file'].filename.replace(os.sep, '_')
+        ufname = form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
-        self.request.session['filename'] = self.form.data['upload_file'].filename
-        self.save_original_file()
+        self.request.session['filename'] = form.data['upload_file'].filename
+        self.save_original_file(self.original_filename, form.data['upload_file'].file)
 
-    def process(self):
+    def process(self, form):
         try:
             # Convert from other office format to odt if needed
             filename, extension = os.path.splitext(self.original_filename)
@@ -517,7 +550,7 @@ class OfficeDocumentProcessor(BaseFormProcessor):
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
@@ -573,73 +606,117 @@ class OfficeDocumentProcessor(BaseFormProcessor):
                     (odt_filename,command) )
         
 class GoogleDocProcessor(BaseFormProcessor):
-    def __init__(self, request, form):
-        super(GoogleDocProcessor, self).__init__(request, form)
+    """ This processor is a little insane. In working with the existing scheme
+        here, it has a process() method, but all that does is send you over to
+        google for authentication. The actual processing is implemented in the
+        callback() method. """
+
+    def __init__(self, request):
+        super(GoogleDocProcessor, self).__init__(request)
         self.set_source('gdocupload')
         self.set_target('new')
-    
-    def process(self):
+
+    def process(self, form):
+        gdocs_resource_id = form.data['gdocs_resource_id']
+
+        # First attempt to get the document without auth. It is unclear
+        # what the official way to do that is, but this works. Fetch the
+        # document using the docs export url. If we get a redirect, we assume
+        # that is a redirect to a login page and move on to real
+        # authentication. Research on the subject suggest that a redirect might
+        # also occur if the imported document is too large.
+        http = httplib2.Http()
+        http.follow_redirects = False
         try:
-            gdocs_resource_id = self.form.data['gdocs_resource_id']
-            gdocs_access_token = self.form.data['gdocs_access_token']
+            # Make sure gdocs_resource_id is safe, we're injecting it
+            # into an url and this could potentially be used for all sorts of
+            # insertion attacks. This checks that all characters in the
+            # resource id is allowed as per RFC 1738.
+            assert re.compile("(^[\w$-.+!*'(),]+$)").match(
+                gdocs_resource_id) is not None, "Possible insertion attack"
+            resp, html = http.request(
+                'https://docs.google.com/document/d/%s/export?format=html&confirm=no_antivirus' % gdocs_resource_id)
+        except HttpError:
+            pass
+        else:
+            # Check that status was OK, google docs sends a redirect to a login
+            # page if not.
+            if resp.status / 100 == 2:
+                # Get the title
+                title = etree.fromstring(html,
+                    etree.HTMLParser()).xpath(
+                    '/html/head/title/text()')[0] or \
+                    'Untitled Google Document'
 
-            self.form.data['gdocs_resource_id'] = None
-            self.form.data['gdocs_access_token'] = None
+                return self.process_gdocs_resource(html, title, form)
 
-            title, filename = self.process_gdocs_resource(
-                self.save_dir, gdocs_resource_id)
+        # Doc is not public or could not import. Redirect google oath. Because
+        # we overrode create_save_dir, we will not leave behind any crud
+        # because of this.  This will eventually redirect to callback() below.
+        return self.request.registry.velruse_providers['google'].login(
+            self.request, docid=gdocs_resource_id)
 
-            self.request.session['title'] = title
-            self.request.session['filename'] = filename
+    def callback(self, request, gdocs_resource_id, gdocs_access_token):
+        # This is called when we return from google auth. Fetch the document.
+        resp, html, title = self.get_gdoc_resource(gdocs_resource_id,
+            gdocs_access_token)
+        if resp.status / 100 != 2:
+            # TODO, we can handle this a bit better.
+            raise HTTPNotFound('Could not download google document')
+
+        # We have the content, now we can create a temporary workspace.
+        # In keeping with the scheme above, update the request on which we
+        # operate, and update like BaseFormProcessor does above.
+        return self.process_gdocs_resource(html, title)
+
+    def process_gdocs_resource(self, html, title, form=None):
+        try:
+            filename = self._process_gdocs_resource(
+                self.save_dir, html)
         except ConversionError as e:
             return render_conversionerror(self.request, e.msg)
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
                 del self.request.session['title']
             return render_to_response(templatePath, response, request=self.request)
 
+        self.request.session['title'] = title
+        self.request.session['filename'] = filename
         self.request.session.flash(self.message)
         return HTTPFound(location=self.request.route_url(self.nextStep()))
-    
-    def process_gdocs_resource(self, save_dir, gdocs_resource_id, gdocs_access_token=None):
 
-        # login to gdocs and get a client object
-        gd_client = getAuthorizedGoogleDocsClient()
-
-        # Create a AuthSub Token based on gdocs_access_token String
-        auth_sub_token = gdata.gauth.AuthSubToken(gdocs_access_token) \
-                         if gdocs_access_token \
-                         else None
-
-        # get the Google Docs Entry
-        gd_entry = gd_client.GetDoc(gdocs_resource_id, None, auth_sub_token)
-
-        # Get the contents of the document
-        gd_entry_url = gd_entry.content.src
-        html = gd_client.get_file_content(gd_entry_url, auth_sub_token)
-
+    @classmethod
+    def _process_gdocs_resource(klass, save_dir, html):
         # Transformation and get images
         cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
-
         cnxml = clean_cnxml(cnxml)
         save_cnxml(save_dir, cnxml, objects.items())
-
         validate_cnxml(cnxml)
+        return "Google Document"
 
-        # Return the title and filename.  Old comment states
-        # that returning this filename might kill the ability to
-        # do multiple tabs in parallel, unless it gets offloaded
-        # onto the form again.
-        return (gd_entry.title.text, "Google Document")
+    @classmethod
+    def get_gdoc_resource(klass, gdocs_resource_id, gdocs_access_token=None):
+        http = httplib2.Http()
+        if gdocs_access_token is not None:
+            credentials = AccessTokenCredentials(gdocs_access_token, 'remix-client')
+            credentials.authorize(http)
+        drive = build('drive', 'v2', http=http)
+
+        # Get the html version of the file
+        md = drive.files().get(fileId=gdocs_resource_id).execute()
+        uri = md['exportLinks']['text/html']
+
+        resp, content = drive._http.request(uri)
+        return resp, content, md['title']
 
 class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):
-        super(PresentationProcessor, self).__init__(request, form)
+        super(PresentationProcessor, self).__init__(request)
         self.set_source('presentation')
         self.set_target('new')
         ufname = form.data['upload_file'].filename.replace(os.sep, '_')
@@ -648,21 +725,19 @@ class PresentationProcessor(BaseFormProcessor):
 
         self.username = self.request.session['username']
         self.uploaded_filename = \
-            self.form.data['upload_file'].filename.replace(os.sep, '_')
+            form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = \
             os.path.join(self.save_dir, self.uploaded_filename)
     
     def create_save_dir(self, request):
         return create_save_dir(request, registry_key='slideshare_import_dir')
     
-    def save_original_file(self):
-        saved_file = open(self.original_filename, 'wb')
-        input_file = self.form.data['upload_file'].file
+    def save_original_file(self, filename, input_file):
+        saved_file = open(filename, 'wb')
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
-        input_file.close()
 
-    def process(self):
+    def process(self, form):
         try:
             LOG.info("Inside presentation form")
             zipped_filepath = os.path.join(self.save_dir, "cnxupload.zip")
@@ -692,7 +767,7 @@ class PresentationProcessor(BaseFormProcessor):
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
@@ -715,14 +790,14 @@ class PresentationProcessor(BaseFormProcessor):
 
 class URLProcessor(BaseFormProcessor):
     
-    def __init__(self, request, form):
-        super(URLProcessor, self).__init__(request, form)
+    def __init__(self, request):
+        super(URLProcessor, self).__init__(request)
         self.set_source('url')
         self.set_target('new')
 
-    def process(self):
+    def process(self, form):
         try:
-            url = self.form.data['url_text']
+            url = form.data['url_text']
 
             # Build a regex for Google Docs URLs
             regex = re.compile(
@@ -730,14 +805,30 @@ class URLProcessor(BaseFormProcessor):
             r = regex.search(url)
 
             # Take special action for Google Docs URLs
-            if r:
+            if r is not None:
                 gdocs_resource_id = r.groups()[0]
-                doc_id = "document:" + gdocs_resource_id
-                title, filename = self.process_gdocs_resource(self.save_dir,
-                                                              doc_id)
+                http = httplib2.Http()
+                http.follow_redirects = False
+                try:
+                    resp, html = http.request(
+                        'https://docs.google.com/document/d/%s/export?format=html&confirm=no_antivirus' % gdocs_resource_id)
+                except HttpError:
+                    pass
+                else:
+                    # Check that status was OK, google docs sends a redirect to a login
+                    # page if not.
+                    if resp.status / 100 == 2:
+                        # Get the title
+                        title = etree.fromstring(html,
+                            etree.HTMLParser()).xpath(
+                            '/html/head/title/text()')[0] or \
+                            'Untitled Google Document'
 
-                self.request.session['title'] = title
-                self.request.session['filename'] = filename
+                        # Process it
+                        P = GoogleDocProcessor(self.request)
+                        return P.process_gdocs_resource(html, title, form)
+                self.request.session.flash('Failed to convert google document')
+                return HTTPFound(location=self.request.route_url('choose'))
             else:
                 # download html:
                 # Simple urlopen() will fail on mediawiki websites eg. Wikipedia!
@@ -767,7 +858,7 @@ class URLProcessor(BaseFormProcessor):
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb)
+            self.write_traceback_to_zipfile(tb, form)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):

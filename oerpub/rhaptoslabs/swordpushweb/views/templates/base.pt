@@ -144,7 +144,6 @@
                         <a href="/logout" id="logout_link" target="_top">Sign out.</a>
                     </div>
                 </div>
-
                 <div id="header">
                     <h1>
                         <a id="cnxlogo_link" href="${request.route_url('login')}">
@@ -155,6 +154,11 @@
                         </a>
                     </h1>
                 </div>
+                <ul id="flashmessages" tal:condition="request.session.peek_flash()">
+                    <li tal:repeat="msg request.session.pop_flash()">
+                        <span tal:content="msg"></span>
+                    </li>
+                </ul>
                 
                 <metal:workflownav define-slot="workflownav">
                 </metal:workflownav>

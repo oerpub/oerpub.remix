@@ -161,6 +161,9 @@ $(document).ready(function()
     // Unless they're just cliking on the little icon that links to the module.
     // Also set that row's background color to be highlighted.
     $("#workarea-contents tbody tr").click(selectModuleRow);
+
+    // Fade the flash message
+    $('#flashmessages').delay(5000).fadeOut(1000);
 });
 
 ///////////////////////////////////

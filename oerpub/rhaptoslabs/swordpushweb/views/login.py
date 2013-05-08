@@ -1,3 +1,5 @@
+import urllib
+import urlparse
 import formencode
 from lxml import etree
 
@@ -8,6 +10,7 @@ from pyramid_simpleform.renderers import FormRenderer
 from pyramid.renderers import render_to_response
 
 from oerpub.rhaptoslabs import sword2cnx
+from oerpub.rhaptoslabs.swordpushweb.views.choose import GoogleDocProcessor
 
 from utils import load_config
 
@@ -121,4 +124,32 @@ def login_view(request):
                                              )[0].text
 
     # Go to the upload page
+    return HTTPFound(location=request.route_url('choose'))
+
+@view_config(context='velruse.AuthenticationComplete')
+def google_login_complete(request):
+    context = request.context
+    result = {
+        'provider_type': context.provider_type,
+        'provider_name': context.provider_name,
+        'profile': context.profile,
+        'credentials': context.credentials,
+    }
+
+    qs = urllib.unquote(request.params.get('state', '')[32:])
+    args = dict(urlparse.parse_qsl(qs))
+    docid = args.get('docid', None)
+
+    if docid is not None:
+        # Google login was done because we want to import the document
+        # identified by docid. Go ahead and import it.
+        processor = GoogleDocProcessor(request)
+        return processor.callback(request, docid,
+            context.credentials['oauthAccessToken'])
+
+    return HTTPFound(location=request.route_url('choose'))
+
+@view_config(context='velruse.AuthenticationDenied')
+def google_login_denied(request):
+    request.session.flash('OAuth2 authorization failed.')
     return HTTPFound(location=request.route_url('choose'))
