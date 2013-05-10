@@ -151,7 +151,7 @@ def get_requirements(deposit_receipt):
     license_links = [e.attrib.get('href') for e in find(treatment)]
     find = ETXPath('//{%s}a[contains(@href, "module_view")]' %atomns)
     preview_links = [e.attrib.get('href') for e in find(treatment)]
-    links = {'license_link': license_links[0],
+    links = {'license_link': license_links[0] if len(license_links) else None,
              'preview_link': preview_links[0],}
 
     find = ETXPath('//{%s}title' %atomns)
