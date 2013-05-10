@@ -132,7 +132,10 @@ class BaseHelper(object):
             selected_workspace = self.session['collections'][0]['href']
         return selected_workspace
 
+    def get_workspace_title(self, workspace):
+        return [entry['title'] for entry in self.session['collections'] \
+            if entry['href'] == workspace][0]
+
     def get_selected_workspace_title(self):
         selected_workspace = self.get_selected_workspace()
-        selected_workspace_title = [entry['title'] for entry in self.session['collections'] if entry['href'] == selected_workspace][0]
-        return selected_workspace_title
+        return self.get_workspace_title(self.get_selected_workspace())
