@@ -42,3 +42,8 @@ class Modules_List_View(BaseHelper):
         return self.macro_renderer.implementation().macros['modules_list']
 
 
+    @reify
+    def form_action(self):
+        # We are used as an ajax call within choose-module, so we need to
+        # generate our batching links relative to that view.
+        return 'choose-module'
