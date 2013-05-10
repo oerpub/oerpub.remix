@@ -70,8 +70,9 @@ class Module_Association_View(BaseHelper):
         workspaces = [
             (i['href'], i['title']) for i in self.session['collections']
         ]
-        selected_workspace = self.get_selected_workspace()
-        workspace_title = self.get_selected_workspace_title()
+        selected_workspace = request.params.get('workspace',
+            self.get_selected_workspace())
+        workspace_title = self.get_workspace_title(selected_workspace)
 
         b_start = int(request.GET.get('b_start', '0'))
         b_size = int(request.GET.get('b_size', config.get('default_batch_size')))
