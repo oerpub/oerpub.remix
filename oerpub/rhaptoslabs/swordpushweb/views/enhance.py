@@ -103,21 +103,21 @@ def enhance(request):
             cnxml += "</section></content></document>"
         else:
             cnxml += "</content></document>"
-        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        workspaces = [(i['href'], i['title']) for i in session['login'].collections]
         metadata_entry = sword2cnx.MetaData(metadata)
         zipped_filepath = session['userfilepath']
         zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
         zip_archive.writestr("index.cnxml",cnxml)
         zip_archive.close()
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
-                                    user_name=session['username'],
-                                    user_pass=session['password'],
+                                    user_name=session['login'].username,
+                                    user_pass=session['login'].password,
                                     always_authenticate=True,
                                     download_service_document=True)
         collections = [{'title': i.title, 'href': i.href}
                                   for i in sword2cnx.get_workspaces(conn)]
-        session['collections'] = collections
-        workspaces = [(i['href'], i['title']) for i in session['collections']]
+        session['login'].collections = collections
+        workspaces = [(i['href'], i['title']) for i in session['login'].collections]
         session['workspaces'] = workspaces
         with open(zipped_filepath, 'rb') as zip_file:
             deposit_receipt = conn.create(
@@ -135,7 +135,7 @@ def enhance(request):
         edit_iri = data['href']
         session['edit_iri'] = edit_iri
         creator = soup.find('dcterms:creator')
-        username = session['username']
+        username = session['login'].username
         email = creator["oerdc:email"]
         url = "http://connexions-oerpub.appspot.com/"
         post_values = {"username":username,"email":email,"slideshow_id":slideshare_id}
@@ -143,7 +143,7 @@ def enhance(request):
         google_req = urllib2.Request(url, data)
         google_response = urllib2.urlopen(google_req)
         now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+        temp_dir_name = '%s-%s' % (request.session['login'].username, now_string)
         save_dir = os.path.join(request.registry.settings['transform_dir'],temp_dir_name)
         os.mkdir(save_dir)
         request.session['upload_dir'] = temp_dir_name

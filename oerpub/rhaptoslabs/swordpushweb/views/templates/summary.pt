@@ -53,7 +53,7 @@
                         <span>To publish and share your module:</span>
                     </p>
 
-                    <ol tal:define="loggedin_user python:request.session['username'];
+                    <ol tal:define="loggedin_user python:request.session['login'].username;
                                     creators python:collaborators.get('creators');
                                     rightsholders python:collaborators.get('rightsholders');
                                     maintainers python:collaborators.get('maintainers');

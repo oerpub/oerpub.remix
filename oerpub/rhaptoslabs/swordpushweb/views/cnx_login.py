@@ -12,8 +12,8 @@ def cnxlogin_view(request):
 
     templatePath = 'templates/cnxlogin.pt'
     response = {
-        'username': request.session['username'],
-        'password': request.session['password'],
+        'username': request.session['login'].username,
+        'password': request.session['login'].password,
         'login_url': login_url,
     }
     return render_to_response(templatePath, response, request=request)

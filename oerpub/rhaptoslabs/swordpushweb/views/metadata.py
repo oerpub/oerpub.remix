@@ -51,7 +51,7 @@ class Metadata_View(BaseHelper):
         self.metadata = self.config['metadata']
         self.featured_links = []
         self.workspaces = \
-            [(i['href'], i['title']) for i in self.session['collections']]
+            [(i['href'], i['title']) for i in self.session['login'].collections]
 
         self.role_mappings = {'authors': 'dcterms:creator',
                               'maintainers': 'oerdc:maintainer',
@@ -394,8 +394,8 @@ class Metadata_View(BaseHelper):
         field_list = self.field_list
 
         metadata = config['metadata']
-        username = session['username']
-        password = session['password']
+        username = session['login'].username
+        password = session['login'].password
         if self.target_module_url:
 
             if self.target_module_url.endswith('/sword'):
