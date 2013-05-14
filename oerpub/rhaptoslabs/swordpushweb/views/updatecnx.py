@@ -19,7 +19,8 @@ def update_cnx_metadata(request):
     templatePath = 'templates/update_metadata.pt'
     session = request.session
     config = load_config(request)
-    workspaces = [(i['href'], i['title']) for i in session['collections']]
+    workspaces = [
+        (i['href'], i['title']) for i in self.session['login'].collections]
     subjects = ["Arts",
                 "Business",
                 "Humanities",
@@ -49,8 +50,8 @@ def update_cnx_metadata(request):
     defaults = {}
 
     for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
-        defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['username'])
-        config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['username'])
+        defaults[role] = ','.join(config['metadata'][role]).replace('_USER_', session['login'].username)
+        config['metadata'][role] = ', '.join(config['metadata'][role]).replace('_USER_', session['login'].username)
 
     if 'title' in session:
         print('TITLE '+session['title']+' in session')
@@ -89,8 +90,8 @@ def update_cnx_metadata(request):
                 if v:
                     metadata_entry.add_field(key, '', {'oerdc:id': v})
         conn = sword2cnx.Connection("http://cnx.org/sword/servicedocument",
-                                    user_name=session['username'],
-                                    user_pass=session['password'],
+                                    user_name=session['login'].username,
+                                    user_pass=session['login'].password,
                                     always_authenticate=True,
                                     download_service_document=True)
         update = conn.update(edit_iri=session['edit_iri'],metadata_entry = metadata_entry,in_progress=True,metadata_relevant=True)

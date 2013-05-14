@@ -68,8 +68,7 @@ class Module_Association_View(BaseHelper):
         conn = self.get_connection()
 
         workspaces = [
-            (i['href'], i['title']) for i in self.session['collections']
-        ]
+            (i['href'], i['title']) for i in self.session['login'].collections]
         selected_workspace = request.params.get('workspace',
             self.get_selected_workspace())
         workspace_title = self.get_workspace_title(selected_workspace)
@@ -99,9 +98,9 @@ class Module_Association_View(BaseHelper):
     def _download_module(self, module_url):
         request = self.request
         session = request.session
-        conn = sword2cnx.Connection(session['service_document_url'],
-                                    user_name=session['username'],
-                                    user_pass=session['password'],
+        conn = sword2cnx.Connection(session['login'].service_document_url,
+                                    user_name=session['login'].username,
+                                    user_pass=session['login'].password,
                                     always_authenticate=True,
                                     download_service_document=False)
 

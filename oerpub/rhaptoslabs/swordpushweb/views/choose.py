@@ -294,10 +294,10 @@ class BaseFormProcessor(object):
             """ + commit_hash + """
 
             USER
-            """ + request.session['username'] + """
+            """ + request.session['login'].username + """
 
             SERVICE DOCUMENT URL
-            """ + request.session['service_document_url'] + """
+            """ + request.session['login'].service_document_url + """
 
             TIMESTAMP
             """ + str(timestamp) + """
@@ -723,7 +723,7 @@ class PresentationProcessor(BaseFormProcessor):
         self.original_filename = os.path.join(self.save_dir, ufname)
         self.request.session['filename'] = form.data['upload_file'].filename
 
-        self.username = self.request.session['username']
+        self.username = self.request.session['login'].username
         self.uploaded_filename = \
             form.data['upload_file'].filename.replace(os.sep, '_')
         self.original_filename = \

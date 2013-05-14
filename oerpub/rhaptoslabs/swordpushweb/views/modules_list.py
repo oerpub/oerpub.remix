@@ -18,7 +18,7 @@ class Modules_List_View(BaseHelper):
         config = load_config(self.request)
         conn = self.get_connection()
 
-        selected_workspace = self.session['collections'][0]['href']
+        selected_workspace = self.session['login'].collections[0]['href']
         selected_workspace = self.request.params.get('workspace',
                                                      selected_workspace)
         print "Workspace url: " + selected_workspace
