@@ -12,7 +12,7 @@ from pyramid.renderers import render_to_response
 from oerpub.rhaptoslabs import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.views.choose import GoogleDocProcessor
 from oerpub.rhaptoslabs.swordpushweb.session import CnxSession, \
-    TestingSession
+    TestingSession, AnonymousSession
 
 from utils import load_config
 
@@ -94,8 +94,11 @@ def login_view(request):
 
     # Check for successful form completion
     if 'form.submitted' in request.POST and valid_form:
-        login = auth(form.data['service_document_url'], form.data['username'],
-                form.data['password'])
+        if form.data['anonymous']:
+            login = AnonymousSession()
+        else:
+            login = auth(form.data['service_document_url'], form.data['username'],
+                    form.data['password'])
 
         if login is None:
             request['errors'] = ["Invalid username or password. Please try again.",]
