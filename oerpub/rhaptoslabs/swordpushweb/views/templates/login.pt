@@ -2,6 +2,22 @@
 
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
+    function check_submit(){
+      passed = true;
+      names = ["service_document_url", "username", "password"];
+      for(idx in names) {
+        name = names[idx];
+        var x = document.forms["login_form"][name];
+        if((x.value == null) || (x.value == "")) {
+          x.style.background = '#ffce99';
+          passed = false;
+        } else {
+          x.style.background = '#ffffff';
+        }
+      }
+      return passed;
+    }
+
     $(document).ready(function(){
        $('input[name="username"]').focus();
     });
