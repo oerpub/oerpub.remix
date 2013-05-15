@@ -20,7 +20,8 @@ requires = [
     'peppercorn',
     'z3c.batching',
     'velruse',
-    'google-api-python-client'
+    'google-api-python-client',
+    'requests'
     ]
 
 tests_requires = requires.extend(
