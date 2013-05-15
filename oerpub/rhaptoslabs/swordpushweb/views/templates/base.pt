@@ -94,24 +94,6 @@
 
         </script>
 
-        <script>
-        function check_submit() {
-          passed = true;
-          names = ["service_document_url", "username", "password"];
-          for(idx in names) {
-            name = names[idx];
-            var x = document.forms["login_form"][name];
-            if((x.value == null) || (x.value == "")) {
-              x.style.background = '#ffce99';
-              passed = false;
-            } else {
-              x.style.background = '#ffffff';
-            }
-          }
-          return passed;
-        }
-        </script>
-        
         <!-- Extra scripts -->
         <metal:script-slot define-slot="script-slot">
         </metal:script-slot>
