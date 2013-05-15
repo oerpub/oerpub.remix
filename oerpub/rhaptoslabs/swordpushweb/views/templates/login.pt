@@ -3,23 +3,38 @@
 <metal:script-slot fill-slot="script-slot">
 <script type="text/javascript">
     function check_submit(){
-      passed = true;
-      names = ["service_document_url", "username", "password"];
-      for(idx in names) {
-        name = names[idx];
-        var x = document.forms["login_form"][name];
-        if((x.value == null) || (x.value == "")) {
-          x.style.background = '#ffce99';
-          passed = false;
-        } else {
-          x.style.background = '#ffffff';
+        var notempty = function(n){
+            if(!$(n).val()){
+                $(n).css('background', '#ffce99');
+                return false;
+            }
+            $(n).css('background', '#ffffff');
+            return true;
+        };
+
+        var $un = $('#inp-username'),
+            $pw = $('#inp-password'),
+            $anon = $('#cb-anonymous');
+
+        if(!$anon.is(':checked')){
+            return notempty($un) && notempty($pw);
         }
-      }
-      return passed;
+        return true;
     }
 
     $(document).ready(function(){
-       $('input[name="username"]').focus();
+        var $un = $('#inp-username'),
+            $pw = $('#inp-password');
+        $('#cb-anonymous').on('click', function(e){
+            if($(e.target).is(':checked')){
+                $un.prop('disabled', true);
+                $pw.prop('disabled', true);
+            } else {
+                $un.prop('disabled', false);
+                $pw.prop('disabled', false);
+            }
+        });
+        $un.focus();
     });
 </script>
 </metal:script-slot>
@@ -68,11 +83,15 @@
                         <table>
                             <tr>
                                 <td><div class="formlabel"><label for="username">Username</label></div></td>
-                                <td><div class="formfield"><input type="text" name="username"/></div></td>
+                                <td><div class="formfield"><input id="inp-username" type="text" name="username"/></div></td>
                             </tr>
                             <tr>
                                 <td><div class="formlabel"><label for="password">Password</label></div></td>
-                                <td><div class="formfield"><input type="password" name="password"/></div></td>
+                                <td><div class="formfield"><input id="inp-password" type="password" name="password"/></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="formlabel"><label for="anonymous">Work anonymously</label></div></td>
+                                <td><input id="cb-anonymous" type="checkbox" name="anonymous" value="1" /></td>
                             </tr>
                             <tr>
                                 <td colspan="2" align="right" id="log-in">

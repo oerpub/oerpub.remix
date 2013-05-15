@@ -18,11 +18,26 @@ from utils import load_config
 
 TESTING = False      
 
+def validate_login(di, state, validator):
+    """ Check that we have both a username and password, unless anonymous login
+        was selected. """
+    errs = {}
+    if not di.get('anonymous', None):
+        if di.get('username', None) is None:
+            errs['username'] = 'You must enter a username'
+        if di.get('password', None) is None:
+            errs['password'] = 'You must enter a password'
+    return errs or None
+validate_login = formencode.schema.SimpleFormValidator(validate_login)
+
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     service_document_url = formencode.validators.String(not_empty=True)
-    username = formencode.validators.PlainText(not_empty=True)
-    password = formencode.validators.NotEmpty()
+    username = formencode.validators.PlainText(if_missing=None)
+    password = formencode.validators.String(if_missing=None)
+    anonymous = formencode.validators.Bool(if_missing=None)
+
+    chained_validators = [ validate_login ]
 
 def auth(service_document_url, username, password):
     # Get the service document and persist what's needed.
