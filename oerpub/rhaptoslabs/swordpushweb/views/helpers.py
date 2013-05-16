@@ -124,18 +124,14 @@ class BaseHelper(object):
         return self.request.matched_route.name
 
     def set_selected_workspace(self, selected_workspace):
-        self.session['selected_workspace'] = selected_workspace
+        self.session['login'].setSelectedWorkspace(selected_workspace)
 
     def get_selected_workspace(self):
-        selected_workspace = self.session.get('selected_workspace', 'undefined')
-        if selected_workspace == 'undefined':
-            selected_workspace = self.session['login'].collections[0]['href']
-        return selected_workspace
+        return self.session['login'].selectedWorkspace
+
+    def get_selected_workspace_title(self):
+        return self.session['login'].selectedWorkspaceTitle
 
     def get_workspace_title(self, workspace):
         return [entry['title'] for entry in self.session['login'].collections \
             if entry['href'] == workspace][0]
-
-    def get_selected_workspace_title(self):
-        selected_workspace = self.get_selected_workspace()
-        return self.get_workspace_title(self.get_selected_workspace())
