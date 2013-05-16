@@ -8,6 +8,11 @@ class Session(object):
             sufficient permissions to download the module using sword. """
         return False
 
+    @property
+    def canUploadModule(self):
+        """ Can the user upload new content to CNX? """
+        return False
+
 class AnonymousSession(Session):
     """ Class for anonymous users. """
 
@@ -35,4 +40,8 @@ class CnxSession(Session):
 
     @property
     def canImportModule(self):
+        return True
+
+    @property
+    def canUploadModule(self):
         return True
