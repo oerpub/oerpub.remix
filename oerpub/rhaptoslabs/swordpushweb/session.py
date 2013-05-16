@@ -1,6 +1,13 @@
 class Session(object):
     """ Base class for oerpub sessions. """
 
+    @property
+    def canImportModule(self):
+        """ Can the user import content from CNX, for example, can he edit
+            an existing module? This should only return true if the user has
+            sufficient permissions to download the module using sword. """
+        return False
+
 class AnonymousSession(Session):
     """ Class for anonymous users. """
 
@@ -25,3 +32,7 @@ class CnxSession(Session):
         self.sword_version = sword_version
         self.maxuploadsize = maxuploadsize
         self.collections = collections
+
+    @property
+    def canImportModule(self):
+        return True
