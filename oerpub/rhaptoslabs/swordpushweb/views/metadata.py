@@ -430,6 +430,9 @@ class Metadata_View(BaseHelper):
             'session': session,
             'view': self,
         }
+        # Enable expert mode when anonymous
+        if not self.request.session['login'].canUploadModule:
+            request.response.set_cookie('oerpushweb.expertmode', 'true')
         return render_to_response(self.templatePath, response, request=request)
 
     @reify
