@@ -447,3 +447,10 @@ class Metadata_View(BaseHelper):
     @reify
     def back_step_title(self):
         return "Return to the preview page"
+
+    def get_next_action(self, *args, **kwargs):
+        """ If we don't have upload rights, there is no next action. """
+        if self.request.session['login'].canUploadModule:
+            return super(Metadata_View, self).get_next_action(
+                *args, **kwargs)
+        return None

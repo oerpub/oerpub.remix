@@ -74,7 +74,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                                     title="This is an entirely new module."> 
                                 <input class="button" id="existingmodule"
                                     name="existingmodule" value="Edit an existing module »" type="submit"
-                                    title="Choose an existing module and edit.">
+                                    title="Choose an existing module and edit."
+                                    tal:condition="request.session.login.canImportModule">
                                 <input type="hidden" id="neworexistingmodule"
                                     name="neworexistingmodule" value="neworexistingmodule">
                             </div>

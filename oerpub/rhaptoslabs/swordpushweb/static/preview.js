@@ -49,8 +49,9 @@ Aloha.ready(function(){
                 // asking whether to upload to a new or existing module.
                 // there are two workflows where this is not necessary
                 // since the new or existing decision has already been made.
-                source = $('#source').attr('value');
-                if ( source === 'new' || source === 'existingmodule' ) {
+                var source = $('#source').val(),
+                    canupload = $('#canupload').val();
+                if ( !canupload || source === 'new' || source === 'existingmodule' ) {
                     event.stopPropagation();
                     event.preventDefault();
                     window.location = '/metadata';
