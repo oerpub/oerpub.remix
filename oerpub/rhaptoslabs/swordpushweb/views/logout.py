@@ -7,5 +7,3 @@ def logout_view(request):
     session = request.session
     session.invalidate()
     raise HTTPFound(location=request.route_url('login'))
-
-

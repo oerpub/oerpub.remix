@@ -283,7 +283,7 @@ ${form.csrf_token()}
             tal:attributes="value selected_workspace|nothing">
         <input name="workflownav.form.submitted" type="hidden" value="submitted" />
         
-        <div id="forward-steps">
+        <div id="forward-steps" tal:define="next_action view.get_next_action()">
             <metal:extras define-slot="extras"/>
             <input id="btn-forward" name="btn-forward"
                 type="submit"
@@ -291,9 +291,10 @@ ${form.csrf_token()}
                 class="forward-button" 
                 role="button"
                 title="Select a module below and then click 'Next' to start editing it"
-                tal:attributes="href string:/${view.get_next_action()};
+                tal:attributes="href (next_action and ('/' + next_action));
                                 value structure:view.next_step_label;
-                                title view.next_step_title"/>
+                                title view.next_step_title;
+                                disabled (next_action is None)"/>
         </div>
     </div>
 </div>

@@ -35,6 +35,9 @@
                                     title view.back_step_title"/>
             </div>
 
+            <input id="canupload" type="hidden" name="canupload"
+                tal:define="login request.session.get('login')"
+                tal:attributes="value login and login.canUploadModule or ''">
             <input id="source" type="hidden" name="source"
                 tal:attributes="value request.session.get('source')">
             <input id="target" type="hidden" name="target"

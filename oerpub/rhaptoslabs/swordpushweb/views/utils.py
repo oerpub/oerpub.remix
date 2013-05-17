@@ -112,7 +112,7 @@ def save_config(config, request):
 
     # Update edit history
     edit_history = config.get('edit_history', [])
-    edit_history.append((request.session.get("username"),
+    edit_history.append((request.session['login'].username,
                          time.asctime(time.gmtime()) + " GMT"))
     config['edit_history'] = edit_history
 
@@ -342,19 +342,19 @@ def build_featured_links(data):
 
 def check_login(request, raise_exception=True):
     # Check if logged in
-    for key in ['username', 'password', 'service_document_url']:
-        if not request.session.has_key(key):
-            if raise_exception:
-                raise HTTPFound(location=request.route_url('login'))
-            else:
-                return False
+    if not 'login' in request.session:
+        if raise_exception:
+            raise HTTPFound(location=request.route_url('login'))
+        else:
+            return False
     return True
 
 
 def get_connection(session):
-    conn = sword2cnx.Connection(session['service_document_url'],
-                                user_name=session['username'],
-                                user_pass=session['password'],
+    login = session['login']
+    conn = sword2cnx.Connection(login.service_document_url,
+                                user_name=login.username,
+                                user_pass=login.password,
                                 always_authenticate=True,
                                 download_service_document=False)
     return conn
@@ -705,7 +705,7 @@ def create_save_dir(request, registry_key='transform_dir'):
     log.debug('Creating save_dir...')
     now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     # TODO: This has a good chance of being unique, but even so...
-    temp_dir_name = '%s-%s' % (request.session['username'], now_string)
+    temp_dir_name = '%s-%s' % (request.session['login'].username, now_string)
     save_dir = os.path.join(
         request.registry.settings[registry_key],
         temp_dir_name
