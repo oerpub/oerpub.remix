@@ -51,7 +51,8 @@ class BaseHelper(object):
                 if errors:
                     return None
                 action = self.get_next_action()
-                return HTTPFound(location=self.request.route_url(action))
+                if action is not None:
+                    return HTTPFound(location=self.request.route_url(action))
         return None
 
     @reify
