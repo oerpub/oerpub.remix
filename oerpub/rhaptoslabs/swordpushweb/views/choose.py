@@ -9,6 +9,7 @@ import traceback
 import formencode
 import shlex, subprocess
 from logging import getLogger
+from pkg_resources import resource_filename
 
 from lxml import etree
 import httplib2
@@ -39,7 +40,6 @@ from oerpub.rhaptoslabs.swordpushweb import convert as JOD
 from oerpub.rhaptoslabs.swordpushweb import jod_check
 from oerpub.rhaptoslabs.swordpushweb.interfaces import IWorkflowSteps
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
-    load_config,
     save_zip,
     clean_cnxml,
     save_cnxml,
@@ -364,8 +364,8 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
         return HTTPFound(location=self.request.route_url(self.nextStep()))
         
     def empty_cnxml(self):
-        config = load_config(self.request)
-        filepath = config['blank_cnxml_file'] 
+        filepath = resource_filename('oerpub.rhaptoslabs.swordpushweb',
+            'views/templates/blank.cnxml')
         with open(filepath, 'rb') as cnxmlfile:
             content = cnxmlfile.read()
         return content
@@ -778,8 +778,8 @@ class PresentationProcessor(BaseFormProcessor):
         return HTTPFound(location=self.request.route_url(self.nextStep()))
 
     def slide_importer_cnxml(self, now_string, username):
-        config = load_config(self.request)
-        filepath = config['slide_importer_cnxml_file'] 
+        filepath = resource_filename('oerpub.rhaptoslabs.swordpushweb',
+            'views/templates/slide_importer.cnxml')
         with open(filepath, 'rb') as cnxmlfile:
             content = cnxmlfile.read()
         return content % (now_string,
