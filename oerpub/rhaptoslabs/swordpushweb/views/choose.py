@@ -717,7 +717,8 @@ class GoogleDocProcessor(BaseFormProcessor):
 
 class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):
-        super(PresentationProcessor, self).__init__(request, form)
+        super(PresentationProcessor, self).__init__(request)
+        self.form = form
         self.set_source('presentation')
         self.set_target('new')
         self.request.session['filename'] = form.data['importer_file'].filename
