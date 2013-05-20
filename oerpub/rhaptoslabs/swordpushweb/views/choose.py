@@ -719,7 +719,7 @@ class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(PresentationProcessor, self).__init__(request)
         self.set_source('presentation')
-        self.set_target('importer')
+        self.set_target('new')
         ufname = form.data['importer_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
         self.request.session['filename'] = form.data['importer_file'].filename
@@ -777,7 +777,7 @@ class PresentationProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url(self.nextStep()))
+        return HTTPFound(location=self.request.route_url('enhance')))
 
     def slide_importer_cnxml(self, now_string, username):
         config = load_config(self.request)
