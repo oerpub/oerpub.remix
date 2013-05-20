@@ -777,7 +777,7 @@ class PresentationProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url('enhance')))
+        return HTTPFound(location=self.request.route_url('importer'))
 
     def slide_importer_cnxml(self, now_string, username):
         config = load_config(self.request)
