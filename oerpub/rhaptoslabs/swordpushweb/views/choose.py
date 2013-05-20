@@ -182,7 +182,7 @@ class Choose_Document_Source(BaseHelper):
     def _process_presentationform_submit(self, request, form):
         LOG.info('process presentation submit')
         processor = PresentationProcessor(request, form)
-        return processor.process(form)
+        return processor.process()
     
     def _process_zip_or_latex_form(self, request, form):
         LOG.info('process zip or latex submit')
@@ -738,7 +738,7 @@ class PresentationProcessor(BaseFormProcessor):
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
 
-    def process(self, form):
+    def process(self):
         try:
             LOG.info("Inside presentation form")
             zipped_filepath = os.path.join(self.save_dir, "cnxupload.zip")
