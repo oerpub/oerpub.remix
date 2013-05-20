@@ -720,8 +720,6 @@ class PresentationProcessor(BaseFormProcessor):
         super(PresentationProcessor, self).__init__(request)
         self.set_source('presentation')
         self.set_target('new')
-        ufname = form.data['importer_file'].filename.replace(os.sep, '_')
-        self.original_filename = os.path.join(self.save_dir, ufname)
         self.request.session['filename'] = form.data['importer_file'].filename
 
         self.username = self.request.session['login'].username
