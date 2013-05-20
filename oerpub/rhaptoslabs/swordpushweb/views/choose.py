@@ -82,6 +82,7 @@ class URLSchema(formencode.Schema):
 class PresentationSchema(formencode.Schema):
     allow_extra_fields = True
     importer = formencode.validators.FieldStorageUploadConverter()
+    presentationform = formencode.validators.NotEmpty()
     #upload_to_ss = formencode.validators.String()
     #upload_to_google = formencode.validators.String()
     #introductory_paragraphs = formencode.validators.String()
@@ -718,22 +719,24 @@ class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(PresentationProcessor, self).__init__(request)
         self.set_source('presentation')
-        self.set_target('new')
-        ufname = form.data['upload_file'].filename.replace(os.sep, '_')
+        self.set_target('importer')
+        ufname = form.data['importer_file'].filename.replace(os.sep, '_')
         self.original_filename = os.path.join(self.save_dir, ufname)
-        self.request.session['filename'] = form.data['upload_file'].filename
+        self.request.session['filename'] = form.data['importer_file'].filename
 
         self.username = self.request.session['login'].username
         self.uploaded_filename = \
-            form.data['upload_file'].filename.replace(os.sep, '_')
+            form.data['importer_file'].filename.replace(os.sep, '_')
         self.original_filename = \
             os.path.join(self.save_dir, self.uploaded_filename)
+        self.save_original_file()
     
     def create_save_dir(self, request):
         return create_save_dir(request, registry_key='slideshare_import_dir')
     
-    def save_original_file(self, filename, input_file):
-        saved_file = open(filename, 'wb')
+    def save_original_file(self):
+        saved_file = open(self.original_filename, 'wb')
+        input_file = self.form.data['importer_file'].file
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
 
@@ -741,7 +744,6 @@ class PresentationProcessor(BaseFormProcessor):
         try:
             LOG.info("Inside presentation form")
             zipped_filepath = os.path.join(self.save_dir, "cnxupload.zip")
-            LOG.info("Zipped filepath", zipped_filepath)
             self.request.session['userfilepath'] = zipped_filepath
             zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
             zip_archive.write(self.original_filename, self.uploaded_filename)
