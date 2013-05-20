@@ -81,7 +81,8 @@ class URLSchema(formencode.Schema):
 
 class PresentationSchema(formencode.Schema):
     allow_extra_fields = True
-    importer = formencode.validators.FieldStorageUploadConverter()
+    importer_file = formencode.validators.FieldStorageUploadConverter()
+    presentationupload = formencode.validators.NotEmpty()
     #upload_to_ss = formencode.validators.String()
     #upload_to_google = formencode.validators.String()
     #introductory_paragraphs = formencode.validators.String()
@@ -181,7 +182,7 @@ class Choose_Document_Source(BaseHelper):
     def _process_presentationform_submit(self, request, form):
         LOG.info('process presentation submit')
         processor = PresentationProcessor(request, form)
-        return processor.process(form)
+        return processor.process()
     
     def _process_zip_or_latex_form(self, request, form):
         LOG.info('process zip or latex submit')
@@ -717,31 +718,31 @@ class GoogleDocProcessor(BaseFormProcessor):
 class PresentationProcessor(BaseFormProcessor):
     def __init__(self, request, form):
         super(PresentationProcessor, self).__init__(request)
+        self.form = form
         self.set_source('presentation')
         self.set_target('new')
-        ufname = form.data['upload_file'].filename.replace(os.sep, '_')
-        self.original_filename = os.path.join(self.save_dir, ufname)
-        self.request.session['filename'] = form.data['upload_file'].filename
+        self.request.session['filename'] = form.data['importer_file'].filename
 
         self.username = self.request.session['login'].username
         self.uploaded_filename = \
-            form.data['upload_file'].filename.replace(os.sep, '_')
+            form.data['importer_file'].filename.replace(os.sep, '_')
         self.original_filename = \
             os.path.join(self.save_dir, self.uploaded_filename)
+        self.save_original_file()
     
     def create_save_dir(self, request):
         return create_save_dir(request, registry_key='slideshare_import_dir')
     
-    def save_original_file(self, filename, input_file):
-        saved_file = open(filename, 'wb')
+    def save_original_file(self):
+        saved_file = open(self.original_filename, 'wb')
+        input_file = self.form.data['importer_file'].file
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
 
-    def process(self, form):
+    def process(self):
         try:
             LOG.info("Inside presentation form")
             zipped_filepath = os.path.join(self.save_dir, "cnxupload.zip")
-            LOG.info("Zipped filepath", zipped_filepath)
             self.request.session['userfilepath'] = zipped_filepath
             zip_archive = zipfile.ZipFile(zipped_filepath, 'w')
             zip_archive.write(self.original_filename, self.uploaded_filename)
@@ -775,7 +776,7 @@ class PresentationProcessor(BaseFormProcessor):
             return render_to_response(templatePath, response, request=self.request)
 
         self.request.session.flash(self.message)
-        return HTTPFound(location=self.request.route_url(self.nextStep()))
+        return HTTPFound(location=self.request.route_url('importer'))
 
     def slide_importer_cnxml(self, now_string, username):
         config = load_config(self.request)
