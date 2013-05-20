@@ -5,7 +5,6 @@
 
         <script type="text/javascript">
             $(document).ready(function(){
-                $('.forward-button').removeAttr('disabled');
                 $('.forward-button').val("Finish: Upload \u00bb");
                 $('#back-steps .button').removeAttr('disabled');
                 $("#formentry-title").removeClass("error");
@@ -38,7 +37,7 @@
     <span metal:use-macro="view.workflow_nav_form_begin">workflow buttons</span>
     <span metal:use-macro="view.workflow_nav_form">
         <metal:extras fill-slot="extras">
-          <span id="uploading-to">
+          <span id="uploading-to" tal:condition="request.session.login.canUploadModule|nothing">
               Uploading to 
               <tal:workspace tal:condition="python: view.get_target() == 'existingmodule'">
                 <span style="color: black"

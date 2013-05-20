@@ -69,10 +69,12 @@
     <div class="modal-body">
         Your changes have not been saved and any work will be lost if you leave this page.
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer"
+         tal:define="next_action view.get_next_action()">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
         <button id="btn-navigate-forward" class="btn btn-primary"
-            tal:attributes="href string:${view.get_next_action()}">OK</button>
+            tal:condition="next_action"
+            tal:attributes="href next_action">OK</button>
     </div>
 </div>
 </metal:forward_navigation_warning>

@@ -38,7 +38,7 @@ def return_slideshare_upload_form(request):
         original_filename = session['original_filename']
         upload_to_google = form.data['upload_to_google']
         upload_to_ss = form.data['upload_to_ss']
-        username = session['username']
+        username = session['login'].username
         if (upload_to_ss=="true"):
 
             slideshow_id = upload_to_slideshare("saketkc",original_filename)
@@ -64,7 +64,7 @@ def return_slideshare_upload_form(request):
                 session['original-file-path'] = original_filename
         else:
             print "NO GOOGLE FOUND"
-        username = session['username']
+        username = session['login'].username
         uploaded_filename = session['uploaded_filename']
         slideshare_details = get_details(slideshow_id)
         slideshare_download_url = get_slideshow_download_url(slideshare_details)
