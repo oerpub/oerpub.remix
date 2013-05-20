@@ -81,8 +81,8 @@ class URLSchema(formencode.Schema):
 
 class PresentationSchema(formencode.Schema):
     allow_extra_fields = True
-    importer = formencode.validators.FieldStorageUploadConverter()
-    presentationform = formencode.validators.NotEmpty()
+    importer_file = formencode.validators.FieldStorageUploadConverter()
+    presentationupload = formencode.validators.NotEmpty()
     #upload_to_ss = formencode.validators.String()
     #upload_to_google = formencode.validators.String()
     #introductory_paragraphs = formencode.validators.String()
