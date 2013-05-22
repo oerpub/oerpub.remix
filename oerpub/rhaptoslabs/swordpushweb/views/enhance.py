@@ -4,7 +4,7 @@ import urllib2
 import zipfile
 import datetime
 import formencode
-import BeautifulSoup
+from BeautifulSoup import BeautifulSoup
 
 from pyramid_simpleform import Form
 from pyramid.view import view_config
