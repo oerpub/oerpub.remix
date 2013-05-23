@@ -8,6 +8,7 @@ from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid.renderers import render_to_response
 from pyramid_simpleform.renderers import FormRenderer
+from pyramid.httpexceptions import HTTPFound
 
 from oerpub.rhaptoslabs.sword2cnx import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.languages import languages
@@ -309,6 +310,16 @@ class Metadata_View(BaseHelper):
         """
         Handle metadata adding and uploads
         """
+        # If user clicks the restart button (this only happens if he is
+        # anonymous), send him to the choose-page. Do this before calling
+        # _process below, that saves us an extra login check.
+        if self.request.params.get('btn-restart', None) is not None:
+            # Should we explicitly clean up? If we do, we break the back
+            # button, so I'm voting no. Also disable expert mode.
+            self.request.response.set_cookie('oerpushweb.expertmode', 'false')
+            return HTTPFound(location=self.request.route_url('choose'),
+                headers=self.request.response.headers)
+
         super(Metadata_View, self)._process()
         request = self.request
         defaults = self.defaults

@@ -49,6 +49,9 @@
               </tal:workspace>
               in Connexions
           </span>
+          <input tal:define="canUploadModule request.session.login.canUploadModule|nothing"
+                 tal:condition="not canUploadModule"
+                 type="submit" name="btn-restart" value="Work on another document" />
           <input name="workflownav.metadata.submitted" type="hidden" value="submitted" />
         </metal:extras>
     </span>
