@@ -194,7 +194,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               </label>
                               <div class="upload-form">
                               <input class="button" id="presentation-submit" name="form.submitted" value="Choose Presentation and preview &#187;" type="submit">
-                              <input id="importer" name="upload_file" style="visibility: hidden;" type="file" />
+                              <input id="importer" name="importer_file" style="visibility: hidden;" type="file" />
+                              <input id="presentationupload" name="presentationupload" style="visibility: hidden;" value="yes" type="text">
                               <!--<input class="button"  value="Import Your Presentations &#187;" onClick="location.href='/importer'" type="button">-->
                               </div>    
                           </li>                          
