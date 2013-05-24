@@ -180,7 +180,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                         <div><strong>Or try our alpha importer tools</strong></div>
                         
                         <ul class="create-new-list">
-                    <tal:comment replace="nothing">
                     ${presentationform.begin(request.route_url('choose'),
                                              multipart='multipart',
                                              id='presentationform')}
@@ -199,7 +198,6 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               </div>    
                           </li>                          
                     ${presentationform.end()}
-                    </tal:comment>
 
                     ${zip_or_latex_form.begin(request.route_url('choose'),
                                               multipart='multipart',
