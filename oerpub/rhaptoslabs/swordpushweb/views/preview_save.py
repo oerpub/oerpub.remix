@@ -24,7 +24,7 @@ def preview_save(request):
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
     # Save new html file from preview area
-    save_and_backup_file(save_dir, 'index.html', html)
+    save_and_backup_file(save_dir, 'index.aloha.html', html)
 
     conversionerror = ''
 
@@ -43,6 +43,7 @@ def preview_save(request):
     cnxml = None
     try:
         tree = aloha_to_etree(html)           #1 create structured HTML5 tree
+        canonical_html = etree.tostring(tree, pretty_print=True)
         cnxml = etree_to_valid_cnxml(tree, pretty_print=True)
     except Exception as e:
         #return render_conversionerror(request, str(e))
@@ -50,8 +51,9 @@ def preview_save(request):
 
     if cnxml is not None:
         save_and_backup_file(save_dir, 'index.cnxml', cnxml)
+        save_and_backup_file(save_dir, 'index.html', canonical_html)
         files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
-        save_zip(save_dir, cnxml, html, files)
+        save_zip(save_dir, cnxml, canonical_html, files)
         try:
             validate_cnxml(cnxml)
         except ConversionError as e:
