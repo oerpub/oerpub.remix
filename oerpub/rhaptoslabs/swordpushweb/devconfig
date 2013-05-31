@@ -1,9 +1,4 @@
 {
-<<<<<<< HEAD
-=======
-    "blank_cnxml_file": "src/remix/oerpub/rhaptoslabs/swordpushweb/views/templates/blank.cnxml",
-    "slide_importer_cnxml_file": "src/remix/oerpub/rhaptoslabs/swordpushweb/views/templates/slide_importer.cnxml",
->>>>>>> ticket411
     "workspace_url": None,
     "service_document_url": u'http://cnx.org/sword/servicedocument',
     "login_url": u'http://cnx.org/login_form',
