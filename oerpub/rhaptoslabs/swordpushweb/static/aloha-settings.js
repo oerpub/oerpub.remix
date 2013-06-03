@@ -61,6 +61,9 @@
                         fieldName: 'upload'
                     }
                 }
+            },
+            math: {
+                cheatsheet: true
             }
         },
         bundles: {
