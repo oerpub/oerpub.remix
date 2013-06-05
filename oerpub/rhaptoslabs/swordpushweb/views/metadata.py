@@ -317,7 +317,8 @@ class Metadata_View(BaseHelper):
             # Should we explicitly clean up? If we do, we break the back
             # button, so I'm voting no. Also disable expert mode.
             self.request.response.set_cookie('oerpushweb.expertmode', 'false')
-            return HTTPFound(location=self.request.route_url('choose'),
+            return HTTPFound(
+                location=self.request.route_url('choose')+"?restart=1",
                 headers=self.request.response.headers)
 
         super(Metadata_View, self)._process()

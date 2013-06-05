@@ -103,6 +103,16 @@ class Choose_Document_Source(BaseHelper):
     def do_transition(self):
         request = self.request
         session = request.session
+
+        # For anonymous users who are restarting, we want to delay the clearing
+        # of the session. We store the previous_upload_dir on the session, we
+        # will use that later to create a download.
+        if not request.session['login'].canUploadModule and \
+                self.request.params.get('restart', None) is not None and \
+                'upload_dir' in session:
+            session['previous_upload_dir'] = session['upload_dir']
+        else:
+            remove_save_dir(request)
         self.clear_session(request, session)
     
     def clear_session(self, request, session):
@@ -120,10 +130,6 @@ class Choose_Document_Source(BaseHelper):
         for key in keys:
             if key in session:
                 del session[key]
-
-        # cleanup the temporary work areas too
-        remove_save_dir(request)
-
         
     def navigate(self, errors=None, form=None):
         request = self.request
