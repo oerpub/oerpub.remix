@@ -697,10 +697,6 @@ def json_set_source_on_session(request):
     return {'source': source,
             'error': error}
 
-def cleanup_save_dir(request):
-    remove_save_dir(request)
-    create_save_dir(request)
-
 def create_save_dir(request, registry_key='transform_dir'):
     log.debug('Creating save_dir...')
     now_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')

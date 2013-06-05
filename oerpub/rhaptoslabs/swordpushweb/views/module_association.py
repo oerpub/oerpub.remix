@@ -22,8 +22,7 @@ from utils import (
     get_files,
     get_save_dir,
     create_save_dir,
-    extract_to_save_dir,
-    cleanup_save_dir)
+    extract_to_save_dir)
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_and_backup_file,
     save_zip,
@@ -49,7 +48,6 @@ class Module_Association_View(BaseHelper):
     def do_transition(self):
         request = self.request
         form = Form(request, schema=ChooseModuleSchema)
-        cleanup_save_dir(request)
         if form.validate():
             selected_workspace = form.data['workspace']
             self.set_selected_workspace(selected_workspace)
