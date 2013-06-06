@@ -1,6 +1,6 @@
 *~
 *.pyc
-oerpub.rhaptoslabs.swordpushweb.egg-info/
+oerpub.remix.egg-info/
 oerpub/rhaptoslabs/swordpushweb/transforms/*
 !oerpub/rhaptoslabs/swordpushweb/transforms/README
 oerpub/rhaptoslabs/data/
