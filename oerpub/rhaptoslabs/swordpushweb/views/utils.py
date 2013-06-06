@@ -283,6 +283,32 @@ def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
     return lxml.etree.tostring(root)
 
 
+def add_metadata_to_cnxml(cnxml, user_metadata, repo_metadata):
+    # returns input cnxml without modification for now
+    # want to use values from user's forms, else use values from repo_metadata
+    # when we lack repo metadata (eg new content), how are fields populated?
+    root = lxml.etree.fromstringlist(cnxml)
+    # <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+    #   <md:repository>
+    #   <md:content-id>
+    #   <md:title>
+    title    = user_metadata['dcterms:title']
+    #   <md:version>
+    #   <md:created>
+    #   <md:revised>
+    #   <md:actors>
+    #   <md:roles>
+    #   <md:license url="http://creativecommons.org/licenses/by/3.0/" />
+    #   <md:subjectlist> and <md:keywordlist>
+    subjects = user_metadata['dcterms:subject'] # plus keywords ftw
+    #   <md:abstract>
+    abstract = user_metadata['dcterms:abstract']
+    #   <md:language>
+    language = user_metadata['dcterms:language']
+    # </metadata>
+    return lxml.etree.tostring(root)
+
+
 def get_files_from_zipfile(zip_file):
     files = []
 
@@ -360,7 +386,7 @@ def get_connection(session):
     return conn
 
 
-def get_metadata_from_repo(session, module_url, user, password):
+def get_metadata_via_sword(session, module_url, user, password):
     conn = get_connection(session)
     resource = conn.get_resource(content_iri = module_url)
     metadata = Metadata(resource.content, module_url, user, password)
@@ -369,16 +395,32 @@ def get_metadata_from_repo(session, module_url, user, password):
 
 class Metadata(dict):
 
-    fields = {'dcterms:title':        types.StringType,
-              'dcterms:abstract':     types.StringType,
-              'dcterms:language':     types.StringType,
-              'oerdc:analyticsCode':  types.StringType,}
+    fields = {
+      'dcterms:title':        types.StringType,
+      'dcterms:abstract':     types.StringType,
+      'dcterms:language':     types.StringType,
+      'oerdc:analyticsCode':  types.StringType,
+    }
     
-    contributor_fields = {'dcterms:creator':      types.ListType,
-                          'oerdc:maintainer':     types.ListType,
-                          'dcterms:rightsHolder': types.ListType,
-                          'oerdc:translator':     types.ListType,
-                          'oerdc:editor':         types.ListType,}
+    contributor_fields = {
+      'dcterms:creator':      types.ListType,
+      'oerdc:maintainer':     types.ListType,
+      'dcterms:rightsHolder': types.ListType,
+      'oerdc:translator':     types.ListType,
+      'oerdc:editor':         types.ListType,
+    }
+
+    cnxml_fields = {
+      'md:repository':        types.StringType,
+      'md:content-id':        types.StringType,
+      'md:title':             types.StringType,
+      'md:version':           types.StringType,
+      'md:created':           types.StringType,
+      'md:revised':           types.StringType,
+      'md:license':           types.StringType,
+      'md:abstract':          types.StringType,
+      'md:language':          types.StringType,
+    }
 
     def __init__(self, xml_deposit_receipt, module_url, user, password):
         """
@@ -386,15 +428,16 @@ class Metadata(dict):
         self.encoding = 'utf-8'
         self.raw_data = xml_deposit_receipt
         self.dom = lxml.etree.fromstring(self.raw_data)
-        self._parse_metadata()
+        self._parse_sword_metadata()
         self.url = self._module_export_url(module_url)
         self.cnxml = self._fetch_cnxml(self.url,
                                        user.encode(self.encoding),
                                        password.encode(self.encoding))
         if self.cnxml:
+            self._parse_cnxml_metadata()
             self._parse_featured_link_groups(self.cnxml)
     
-    def _parse_metadata(self):
+    def _parse_sword_metadata(self):
         for name, ftype in self.fields.items():
             value = self._get_value_from_raw(name,
                                              ftype,
@@ -405,6 +448,54 @@ class Metadata(dict):
         self._parse_subjects_and_keywords()
         self._parse_contributors()
 
+    def _parse_cnxml_metadata(self):
+        self.cnxml_dom = lxml.etree.fromstring(self.cnxml)
+        for name, ftype in self.cnxml_fields.items():
+            value = self._get_value_from_raw('cnxml:metadata/' + name,
+                                             ftype,
+                                             self.cnxml_dom,
+                                             NAMESPACES)
+            self[name] = value
+        # parse md:actors
+        persons = self.cnxml_dom.xpath('cnxml:metadata/md:actors/md:person', 
+                                       namespaces=NAMESPACES)
+        self['md:actors'] = {}
+        for person in persons:
+            person_attrs = dict((x, y) for x, y in person.items())
+            userid = person_attrs['userid']
+            self['md:actors'][userid] = {}
+            firstname = person.find('md:firstname', namespaces=NAMESPACES).text
+            surname   = person.find('md:surname',   namespaces=NAMESPACES).text
+            fullname  = person.find('md:fullname',  namespaces=NAMESPACES).text
+            email     = person.find('md:email',     namespaces=NAMESPACES).text
+            self['md:actors'][userid]['firstname'] = firstname
+            self['md:actors'][userid]['surname']   = surname
+            self['md:actors'][userid]['fullname']  = fullname
+            self['md:actors'][userid]['email']     = email
+        # parse md:roles
+        roles = self.cnxml_dom.xpath('cnxml:metadata/md:roles/md:role', 
+                                     namespaces=NAMESPACES)
+        self['md:roles'] = {}
+        for role in roles:
+            role_attrs = dict((x, y) for x, y in role.items())
+            roletype = role_attrs['type']
+            if roletype not in self['md:roles']:
+                self['md:roles'][roletype] = []
+                self['md:roles'][roletype].append(role.text)
+        # parse md:keywordlist
+        keywords = self.cnxml_dom.xpath('cnxml:metadata/md:keywordlist/md:keyword', 
+                                     namespaces=NAMESPACES)
+        self['md:keywordlist'] = []
+        for keyword in keywords:
+            self['md:keywordlist'].append(keyword.text)
+        # parse md:subjectlist
+        subjects = self.cnxml_dom.xpath('cnxml:metadata/md:subjectlist/md:subject', 
+                                     namespaces=NAMESPACES)
+        self['md:subjectlist'] = []
+        for subject in subjects:
+            self['md:subjectlist'].append(subject.text)
+        return
+        
     def _parse_subjects_and_keywords(self):
         """ We have to do this, because subjects and keywords are marshalled
             in the same basic element. The only thing distinguishing them is

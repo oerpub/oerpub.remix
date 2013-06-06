@@ -13,10 +13,11 @@ from pyramid.httpexceptions import HTTPFound
 from oerpub.rhaptoslabs.sword2cnx import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.languages import languages
 from choose import save_cnxml
-from utils import get_metadata_from_repo
+from utils import get_metadata_via_sword
 from utils import ZIP_PACKAGING, create_module_in_2_steps
 from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
 from utils import get_files_from_zipfile, load_config, build_featured_links
+from utils import add_metadata_to_cnxml
 from helpers import BaseHelper
 
 class MetadataSchema(formencode.Schema):
@@ -100,6 +101,20 @@ class Metadata_View(BaseHelper):
             self.defaults['title'] = self.session['title']
             self.config['metadata']['title'] = self.session['title']
 
+        self.target_module_url = self.session.get('target_module_url', None)
+
+        if self.target_module_url:
+            if self.target_module_url.endswith('/sword'):
+                dr_url = self.target_module_url
+            else:
+                dr_url = self.target_module_url + '/sword'
+            username = self.session['username']
+            password = self.session['password']
+            self.repo_metadata = get_metadata_via_sword(self.session, dr_url, 
+                                                        username, password)
+        else:
+            self.repo_metadata = {}
+
     def update_session(self, session, remember_fields, form):        
         # Persist the values that should be persisted in the session, and
         # delete the others.
@@ -111,8 +126,10 @@ class Metadata_View(BaseHelper):
                     del(session[field_name])
         return session
     
-    def get_metadata_entry(self, form, session):
+    def get_metadata(self, form, session):
+        # create metadata dictionary from form values
         metadata = {}
+
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
 
@@ -136,16 +153,21 @@ class Metadata_View(BaseHelper):
         # Standard change description
         metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
 
-        # Build metadata entry object
         for key in metadata.keys():
             if metadata[key] == '':
                 del metadata[key]
-        metadata_entry = sword2cnx.MetaData(metadata)
 
-        # Add role tags
         role_metadata = {}
         for k, v in self.role_mappings.items():
             role_metadata[v] = form.data[k].split(',')
+
+        return metadata, role_metadata
+
+    def get_metadata_entry(self, metadata, role_metadata):
+        # Build metadata entry object
+        metadata_entry = sword2cnx.MetaData(metadata)
+
+        # Add role tags
         for key, value in role_metadata.iteritems():
             for v in value:
                 v = v.strip()
@@ -180,6 +202,15 @@ class Metadata_View(BaseHelper):
                 files = get_files_from_zipfile(zip_file)
                 save_cnxml(save_dir, new_cnxml, files)
         return featuredlinks
+
+    def add_metadata(self, user_metadata, repo_metadata, zip_file, save_dir):
+        if user_metadata:
+            cnxml_file = get_cnxml_from_zipfile(zip_file)
+            # below calling is not yet functional, inout cnxml is returned
+            new_cnxml = add_metadata_to_cnxml(cnxml_file.readlines(), user_metadata, repo_metadata)
+            files = get_files_from_zipfile(zip_file)
+            save_cnxml(save_dir, new_cnxml, files)
+        return
 
     def create_module_with_atompub_xml(self, conn, collection_iri, entry):
         dr = conn.create(col_iri = collection_iri,
@@ -336,7 +367,6 @@ class Metadata_View(BaseHelper):
         session = self.session
         request = self.request
         workspaces = self.workspaces
-        self.target_module_url = session.get('target_module_url', None)
 
         # Check for successful form completion
         if form.validate():
@@ -359,15 +389,21 @@ class Metadata_View(BaseHelper):
 
                 # Send zip file to Connexions through SWORD interface
                 with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                    # Create the metadata entry
-                    metadata_entry = self.get_metadata_entry(form, session)
+                    # Create the metadata dictionary and the sword metadata entry, 
+                    # using the values in the forms supplied by the user
+                    user_metadata, user_role_metadata = self.get_metadata(form, session);
+                    user_metadata_entry = self.get_metadata_entry(user_metadata, user_role_metadata)
+                    
+                    # Update the index.cnxml and zipfile with new metadata and
+                    # featured links
+                    self.add_metadata(user_metadata, self.repo_metadata, zip_file, save_dir)
                     self.featured_links = self.add_featured_links(request,
                                                                   zip_file,
                                                                   save_dir)
                     if self.target_module_url:
                         # this is an update not a create
                         deposit_receipt = self.update_module(
-                            save_dir, conn, metadata_entry, self.target_module_url)
+                            save_dir, conn, user_metadata_entry, self.target_module_url)
                     else:
                         # this is a workaround until I can determine why the 
                         # featured links don't upload correcly with a multipart
@@ -376,10 +412,10 @@ class Metadata_View(BaseHelper):
                         # Fix me properly!
                         if self.featured_links:
                             deposit_receipt = create_module_in_2_steps(
-                                form, conn, metadata_entry, zip_file, save_dir)
+                                form, conn, user_metadata_entry, zip_file, save_dir)
                         else:
                             deposit_receipt = self.create_module(
-                                form, conn, metadata_entry, zip_file)
+                                form, conn, user_metadata_entry, zip_file)
 
                 # Remember to which workspace we submitted
                 session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
@@ -408,12 +444,7 @@ class Metadata_View(BaseHelper):
         username = session['login'].username
         password = session['login'].password
         if self.target_module_url:
-
-            if self.target_module_url.endswith('/sword'):
-                dr_url = self.target_module_url
-            else:
-                dr_url = self.target_module_url + '/sword'
-            metadata.update(get_metadata_from_repo(session, dr_url, username, password))
+             metadata.update(self.repo_metadata)
         else:
             for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
                 self.defaults[role] = ','.join(
