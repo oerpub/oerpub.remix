@@ -35,7 +35,7 @@ tests_requires = requires.extend(
     ]
 )
 
-setup(name='oerpub.rhaptoslabs.swordpushweb',
+setup(name='oerpub.remix',
       version='0.1.4',
       description='SwordPush',
       long_description=README + '\n\n' +  CHANGES,
