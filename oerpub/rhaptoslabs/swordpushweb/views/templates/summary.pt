@@ -60,14 +60,14 @@
                                     license_link python:links.get('license_link');
                                     preview_link python:links.get('preview_link');
                                     creator python:creators.get(loggedin_user);">
-                      <tal:preview condition="python: preview_link is not None and len(preview_link) > 0">
+                      <tal:preview condition="preview_link">
                         <li>
                           You can 
                           <a href="${preview_link}" class="external" target="_blank">preview your module here</a> 
                           to see what it will look like once it is published.
                         </li>
                       </tal:preview>
-                      <tal:license condition="python: license_link is not None and len(license_link) > 0">
+                      <tal:license condition="license_link">
                         <tal:no_collaborators condition="len(creators) == 1">
                           <li>
                               You must <a href="${license_link}" class="external" target="_blank">sign the Open Content License</a> at Connexions and then click "Publish".
