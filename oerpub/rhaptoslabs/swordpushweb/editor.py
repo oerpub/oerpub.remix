@@ -1,12 +1,23 @@
-from pkg_resources import resource_filename
-from pyramid.renderers import get_renderer
-from pyramid.chameleon_zpt import renderer_factory
+import re
 from translationstring import ChameleonTranslate
-from chameleon.zpt.loader import TemplateLoader
+from chameleon.loader import TemplateLoader
+from chameleon.zpt.template import PageTemplateFile as BasePageTemplateFile
 
-# This template loader implementation shamelessly stolen from deform
+COMMENTRE = re.compile('<!--(/?metal:.*?)-->')
+
 class TemplateError(Exception):
     pass
+
+class PageTemplateFile(BasePageTemplateFile):
+    """ Extend the Base PageTemplateFile and change the cook method
+        to add a bit of comment trickery, I need to use metal tags in html
+        in a way that will not confuse a browser, but will still be properly
+        executed by chameleon. Doing it this way, we can use html comments
+        to hide metal. """
+    def cook(self, body):
+        # Translate <!--metal: to <metal:
+        b = COMMENTRE.sub(r'<\1>', body)
+        return super(PageTemplateFile, self).cook(b)
 
 class ZPTTemplateLoader(TemplateLoader):
     def __init__(self, *args, **kwargs):
@@ -16,7 +27,7 @@ class ZPTTemplateLoader(TemplateLoader):
     def load(self, filename, *args, **kwargs):
         try:
             return super(ZPTTemplateLoader, self).load(
-                filename, *args, **kwargs)
+                filename, PageTemplateFile, *args, **kwargs)
         except ValueError:
             raise TemplateError(filename)
 
