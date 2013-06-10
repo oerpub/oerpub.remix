@@ -124,6 +124,7 @@ class Module_Association_View(BaseHelper):
         conversionerror = None
         try:
             structuredhtml = cnxml_to_structuredhtml(cnxml)
+            save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
             htmlpreview    = cnxml_to_htmlpreview(cnxml)
             save_and_backup_file(save_dir, 'index.html', htmlpreview)
             files = get_files(save_dir)
