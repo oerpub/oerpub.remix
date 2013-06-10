@@ -24,7 +24,7 @@ def preview_save(request):
     save_dir = os.path.join(request.registry.settings['transform_dir'],
         request.session['upload_dir'])
     # Save new html file from preview area
-    save_and_backup_file(save_dir, 'index.aloha.html', html)
+    save_and_backup_file(save_dir, 'index.html', html)
 
     conversionerror = ''
 
@@ -51,7 +51,7 @@ def preview_save(request):
 
     if cnxml is not None:
         save_and_backup_file(save_dir, 'index.cnxml', cnxml)
-        save_and_backup_file(save_dir, 'index.html', canonical_html)
+        save_and_backup_file(save_dir, 'index.structured.html', canonical_html)
         files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
         save_zip(save_dir, cnxml, canonical_html, files)
         try:
