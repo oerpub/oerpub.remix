@@ -610,7 +610,7 @@ def save_cnxml(save_dir, cnxml, files):
     # we generate the preview and save the error
     conversionerror = None
     try:
-        htmlpreview = cnxml_to_structuredhtml(cnxml)
+        structuredhtml = cnxml_to_structuredhtml(cnxml)
     except libxml2.parserError:
         conversionerror = traceback.format_exc()
 
@@ -620,8 +620,8 @@ def save_cnxml(save_dir, cnxml, files):
     # available from python 2.7
     # TODO: Do a filesize check xxxx
     if conversionerror is None:
-        save_and_backup_file(save_dir, 'index.html', htmlpreview)
-        save_zip(save_dir, cnxml, htmlpreview, files)
+        save_and_backup_file(save_dir, 'index.html', structuredhtml)
+        save_zip(save_dir, cnxml, structuredhtml, files)
     else:
         save_zip(save_dir, cnxml, None, files)
         raise ConversionError(conversionerror)
