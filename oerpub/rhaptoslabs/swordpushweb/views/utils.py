@@ -22,7 +22,7 @@ from pyramid.threadlocal import get_current_registry
 from rhaptos.cnxmlutils.validatecnxml import validate
 from oerpub.rhaptoslabs import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.errors import ConversionError
-from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
+from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_structuredhtml
 
 current_dir = os.path.dirname(__file__)
 ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
@@ -610,7 +610,7 @@ def save_cnxml(save_dir, cnxml, files):
     # we generate the preview and save the error
     conversionerror = None
     try:
-        htmlpreview = cnxml_to_htmlpreview(cnxml)
+        htmlpreview = cnxml_to_structuredhtml(cnxml)
     except libxml2.parserError:
         conversionerror = traceback.format_exc()
 
