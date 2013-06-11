@@ -12,6 +12,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from oerpub.rhaptoslabs.sword2cnx import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.languages import languages
+
 from choose import save_cnxml
 from utils import get_metadata_from_repo
 from utils import ZIP_PACKAGING, create_module_in_2_steps
@@ -168,6 +169,19 @@ class Metadata_View(BaseHelper):
             tmp_list.append(details)
             tmp_links[category] = tmp_list
         return tmp_list
+
+    def update_cnxml(self, request, zip_file, metadata=None):
+        # retrieve the cnxml from the zip file on the server
+        # add feature feature links to cnxml (later we will want to add metadata as well)
+        # return the updated cnxml
+        zip_cnxml_file = get_cnxml_from_zipfile(zip_file)
+        updated_cnxml = "\n".join(zip_cnxml_file.readlines())
+        structure = peppercorn.parse(request.POST.items())
+        if structure.has_key('featuredlinks'):
+            featuredlinks = build_featured_links(structure)
+            if featuredlinks:
+                updated_cnxml = add_featuredlinks_to_cnxml(zip_cnxml_file, featuredlinks)
+        return updated_cnxml
 
     def add_featured_links(self, request, zip_file, save_dir):
         structure = peppercorn.parse(request.POST.items())
@@ -362,9 +376,13 @@ class Metadata_View(BaseHelper):
                 with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
                     # Create the metadata entry
                     metadata_entry = self.get_metadata_entry(form, session)
-                    self.featured_links = self.add_featured_links(request,
-                                                                  zip_file,
-                                                                  save_dir)
+                    title = form.data['title']
+                    # get the cnxml file from zip and update it
+                    updated_cnxml = self.update_cnxml(request, zip_file)
+                    # write cnxml et al to server and zip filename
+                    files = get_files_from_zipfile(zip_file)
+                    save_cnxml(save_dir, updated_cnxml, files, title=title)
+
                     if self.target_module_url:
                         # this is an update not a create
                         deposit_receipt = self.update_module(
