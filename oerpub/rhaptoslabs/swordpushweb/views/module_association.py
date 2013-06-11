@@ -29,7 +29,7 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_zip,
     ConversionError)
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import \
-    cnxml_to_htmlpreview, cnxml_to_structuredhtml
+    cnxml_to_structuredhtml, structuredhtml_to_htmlpreview
 
 
 
@@ -125,7 +125,7 @@ class Module_Association_View(BaseHelper):
         try:
             structuredhtml = cnxml_to_structuredhtml(cnxml)
             save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
-            htmlpreview    = cnxml_to_htmlpreview(cnxml)
+            htmlpreview    = structuredhtml_to_htmlpreview(structuredhtml)
             save_and_backup_file(save_dir, 'index.html', htmlpreview)
             files = get_files(save_dir)
             save_zip(save_dir, cnxml, structuredhtml, files)

@@ -26,7 +26,7 @@ from rhaptos.cnxmlutils.validatecnxml import validate
 from oerpub.rhaptoslabs import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.errors import ConversionError
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import \
-  cnxml_to_structuredhtml, cnxml_to_htmlpreview
+  cnxml_to_structuredhtml, structuredhtml_to_htmlpreview
 
 current_dir = os.path.dirname(__file__)
 ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
@@ -566,7 +566,7 @@ def update_html(cnxml, title, metadata):
         
     try:
         structuredhtml = cnxml_to_structuredhtml(cnxml)
-        previewhtml    = cnxml_to_htmlpreview(cnxml)
+        previewhtml    = structuredhtml_to_htmlpreview(structuredhtml)
         conversion_error = None
     except libxml2.parserError:
         structuredhtml = None
