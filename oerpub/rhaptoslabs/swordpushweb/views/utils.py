@@ -584,14 +584,7 @@ def update_html(cnxml, title, metadata):
                     <html><xsl:copy-of select="@*"/>
                     <head>
                       <title>
-                        <xsl:choose>
-                          <xsl:when test="head/title">
-                            <xsl:apply-templates select="head/title"/>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:text>$user_supplied_title</xsl:text>
-                          </xsl:otherwise>
-                        </xsl:choose>
+                        $title
                       </title>
                       <link rel="stylesheet" type="text/css" href="oerpub.css" />
                       <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
@@ -606,6 +599,7 @@ def update_html(cnxml, title, metadata):
                         },
                         AsciiMath: { noErrors: { disabled: true } }
                       });</script>
+                      $meta
                     </head>
                     <xsl:apply-templates select="node()[not(self::head)]" />
                     </html>
@@ -623,11 +617,27 @@ def update_html(cnxml, title, metadata):
                     <xsl:copy><xsl:apply-templates select="@*|node()"/></xsl:copy>
                 </xsl:template>
               </xsl:stylesheet>""")
-        title = cgi.escape(title)
-        xsl = xsl_template.substitute(user_supplied_title=title)
+
+        # small demostration how metadata can not placed into html/head
+        if title is None:
+            title = """<xsl:apply-templates select="head/title"/>"""
+            meta = ""
+	else:
+	  title = cgi.escape(title)
+	  meta = Template("""
+              <link rel="schema.MD" href="http://cnx.rice.edu/mdml" />
+	      <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+              <link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
+              <meta name="title" content="$title" />
+              <meta name="MD:title" content="$title" />
+              <meta name="DC:title" content="$title" />
+              <meta itemscope="" itemtype="http://schema.org/CreativeWork" 
+                  itemprop="name" content="$title "/>
+	      """).substitute(title=title)
+
+        xsl = xsl_template.substitute(title=title, meta=meta)
         xslt = etree.XML(xsl)
         structuredhtml = str(etree.XSLT(xslt)(tree))
-        
     return previewhtml, structuredhtml, conversion_error
 
 def validate_cnxml(cnxml):
