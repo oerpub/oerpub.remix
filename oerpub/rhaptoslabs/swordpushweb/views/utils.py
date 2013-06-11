@@ -672,7 +672,7 @@ def save_cnxml(save_dir, cnxml, files, title=None, metadata=None):
         save_zip(save_dir, cnxml, structuredhtml, files)
     else:
         save_zip(save_dir, cnxml, None, files)
-        raise ConversionError(conversionerror)
+        raise ConversionError(conversion_error)
 
 def render_conversionerror(request, error):
     templatePath = 'templates/conv_error.pt'
