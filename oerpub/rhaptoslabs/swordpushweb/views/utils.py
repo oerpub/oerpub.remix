@@ -618,22 +618,22 @@ def update_html(cnxml, title, metadata):
                 </xsl:template>
               </xsl:stylesheet>""")
 
-        # small demostration how metadata can not placed into html/head
+        # small demonstration how metadata can not placed into html/head
         if title is None:
             title = """<xsl:apply-templates select="head/title"/>"""
             meta = ""
-	else:
-	  title = cgi.escape(title)
-	  meta = Template("""
+        else:
+            title = cgi.escape(title)
+            meta = Template("""
               <link rel="schema.MD" href="http://cnx.rice.edu/mdml" />
-	      <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+              <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
               <link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
               <meta name="title" content="$title" />
               <meta name="MD:title" content="$title" />
               <meta name="DC:title" content="$title" />
               <meta itemscope="" itemtype="http://schema.org/CreativeWork" 
                   itemprop="name" content="$title "/>
-	      """).substitute(title=title)
+              """).substitute(title=title)
 
         xsl = xsl_template.substitute(title=title, meta=meta)
         xslt = etree.XML(xsl)
