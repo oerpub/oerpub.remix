@@ -1,5 +1,3 @@
-import MySQLdb as mdb
-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
@@ -17,17 +15,20 @@ def google_oauth_callback(request):
     oauth.authorize_request_token(request.session['saved_request_token'],url)
     oauth.get_access_token()
     session = request.session
-    connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
     oauth_token =  oauth.get_token_key()
     oauth_secret = oauth.get_token_secret()
-    query = "INSERT INTO user(username,email,oauth_token,oauth_secret) VALUES("+"'"+session['username']+"'"+","+"'test@gmail.com'"+","+"'"+oauth_token+"'"+","+"'"+oauth_secret+"'"+")"
-    with connection:
-        cursor = connection.cursor()
-        cursor.execute(query)
-    connection.close()
+
+    session['slideshare_oauth'] = {
+        'oauth_token': oauth_token,
+        'oauth_secret': oauth_secret
+    }
+
     guploader = GooglePresentationUploader()
-    guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)
+    guploader.authentincate_client_with_oauth2(oauth_token, oauth_secret)
     upload_to_gdocs = guploader.upload(session['original-file-path'])
+    # Hint, tricky code here, get_first_revision_feed persist something on
+    # guploader that is needed for the call to publish_presentation_on_web,
+    # I'm not entering that rabit hole today!
     guploader.get_first_revision_feed()
     guploader.publish_presentation_on_web()
     resource_id = guploader.get_resource_id().split(':')[1]
