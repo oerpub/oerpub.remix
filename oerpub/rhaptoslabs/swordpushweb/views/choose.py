@@ -40,11 +40,9 @@ from oerpub.rhaptoslabs.swordpushweb import convert as JOD
 from oerpub.rhaptoslabs.swordpushweb import jod_check
 from oerpub.rhaptoslabs.swordpushweb.interfaces import IWorkflowSteps
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
-    save_zip,
     clean_cnxml,
     save_cnxml,
     validate_cnxml,
-    check_login,
     escape_system,
     add_directory_to_zip,
     render_conversionerror,
@@ -657,9 +655,8 @@ class GoogleDocProcessor(BaseFormProcessor):
 
                 return self.process_gdocs_resource(html, title, form)
 
-        # Doc is not public or could not import. Redirect google oath. Because
-        # we overrode create_save_dir, we will not leave behind any crud
-        # because of this.  This will eventually redirect to callback() below.
+        # Doc is not public or could not import. Redirect google oath.
+        # This will eventually redirect to callback() below.
         return self.request.registry.velruse_providers['google'].login(
             self.request, docid=gdocs_resource_id)
 
