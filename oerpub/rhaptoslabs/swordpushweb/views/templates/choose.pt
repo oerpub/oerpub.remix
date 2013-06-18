@@ -243,8 +243,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
 <iframe id="login-frame" class="hidden" src="${request.route_url('cnxlogin')}"
     frameborder="0" marginheight="0" marginwidth="0" noresize scrolling="auto">
 </iframe>
-<b tal:content="request.session.previous_upload_dir|nothing">XXX</b>
-<iframe tal:condition="request.session.previous_upload_dir|nothing"
+<b tal:content="request.session.previous_save_dir|nothing">XXX</b>
+<iframe tal:condition="request.session.previous_save_dir|nothing"
         src="${request.route_url('download_zip')}"
         style="visibility: hidden"></iframe>
 

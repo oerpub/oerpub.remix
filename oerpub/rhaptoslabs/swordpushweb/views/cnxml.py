@@ -20,7 +20,7 @@ class CnxmlSchema(formencode.Schema):
 def cnxml_view(request):
     check_login(request)
     form = Form(request, schema=CnxmlSchema)
-    save_dir = os.path.join(request.registry.settings['transform_dir'], request.session['upload_dir'])
+    save_dir = request.session['login'].saveDir
     cnxml_filename = os.path.join(save_dir, 'index.cnxml')
     transformerror = request.session.get('transformerror')
 

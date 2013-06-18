@@ -14,8 +14,7 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import append_zip, check_login
 def upload_dnd(request):
     check_login(request)
 
-    save_dir = os.path.join(request.registry.settings['transform_dir'],
-        request.session['upload_dir'])
+    save_dir = request.session['login'].saveDir
 
     # userfn, if browser does not support naming of blobs, this might be
     # 'blob', so we need to further uniquefy it.

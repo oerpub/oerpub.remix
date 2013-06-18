@@ -364,10 +364,7 @@ class Metadata_View(BaseHelper):
                 self.update_session(session, self.remember_fields, form)
 
                 # Reconstruct the path to the saved files
-                save_dir = os.path.join(
-                    request.registry.settings['transform_dir'],
-                    session['upload_dir']
-                )
+                save_dir = request.session['login'].saveDir
 
                 # Create a connection to the sword service
                 conn = self.get_connection()

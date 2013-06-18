@@ -57,10 +57,10 @@ class PreviewView(BaseHelper):
         return {
             'body_base': '%s%s/' % (
                          request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                         request.session['upload_dir']),
+                         request.session['login'].saveDirName),
             'body_url': '%s%s/index.html'% (
                          request.static_url('oerpub.rhaptoslabs.swordpushweb:transforms/'),
-                         request.session['upload_dir']),
+                         request.session['login'].saveDirName),
             'form': FormRenderer(form),
             'editor': EditorHelper(request),
             'view': self,

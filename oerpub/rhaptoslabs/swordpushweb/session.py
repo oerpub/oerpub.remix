@@ -1,5 +1,12 @@
+import os
+import tempfile
+from pyramid.threadlocal import get_current_registry
+
 class Session(object):
     """ Base class for oerpub sessions. """
+
+    def __init__(self):
+        self._saveDir = None
 
     @property
     def canImportModule(self):
@@ -24,6 +31,26 @@ class Session(object):
     def setSelectedWorkspace(self, ws):
         raise NotImplementedError, 'setSelectedWorkspace'
 
+    def newSaveDir(self):
+        self._saveDir = None
+
+    @property
+    def saveDir(self):
+        """ Create a save dir for this session the first time this property
+            is accessed. """
+        if self._saveDir is None:
+            tmp = get_current_registry().settings.transform_dir
+            self._saveDir = tempfile.mkdtemp(dir=tmp)
+        return self._saveDir
+
+    @property
+    def saveDirName(self):
+        return os.path.basename(self.saveDir)
+
+    @property
+    def hasData(self):
+        return self._saveDir is not None
+
 class AnonymousSession(Session):
     """ Class for anonymous users. """
 
@@ -41,6 +68,7 @@ class CnxSession(Session):
     """ Class that stores information about a cnx user's login. """
     def __init__(self, username, password, service_document_url,
             workspace_title, sword_version, maxuploadsize, collections):
+        super(CnxSession, self).__init__()
         self.username = username
         self.password = password
         self.service_document_url = service_document_url

@@ -50,7 +50,7 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     LATEX_PACKAGING,
     UNKNOWN_PACKAGING,
     remove_save_dir,
-    create_save_dir,)
+    get_save_dir,)
 from oerpub.rhaptoslabs.swordpushweb.errors import (
     ConversionError,
     UnknownPackagingError)
@@ -103,14 +103,17 @@ class Choose_Document_Source(BaseHelper):
         session = request.session
 
         # For anonymous users who are restarting, we want to delay the clearing
-        # of the session. We store the previous_upload_dir on the session, we
+        # of the session. We store the previous_save_dir on the session, we
         # will use that later to create a download.
+        sd = get_save_dir(request)
         if not request.session['login'].canUploadModule and \
                 self.request.params.get('restart', None) is not None and \
-                'upload_dir' in session:
-            session['previous_upload_dir'] = session['upload_dir']
+                request.session['login'].hasData:
+            session['previous_save_dir'] = session['login'].saveDir
         else:
             remove_save_dir(request)
+
+        session['login'].newSaveDir()
         self.clear_session(request, session)
     
     def clear_session(self, request, session):
@@ -121,7 +124,6 @@ class Choose_Document_Source(BaseHelper):
                 'source',
                 'target',
                 'module_url',
-                'upload_dir',
                 'source_module_url',
                 'target_module_url',
                 'preview-no-cache',]
@@ -204,34 +206,9 @@ class BaseFormProcessor(object):
         self.message = 'The file was successfully converted.'
         request.session['source'] = 'undefined'
 
-        # Leave these empty at first
-        self._temp_dir_name = None
-        self._save_dir = None
-        self._upload_dir = None
-
-    def _tmp(self):
-        """ This is called by the temp_dir_name, upload_dir and save_dir
-            properties below. The idea is that you allocate temporary space
-            the second one of these properties is touched and no sooner. """
-        if self._upload_dir is None:
-            self._temp_dir_name, self._save_dir = self.create_save_dir(
-                self.request)
-            self._upload_dir = self._temp_dir_name
-            self.request.session['upload_dir'] = self._upload_dir
-        return (self._upload_dir, self._save_dir)
-
-    @property
-    def temp_dir_name(self):
-        return self.upload_dir
-
-    @property
-    def upload_dir(self):
-        return self._tmp()[0]
-
     @property
     def save_dir(self):
-        return self._tmp()[1]
-        
+        return self.request.session['login'].saveDir
 
     @classmethod
     def save_original_file(self, filename, input_file):
@@ -240,13 +217,10 @@ class BaseFormProcessor(object):
         shutil.copyfileobj(input_file, saved_file)
         saved_file.close()
 
-    def create_save_dir(self, request):
-        return create_save_dir(request)
-
     def write_traceback_to_zipfile(self, traceback, form=None):
         # Record traceback
 
-        if self._temp_dir_name is None:
+        if not self.request.session['login'].hasData:
             # No files to zip just yet, just return
             return
 
@@ -256,8 +230,7 @@ class BaseFormProcessor(object):
         # get the path to the error zip file
         zip_filename = os.path.join(
             self.request.registry.settings['errors_dir'],
-            self._temp_dir_name + '.zip'
-        )
+            os.path.basename(self.save_dir) + '.zip')
 
         # Zip up error report, form data, uploaded file (if any)  and
         # temporary transform directory
@@ -267,9 +240,8 @@ class BaseFormProcessor(object):
             zip_archive.writestr("info.txt", info)
 
         basePath = self.request.registry.settings['transform_dir']
-        add_directory_to_zip(self._temp_dir_name,
-                             zip_archive,
-                             basePath=basePath)
+        add_directory_to_zip(os.path.basename(self.save_dir), zip_archive,
+                             basePath=os.path.dirname(self.save_dir))
 
     def get_commit_hash(self):
         try:
@@ -732,9 +704,6 @@ class PresentationProcessor(BaseFormProcessor):
         self.original_filename = \
             os.path.join(self.save_dir, self.uploaded_filename)
         self.save_original_file()
-    
-    def create_save_dir(self, request):
-        return create_save_dir(request, registry_key='slideshare_import_dir')
     
     def save_original_file(self):
         saved_file = open(self.original_filename, 'wb')

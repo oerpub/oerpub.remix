@@ -21,9 +21,8 @@ def preview_save(request):
     if isinstance(html, unicode):
         html = html.encode('ascii', 'xmlcharrefreplace')        
 
-    save_dir = os.path.join(request.registry.settings['transform_dir'],
-        request.session['upload_dir'])
     # Save new html file from preview area
+    save_dir = request.session['login'].saveDir
     save_and_backup_file(save_dir, 'index.html', html)
 
     conversionerror = ''
