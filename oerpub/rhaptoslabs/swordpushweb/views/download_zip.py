@@ -5,7 +5,7 @@ import shutil
 from pyramid.response import Response
 from pyramid.view import view_config
 
-from utils import check_login
+from utils import check_login, make_zip
 
 @view_config(route_name='download_zip',
     http_cache=(0, {'no-store': True, 'no-cache': True, 'must-revalidate': True}))
@@ -23,12 +23,15 @@ def download_zip(request):
     save_dir = login.hasData and login.saveDir or previous_upload_dir
     assert save_dir is not None
 
-    zipfile = open(os.path.join(save_dir, 'upload.zip'), 'rb')
-    stat = os.fstat(zipfile.fileno())
+    zipfile = make_zip(save_dir, login.files)
+
+    zipfile.seek(0, os.SEEK_END)
+    res.content_length = zipfile.tell()
+    zipfile.seek(0)
+
     res.app_iter = iter(lambda: zipfile.read(4096), '')
-    res.content_length = stat.st_size
-    res.last_modified = datetime.datetime.utcfromtimestamp(
-        stat.st_mtime).strftime('%a, %d %b %Y %H:%M:%S GMT')
+    res.last_modified = datetime.datetime.now().strftime(
+        '%a, %d %b %Y %H:%M:%S GMT')
 
     # If there is a previous_upload_dir, kill it. This allows the user
     # one final chance to download it even if the rest of the session has been

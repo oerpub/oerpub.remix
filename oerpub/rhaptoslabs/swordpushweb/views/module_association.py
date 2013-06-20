@@ -20,11 +20,9 @@ from utils import load_config
 from helpers import BaseHelper
 from utils import (
     get_files,
-    get_save_dir,
-    extract_to_save_dir)
+    get_save_dir)
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_and_backup_file,
-    save_zip,
     ConversionError)
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import \
     cnxml_to_structuredhtml, structuredhtml_to_htmlpreview
@@ -111,7 +109,18 @@ class Module_Association_View(BaseHelper):
                                        packaging = 'zip')
          
         save_dir = request.session['login'].saveDir
-        extract_to_save_dir(zip_file, save_dir)
+        for zinfo in zip_file.infolist():
+            content = zip_file.read(zinfo)
+            filename = zinfo.filename.split('/')[-1]
+            if filename in ('index.html', 'index.cnxml'):
+                # Don't register index files
+                fp = open(os.path.join(save_dir, filename), 'wb')
+                try:
+                    fp.write(content)
+                finally:
+                    fp.close()
+                continue
+            self.request.session['login'].addFile(filename, content)
 
         cnxml_file = open(os.path.join(save_dir, 'index.cnxml'), 'rb')
         cnxml = cnxml_file.read()
@@ -122,8 +131,6 @@ class Module_Association_View(BaseHelper):
             save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
             htmlpreview    = structuredhtml_to_htmlpreview(structuredhtml)
             save_and_backup_file(save_dir, 'index.html', htmlpreview)
-            files = get_files(save_dir)
-            save_zip(save_dir, cnxml, structuredhtml, files)
         except libxml2.parserError:
             conversionerror = traceback.format_exc()
             raise ConversionError(conversionerror)

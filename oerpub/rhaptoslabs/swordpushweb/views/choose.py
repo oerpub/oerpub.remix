@@ -315,8 +315,7 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
                 self.set_target('new')
                 # save empty cnxml and html files
                 cnxml = self.empty_cnxml()
-                files = []
-                save_cnxml(self.save_dir, cnxml, files)
+                save_cnxml(self.save_dir, cnxml)
             
             elif form.data.get('existingmodule'):
                 self.set_source('existingmodule')
@@ -427,12 +426,20 @@ class ZipFileProcessor(BaseFormProcessor):
         try:
             self.zip_archive = zipfile.ZipFile(zip_filename, 'r')
 
-            # Unzip into transform directory
-            self.zip_archive.extractall(path=self.save_dir)
-
-            # Rename ZIP file so that the user can download it again
-            os.rename(zip_filename,
-                      os.path.join(self.save_dir, 'upload.zip'))
+            # Unzip into transform directory and register all files with
+            # session
+            for zinfo in self.zip_archive.infolist():
+                content = self.zip_archive.read(zinfo)
+                filename = zinfo.filename.split('/')[-1]
+                if filename in ('index.html', 'index.cnxml'):
+                    # Don't register index files
+                    fp = open(os.path.join(self.save_dir, filename), 'wb')
+                    try:
+                        fp.write(content)
+                    finally:
+                        fp.close()
+                    continue
+                self.request.session['login'].addFile(filename, content)
 
             # Read CNXML
             with open(os.path.join(self.save_dir, 'index.cnxml'), 'rt') as fp:
@@ -451,7 +458,7 @@ class ZipFileProcessor(BaseFormProcessor):
 
         except Exception:
             tb = traceback.format_exc()
-            self.write_traceback_to_zipfile(tb, form)
+            self.write_traceback_to_zipfile(tb)
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
@@ -476,7 +483,9 @@ class LatexProcessor(BaseFormProcessor):
             cnxml, objects = latex_to_cnxml(latex_archive, self.original_filename)
 
             cnxml = clean_cnxml(cnxml)
-            save_cnxml(self.save_dir, cnxml, objects.items())
+            save_cnxml(self.save_dir, cnxml)
+            for name, content in objects.items():
+                self.request.session['login'].addFile(name, content)
             validate_cnxml(cnxml)
 
         except ConversionError as e:
@@ -517,7 +526,9 @@ class OfficeDocumentProcessor(BaseFormProcessor):
             tree, files, errors = transform(odt_filename)
             cnxml = clean_cnxml(etree.tostring(tree))
 
-            save_cnxml(self.save_dir, cnxml, files.items())
+            save_cnxml(self.save_dir, cnxml)
+            for name, content in files.items():
+                self.request.session['login'].addFile(name, content)
 
             # now validate with jing
             validate_cnxml(cnxml)
@@ -647,8 +658,7 @@ class GoogleDocProcessor(BaseFormProcessor):
 
     def process_gdocs_resource(self, html, title, form=None):
         try:
-            filename = self._process_gdocs_resource(
-                self.save_dir, html)
+            filename = self._process_gdocs_resource(html)
         except ConversionError as e:
             return render_conversionerror(self.request, e.msg)
 
@@ -666,12 +676,14 @@ class GoogleDocProcessor(BaseFormProcessor):
         self.request.session.flash(self.message)
         return HTTPFound(location=self.request.route_url(self.nextStep()))
 
-    @classmethod
-    def _process_gdocs_resource(klass, save_dir, html):
+    def _process_gdocs_resource(self, html):
         # Transformation and get images
         cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
         cnxml = clean_cnxml(cnxml)
-        save_cnxml(save_dir, cnxml, objects.items())
+        save_cnxml(self.save_dir, cnxml)
+        for name, content in objects.items():
+            self.request.session['login'].addFile(name, content)
+
         validate_cnxml(cnxml)
         return "Google Document"
 
@@ -816,7 +828,9 @@ class URLProcessor(BaseFormProcessor):
                 self.request.session['title'] = html_title
 
                 cnxml = clean_cnxml(cnxml)
-                save_cnxml(self.save_dir, cnxml, objects.items())
+                save_cnxml(self.save_dir, cnxml)
+                for name, content in objects.items():
+                    self.request.session['login'].addFile(name, content)
 
                 # Keep the info we need for next uploads.  Note that
                 # this might kill the ability to do multiple tabs in

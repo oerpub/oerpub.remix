@@ -58,24 +58,7 @@ def get_files(save_dir, file_filter=TEMP_FILES_RE):
         files.append([name, content])
     return files
 
-def extract_to_save_dir(zip_file, save_dir):
-    if not zip_file:
-        return
-    
-    tmp_dir = os.path.join(save_dir, 'tmp')
-    for zinfo in zip_file.infolist():
-        zip_file.extract(zinfo, tmp_dir)
-        fileparts = zinfo.filename.split('/')
-        src = os.path.join(tmp_dir, zinfo.filename)
-        dest = os.path.join(save_dir, fileparts[-1])
-        if os.path.exists(dest):
-            os.remove(src)
-        else:
-            shutil.move(src, dest)
-    shutil.rmtree(tmp_dir, ignore_errors=True)
-
-def create_module_in_2_steps(form, connection, metadata_entry, zip_file, save_dir):
-    zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
+def create_module_in_2_steps(form, connection, metadata_entry, zip_file):
     data = zip_file.read()
     deposit_receipt = connection.create(
         col_iri = form.data['workspace'],
@@ -89,8 +72,6 @@ def create_module_in_2_steps(form, connection, metadata_entry, zip_file, save_di
                                         filename = 'upload.zip',
                                         dr = deposit_receipt,
                                         in_progress=True)
-    
-    zip_file.close()
     return deposit_receipt
 
 def pretty_print_dict(x, indent=0):
@@ -272,33 +253,12 @@ def add_directory_to_zip(directory, zipFile, basePath=None):
             add_directory_to_zip(pathToFile[basePathLength:], zipFile, basePath=basePath)
 
 
-def get_cnxml_from_zipfile(zip_file):
-    zf = zipfile.ZipFile(zip_file, 'r')
-    cnxml = zf.open('index.cnxml')
-    zf.close()
-    return cnxml
-
-
 def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
-    root = lxml.etree.fromstringlist(cnxml.readlines())
+    root = lxml.etree.fromstring(cnxml)
     featuredlinks = ''.join(featuredlinks)
     featuredlinks_element = lxml.etree.fromstring(featuredlinks)
     root.insert(1, featuredlinks_element) 
     return lxml.etree.tostring(root)
-
-
-def get_files_from_zipfile(zip_file):
-    files = []
-
-    zip_archive = zipfile.ZipFile(zip_file, 'r')
-    for filename in zip_archive.namelist():
-        if filename in ['index.cnxml', 'index.html', 'index.structured.html', 'oerpub.css']:
-            continue
-        fp = zip_archive.open(filename, 'r')
-        files.append((filename, fp.read()))
-        fp.close()
-
-    return files
 
 
 def build_featured_links(data):
@@ -530,33 +490,28 @@ class FeaturedLink(object):
     def parse_cnxversion(self, element):
         return element.attrib.get('cnxversion', '')
 
-def append_zip(zipfilename, filename, content):
-    """ Append files to a zip file. files is a list of tuples where each tuple
-        is a (filename, content) pair. """
-    zip_archive = zipfile.ZipFile(zipfilename, 'a')
-    zip_archive.writestr(filename, content)
-    zip_archive.close()
+def make_zip(save_dir, files):
+    """ Create a buffer in memory with the zip content of save_dir.
+        In addition to the files mentioned in files, we also include index.html
+        and index.cnxml. """
 
-def save_zip(save_dir, cnxml, html, files):
     ram = cStringIO.StringIO()
     zip_archive = zipfile.ZipFile(ram, 'w')
 
-    zip_archive.writestr('index.cnxml', cnxml)
+    def addfile(src, dest=None):
+        if dest is None:
+            dest = src
+        zip_archive.write(os.path.join(save_dir, src), dest)
 
-    if html is not None:
-        zip_archive.writestr('index.html', html)
-        # Add the css file to zip
-        registry = get_current_registry()
-        f1 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_metacontent.css')
-        f2 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_content_in_oerpub.css')
-        zip_archive.writestr('oerpub.css', open(f1, 'r').read() + open(f2, 'r').read())
+    addfile('index.cnxml')
+    try:
+        addfile('index.structured.html', 'index.html')
+    except OSError:
+        pass
+    for f in files:
+        addfile(f)
 
-    for filename, fileObj in files:
-        zip_archive.writestr(filename, fileObj)
-
-    zip_archive.close()
-    zip_filename = os.path.join(save_dir, 'upload.zip')
-    save_and_backup_file(save_dir, zip_filename, ram.getvalue(), mode='wb')
+    return ram
 
 def update_html(cnxml, title, metadata):
     # convert cnxml to structured, canonical html5
@@ -645,7 +600,7 @@ def validate_cnxml(cnxml):
     if not valid:
         raise ConversionError(log)
 
-def save_cnxml(save_dir, cnxml, files, title=None, metadata=None):
+def save_cnxml(save_dir, cnxml, title=None, metadata=None):
     # write CNXML output to server work directory
     save_and_backup_file(save_dir, 'index.cnxml', cnxml)
     
@@ -656,22 +611,7 @@ def save_cnxml(save_dir, cnxml, files, title=None, metadata=None):
         save_and_backup_file(save_dir, 'index.html',            previewhtml)
         save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
 
-    # write files
-    for filename, content in files:
-        filename = os.path.join(save_dir, filename)
-        f = open(filename, 'wb') # write binary, important!
-        f.write(content)
-        f.close()
-
-    # Zip up all the files. This is done now, since we have all the files
-    # available, and it also allows us to post a simple download link.
-    # Note that we cannot use zipfile as context manager, as that is only
-    # available from python 2.7
-    # TODO: Do a filesize check xxxx
-    if conversion_error is None:
-        save_zip(save_dir, cnxml, structuredhtml, files)
-    else:
-        save_zip(save_dir, cnxml, None, files)
+    if conversion_error is not None:
         raise ConversionError(conversion_error)
 
 def render_conversionerror(request, error):

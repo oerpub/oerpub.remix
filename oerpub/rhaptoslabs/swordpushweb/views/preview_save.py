@@ -10,9 +10,8 @@ from rhaptos.cnxmlutils.utils import aloha_to_etree, etree_to_valid_cnxml
 from choose import validate_cnxml
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_and_backup_file,
-    save_zip,
     ConversionError)
-from utils import check_login, get_files_from_zipfile
+from utils import check_login
 
 @view_config(route_name='preview_save')
 def preview_save(request):
@@ -51,8 +50,8 @@ def preview_save(request):
     if cnxml is not None:
         save_and_backup_file(save_dir, 'index.cnxml', cnxml)
         save_and_backup_file(save_dir, 'index.structured.html', canonical_html)
-        files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
-        save_zip(save_dir, cnxml, canonical_html, files)
+        files = request.session['login'].files
+ 
         try:
             validate_cnxml(cnxml)
         except ConversionError as e:

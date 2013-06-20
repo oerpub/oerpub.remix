@@ -7,6 +7,7 @@ class Session(object):
 
     def __init__(self):
         self._saveDir = None
+        self._files = []
 
     @property
     def canImportModule(self):
@@ -33,11 +34,13 @@ class Session(object):
 
     def newSaveDir(self):
         self._saveDir = None
+        self._files = []
 
     @property
     def saveDir(self):
         """ Create a save dir for this session the first time this property
-            is accessed. """
+            is accessed. This is where we will store temporary files part
+            of this editing session. """
         if self._saveDir is None:
             tmp = get_current_registry().settings.transform_dir
             self._saveDir = tempfile.mkdtemp(dir=tmp)
@@ -50,6 +53,22 @@ class Session(object):
     @property
     def hasData(self):
         return self._saveDir is not None
+
+    def addFile(self, filename, content):
+        """ Add a file to our editing area, and keep track of it. """
+        sd = self.saveDir
+        fn = os.path.join(sd, filename)
+        fp = open(fn, 'wb')
+        try:
+            fp.write(content)
+        finally:
+            fp.close()
+            if not filename in self._files:
+                self._files.append(filename)
+
+    @property
+    def files(self):
+        return self._files
 
 class AnonymousSession(Session):
     """ Class for anonymous users. """

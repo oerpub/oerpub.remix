@@ -148,7 +148,7 @@ def enhance(request):
         os.mkdir(save_dir)
         request.session['upload_dir'] = temp_dir_name
         cnxml = clean_cnxml(cnxml)
-        save_cnxml(save_dir,cnxml,[])
+        save_cnxml(save_dir,cnxml)
         return HTTPFound(location=request.route_url('metadata'))
         
         

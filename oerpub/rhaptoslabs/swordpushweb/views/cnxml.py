@@ -7,8 +7,8 @@ from pyramid.view import view_config
 from pyramid_simpleform.renderers import FormRenderer
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
-from choose import save_cnxml, validate_cnxml
-from utils import check_login, get_files_from_zipfile, clean_cnxml
+from utils import save_cnxml, validate_cnxml
+from utils import check_login, clean_cnxml
 
 
 class CnxmlSchema(formencode.Schema):
@@ -32,21 +32,8 @@ def cnxml_view(request):
         if isinstance(cnxml, unicode):
             cnxml = cnxml.encode('ascii', 'xmlcharrefreplace')        
 
-        # get the list of files from upload.zip if it exists
-        files = []
-        zip_filename = os.path.join(save_dir, 'upload.zip')
-        if os.path.exists(zip_filename):
-            zip_archive = zipfile.ZipFile(zip_filename, 'r')
-            for filename in zip_archive.namelist():
-                if filename == 'index.cnxml':
-                    continue
-                fp = zip_archive.open(filename, 'r')
-                files.append((filename, fp.read()))
-                fp.close()
-
         try:
-            files = get_files_from_zipfile(os.path.join(save_dir, 'upload.zip'))
-            save_cnxml(save_dir, cnxml, files)
+            save_cnxml(save_dir, cnxml)
             validate_cnxml(cnxml)
         except ConversionError as e:
             return render_conversionerror(request, e.msg)

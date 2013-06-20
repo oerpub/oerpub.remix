@@ -16,8 +16,9 @@ from oerpub.rhaptoslabs.swordpushweb.languages import languages
 from choose import save_cnxml
 from utils import get_metadata_from_repo
 from utils import ZIP_PACKAGING, create_module_in_2_steps
-from utils import get_cnxml_from_zipfile, add_featuredlinks_to_cnxml
-from utils import get_files_from_zipfile, load_config, build_featured_links
+from utils import add_featuredlinks_to_cnxml
+from utils import load_config, build_featured_links
+from utils import make_zip
 from helpers import BaseHelper
 
 class MetadataSchema(formencode.Schema):
@@ -170,30 +171,18 @@ class Metadata_View(BaseHelper):
             tmp_links[category] = tmp_list
         return tmp_list
 
-    def update_cnxml(self, request, zip_file, metadata=None):
+    def update_cnxml(self, request, cnxml_file, metadata=None):
         # retrieve the cnxml from the zip file on the server
         # add feature feature links to cnxml (later we will want to add metadata as well)
         # return the updated cnxml
-        zip_cnxml_file = get_cnxml_from_zipfile(zip_file)
-        updated_cnxml = "\n".join(zip_cnxml_file.readlines())
-        structure = peppercorn.parse(request.POST.items())
-        if structure.has_key('featuredlinks'):
-            featuredlinks = build_featured_links(structure)
-            if featuredlinks:
-                updated_cnxml = add_featuredlinks_to_cnxml(zip_cnxml_file, featuredlinks)
-        return updated_cnxml
+        updated_cnxml = open(cnxml_file).read()
 
-    def add_featured_links(self, request, zip_file, save_dir):
         structure = peppercorn.parse(request.POST.items())
         if structure.has_key('featuredlinks'):
             featuredlinks = build_featured_links(structure)
             if featuredlinks:
-                cnxml = get_cnxml_from_zipfile(zip_file)
-                new_cnxml = add_featuredlinks_to_cnxml(cnxml,
-                                                       featuredlinks)
-                files = get_files_from_zipfile(zip_file)
-                save_cnxml(save_dir, new_cnxml, files)
-        return featuredlinks
+                updated_cnxml = add_featuredlinks_to_cnxml(updated_cnxml, featuredlinks)
+        return updated_cnxml
 
     def create_module_with_atompub_xml(self, conn, collection_iri, entry):
         dr = conn.create(col_iri = collection_iri,
@@ -202,7 +191,7 @@ class Metadata_View(BaseHelper):
         return dr
 
     def update_module(self, save_dir, connection, metadata, target_module_url):
-        zip_file = open(os.path.join(save_dir, 'upload.zip'), 'rb')
+        zip_file = make_zip(save_dir, self.request.session['login'].files)
         
         # We cannot be sure whether the '/sword' will be there or not,
         # so we remove it, which works fine even if it is not there.
@@ -370,32 +359,36 @@ class Metadata_View(BaseHelper):
                 conn = self.get_connection()
 
                 # Send zip file to Connexions through SWORD interface
-                with open(os.path.join(save_dir, 'upload.zip'), 'rb') as zip_file:
-                    # Create the metadata entry
-                    metadata_entry = self.get_metadata_entry(form, session)
-                    title = form.data['title']
-                    # get the cnxml file from zip and update it
-                    updated_cnxml = self.update_cnxml(request, zip_file)
-                    # write cnxml et al to server and zip filename
-                    files = get_files_from_zipfile(zip_file)
-                    save_cnxml(save_dir, updated_cnxml, files, title=title)
+                files = self.request.session['login'].files
+                zip_file = make_zip(save_dir, files)
 
-                    if self.target_module_url:
-                        # this is an update not a create
-                        deposit_receipt = self.update_module(
-                            save_dir, conn, metadata_entry, self.target_module_url)
+                # Create the metadata entry
+                metadata_entry = self.get_metadata_entry(form, session)
+                title = form.data['title']
+
+                # update the cnxml
+                updated_cnxml = self.update_cnxml(request,
+                    os.path.join(save_dir, 'index.cnxml'))
+
+                # write cnxml et al to server and zip filename
+                save_cnxml(save_dir, updated_cnxml, title=title)
+
+                if self.target_module_url:
+                    # this is an update not a create
+                    deposit_receipt = self.update_module(
+                        save_dir, conn, metadata_entry, self.target_module_url)
+                else:
+                    # this is a workaround until I can determine why the 
+                    # featured links don't upload correcly with a multipart
+                    # upload during module creation. See redmine issue 40
+                    # TODO:
+                    # Fix me properly!
+                    if self.featured_links:
+                        deposit_receipt = create_module_in_2_steps(
+                            form, conn, metadata_entry, zip_file)
                     else:
-                        # this is a workaround until I can determine why the 
-                        # featured links don't upload correcly with a multipart
-                        # upload during module creation. See redmine issue 40
-                        # TODO:
-                        # Fix me properly!
-                        if self.featured_links:
-                            deposit_receipt = create_module_in_2_steps(
-                                form, conn, metadata_entry, zip_file, save_dir)
-                        else:
-                            deposit_receipt = self.create_module(
-                                form, conn, metadata_entry, zip_file)
+                        deposit_receipt = self.create_module(
+                            form, conn, metadata_entry, zip_file)
 
                 # Remember to which workspace we submitted
                 session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]

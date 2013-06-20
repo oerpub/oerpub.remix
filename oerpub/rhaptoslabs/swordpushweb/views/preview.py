@@ -11,7 +11,6 @@ from helpers import BaseHelper
 from ..editor import EditorHelper
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_and_backup_file,
-    save_zip,
     ConversionError)
 
 
