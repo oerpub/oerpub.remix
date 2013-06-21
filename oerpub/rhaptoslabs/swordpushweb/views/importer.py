@@ -1,6 +1,4 @@
 import formencode
-import MySQLdb as mdb
-
 from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -29,27 +27,23 @@ def return_slideshare_upload_form(request):
     check_login(request)
     session = request.session
     redirect_to_google_oauth = False
-    if session.has_key('original-file-location'):
-        del session['original-file-location']
+
     form = Form(request, schema=ImporterChoiceSchema)
     response = {'form':FormRenderer(form)}
-    validate_form = form.validate()
-    if validate_form:
+    username = session['login'].username
+    if form.validate():
         original_filename = session['original_filename']
-        upload_to_google = form.data['upload_to_google']
-        upload_to_ss = form.data['upload_to_ss']
-        username = session['login'].username
-        if (upload_to_ss=="true"):
-
-            slideshow_id = upload_to_slideshare("saketkc",original_filename)
+        slideshow_id = None
+        if form.data['importer'] == 'slideshare':
+            slideshow_id = upload_to_slideshare("saketkc", original_filename)
             session['slideshare_id'] = slideshow_id
-        if (upload_to_google == "true"):
-            if is_returning_google_user(username):
-                print "RETURNING USER"
+
+        if form.data['importer'] == 'google':
+            if session.has_key('slideshare_oauth'):
+                # RETURNING USER
                 redirect_to_google_oauth = False
-                oauth_token_and_secret = get_oauth_token_and_secret(username)
-                oauth_token = oauth_token_and_secret["oauth_token"]
-                oauth_secret = oauth_token_and_secret["oauth_secret"]
+                oauth_token = session['slideshare_oauth']["oauth_token"]
+                oauth_secret = session['slideshare_oauth']["oauth_secret"]
                 guploader = GooglePresentationUploader()
                 guploader.authentincate_client_with_oauth2(oauth_token,oauth_secret)
                 guploader.upload(original_filename)
@@ -62,57 +56,26 @@ def return_slideshare_upload_form(request):
                 print "NEW USER"
                 redirect_to_google_oauth = True
                 session['original-file-path'] = original_filename
-        else:
-            print "NO GOOGLE FOUND"
-        username = session['login'].username
+
         uploaded_filename = session['uploaded_filename']
-        slideshare_details = get_details(slideshow_id)
-        slideshare_download_url = get_slideshow_download_url(slideshare_details)
-        session['transcript'] = get_transcript(slideshare_details)
-        cnxml = """<featured-links>
+        if slideshow_id is not None:
+            slideshare_details = get_details(slideshow_id)
+        cnxml = """\
+<featured-links>
   <!-- WARNING! The 'featured-links' section is read only. Do not edit below.
        Changes to the links section in the source will not be saved. -->
     <link-group type="supplemental">
-      <link url="""+ "\"" + uploaded_filename + "\""+""" strength="3">Download the original slides in PPT format</link>
-      <link url="""+ "\"" +slideshare_download_url + "\"" +""" strength="2">SlideShare PPT Download Link</link>
+      <link url="""+ "\"" + uploaded_filename + "\""+""" strength="3">Download the original slides in PPT format</link>"""
+        if slideshow_id is not None:
+            cnxml += """<link url="""+ "\"" + get_slideshow_download_url(slideshare_details) + "\"" +""" strength="2">SlideShare PPT Download Link</link>"""
+        cnxml += """\
     </link-group>
   <!-- WARNING! The 'featured-links' section is read only. Do not edit above.
        Changes to the links section in the source will not be saved. -->
 </featured-links>"""
         session['cnxml'] += cnxml
 
-
-
-        #print deposit_receipt.metadata #.get("dcterms_title")
         if redirect_to_google_oauth:
             raise HTTPFound(location=request.route_url('google_oauth'))
         raise HTTPFound(location=request.route_url('enhance'))
     return {'form' : FormRenderer(form),'conversion_flag': False, 'oembed': False}
-
-
-def is_returning_google_user(username):
-    connection = mdb.connect('localhost', 'root', 'fedora', 'cnx_oerpub_oauth')
-    query = "SELECT * FROM user WHERE username='"+username+"'"
-    print query
-    numrows=0
-    with connection:
-        cursor = connection.cursor()
-        cursor.execute(query)
-        numrows = int(cursor.rowcount)
-    connection.close()
-    if numrows == 0:
-        return False
-    else :
-        return True
-
-
-def get_oauth_token_and_secret(username):
-    try:
-        connection = mdb.connect('localhost', 'root',  'fedora', 'cnx_oerpub_oauth');
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT oauth_token,oauth_secret FROM user WHERE username='"+username+"'")
-            row = cursor.fetchone()
-            return {"oauth_token": row[0],"oauth_secret":row[1]}
-    except mdb.Error, e:
-        print e
