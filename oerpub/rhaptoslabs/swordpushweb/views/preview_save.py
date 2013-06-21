@@ -50,8 +50,6 @@ def preview_save(request):
     if cnxml is not None:
         save_and_backup_file(save_dir, 'index.cnxml', cnxml)
         save_and_backup_file(save_dir, 'index.structured.html', canonical_html)
-        files = request.session['login'].files
- 
         try:
             validate_cnxml(cnxml)
         except ConversionError as e:
