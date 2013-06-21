@@ -2,13 +2,7 @@
 
 <metal:script-slot fill-slot="script-slot">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="/static/toolbar.css"
-          tal:replace="nothing"> <!-- xhtml --></link>
-
-    <script type="text/javascript" src="${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
-    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
-
-    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/choose.js')}"></script>
+<script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/choose.js')}"></script>
 
 <script type="text/javascript">
 
@@ -193,8 +187,8 @@ tal:define="images_url request.static_url('oerpub.rhaptoslabs.swordpushweb:stati
                               </label>
                               <div class="upload-form">
                               <input class="button" id="presentation-submit" name="form.submitted" value="Choose Presentation and preview &#187;" type="submit">
-                              <input id="importer" name="importer_file" style="visibility: hidden;" type="file" />
-                              <input id="presentationupload" name="presentationupload" style="visibility: hidden;" value="yes" type="text">
+                              <input id="importer" name="importer_file" style="display: none;" type="file" />
+                              <input id="presentationupload" name="presentationupload" value="yes" type="hidden">
                               <!--<input class="button"  value="Import Your Presentations &#187;" onClick="location.href='/importer'" type="button">-->
                               </div>    
                           </li>                          
