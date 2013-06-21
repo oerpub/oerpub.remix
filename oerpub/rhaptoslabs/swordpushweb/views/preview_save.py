@@ -1,4 +1,3 @@
-import os
 import json
 from lxml import etree
 
@@ -44,7 +43,6 @@ def preview_save(request):
         canonical_html = etree.tostring(tree, pretty_print=True)
         cnxml = etree_to_valid_cnxml(tree, pretty_print=True)
     except Exception as e:
-        #return render_conversionerror(request, str(e))
         conversionerror = str(e)
 
     if cnxml is not None:
@@ -53,7 +51,6 @@ def preview_save(request):
         try:
             validate_cnxml(cnxml)
         except ConversionError as e:
-            #return render_conversionerror(request, str(e))
             conversionerror = str(e)
 
     response = Response(json.dumps({'saved': True, 'error': conversionerror}))
