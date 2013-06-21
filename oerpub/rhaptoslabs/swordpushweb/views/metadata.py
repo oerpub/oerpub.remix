@@ -313,17 +313,6 @@ class Metadata_View(BaseHelper):
         """
         Handle metadata adding and uploads
         """
-        # If user clicks the restart button (this only happens if he is
-        # anonymous), send him to the choose-page. Do this before calling
-        # _process below, that saves us an extra login check.
-        if self.request.params.get('btn-restart', None) is not None:
-            # Should we explicitly clean up? If we do, we break the back
-            # button, so I'm voting no. Also disable expert mode.
-            self.request.response.set_cookie('oerpushweb.expertmode', 'false')
-            return HTTPFound(
-                location=self.request.route_url('choose')+"?restart=1",
-                headers=self.request.response.headers)
-
         super(Metadata_View, self)._process()
         request = self.request
         defaults = self.defaults
@@ -333,34 +322,43 @@ class Metadata_View(BaseHelper):
                    )
 
         errors = self.do_transition(form)
+        if request.params.get('btn-restart'):
+            # If user clicked the restart button (this only happens if he is
+            # anonymous), send him to the choose-page. Disable expert mode.
+            request.response.set_cookie('oerpushweb.expertmode', 'false')
+            return HTTPFound(
+                location=request.route_url('choose')+"?restart=1",
+                headers=request.response.headers)
+
         return self.navigate(errors, form)
 
-    def do_transition(self, form=None, request=None):
+    def do_transition(self, form):
         errors = {}
         session = self.session
         request = self.request
         workspaces = self.workspaces
         self.target_module_url = session.get('target_module_url', None)
 
+        # If the user cannot upload, then a workspace isn't required. This
+        # allows the form to otherwise validate.
+        if not self.request.session['login'].canUploadModule:
+            form.schema.fields['workspace'].not_empty = False
+
         # Check for successful form completion
-        if form.validate():
+        if form and form.validate():
             # Find what the user actually wanted to do.
             # This is important since we don't want to upload the module to cnx
             # if the user clicked on the back button.
-            action = self.request.params.get('btn-forward') and 'forward' or 'back'
-            if action == 'forward':
-                self.set_selected_workspace(form.data['workspace'])
-                self.update_session(session, self.remember_fields, form)
 
+            action = 'back'
+            if self.request.params.get('btn-forward'):
+                action = 'forward'
+            elif self.request.params.get('btn-restart'):
+                action = 'restart'
+
+            if action in ('forward', 'restart'):
                 # Reconstruct the path to the saved files
                 save_dir = request.session['login'].saveDir
-
-                # Create a connection to the sword service
-                conn = self.get_connection()
-
-                # Send zip file to Connexions through SWORD interface
-                files = self.request.session['login'].files
-                zip_file = make_zip(save_dir, files)
 
                 # Create the metadata entry
                 metadata_entry = self.get_metadata_entry(form, session)
@@ -373,28 +371,39 @@ class Metadata_View(BaseHelper):
                 # write cnxml et al to server and zip filename
                 save_cnxml(save_dir, updated_cnxml, title=title)
 
-                if self.target_module_url:
-                    # this is an update not a create
-                    deposit_receipt = self.update_module(
-                        save_dir, conn, metadata_entry, self.target_module_url)
-                else:
-                    # this is a workaround until I can determine why the 
-                    # featured links don't upload correcly with a multipart
-                    # upload during module creation. See redmine issue 40
-                    # TODO:
-                    # Fix me properly!
-                    if self.featured_links:
-                        deposit_receipt = create_module_in_2_steps(
-                            form, conn, metadata_entry, zip_file)
+                if action == 'forward':
+                    self.set_selected_workspace(form.data['workspace'])
+                    self.update_session(session, self.remember_fields, form)
+
+                    # Create a connection to the sword service
+                    conn = self.get_connection()
+
+                    # Send zip file to Connexions through SWORD interface
+                    files = self.request.session['login'].files
+                    zip_file = make_zip(save_dir, files)
+
+                    if self.target_module_url:
+                        # this is an update not a create
+                        deposit_receipt = self.update_module(
+                            save_dir, conn, metadata_entry, self.target_module_url)
                     else:
-                        deposit_receipt = self.create_module(
-                            form, conn, metadata_entry, zip_file)
+                        # this is a workaround until I can determine why the 
+                        # featured links don't upload correcly with a multipart
+                        # upload during module creation. See redmine issue 40
+                        # TODO:
+                        # Fix me properly!
+                        if self.featured_links:
+                            deposit_receipt = create_module_in_2_steps(
+                                form, conn, metadata_entry, zip_file)
+                        else:
+                            deposit_receipt = self.create_module(
+                                form, conn, metadata_entry, zip_file)
 
-                # Remember to which workspace we submitted
-                session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
+                    # Remember to which workspace we submitted
+                    session['deposit_workspace'] = workspaces[[x[0] for x in workspaces].index(form.data['workspace'])][1]
 
-                # The deposit receipt cannot be pickled, so we pickle the xml
-                session['deposit_receipt'] = deposit_receipt.to_xml()
+                    # The deposit receipt cannot be pickled, so we pickle the xml
+                    session['deposit_receipt'] = deposit_receipt.to_xml()
         else:
             errors.update(form.errors)
             return errors
