@@ -68,9 +68,7 @@
         },
         bundles: {
             // Path for custom bundle relative from require.js path
-            oerpub: '../plugins/oerpub',
-            oer: '../plugins/oer',
-            cnx: '../plugins/cnx'
+            oer: '../plugins/oer'
         },
         contentHandler: {
             insertHtml: [ 'word', 'generic', 'oembed'],
