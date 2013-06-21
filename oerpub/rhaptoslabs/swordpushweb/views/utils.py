@@ -11,7 +11,10 @@ import pycurl
 import logging
 import datetime
 import traceback
+import cgi
+
 from lxml import etree
+from string import Template
 
 from pyramid.view import view_config
 from pyramid.response import Response
@@ -22,7 +25,8 @@ from pyramid.threadlocal import get_current_registry
 from rhaptos.cnxmlutils.validatecnxml import validate
 from oerpub.rhaptoslabs import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.errors import ConversionError
-from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_htmlpreview
+from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import \
+  cnxml_to_structuredhtml, structuredhtml_to_htmlpreview
 
 current_dir = os.path.dirname(__file__)
 ZIP_PACKAGING = 'http://purl.org/net/sword/package/SimpleZip'
@@ -288,7 +292,7 @@ def get_files_from_zipfile(zip_file):
 
     zip_archive = zipfile.ZipFile(zip_file, 'r')
     for filename in zip_archive.namelist():
-        if filename in ['index.cnxml', 'index.html', 'oerpub.css']:
+        if filename in ['index.cnxml', 'index.html', 'index.structured.html', 'oerpub.css']:
             continue
         fp = zip_archive.open(filename, 'r')
         files.append((filename, fp.read()))
@@ -536,17 +540,52 @@ def append_zip(zipfilename, filename, content):
 def save_zip(save_dir, cnxml, html, files):
     ram = cStringIO.StringIO()
     zip_archive = zipfile.ZipFile(ram, 'w')
+
     zip_archive.writestr('index.cnxml', cnxml)
+
     if html is not None:
+        zip_archive.writestr('index.html', html)
+        # Add the css file to zip
+        registry = get_current_registry()
+        f1 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_metacontent.css')
+        f2 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_content_in_oerpub.css')
+        zip_archive.writestr('oerpub.css', open(f1, 'r').read() + open(f2, 'r').read())
+
+    for filename, fileObj in files:
+        zip_archive.writestr(filename, fileObj)
+
+    zip_archive.close()
+    zip_filename = os.path.join(save_dir, 'upload.zip')
+    save_and_backup_file(save_dir, zip_filename, ram.getvalue(), mode='wb')
+
+def update_html(cnxml, title, metadata):
+    # convert cnxml to structured, canonical html5
+    # return the updated html
+    structuredhtml = None
+    conversion_error = None
+        
+    try:
+        structuredhtml = cnxml_to_structuredhtml(cnxml)
+        previewhtml    = structuredhtml_to_htmlpreview(structuredhtml)
+        conversion_error = None
+    except libxml2.parserError:
+        structuredhtml = None
+        previewhtml    = None
+        conversion_error = traceback.format_exc()
+        
+    if structuredhtml is not None:
         # Add a head and css to the html. Also add #canvas to the body
         # so the css that was constructed to work with the editor nested
         # in that element continues to work.
-        tree = etree.fromstring(html, etree.HTMLParser())
-        xslt = etree.XML("""\
-            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+        tree = etree.fromstring(structuredhtml, etree.HTMLParser())
+        xsl_template = Template("""\
+              <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
                 <xsl:template match="/html">
                     <html><xsl:copy-of select="@*"/>
                     <head>
+                      <title>
+                        $title
+                      </title>
                       <link rel="stylesheet" type="text/css" href="oerpub.css" />
                       <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
                       <script type="text/javascript" src="oerpub.js"></script>
@@ -560,8 +599,9 @@ def save_zip(save_dir, cnxml, html, files):
                         },
                         AsciiMath: { noErrors: { disabled: true } }
                       });</script>
+                      $meta
                     </head>
-                    <xsl:apply-templates />
+                    <xsl:apply-templates select="node()[not(self::head)]" />
                     </html>
                 </xsl:template>
                 <xsl:template match="body">
@@ -576,29 +616,45 @@ def save_zip(save_dir, cnxml, html, files):
                 <xsl:template match="@*|node()">
                     <xsl:copy><xsl:apply-templates select="@*|node()"/></xsl:copy>
                 </xsl:template>
-            </xsl:stylesheet>""")
-        html = str(etree.XSLT(xslt)(tree))
-        zip_archive.writestr('index.html', html)
-        # Add the css file itself
-        registry = get_current_registry()
-        f1 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_metacontent.css')
-        f2 = os.path.join(registry.settings['aloha.editor'], 'css', 'html5_content_in_oerpub.css')
-        zip_archive.writestr('oerpub.css', open(f1, 'r').read() + open(f2, 'r').read())
+              </xsl:stylesheet>""")
 
-    for filename, fileObj in files:
-        zip_archive.writestr(filename, fileObj)
-    zip_archive.close()
-    zip_filename = os.path.join(save_dir, 'upload.zip')
-    save_and_backup_file(save_dir, zip_filename, ram.getvalue(), mode='wb')
+        # small demonstration how metadata can not placed into html/head
+        if title is None:
+            title = """<xsl:apply-templates select="head/title"/>"""
+            meta = ""
+        else:
+            title = cgi.escape(title)
+            meta = Template("""
+              <link rel="schema.MD" href="http://cnx.rice.edu/mdml" />
+              <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+              <link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
+              <meta name="title" content="$title" />
+              <meta name="MD:title" content="$title" />
+              <meta name="DC:title" content="$title" />
+              <meta itemscope="" itemtype="http://schema.org/CreativeWork" 
+                  itemprop="name" content="$title "/>
+              """).substitute(title=title)
+
+        xsl = xsl_template.substitute(title=title, meta=meta)
+        xslt = etree.XML(xsl)
+        structuredhtml = str(etree.XSLT(xslt)(tree))
+    return previewhtml, structuredhtml, conversion_error
 
 def validate_cnxml(cnxml):
     valid, log = validate(cnxml, validator="jing")
     if not valid:
         raise ConversionError(log)
 
-def save_cnxml(save_dir, cnxml, files):
-    # write CNXML output
+def save_cnxml(save_dir, cnxml, files, title=None, metadata=None):
+    # write CNXML output to server work directory
     save_and_backup_file(save_dir, 'index.cnxml', cnxml)
+    
+    # from input cnxml, create aloha-ized html4/5 and structured, canonical html5
+    previewhtml, structuredhtml, conversion_error = update_html(cnxml, title, metadata)
+    if conversion_error is None:
+        # write aloha-ized and structured index.html to server work directory
+        save_and_backup_file(save_dir, 'index.html',            previewhtml)
+        save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
 
     # write files
     for filename, content in files:
@@ -607,24 +663,16 @@ def save_cnxml(save_dir, cnxml, files):
         f.write(content)
         f.close()
 
-    # we generate the preview and save the error
-    conversionerror = None
-    try:
-        htmlpreview = cnxml_to_htmlpreview(cnxml)
-    except libxml2.parserError:
-        conversionerror = traceback.format_exc()
-
     # Zip up all the files. This is done now, since we have all the files
     # available, and it also allows us to post a simple download link.
     # Note that we cannot use zipfile as context manager, as that is only
     # available from python 2.7
     # TODO: Do a filesize check xxxx
-    if conversionerror is None:
-        save_and_backup_file(save_dir, 'index.html', htmlpreview)
-        save_zip(save_dir, cnxml, htmlpreview, files)
+    if conversion_error is None:
+        save_zip(save_dir, cnxml, structuredhtml, files)
     else:
         save_zip(save_dir, cnxml, None, files)
-        raise ConversionError(conversionerror)
+        raise ConversionError(conversion_error)
 
 def render_conversionerror(request, error):
     templatePath = 'templates/conv_error.pt'

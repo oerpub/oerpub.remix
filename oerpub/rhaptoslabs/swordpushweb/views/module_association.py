@@ -29,7 +29,7 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_zip,
     ConversionError)
 from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import \
-    cnxml_to_htmlpreview
+    cnxml_to_structuredhtml, structuredhtml_to_htmlpreview
 
 
 
@@ -123,10 +123,12 @@ class Module_Association_View(BaseHelper):
         cnxml_file.close()
         conversionerror = None
         try:
-            htmlpreview = cnxml_to_htmlpreview(cnxml)
+            structuredhtml = cnxml_to_structuredhtml(cnxml)
+            save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
+            htmlpreview    = structuredhtml_to_htmlpreview(structuredhtml)
             save_and_backup_file(save_dir, 'index.html', htmlpreview)
             files = get_files(save_dir)
-            save_zip(save_dir, cnxml, htmlpreview, files)
+            save_zip(save_dir, cnxml, structuredhtml, files)
         except libxml2.parserError:
             conversionerror = traceback.format_exc()
             raise ConversionError(conversionerror)
