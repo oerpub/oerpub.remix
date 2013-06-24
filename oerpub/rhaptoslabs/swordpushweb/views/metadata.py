@@ -337,7 +337,7 @@ class Metadata_View(BaseHelper):
         session = self.session
         request = self.request
         workspaces = self.workspaces
-        self.target_module_url = session.get('target_module_url', None)
+        target_module_url = session.get('target_module_url', None)
 
         # If the user cannot upload, then a workspace isn't required. This
         # allows the form to otherwise validate.
@@ -382,10 +382,10 @@ class Metadata_View(BaseHelper):
                     files = self.request.session['login'].files
                     zip_file = make_zip(save_dir, files)
 
-                    if self.target_module_url:
+                    if target_module_url:
                         # this is an update not a create
                         deposit_receipt = self.update_module(
-                            save_dir, conn, metadata_entry, self.target_module_url)
+                            save_dir, conn, metadata_entry, target_module_url)
                     else:
                         # this is a workaround until I can determine why the 
                         # featured links don't upload correcly with a multipart
@@ -421,16 +421,16 @@ class Metadata_View(BaseHelper):
         workspaces = self.workspaces
         subjects = self.subjects
         field_list = self.field_list
+        target_module_url = session.get('target_module_url', None)
 
         metadata = config['metadata']
         username = session['login'].username
         password = session['login'].password
-        if self.target_module_url:
-
-            if self.target_module_url.endswith('/sword'):
-                dr_url = self.target_module_url
+        if target_module_url:
+            if target_module_url.endswith('/sword'):
+                dr_url = target_module_url
             else:
-                dr_url = self.target_module_url + '/sword'
+                dr_url = target_module_url + '/sword'
             metadata.update(get_metadata_from_repo(session, dr_url, username, password))
         else:
             for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
