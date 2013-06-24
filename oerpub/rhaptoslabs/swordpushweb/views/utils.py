@@ -345,11 +345,12 @@ class Metadata(dict):
         self.dom = lxml.etree.fromstring(self.raw_data)
         self._parse_metadata()
         self.url = self._module_export_url(module_url)
-        self.cnxml = self._fetch_cnxml(self.url,
-                                       user.encode(self.encoding),
-                                       password.encode(self.encoding))
-        if self.cnxml:
-            self._parse_featured_link_groups(self.cnxml)
+
+        # Fetch cnxml for the sole purpose of parsing out featured links.
+        cnxml = self._fetch_cnxml(self.url, user.encode(self.encoding),
+                password.encode(self.encoding))
+        if cnxml:
+            self._parse_featured_link_groups(cnxml)
     
     def _parse_metadata(self):
         for name, ftype in self.fields.items():
