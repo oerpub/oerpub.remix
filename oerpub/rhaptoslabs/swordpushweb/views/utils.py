@@ -324,13 +324,6 @@ def get_connection(session):
     return conn
 
 
-def get_metadata_from_repo(session, module_url, user, password):
-    conn = get_connection(session)
-    resource = conn.get_resource(content_iri = module_url)
-    metadata = Metadata(resource.content, module_url, user, password)
-    return metadata
-
-
 class Metadata(dict):
 
     fields = {'dcterms:title':        types.StringType,

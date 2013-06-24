@@ -49,7 +49,7 @@ class Module_Association_View(BaseHelper):
             selected_workspace = form.data['workspace']
             self.set_selected_workspace(selected_workspace)
             module_url = form.data['module_url']
-            request.session['target_module_url'] = module_url
+            request.session['login'].module_url = module_url
             self._download_module(module_url)
     
     def navigate(self, errors=None, form=None):

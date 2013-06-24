@@ -14,7 +14,6 @@ from oerpub.rhaptoslabs.sword2cnx import sword2cnx
 from oerpub.rhaptoslabs.swordpushweb.languages import languages
 
 from choose import save_cnxml
-from utils import get_metadata_from_repo
 from utils import ZIP_PACKAGING, create_module_in_2_steps
 from utils import add_featuredlinks_to_cnxml
 from utils import load_config, build_featured_links
@@ -337,7 +336,6 @@ class Metadata_View(BaseHelper):
         session = self.session
         request = self.request
         workspaces = self.workspaces
-        target_module_url = session.get('target_module_url', None)
 
         # If the user cannot upload, then a workspace isn't required. This
         # allows the form to otherwise validate.
@@ -382,6 +380,7 @@ class Metadata_View(BaseHelper):
                     files = self.request.session['login'].files
                     zip_file = make_zip(save_dir, files)
 
+                    target_module_url = session['login'].module_url
                     if target_module_url:
                         # this is an update not a create
                         deposit_receipt = self.update_module(
@@ -421,7 +420,8 @@ class Metadata_View(BaseHelper):
         workspaces = self.workspaces
         subjects = self.subjects
         field_list = self.field_list
-        target_module_url = session.get('target_module_url', None)
+        target_module_url = session['login'].module_url
+        target_metadata = session['login'].metadata
 
         metadata = config['metadata']
         username = session['login'].username
@@ -431,7 +431,8 @@ class Metadata_View(BaseHelper):
                 dr_url = target_module_url
             else:
                 dr_url = target_module_url + '/sword'
-            metadata.update(get_metadata_from_repo(session, dr_url, username, password))
+            if target_metadata is not None:
+                metadata.update(target_metadata)
         else:
             for role in ['authors', 'maintainers', 'copyright', 'editors', 'translators']:
                 self.defaults[role] = ','.join(

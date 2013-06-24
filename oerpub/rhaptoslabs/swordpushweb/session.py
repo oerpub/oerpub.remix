@@ -1,6 +1,8 @@
 import os
 import tempfile
 from pyramid.threadlocal import get_current_registry
+from oerpub.rhaptoslabs.swordpushweb.views.utils import Metadata
+from oerpub.rhaptoslabs.sword2cnx import Connection
 
 class Session(object):
     """ Base class for oerpub sessions. """
@@ -8,6 +10,7 @@ class Session(object):
     def __init__(self):
         self._saveDir = None
         self._files = []
+        self.metadata = None
 
     @property
     def canImportModule(self):
@@ -70,6 +73,17 @@ class Session(object):
     def files(self):
         return self._files
 
+    @property
+    def module_url(self):
+        """ Return the url of the module on the remote site, when you are
+            editing an existing module. """
+        return None
+
+    @module_url.setter
+    def module_url(self, v):
+        """ Set the url of the upstream module. """
+        pass
+
 class AnonymousSession(Session):
     """ Class for anonymous users. """
 
@@ -96,6 +110,7 @@ class CnxSession(Session):
         self.maxuploadsize = maxuploadsize
         self.collections = collections
         self.selected_workspace = 0
+        self._module_url = None
 
     @property
     def canImportModule(self):
@@ -125,3 +140,22 @@ class CnxSession(Session):
             if entry['href'] == ws:
                 self.selected_workspace = i
                 break
+
+    @property
+    def module_url(self):
+        """ Return the url of the upstream module being edited in this session.
+        """
+        return self._module_url
+
+    @module_url.setter
+    def module_url(self, v):
+        """ Set the url of the upstream module. """
+        self._module_url = v
+        conn = Connection(self.service_document_url,
+                          user_name=self.username,
+                          user_pass=self.password,
+                          always_authenticate=True,
+                          download_service_document=False)
+        resource = conn.get_resource(content_iri = v)
+        self.metadata = Metadata(resource.content, v,
+            self.username, self.password)
