@@ -354,10 +354,7 @@ class Metadata(dict):
     
     def _parse_metadata(self):
         for name, ftype in self.fields.items():
-            value = self._get_value_from_raw(name,
-                                             ftype,
-                                             self.dom,
-                                             NAMESPACES)
+            value = self._get_value_from_raw(name, ftype, self.dom, NAMESPACES)
             self[name] = value
 
         self._parse_subjects_and_keywords()
