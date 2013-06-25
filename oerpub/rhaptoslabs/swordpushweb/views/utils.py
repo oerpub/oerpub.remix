@@ -253,56 +253,35 @@ def add_directory_to_zip(directory, zipFile, basePath=None):
             add_directory_to_zip(pathToFile[basePathLength:], zipFile, basePath=basePath)
 
 
-def add_featuredlinks_to_cnxml(cnxml, featuredlinks):
-    root = lxml.etree.fromstring(cnxml)
-    featuredlinks = ''.join(featuredlinks)
-    featuredlinks_element = lxml.etree.fromstring(featuredlinks)
-    root.insert(1, featuredlinks_element) 
-    return lxml.etree.tostring(root)
-
-
 def build_featured_links(data):
-    if data is None or len(data.get('featuredlinks')) < 1:
-        return ''
+    """ data is a list of dictionaries, each with fl_title, fl_strength and
+        url or module keys. """
+    # organise links by category
+    di = {}
+    for l in data:
+        category = l['fl_category']
+        if category in di:
+            di[category].append(l)
+        else:
+            di[category] = [l]
 
-    # get featured links from data
-    tmp_links = {}
-    # first we organise the links by category
-    for details in data['featuredlinks']:
-        category = details['fl_category']
-        tmp_list = tmp_links.get(category, [])
-        tmp_list.append(details)
-        tmp_links[category] = tmp_list
+    root = etree.Element('featured-links')
+    for category, values in di.items():
+        group = etree.Element('link-group')
+        group.set('type', category)
+        root.append(group)
 
-    links = [u'<featured-links>']
-    for category, values in tmp_links.items():
-        links.append(u'<link-group type="%s">' %category)
-        
-        for details in values:
-            title = details['fl_title']
-            strength = details['fl_strength']
-            url = details.get('url', '')
-            module = details.get('fl_cnxmodule', '')
-
-            link = ''
-            if url:
-                link = u'<link url="%s" strength="%s">%s</link>' %(
-                    url, strength, title)
-            elif module:
-                base = 'http://cnx.org/content'
-                cnxversion = details.get('fl_cnxversion')
-                if not cnxversion:
-                    cnxversion = 'latest'
-                link = u'<link url="%s/%s/%s/" strength="%s">%s</link>' %(
-                    base, module, cnxversion, strength, title)
-
-            links.append(link)
-
-        links.append(u'</link-group>')
-
-    links.append(u'</featured-links>')
-    return links
-
+        for l in values:
+            link = etree.Element('link')
+            link.set('strength', l['fl_strength'])
+            link.text = l['fl_title']
+            if 'url' in l:
+                link.set('url', l['url'])
+            elif 'module' in l:
+                link.set('url', 'http://cnx.org/content/%s/%s/' % (
+                    l['fl_cnxmodule'], l['fl_cnxversion']))
+            group.append(link)
+    return root
 
 def check_login(request, raise_exception=True):
     # Check if logged in
@@ -592,10 +571,15 @@ def validate_cnxml(cnxml):
         raise ConversionError(log)
 
 def save_cnxml(save_dir, cnxml, title=None, metadata=None):
+    # Add metadata to cnxml before writing to file
+    if metadata is not None:
+        pass
+
     # write CNXML output to server work directory
     save_and_backup_file(save_dir, 'index.cnxml', cnxml)
     
-    # from input cnxml, create aloha-ized html4/5 and structured, canonical html5
+    # from input cnxml, create aloha-ized html4/5 and structured, canonical
+    # html5
     previewhtml, structuredhtml, conversion_error = update_html(cnxml, title, metadata)
     if conversion_error is None:
         # write aloha-ized and structured index.html to server work directory

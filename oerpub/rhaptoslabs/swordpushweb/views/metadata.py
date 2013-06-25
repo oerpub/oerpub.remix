@@ -2,6 +2,7 @@ import os
 import types
 import formencode
 import peppercorn
+from lxml import etree
 
 from pyramid.decorator import reify
 from pyramid_simpleform import Form
@@ -15,7 +16,6 @@ from oerpub.rhaptoslabs.swordpushweb.languages import languages
 
 from choose import save_cnxml
 from utils import ZIP_PACKAGING, create_module_in_2_steps
-from utils import add_featuredlinks_to_cnxml
 from utils import load_config, build_featured_links
 from utils import make_zip
 from helpers import BaseHelper
@@ -170,18 +170,20 @@ class Metadata_View(BaseHelper):
             tmp_links[category] = tmp_list
         return tmp_list
 
-    def update_cnxml(self, request, cnxml_file, metadata=None):
+    def update_cnxml(self, request, cnxml, metadata=None):
         # retrieve the cnxml from the zip file on the server
-        # add feature feature links to cnxml (later we will want to add metadata as well)
+        # add feature feature links to cnxml (later we will want to add
+        # metadata as well)
         # return the updated cnxml
-        updated_cnxml = open(cnxml_file).read()
-
         structure = peppercorn.parse(request.POST.items())
-        if structure.has_key('featuredlinks'):
-            featuredlinks = build_featured_links(structure)
-            if featuredlinks:
-                updated_cnxml = add_featuredlinks_to_cnxml(updated_cnxml, featuredlinks)
-        return updated_cnxml
+        if structure.has_key('featuredlinks') and len(
+                structure['featuredlinks'])>0:
+            featuredlinks = build_featured_links(structure['featuredlinks'])
+            root = etree.fromstring(cnxml)
+            root.insert(1, featuredlinks) 
+            return etree.tostring(root)
+
+        return None
 
     def create_module_with_atompub_xml(self, conn, collection_iri, entry):
         dr = conn.create(col_iri = collection_iri,
@@ -357,17 +359,16 @@ class Metadata_View(BaseHelper):
             if action in ('forward', 'restart'):
                 # Reconstruct the path to the saved files
                 save_dir = request.session['login'].saveDir
-
-                # Create the metadata entry
-                metadata_entry = self.get_metadata_entry(form, session)
+                metadata = request.session['login'].metadata
                 title = form.data['title']
 
-                # update the cnxml
-                updated_cnxml = self.update_cnxml(request,
-                    os.path.join(save_dir, 'index.cnxml'))
-
-                # write cnxml et al to server and zip filename
-                save_cnxml(save_dir, updated_cnxml, title=title)
+                # update the cnxml. If no update is done, no need to write
+                # the file to disk
+                cnxml = open(os.path.join(save_dir, 'index.cnxml'), 'r').read()
+                updated_cnxml = self.update_cnxml(request, cnxml)
+                if updated_cnxml is not None:
+                    save_cnxml(save_dir, updated_cnxml, title=title,
+                        metadata=metadata)
 
                 if action == 'forward':
                     self.set_selected_workspace(form.data['workspace'])
@@ -381,6 +382,7 @@ class Metadata_View(BaseHelper):
                     zip_file = make_zip(save_dir, files)
 
                     target_module_url = session['login'].module_url
+                    metadata_entry = self.get_metadata_entry(form, session)
                     if target_module_url:
                         # this is an update not a create
                         deposit_receipt = self.update_module(
