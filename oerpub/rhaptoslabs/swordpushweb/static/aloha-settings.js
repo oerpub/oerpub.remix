@@ -49,6 +49,13 @@
                 rootTags: ['span', 'div', 'figure'],
                 dragdrop: "1"
             },
+            note: [
+                { label: 'Note',      cls: 'note', hasTitle: true },
+                { label: 'Aside',     cls: 'note', hasTitle: true, type: 'aside' },
+                { label: 'Warning',   cls: 'note', hasTitle: true, type: 'warning' },
+                { label: 'Tip',       cls: 'note', hasTitle: true, type: 'tip' },
+                { label: 'Important', cls: 'note', hasTitle: true, type: 'important' },
+            ],
             image: {
                 onUploadSuccess: function(xhr){
                     // Expect a json-formatted response
