@@ -159,3 +159,7 @@ class CnxSession(Session):
         resource = conn.get_resource(content_iri = v)
         self.metadata = Metadata(resource.content, v,
             self.username, self.password)
+
+    def newSaveDir(self):
+        super(CnxSession, self).newSaveDir()
+        self._module_url = None
