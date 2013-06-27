@@ -9,10 +9,6 @@ from oerpub.rhaptoslabs.cnxml2htmlpreview.cnxml2htmlpreview import cnxml_to_html
 
 from helpers import BaseHelper 
 from ..editor import EditorHelper
-from oerpub.rhaptoslabs.swordpushweb.views.utils import (
-    save_and_backup_file,
-    ConversionError)
-
 
 class PreviewSchema(formencode.Schema):
     allow_extra_fields = True
