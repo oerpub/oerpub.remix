@@ -2,7 +2,6 @@ import os
 import types
 import formencode
 import peppercorn
-from lxml import etree
 
 from pyramid.decorator import reify
 from pyramid_simpleform import Form
@@ -112,7 +111,7 @@ class Metadata_View(BaseHelper):
                     del(session[field_name])
         return session
     
-    def get_metadata_entry(self, form, session):
+    def _get_metadata(self, form, session):
         metadata = {}
         metadata['dcterms:title'] = form.data['title'] if form.data['title'] \
                                     else session['filename']
@@ -136,6 +135,10 @@ class Metadata_View(BaseHelper):
 
         # Standard change description
         metadata['oerdc:descriptionOfChanges'] = 'Uploaded from external document importer.'
+        return metadata
+
+    def get_metadata_entry(self, form, session):
+        metadata = self._get_metadata(form, session)
 
         # Build metadata entry object
         for key in metadata.keys():
@@ -169,21 +172,6 @@ class Metadata_View(BaseHelper):
             tmp_list.append(details)
             tmp_links[category] = tmp_list
         return tmp_list
-
-    def update_cnxml(self, request, cnxml, metadata=None):
-        # retrieve the cnxml from the zip file on the server
-        # add feature feature links to cnxml (later we will want to add
-        # metadata as well)
-        # return the updated cnxml
-        structure = peppercorn.parse(request.POST.items())
-        if structure.has_key('featuredlinks') and len(
-                structure['featuredlinks'])>0:
-            featuredlinks = build_featured_links(structure['featuredlinks'])
-            root = etree.fromstring(cnxml)
-            root.insert(1, featuredlinks) 
-            return etree.tostring(root)
-
-        return None
 
     def create_module_with_atompub_xml(self, conn, collection_iri, entry):
         dr = conn.create(col_iri = collection_iri,
@@ -359,16 +347,17 @@ class Metadata_View(BaseHelper):
             if action in ('forward', 'restart'):
                 # Reconstruct the path to the saved files
                 save_dir = request.session['login'].saveDir
-                metadata = request.session['login'].metadata
                 title = form.data['title']
 
-                # update the cnxml. If no update is done, no need to write
-                # the file to disk
+                metadata = {}
+                metadata.update(request.session['login'].metadata)
+                metadata.update(self._get_metadata(form, session))
+                metadata['featured_link_groups'] = \
+                    self.get_raw_featured_links(request)
+
+                # update the cnxml
                 cnxml = open(os.path.join(save_dir, 'index.cnxml'), 'r').read()
-                updated_cnxml = self.update_cnxml(request, cnxml)
-                if updated_cnxml is not None:
-                    save_cnxml(save_dir, updated_cnxml, title=title,
-                        metadata=metadata)
+                save_cnxml(save_dir, cnxml, title=title, metadata=metadata)
 
                 if action == 'forward':
                     self.set_selected_workspace(form.data['workspace'])
@@ -382,6 +371,7 @@ class Metadata_View(BaseHelper):
                     zip_file = make_zip(save_dir, files)
 
                     target_module_url = session['login'].module_url
+                    import pdb; pdb.set_trace()
                     metadata_entry = self.get_metadata_entry(form, session)
                     if target_module_url:
                         # this is an update not a create

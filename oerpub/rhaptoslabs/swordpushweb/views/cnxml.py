@@ -33,7 +33,7 @@ def cnxml_view(request):
             cnxml = cnxml.encode('ascii', 'xmlcharrefreplace')        
 
         try:
-            save_cnxml(save_dir, cnxml)
+            save_cnxml(save_dir, cnxml, metadata=request.session['login'].metadata)
             validate_cnxml(cnxml)
         except ConversionError as e:
             return render_conversionerror(request, e.msg)

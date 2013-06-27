@@ -570,24 +570,30 @@ def validate_cnxml(cnxml):
     if not valid:
         raise ConversionError(log)
 
-def save_cnxml(save_dir, cnxml, title=None, metadata=None):
+def save_cnxml(save_dir, cnxml, title=None, metadata=None, updatehtml=True):
     # Add metadata to cnxml before writing to file
     if metadata is not None:
-        pass
+        if metadata.has_key('featured_link_groups') and len(
+                metadata['featured_link_groups'])>0:
+            featuredlinks = build_featured_links(metadata['featured_link_groups'])
+            root = etree.fromstring(cnxml)
+            root.insert(1, featuredlinks) 
+            cnxml = etree.tostring(root)
+        # TODO populate more metadata here!
 
     # write CNXML output to server work directory
     save_and_backup_file(save_dir, 'index.cnxml', cnxml)
     
     # from input cnxml, create aloha-ized html4/5 and structured, canonical
     # html5
-    previewhtml, structuredhtml, conversion_error = update_html(cnxml, title, metadata)
-    if conversion_error is None:
-        # write aloha-ized and structured index.html to server work directory
-        save_and_backup_file(save_dir, 'index.html',            previewhtml)
-        save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
-
-    if conversion_error is not None:
-        raise ConversionError(conversion_error)
+    if updatehtml:
+        previewhtml, structuredhtml, conversion_error = update_html(cnxml, title, metadata)
+        if conversion_error is None:
+            # write aloha-ized and structured index.html to server work directory
+            save_and_backup_file(save_dir, 'index.html',            previewhtml)
+            save_and_backup_file(save_dir, 'index.structured.html', structuredhtml)
+        else:
+            raise ConversionError(conversion_error)
 
 def render_conversionerror(request, error):
     templatePath = 'templates/conv_error.pt'

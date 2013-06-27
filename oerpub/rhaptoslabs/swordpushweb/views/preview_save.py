@@ -9,6 +9,7 @@ from rhaptos.cnxmlutils.utils import aloha_to_etree, etree_to_valid_cnxml
 from choose import validate_cnxml
 from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     save_and_backup_file,
+    save_cnxml,
     ConversionError)
 from utils import check_login
 
@@ -41,13 +42,14 @@ def preview_save(request):
     try:
         tree = aloha_to_etree(html)           #1 create structured HTML5 tree
         canonical_html = etree.tostring(tree, pretty_print=True)
+        save_and_backup_file(save_dir, 'index.structured.html', canonical_html)
         cnxml = etree_to_valid_cnxml(tree, pretty_print=True)
     except Exception as e:
         conversionerror = str(e)
 
     if cnxml is not None:
-        save_and_backup_file(save_dir, 'index.cnxml', cnxml)
-        save_and_backup_file(save_dir, 'index.structured.html', canonical_html)
+        save_cnxml(save_dir, cnxml, title=request.session['title'],
+            metadata=request.session['login'].metadata, updatehtml=False)
         try:
             validate_cnxml(cnxml)
         except ConversionError as e:

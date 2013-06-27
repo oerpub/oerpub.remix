@@ -313,7 +313,8 @@ class NewOrExistingModuleProcessor(BaseFormProcessor):
                 self.set_target('new')
                 # save empty cnxml and html files
                 cnxml = self.empty_cnxml()
-                save_cnxml(self.save_dir, cnxml)
+                save_cnxml(self.save_dir, cnxml,
+                    metadata=self.request.session['login'].metadata)
             
             elif form.data.get('existingmodule'):
                 self.set_source('existingmodule')
@@ -481,7 +482,8 @@ class LatexProcessor(BaseFormProcessor):
             cnxml, objects = latex_to_cnxml(latex_archive, self.original_filename)
 
             cnxml = clean_cnxml(cnxml)
-            save_cnxml(self.save_dir, cnxml)
+            save_cnxml(self.save_dir, cnxml,
+                metadata=self.request.session['login'].metadata)
             for name, content in objects.items():
                 self.request.session['login'].addFile(name, content)
             validate_cnxml(cnxml)
@@ -524,7 +526,8 @@ class OfficeDocumentProcessor(BaseFormProcessor):
             tree, files, errors = transform(odt_filename)
             cnxml = clean_cnxml(etree.tostring(tree))
 
-            save_cnxml(self.save_dir, cnxml)
+            save_cnxml(self.save_dir, cnxml,
+                metadata=self.request.session['login'].metadata)
             for name, content in files.items():
                 self.request.session['login'].addFile(name, content)
 
@@ -678,7 +681,8 @@ class GoogleDocProcessor(BaseFormProcessor):
         # Transformation and get images
         cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
         cnxml = clean_cnxml(cnxml)
-        save_cnxml(self.save_dir, cnxml)
+        save_cnxml(self.save_dir, cnxml,
+            metadata=self.request.session['login'].metadata)
         for name, content in objects.items():
             self.request.session['login'].addFile(name, content)
 
@@ -826,7 +830,8 @@ class URLProcessor(BaseFormProcessor):
                 self.request.session['title'] = html_title
 
                 cnxml = clean_cnxml(cnxml)
-                save_cnxml(self.save_dir, cnxml)
+                save_cnxml(self.save_dir, cnxml,
+                    metadata=self.request.session['login'].metadata)
                 for name, content in objects.items():
                     self.request.session['login'].addFile(name, content)
 
