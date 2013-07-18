@@ -49,6 +49,7 @@ from oerpub.rhaptoslabs.swordpushweb.views.utils import (
     add_directory_to_zip,
     render_conversionerror,
     ZIP_PACKAGING,
+    HTML_TEST_PACKAGING,
     LATEX_PACKAGING,
     UNKNOWN_PACKAGING,
     remove_save_dir,
@@ -396,6 +397,9 @@ class ZipOrLatexModuleProcessor(BaseFormProcessor):
             if packaging == ZIP_PACKAGING:
                 processor = ZipFileProcessor(self.request, form)
                 return processor.process(self.original_filename)
+            elif packaging == HTML_TEST_PACKAGING:
+                processor = HtmlTestFileProcessor(self.request, form)
+                return processor.process(self.original_filename)
             elif packaging == LATEX_PACKAGING:
                 processor = LatexProcessor(self.request)
                 return processor.process(form)
@@ -420,10 +424,13 @@ class ZipOrLatexModuleProcessor(BaseFormProcessor):
         result = UNKNOWN_PACKAGING
         try:
             is_zip_archive = ('index.cnxml' in self.zip_archive.namelist())
+            is_html_test_archive = ('index.html' in self.zip_archive.namelist())
 
             # Do we have a latex file?
             if is_zip_archive:
                 result = ZIP_PACKAGING
+            elif is_html_test_archive:
+                result = HTML_TEST_PACKAGING
             else:
                 # incoming latex.zip must contain a latex.tex file, where
                 # "latex" is the base name.
@@ -476,6 +483,41 @@ class ZipFileProcessor(BaseFormProcessor):
         except Exception:
             tb = traceback.format_exc()
             self.write_traceback_to_zipfile(tb, form)
+            templatePath = 'templates/error.pt'
+            response = {'traceback': tb}
+            if('title' in self.request.session):
+                del self.request.session['title']
+            return render_to_response(templatePath, response, request=self.request)
+
+        self.request.session.flash(self.message)
+        return HTTPFound(location=self.request.route_url(self.nextStep()))
+
+class HtmlTestFileProcessor(BaseFormProcessor):
+    def __init__(self, request, form):
+        super(HtmlTestFileProcessor, self).__init__(request)
+        self.set_source('cnxinputs')
+        self.set_target('new')
+
+    def process(self, zip_filename):
+        try:
+            self.zip_archive = zipfile.ZipFile(zip_filename, 'r')
+
+            # Unzip into transform directory
+            self.zip_archive.extractall(path=self.save_dir)
+
+            # Rename ZIP file so that the user can download it again
+            os.rename(zip_filename,
+                      os.path.join(self.save_dir, 'upload.zip'))
+
+            # with open(os.path.join(self.save_dir, 'index.html'), 'r') as index:
+            #     html = index.read()
+
+        except ConversionError as e:
+            return render_conversionerror(self.request, e.msg)
+
+        except Exception:
+            tb = traceback.format_exc()
+            # self.write_traceback_to_zipfile(tb, zip_filename) # TODO: This fails, unicode error. Also untested in other processors like e.g. ZipFileProcessor
             templatePath = 'templates/error.pt'
             response = {'traceback': tb}
             if('title' in self.request.session):
