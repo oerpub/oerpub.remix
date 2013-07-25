@@ -38,6 +38,15 @@
                     '.title-editor': {enabled: false},
                 }
             },
+            toolbar: {
+                formats: {
+                  'p':   'Normal Text',
+                  'h1':  'Heading',
+                  'h2':  'Subheading',
+                  'h3':  'SubSubHeading',
+                  'pre': 'Code'
+                }
+            },
             block: {
                 defaults : {
                     '.default-block': {
