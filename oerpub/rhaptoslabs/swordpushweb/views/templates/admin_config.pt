@@ -4,7 +4,7 @@
       <metal:page_title define-slot="page_title">Connexions Document Importer Configuration</metal:page_title>
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.7.1.min.js')}"></script>
+    <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.7.2.min.js')}"></script>
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery.simplemodal.1.4.1.min.js')}"></script>
     <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
     <link rel="stylesheet" href="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
