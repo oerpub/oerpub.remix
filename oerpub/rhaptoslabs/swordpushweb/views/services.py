@@ -62,5 +62,4 @@ def gdoc2html(request):
     #res.last_modified = datetime.datetime.now().strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     jsonresult =  { "html": html, "aloha-ready": True }
-    #return jsonresult
-    return Response('OK')
+    return jsonresult
