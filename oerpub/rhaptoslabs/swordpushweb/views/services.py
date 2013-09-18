@@ -25,7 +25,7 @@ def gdoc2html(request):
     # grab inputs
     if 'html' in request.POST: 
       html = request.POST['html'] 
-    elif 'html' in request.GETT: 
+    elif 'html' in request.GET: 
       html = request.GET['html']
     else:
       return
