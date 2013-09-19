@@ -60,6 +60,7 @@ def gdoc2html(request):
     #res.last_modified = datetime.datetime.utcfromtimestamp(
     #    datetime.datetime.now()).strftime('%a, %d %b %Y %H:%M:%S GMT')
     #res.last_modified = datetime.datetime.now().strftime('%a, %d %b %Y %H:%M:%S GMT')
+    request.response.headers.add('Access-Control-Allow-Origin', '*')
 
     jsonresult =  { "html": html, "aloha-ready": True }
     return jsonresult
