@@ -1,7 +1,7 @@
 <meta charset="UTF-8">
 <html>
 <head>
-<title>GDoc Importer</title>
+<title>GDoc Transform Service Demo</title>
 
 <!-- https://developers.google.com/speed/libraries/devguide#jquery -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
@@ -49,9 +49,9 @@ if (!window['google']['loader']) {
 }
 </script>
 
-<!-- -------------------------------------------------------------------------------------- -->
-<!-- -------------------------------------------------------------------------------------- -->
-<!-- -------------------------------------------------------------------------------------- -->
+<!-- ************************************************************************************** -->
+<!-- ************************************************************************************** -->
+<!-- ************************************************************************************** -->
 
 <script>
 //
@@ -74,51 +74,53 @@ var picker = new google.picker.PickerBuilder().
 // A simple callback implementation for Picker.
 function pickerCallback(data) {
     if(data.action == google.picker.Action.PICKED){
-        var doc = data[google.picker.Response.DOCUMENTS][0];
-        var url = doc[google.picker.Document.URL];
-        var gdoc_resource_id  = data.docs[0].id;
-        var sanity = ( gdoc_resource_id == doc.id );
-        var html_url = 'https://docs.google.com/document/d/' + gdoc_resource_id + 
-                       '/export?format=html&confirm=no_antivirus';
-        var zip_url  = 'https://docs.google.com/document/d/' + gdoc_resource_id + 
-                       '/export?format=zip&confirm=no_antivirus';
-        /* go get html from google */
-        var promise = $.get(html_url);
-        promise.then(
-          function(data,status,xhr) {
-              /* send google html to gdoc2html xform service */
-              var html = data;
-              alert('got html from google');
-              /*
-              var promise2 = $.post("http://localhost:6543/gdoc2html",
-                                    {html: html, textbook_html: 0});
-              */
-              var promise2 = $.ajax({
-                  dataType: "json",
-                  type: 'POST',
-                  async: true,
-                  url: 'http://testing.oerpub.org/gdoc2html',
-                  data: { html: html, 
-                          textbook_html: 0,
-                          copy_images: 0 },
-              });
-              promise2.then(
-                function(data,status,xhr) {
-                    alert("gdoc2html succeeded");
-                    /* display the transformed html */
-                    var $newhtml = $(data['html']);
-                    $('body#content').append($newhtml);
-                },
-                function(data,status,xhr) {
-                    alert("gdoc2html failed");
-                }
-              );
-          },
-          function(data) {
-            alert('no got html from google');
-          }
-        );
+        transformGoogleDoc(data);
     }
+}
+
+// Transform Google Doc into an Aloha-Ready HMTL file
+function transformGoogleDoc(data) {
+  var doc = data[google.picker.Response.DOCUMENTS][0];
+  var url = doc[google.picker.Document.URL];
+  var gdoc_resource_id  = data.docs[0].id;
+  var sanity = ( gdoc_resource_id == doc.id );
+  var html_url = 'https://docs.google.com/document/d/' + gdoc_resource_id + 
+                 '/export?format=html&confirm=no_antivirus';
+  var zip_url  = 'https://docs.google.com/document/d/' + gdoc_resource_id + 
+                 '/export?format=zip&confirm=no_antivirus';
+  /* go get html from google */
+  var promise = $.get(html_url);
+  promise.then(
+    function(data,status,xhr) {
+        /* send google html to gdoc2html xform service */
+        var html = data;
+        alert('got html from google');
+        var promise2 = $.ajax({
+            dataType: "json",
+            type: 'POST',
+            async: true,
+            /* http://localhost:6543/gdoc2html or http://testing.oerpub.org/gdoc2html */
+            url: 'http://testing.oerpub.org/gdoc2html', 
+            data: { html: html, 
+                    textbook_html: 0,
+                    copy_images: 0 },
+        });
+        promise2.then(
+           function(data,status,xhr) {
+              alert("gdoc2html succeeded");
+              /* display the transformed html */
+              var $newhtml = $(data['html']);
+              $('body#content').append($newhtml);
+            },
+            function(data,status,xhr) {
+              alert("gdoc2html failed");
+            }
+         );
+    },
+    function(data) {
+      alert('did not get html from google');
+    }
+  );
 }
 
 $(document).ready(function()
