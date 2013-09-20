@@ -619,7 +619,7 @@ def update_html(cnxml, title, metadata):
                 </xsl:template>
               </xsl:stylesheet>""")
 
-        # small demonstration how metadata can not placed into html/head
+        # small demonstration how metadata can placed into html/head
         if title is None:
             title = """<xsl:apply-templates select="head/title"/>"""
             meta = ""
