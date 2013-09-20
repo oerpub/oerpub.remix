@@ -49,6 +49,10 @@ if (!window['google']['loader']) {
 }
 </script>
 
+<!-- -------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------- -->
+
 <script>
 //
 // Google Picker API for the Google Docs import
@@ -93,15 +97,17 @@ function pickerCallback(data) {
                   dataType: "json",
                   type: 'POST',
                   async: true,
-                  url: 'http://localhost:6543/gdoc2html',
+                  url: 'http://testing.oerpub.org/gdoc2html',
                   data: { html: html, 
-                           textbook_html: 0 },
+                          textbook_html: 0,
+                          copy_images: 0 },
               });
               promise2.then(
                 function(data,status,xhr) {
-                    /* display the transformed html */
-                    var html = data;
                     alert("gdoc2html succeeded");
+                    /* display the transformed html */
+                    var $newhtml = $(data['html']);
+                    $('body#content').append($newhtml);
                 },
                 function(data,status,xhr) {
                     alert("gdoc2html failed");
@@ -121,10 +127,10 @@ $(document).ready(function()
 });
 </script>
 </head>
-<body>
+<body id="content">
   <div>GDoc Transform Service Demo</div>
   <hr/>
-  <div id="place-import-here"/>
+  <!-- place gdoc service result here -->
 </body>
 </html>
 
