@@ -7,6 +7,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
 
 <!-- remix/oerpub/rhaptoslabs/swordpushweb/static/googlejsapi.js -->
+<!-- <script src="http://www.google.com/jsapi"></script> ??? -->
 <script>
 if(!window['googleLT_']){window['googleLT_']=(new Date()).getTime();}if (!window['google']) {
     window['google'] = {};
@@ -58,74 +59,101 @@ if (!window['google']['loader']) {
 // Google Picker API for the Google Docs import
 //
 
+var deferred;
+
 function newPicker() {
-google.load('picker', '1', {"callback" : createPicker});
+    google.load('picker', '1', {"callback" : createPicker});
+    deferred = $.Deferred();
+    return deferred.promise()
 }       
 
 // Create and render a Picker object for selecting documents
 function createPicker() {
-var picker = new google.picker.PickerBuilder().
-    addView(google.picker.ViewId.DOCUMENTS).
-    setCallback(pickerCallback).
-    build();
+    var picker = new google.picker.PickerBuilder().
+      addView(google.picker.ViewId.DOCUMENTS).
+      setCallback(pickerCallback).
+      build();
     picker.setVisible(true);
 }
 
 // A simple callback implementation for Picker.
 function pickerCallback(data) {
+    // <this> is the picker object
     if(data.action == google.picker.Action.PICKED){
-        transformGoogleDoc(data);
+        deferred.resolve(data);
+    }
+    else if(data.action == google.picker.Action.CANCEL){
+        deferred.reject();
     }
 }
 
+//
 // Transform Google Doc into an Aloha-Ready HMTL file
-function transformGoogleDoc(data) {
-  var doc = data[google.picker.Response.DOCUMENTS][0];
-  var url = doc[google.picker.Document.URL];
-  var gdoc_resource_id  = data.docs[0].id;
-  var sanity = ( gdoc_resource_id == doc.id );
-  var html_url = 'https://docs.google.com/document/d/' + gdoc_resource_id + 
-                 '/export?format=html&confirm=no_antivirus';
-  var zip_url  = 'https://docs.google.com/document/d/' + gdoc_resource_id + 
-                 '/export?format=zip&confirm=no_antivirus';
-  /* go get html from google */
-  var promise = $.get(html_url);
-  promise.then(
-    function(data,status,xhr) {
-        /* send google html to gdoc2html xform service */
-        var html = data;
-        alert('got html from google');
-        var promise2 = $.ajax({
-            dataType: "json",
-            type: 'POST',
-            async: true,
-            /* http://localhost:6543/gdoc2html or http://testing.oerpub.org/gdoc2html */
-            url: 'http://testing.oerpub.org/gdoc2html', 
-            data: { html: html, 
-                    textbook_html: 0,
-                    copy_images: 0 },
-        });
-        promise2.then(
-           function(data,status,xhr) {
-              alert("gdoc2html succeeded");
-              /* display the transformed html */
-              var $newhtml = $(data['html']);
-              $('body#content').append($newhtml);
-            },
-            function(data,status,xhr) {
-              alert("gdoc2html failed");
-            }
-         );
-    },
-    function(data) {
-      alert('did not get html from google');
-    }
-  );
+//
+
+function getGoogleDocHtml(data) {
+    var gdoc_resource_id, html_url, gdoc_html_promise;
+    gdoc_resource_id  = data.docs[0].id;
+    html_url = 'https://docs.google.com/document/d/' + gdoc_resource_id + 
+               '/export?format=html&confirm=no_antivirus';
+    gdoc_html_promise = $.get(html_url);
+    return gdoc_html_promise;
+}
+
+function transformGoogleDocHtml(html) {
+    var gdoc_transform_promise;
+    gdoc_transform_promise = $.ajax({
+        dataType: "json",
+        type: 'POST',
+        async: true,
+        url: 'http://testing.oerpub.org/gdoc2html', 
+        data: { html: html, 
+                textbook_html: 0,
+                copy_images: 0 },
+    });
+    return gdoc_transform_promise;
 }
 
 $(document).ready(function()
 {
-    newPicker();
+    var gdocpicker_promise, gdoc_html_promise, gdoc_transform_promise;
+
+    gdocpicker_promise = newPicker();
+    gdocpicker_promise.done(
+      function(data) {
+          gdoc_html_promise = getGoogleDocHtml(data);
+          gdoc_html_promise.done(
+            function(data,status,xhr) {
+                var html = data;
+                alert('got html from google');
+                gdoc_transform_promise = transformGoogleDocHtml(html);
+                gdoc_transform_promise.done(
+                  function(data,status,xhr) {
+                      alert("gdoc2html service succeeded");
+                      /* display the transformed html */
+                      var $newhtml = $(data['html']);
+                      $('body#content').append($newhtml);
+                  }
+                );
+                gdoc_transform_promise.fail(
+                  function(data,status,xhr) {
+                      alert("gdoc service failed to tranform html into aloha ready html.");
+                  }
+                );
+            }
+          );
+          gdoc_html_promise.fail(
+            function(data,status,xhr) {
+                alert("failed to get the google doc's html from google.");
+            }
+          );
+      }
+    );
+    gdocpicker_promise.fail(
+      function() {
+          alert('canceled out of the google doc picker.');
+      }
+    );
 });
 </script>
 </head>
