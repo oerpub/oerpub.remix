@@ -1,17 +1,535 @@
-window.Modernizr=function(t,c,l){function k(){d.input=function(a){for(var b=0,f=a.length;b<f;b++)m[a[b]]=a[b]in e;return m}("autocomplete autofocus list placeholder max min multiple pattern required step".split(" "));d.inputtypes=function(a){for(var b=0,f,u,d,g=a.length;b<g;b++)e.setAttribute("type",u=a[b]),f=e.type!=="text",f&&(e.value=j,e.style.cssText="position:absolute;visibility:hidden;",/^range$/.test(u)&&e.style.WebkitAppearance!==l?(v.appendChild(e),d=c.defaultView,f=d.getComputedStyle&&d.getComputedStyle(e,
-null).WebkitAppearance!=="textfield"&&e.offsetHeight!==0,v.removeChild(e)):/^(search|tel)$/.test(u)||(/^(url|email)$/.test(u)?f=e.checkValidity&&e.checkValidity()===!1:/^color$/.test(u)?(v.appendChild(e),f=e.value!=j,v.removeChild(e)):f=e.value!=j)),x[a[b]]=!!f;return x}("search tel url email datetime date month week time datetime-local number range color".split(" "))}function F(a,b){var f=a.charAt(0).toUpperCase()+a.substr(1),f=(a+" "+p.join(f+" ")+f).split(" ");return G(f,b)}function G(a,b){for(var f in a)if(B[a[f]]!==
-l)return b=="pfx"?a[f]:!0;return!1}var d={},v=c.documentElement;c.head||c.getElementsByTagName("head");var g=c.createElement("modernizr"),B=g.style,e=c.createElement("input"),j=":)",p="Webkit Moz O ms Khtml".split(" "),g={},x={},m={},y=[],r,w={}.hasOwnProperty,s;typeof w!==l&&typeof w.call!==l?s=function(a,b){return w.call(a,b)}:s=function(a,b){return b in a&&typeof a.constructor.prototype[b]===l};g.canvas=function(){var a=c.createElement("canvas");return!!a.getContext&&!!a.getContext("2d")};g.geolocation=
-function(){return!!navigator.geolocation};g.video=function(){var a=c.createElement("video"),b=!1;try{if(b=!!a.canPlayType)b=new Boolean(b),b.ogg=a.canPlayType('video/ogg; codecs="theora"'),b.h264=a.canPlayType('video/mp4; codecs="avc1.42E01E"')||a.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"'),b.webm=a.canPlayType('video/webm; codecs="vp8, vorbis"')}catch(f){}return b};g.audio=function(){var a=c.createElement("audio"),b=!1;try{if(b=!!a.canPlayType)b=new Boolean(b),b.ogg=a.canPlayType('audio/ogg; codecs="vorbis"'),
-b.mp3=a.canPlayType("audio/mpeg;"),b.wav=a.canPlayType('audio/wav; codecs="1"'),b.m4a=a.canPlayType("audio/x-m4a;")||a.canPlayType("audio/aac;")}catch(f){}return b};g.localstorage=function(){try{return!!localStorage.getItem}catch(a){return!1}};g.sessionstorage=function(){try{return!!sessionStorage.getItem}catch(a){return!1}};for(var C in g)s(g,C)&&(r=C.toLowerCase(),d[r]=g[C](),y.push((d[r]?"":"no-")+r));d.input||k();d.addTest=function(a,b){if(typeof a=="object")for(var f in a)s(a,f)&&d.addTest(f,
-a[f]);else{a=a.toLowerCase();if(d[a]!==l)return;b=typeof b=="boolean"?b:!!b();v.className+=" "+(b?"":"no-")+a;d[a]=b}return d};B.cssText="";g=e=null;t.attachEvent&&function(){var a=c.createElement("div");a.innerHTML="<elem></elem>";return a.childNodes.length!==1}()&&function(a,b){function f(a){for(var h=-1;++h<g;)a.createElement(e[h])}a.iepp=a.iepp||{};var c=a.iepp,d=c.html5elements||"abbr|article|aside|audio|canvas|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video",
-e=d.split("|"),g=e.length,j=RegExp("(^|\\s)("+d+")","gi"),k=RegExp("<(/*)("+d+")","gi"),m=/^\s*[\{\}]\s*$/,n=RegExp("(^|[^\\n]*?\\s)("+d+")([^\\n]*)({[\\n\\w\\W]*?})","gi"),i=b.createDocumentFragment(),o=b.documentElement,d=o.firstChild,z=b.createElement("body"),D=b.createElement("style"),N=/print|all/,q;c.getCSS=function(a,h){if(a+""===l)return"";for(var b=-1,i=a.length,o,d=[];++b<i;)o=a[b],o.disabled||(h=o.media||h,N.test(h)&&d.push(c.getCSS(o.imports,h),o.cssText),h="all");return d.join("")};c.parseCSS=
-function(a){for(var b=[],i;(i=n.exec(a))!=null;)b.push(((m.exec(i[1])?"\n":i[1])+i[2]+i[3]).replace(j,"$1.iepp_$2")+i[4]);return b.join("\n")};c.writeHTML=function(){var a=-1;for(q=q||b.body;++a<g;)for(var h=b.getElementsByTagName(e[a]),c=h.length,d=-1;++d<c;)h[d].className.indexOf("iepp_")<0&&(h[d].className+=" iepp_"+e[a]);i.appendChild(q);o.appendChild(z);z.className=q.className;z.id=q.id;z.innerHTML=q.innerHTML.replace(k,"<$1font")};c._beforePrint=function(){D.styleSheet.cssText=c.parseCSS(c.getCSS(b.styleSheets,
-"all"));c.writeHTML()};c.restoreHTML=function(){z.innerHTML="";o.removeChild(z);o.appendChild(q)};c._afterPrint=function(){c.restoreHTML();D.styleSheet.cssText=""};f(b);f(i);c.disablePP||(d.insertBefore(D,d.firstChild),D.media="print",D.className="iepp-printshim",a.attachEvent("onbeforeprint",c._beforePrint),a.attachEvent("onafterprint",c._afterPrint))}(t,c);d._version="2.0.6";d._domPrefixes=p;d.testProp=function(a){return G([a])};d.testAllProps=F;d.prefixed=function(a){return F(a,"pfx")};return d}(this,
-this.document);
-(function(t,c,l){function k(){for(var a=1,b=-1;m.length-++b;)if(m[b].s&&!(a=m[b].r))break;a&&d()}function F(a){var b=c.createElement("script"),d;b.src=a.s;b.onreadystatechange=b.onload=function(){!d&&(!b.readyState||b.readyState=="loaded"||b.readyState=="complete")&&(d=1,k(),b.onload=b.onreadystatechange=null)};j(function(){d||(d=1,k())},n.errorTimeout);a.e?b.onload():p.parentNode.insertBefore(b,p)}function G(b){var d=c.createElement("link"),f;d.href=b.s;d.rel="stylesheet";d.type="text/css";if(!b.e&&
-(a||r)){var e=function(a){j(function(){if(!f)try{a.sheet.cssRules.length?(f=1,k()):e(a)}catch(b){b.code==1E3||b.message=="security"||b.message=="denied"?(f=1,j(function(){k()},0)):e(a)}},0)};e(d)}else d.onload=function(){f||(f=1,j(function(){k()},0))},b.e&&d.onload();j(function(){f||(f=1,k())},n.errorTimeout);!b.e&&p.parentNode.insertBefore(d,p)}function d(){var a=m.shift();y=1;a?a.t?j(function(){a.t=="c"?G(a):F(a)},0):(a(),k()):y=0}function v(a,b,f,e,g,q){function l(){!H&&(!h.readyState||h.readyState==
-"loaded"||h.readyState=="complete")&&(A.r=H=1,!y&&k(),h.onload=h.onreadystatechange=null,j(function(){s.removeChild(h)},0))}var h=c.createElement(a),H=0,A={t:f,s:b,e:q};h.src=h.data=b;!w&&(h.style.display="none");h.width=h.height="0";a!="object"&&(h.type=f);h.onload=h.onreadystatechange=l;a=="img"?h.onerror=l:a=="script"&&(h.onerror=function(){A.e=A.r=1;d()});m.splice(e,0,A);s.insertBefore(h,w?null:p);j(function(){H||(s.removeChild(h),A.r=A.e=H=1,k())},n.errorTimeout)}function g(a,b,c){var g=b=="c"?
-u:f;y=0;b=b||"j";E(a)?v(g,a,b,this.i++,e,c):(m.splice(this.i++,0,a),m.length==1&&d());return this}function B(){var a=n;a.loader={load:g,i:0};return a}var e=c.documentElement,j=t.setTimeout,p=c.getElementsByTagName("script")[0],x={}.toString,m=[],y=0,r="MozAppearance"in e.style,w=r&&!!c.createRange().compareNode,s=w?e:p.parentNode,C=t.opera&&x.call(t.opera)=="[object Opera]",a="webkitAppearance"in e.style,b=a&&"async"in c.createElement("script"),f=r?"object":C||b?"img":"script",u=a?"img":f,K=Array.isArray||
-function(a){return x.call(a)=="[object Array]"},E=function(a){return typeof a=="string"},I=function(a){return x.call(a)=="[object Function]"},J=[],L={},M,n;n=function(a){function b(a){var a=a.split("!"),d=J.length,c=a.pop(),f=a.length,c={url:c,origUrl:c,prefixes:a},e,g;for(g=0;g<f;g++)e=L[a[g]],e&&(c=e(c));for(g=0;g<d;g++)c=J[g](c);return c}function d(a,c,f,e,g){var i=b(a),j=i.autoCallback;if(!i.bypass){c&&(c=I(c)?c:c[a]||c[e]||c[a.split("/").pop().split("?")[0]]);if(i.instead)return i.instead(a,
-c,f,e,g);f.load(i.url,i.forceCSS||!i.forceJS&&/css$/.test(i.url)?"c":l,i.noexec);(I(c)||I(j))&&f.load(function(){B();c&&c(i.origUrl,g,e);j&&j(i.origUrl,g,e)})}}function c(a,b){function f(a){if(E(a))d(a,i,b,0,e);else if(Object(a)===a)for(j in a)a.hasOwnProperty(j)&&d(a[j],i,b,j,e)}var e=!!a.test,g=a.load||a.both,i=a.callback,j;f(e?a.yep:a.nope);f(g);a.complete&&b.load(a.complete)}var f,e,g=this.yepnope.loader;if(E(a))d(a,0,g,0);else if(K(a))for(f=0;f<a.length;f++)e=a[f],E(e)?d(e,0,g,0):K(e)?n(e):Object(e)===
-e&&c(e,g);else Object(a)===a&&c(a,g)};n.addPrefix=function(a,b){L[a]=b};n.addFilter=function(a){J.push(a)};n.errorTimeout=1E4;c.readyState==null&&c.addEventListener&&(c.readyState="loading",c.addEventListener("DOMContentLoaded",M=function(){c.removeEventListener("DOMContentLoaded",M,0);c.readyState="complete"},0));t.yepnope=B()})(this,this.document);Modernizr.load=function(){yepnope.apply(window,[].slice.call(arguments,0))};
+/* Modernizr 2.6.2 (Custom Build) | MIT & BSD
+ * Build: http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load
+ */
+;
+
+
+
+window.Modernizr = (function( window, document, undefined ) {
+
+    var version = '2.6.2',
+
+    Modernizr = {},
+
+    enableClasses = true,
+
+    docElement = document.documentElement,
+
+    mod = 'modernizr',
+    modElem = document.createElement(mod),
+    mStyle = modElem.style,
+
+    inputElem  = document.createElement('input')  ,
+
+    smile = ':)',
+
+    toString = {}.toString,
+
+    prefixes = ' -webkit- -moz- -o- -ms- '.split(' '),
+
+
+
+    omPrefixes = 'Webkit Moz O ms',
+
+    cssomPrefixes = omPrefixes.split(' '),
+
+    domPrefixes = omPrefixes.toLowerCase().split(' '),
+
+
+    tests = {},
+    inputs = {},
+    attrs = {},
+
+    classes = [],
+
+    slice = classes.slice,
+
+    featureName,
+
+
+
+    _hasOwnProperty = ({}).hasOwnProperty, hasOwnProp;
+
+    if ( !is(_hasOwnProperty, 'undefined') && !is(_hasOwnProperty.call, 'undefined') ) {
+      hasOwnProp = function (object, property) {
+        return _hasOwnProperty.call(object, property);
+      };
+    }
+    else {
+      hasOwnProp = function (object, property) { 
+        return ((property in object) && is(object.constructor.prototype[property], 'undefined'));
+      };
+    }
+
+
+    if (!Function.prototype.bind) {
+      Function.prototype.bind = function bind(that) {
+
+        var target = this;
+
+        if (typeof target != "function") {
+            throw new TypeError();
+        }
+
+        var args = slice.call(arguments, 1),
+            bound = function () {
+
+            if (this instanceof bound) {
+
+              var F = function(){};
+              F.prototype = target.prototype;
+              var self = new F();
+
+              var result = target.apply(
+                  self,
+                  args.concat(slice.call(arguments))
+              );
+              if (Object(result) === result) {
+                  return result;
+              }
+              return self;
+
+            } else {
+
+              return target.apply(
+                  that,
+                  args.concat(slice.call(arguments))
+              );
+
+            }
+
+        };
+
+        return bound;
+      };
+    }
+
+    function setCss( str ) {
+        mStyle.cssText = str;
+    }
+
+    function setCssAll( str1, str2 ) {
+        return setCss(prefixes.join(str1 + ';') + ( str2 || '' ));
+    }
+
+    function is( obj, type ) {
+        return typeof obj === type;
+    }
+
+    function contains( str, substr ) {
+        return !!~('' + str).indexOf(substr);
+    }
+
+    function testProps( props, prefixed ) {
+        for ( var i in props ) {
+            var prop = props[i];
+            if ( !contains(prop, "-") && mStyle[prop] !== undefined ) {
+                return prefixed == 'pfx' ? prop : true;
+            }
+        }
+        return false;
+    }
+
+    function testDOMProps( props, obj, elem ) {
+        for ( var i in props ) {
+            var item = obj[props[i]];
+            if ( item !== undefined) {
+
+                            if (elem === false) return props[i];
+
+                            if (is(item, 'function')){
+                                return item.bind(elem || obj);
+                }
+
+                            return item;
+            }
+        }
+        return false;
+    }
+
+    function testPropsAll( prop, prefixed, elem ) {
+
+        var ucProp  = prop.charAt(0).toUpperCase() + prop.slice(1),
+            props   = (prop + ' ' + cssomPrefixes.join(ucProp + ' ') + ucProp).split(' ');
+
+            if(is(prefixed, "string") || is(prefixed, "undefined")) {
+          return testProps(props, prefixed);
+
+            } else {
+          props = (prop + ' ' + (domPrefixes).join(ucProp + ' ') + ucProp).split(' ');
+          return testDOMProps(props, prefixed, elem);
+        }
+    }
+
+
+
+    tests['canvas'] = function() {
+        var elem = document.createElement('canvas');
+        return !!(elem.getContext && elem.getContext('2d'));
+    };    tests['geolocation'] = function() {
+        return 'geolocation' in navigator;
+    };
+
+
+    tests['video'] = function() {
+        var elem = document.createElement('video'),
+            bool = false;
+
+            try {
+            if ( bool = !!elem.canPlayType ) {
+                bool      = new Boolean(bool);
+                bool.ogg  = elem.canPlayType('video/ogg; codecs="theora"')      .replace(/^no$/,'');
+
+                            bool.h264 = elem.canPlayType('video/mp4; codecs="avc1.42E01E"') .replace(/^no$/,'');
+
+                bool.webm = elem.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/^no$/,'');
+            }
+
+        } catch(e) { }
+
+        return bool;
+    };
+
+    tests['audio'] = function() {
+        var elem = document.createElement('audio'),
+            bool = false;
+
+        try {
+            if ( bool = !!elem.canPlayType ) {
+                bool      = new Boolean(bool);
+                bool.ogg  = elem.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/,'');
+                bool.mp3  = elem.canPlayType('audio/mpeg;')               .replace(/^no$/,'');
+
+                                                    bool.wav  = elem.canPlayType('audio/wav; codecs="1"')     .replace(/^no$/,'');
+                bool.m4a  = ( elem.canPlayType('audio/x-m4a;')            ||
+                              elem.canPlayType('audio/aac;'))             .replace(/^no$/,'');
+            }
+        } catch(e) { }
+
+        return bool;
+    };
+
+
+    tests['localstorage'] = function() {
+        try {
+            localStorage.setItem(mod, mod);
+            localStorage.removeItem(mod);
+            return true;
+        } catch(e) {
+            return false;
+        }
+    };
+
+    tests['sessionstorage'] = function() {
+        try {
+            sessionStorage.setItem(mod, mod);
+            sessionStorage.removeItem(mod);
+            return true;
+        } catch(e) {
+            return false;
+        }
+    };
+
+    function webforms() {
+                                            Modernizr['input'] = (function( props ) {
+            for ( var i = 0, len = props.length; i < len; i++ ) {
+                attrs[ props[i] ] = !!(props[i] in inputElem);
+            }
+            if (attrs.list){
+                                  attrs.list = !!(document.createElement('datalist') && window.HTMLDataListElement);
+            }
+            return attrs;
+        })('autocomplete autofocus list placeholder max min multiple pattern required step'.split(' '));
+                            Modernizr['inputtypes'] = (function(props) {
+
+            for ( var i = 0, bool, inputElemType, defaultView, len = props.length; i < len; i++ ) {
+
+                inputElem.setAttribute('type', inputElemType = props[i]);
+                bool = inputElem.type !== 'text';
+
+                                                    if ( bool ) {
+
+                    inputElem.value         = smile;
+                    inputElem.style.cssText = 'position:absolute;visibility:hidden;';
+
+                    if ( /^range$/.test(inputElemType) && inputElem.style.WebkitAppearance !== undefined ) {
+
+                      docElement.appendChild(inputElem);
+                      defaultView = document.defaultView;
+
+                                        bool =  defaultView.getComputedStyle &&
+                              defaultView.getComputedStyle(inputElem, null).WebkitAppearance !== 'textfield' &&
+                                                                                  (inputElem.offsetHeight !== 0);
+
+                      docElement.removeChild(inputElem);
+
+                    } else if ( /^(search|tel)$/.test(inputElemType) ){
+                                                                                    } else if ( /^(url|email)$/.test(inputElemType) ) {
+                                        bool = inputElem.checkValidity && inputElem.checkValidity() === false;
+
+                    } else {
+                                        bool = inputElem.value != smile;
+                    }
+                }
+
+                inputs[ props[i] ] = !!bool;
+            }
+            return inputs;
+        })('search tel url email datetime date month week time datetime-local number range color'.split(' '));
+        }
+    for ( var feature in tests ) {
+        if ( hasOwnProp(tests, feature) ) {
+                                    featureName  = feature.toLowerCase();
+            Modernizr[featureName] = tests[feature]();
+
+            classes.push((Modernizr[featureName] ? '' : 'no-') + featureName);
+        }
+    }
+
+    Modernizr.input || webforms();
+
+
+     Modernizr.addTest = function ( feature, test ) {
+       if ( typeof feature == 'object' ) {
+         for ( var key in feature ) {
+           if ( hasOwnProp( feature, key ) ) {
+             Modernizr.addTest( key, feature[ key ] );
+           }
+         }
+       } else {
+
+         feature = feature.toLowerCase();
+
+         if ( Modernizr[feature] !== undefined ) {
+                                              return Modernizr;
+         }
+
+         test = typeof test == 'function' ? test() : test;
+
+         if (typeof enableClasses !== "undefined" && enableClasses) {
+           docElement.className += ' ' + (test ? '' : 'no-') + feature;
+         }
+         Modernizr[feature] = test;
+
+       }
+
+       return Modernizr; 
+     };
+
+
+    setCss('');
+    modElem = inputElem = null;
+
+    ;(function(window, document) {
+        var options = window.html5 || {};
+
+        var reSkip = /^<|^(?:button|map|select|textarea|object|iframe|option|optgroup)$/i;
+
+        var saveClones = /^(?:a|b|code|div|fieldset|h1|h2|h3|h4|h5|h6|i|label|li|ol|p|q|span|strong|style|table|tbody|td|th|tr|ul)$/i;
+
+        var supportsHtml5Styles;
+
+        var expando = '_html5shiv';
+
+        var expanID = 0;
+
+        var expandoData = {};
+
+        var supportsUnknownElements;
+
+      (function() {
+        try {
+            var a = document.createElement('a');
+            a.innerHTML = '<xyz></xyz>';
+                    supportsHtml5Styles = ('hidden' in a);
+
+            supportsUnknownElements = a.childNodes.length == 1 || (function() {
+                        (document.createElement)('a');
+              var frag = document.createDocumentFragment();
+              return (
+                typeof frag.cloneNode == 'undefined' ||
+                typeof frag.createDocumentFragment == 'undefined' ||
+                typeof frag.createElement == 'undefined'
+              );
+            }());
+        } catch(e) {
+          supportsHtml5Styles = true;
+          supportsUnknownElements = true;
+        }
+
+      }());        function addStyleSheet(ownerDocument, cssText) {
+        var p = ownerDocument.createElement('p'),
+            parent = ownerDocument.getElementsByTagName('head')[0] || ownerDocument.documentElement;
+
+        p.innerHTML = 'x<style>' + cssText + '</style>';
+        return parent.insertBefore(p.lastChild, parent.firstChild);
+      }
+
+        function getElements() {
+        var elements = html5.elements;
+        return typeof elements == 'string' ? elements.split(' ') : elements;
+      }
+
+          function getExpandoData(ownerDocument) {
+        var data = expandoData[ownerDocument[expando]];
+        if (!data) {
+            data = {};
+            expanID++;
+            ownerDocument[expando] = expanID;
+            expandoData[expanID] = data;
+        }
+        return data;
+      }
+
+        function createElement(nodeName, ownerDocument, data){
+        if (!ownerDocument) {
+            ownerDocument = document;
+        }
+        if(supportsUnknownElements){
+            return ownerDocument.createElement(nodeName);
+        }
+        if (!data) {
+            data = getExpandoData(ownerDocument);
+        }
+        var node;
+
+        if (data.cache[nodeName]) {
+            node = data.cache[nodeName].cloneNode();
+        } else if (saveClones.test(nodeName)) {
+            node = (data.cache[nodeName] = data.createElem(nodeName)).cloneNode();
+        } else {
+            node = data.createElem(nodeName);
+        }
+
+                                    return node.canHaveChildren && !reSkip.test(nodeName) ? data.frag.appendChild(node) : node;
+      }
+
+        function createDocumentFragment(ownerDocument, data){
+        if (!ownerDocument) {
+            ownerDocument = document;
+        }
+        if(supportsUnknownElements){
+            return ownerDocument.createDocumentFragment();
+        }
+        data = data || getExpandoData(ownerDocument);
+        var clone = data.frag.cloneNode(),
+            i = 0,
+            elems = getElements(),
+            l = elems.length;
+        for(;i<l;i++){
+            clone.createElement(elems[i]);
+        }
+        return clone;
+      }
+
+        function shivMethods(ownerDocument, data) {
+        if (!data.cache) {
+            data.cache = {};
+            data.createElem = ownerDocument.createElement;
+            data.createFrag = ownerDocument.createDocumentFragment;
+            data.frag = data.createFrag();
+        }
+
+
+        ownerDocument.createElement = function(nodeName) {
+                if (!html5.shivMethods) {
+              return data.createElem(nodeName);
+          }
+          return createElement(nodeName, ownerDocument, data);
+        };
+
+        ownerDocument.createDocumentFragment = Function('h,f', 'return function(){' +
+          'var n=f.cloneNode(),c=n.createElement;' +
+          'h.shivMethods&&(' +
+                    getElements().join().replace(/\w+/g, function(nodeName) {
+              data.createElem(nodeName);
+              data.frag.createElement(nodeName);
+              return 'c("' + nodeName + '")';
+            }) +
+          ');return n}'
+        )(html5, data.frag);
+      }        function shivDocument(ownerDocument) {
+        if (!ownerDocument) {
+            ownerDocument = document;
+        }
+        var data = getExpandoData(ownerDocument);
+
+        if (html5.shivCSS && !supportsHtml5Styles && !data.hasCSS) {
+          data.hasCSS = !!addStyleSheet(ownerDocument,
+                    'article,aside,figcaption,figure,footer,header,hgroup,nav,section{display:block}' +
+                    'mark{background:#FF0;color:#000}'
+          );
+        }
+        if (!supportsUnknownElements) {
+          shivMethods(ownerDocument, data);
+        }
+        return ownerDocument;
+      }        var html5 = {
+
+            'elements': options.elements || 'abbr article aside audio bdi canvas data datalist details figcaption figure footer header hgroup mark meter nav output progress section summary time video',
+
+            'shivCSS': (options.shivCSS !== false),
+
+            'supportsUnknownElements': supportsUnknownElements,
+
+            'shivMethods': (options.shivMethods !== false),
+
+            'type': 'default',
+
+            'shivDocument': shivDocument,
+
+            createElement: createElement,
+
+            createDocumentFragment: createDocumentFragment
+      };        window.html5 = html5;
+
+        shivDocument(document);
+
+    }(this, document));
+
+    Modernizr._version      = version;
+
+    Modernizr._prefixes     = prefixes;
+    Modernizr._domPrefixes  = domPrefixes;
+    Modernizr._cssomPrefixes  = cssomPrefixes;
+
+
+
+    Modernizr.testProp      = function(prop){
+        return testProps([prop]);
+    };
+
+    Modernizr.testAllProps  = testPropsAll;
+
+
+    Modernizr.prefixed      = function(prop, obj, elem){
+      if(!obj) {
+        return testPropsAll(prop, 'pfx');
+      } else {
+            return testPropsAll(prop, obj, elem);
+      }
+    };
+
+
+    docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2') +
+
+                                                    (enableClasses ? ' js ' + classes.join(' ') : '');
+
+    return Modernizr;
+
+})(this, this.document);
+/*yepnope1.5.4|WTFPL*/
+(function(a,b,c){function d(a){return"[object Function]"==o.call(a)}function e(a){return"string"==typeof a}function f(){}function g(a){return!a||"loaded"==a||"complete"==a||"uninitialized"==a}function h(){var a=p.shift();q=1,a?a.t?m(function(){("c"==a.t?B.injectCss:B.injectJs)(a.s,0,a.a,a.x,a.e,1)},0):(a(),h()):q=0}function i(a,c,d,e,f,i,j){function k(b){if(!o&&g(l.readyState)&&(u.r=o=1,!q&&h(),l.onload=l.onreadystatechange=null,b)){"img"!=a&&m(function(){t.removeChild(l)},50);for(var d in y[c])y[c].hasOwnProperty(d)&&y[c][d].onload()}}var j=j||B.errorTimeout,l=b.createElement(a),o=0,r=0,u={t:d,s:c,e:f,a:i,x:j};1===y[c]&&(r=1,y[c]=[]),"object"==a?l.data=c:(l.src=c,l.type=a),l.width=l.height="0",l.onerror=l.onload=l.onreadystatechange=function(){k.call(this,r)},p.splice(e,0,u),"img"!=a&&(r||2===y[c]?(t.insertBefore(l,s?null:n),m(k,j)):y[c].push(l))}function j(a,b,c,d,f){return q=0,b=b||"j",e(a)?i("c"==b?v:u,a,b,this.i++,c,d,f):(p.splice(this.i++,0,a),1==p.length&&h()),this}function k(){var a=B;return a.loader={load:j,i:0},a}var l=b.documentElement,m=a.setTimeout,n=b.getElementsByTagName("script")[0],o={}.toString,p=[],q=0,r="MozAppearance"in l.style,s=r&&!!b.createRange().compareNode,t=s?l:n.parentNode,l=a.opera&&"[object Opera]"==o.call(a.opera),l=!!b.attachEvent&&!l,u=r?"object":l?"script":"img",v=l?"script":u,w=Array.isArray||function(a){return"[object Array]"==o.call(a)},x=[],y={},z={timeout:function(a,b){return b.length&&(a.timeout=b[0]),a}},A,B;B=function(a){function b(a){var a=a.split("!"),b=x.length,c=a.pop(),d=a.length,c={url:c,origUrl:c,prefixes:a},e,f,g;for(f=0;f<d;f++)g=a[f].split("="),(e=z[g.shift()])&&(c=e(c,g));for(f=0;f<b;f++)c=x[f](c);return c}function g(a,e,f,g,h){var i=b(a),j=i.autoCallback;i.url.split(".").pop().split("?").shift(),i.bypass||(e&&(e=d(e)?e:e[a]||e[g]||e[a.split("/").pop().split("?")[0]]),i.instead?i.instead(a,e,f,g,h):(y[i.url]?i.noexec=!0:y[i.url]=1,f.load(i.url,i.forceCSS||!i.forceJS&&"css"==i.url.split(".").pop().split("?").shift()?"c":c,i.noexec,i.attrs,i.timeout),(d(e)||d(j))&&f.load(function(){k(),e&&e(i.origUrl,h,g),j&&j(i.origUrl,h,g),y[i.url]=2})))}function h(a,b){function c(a,c){if(a){if(e(a))c||(j=function(){var a=[].slice.call(arguments);k.apply(this,a),l()}),g(a,j,b,0,h);else if(Object(a)===a)for(n in m=function(){var b=0,c;for(c in a)a.hasOwnProperty(c)&&b++;return b}(),a)a.hasOwnProperty(n)&&(!c&&!--m&&(d(j)?j=function(){var a=[].slice.call(arguments);k.apply(this,a),l()}:j[n]=function(a){return function(){var b=[].slice.call(arguments);a&&a.apply(this,b),l()}}(k[n])),g(a[n],j,b,n,h))}else!c&&l()}var h=!!a.test,i=a.load||a.both,j=a.callback||f,k=j,l=a.complete||f,m,n;c(h?a.yep:a.nope,!!i),i&&c(i)}var i,j,l=this.yepnope.loader;if(e(a))g(a,0,l,0);else if(w(a))for(i=0;i<a.length;i++)j=a[i],e(j)?g(j,0,l,0):w(j)?B(j):Object(j)===j&&h(j,l);else Object(a)===a&&h(a,l)},B.addPrefix=function(a,b){z[a]=b},B.addFilter=function(a){x.push(a)},B.errorTimeout=1e4,null==b.readyState&&b.addEventListener&&(b.readyState="loading",b.addEventListener("DOMContentLoaded",A=function(){b.removeEventListener("DOMContentLoaded",A,0),b.readyState="complete"},0)),a.yepnope=k(),a.yepnope.executeStack=h,a.yepnope.injectJs=function(a,c,d,e,i,j){var k=b.createElement("script"),l,o,e=e||B.errorTimeout;k.src=a;for(o in d)k.setAttribute(o,d[o]);c=j?h:c||f,k.onreadystatechange=k.onload=function(){!l&&g(k.readyState)&&(l=1,c(),k.onload=k.onreadystatechange=null)},m(function(){l||(l=1,c(1))},e),i?k.onload():n.parentNode.insertBefore(k,n)},a.yepnope.injectCss=function(a,c,d,e,g,i){var e=b.createElement("link"),j,c=i?h:c||f;e.href=a,e.rel="stylesheet",e.type="text/css";for(j in d)e.setAttribute(j,d[j]);g||(n.parentNode.insertBefore(e,n),m(c,0))}})(this,document);
+Modernizr.load=function(){yepnope.apply(window,[].slice.call(arguments,0));};
+// Track element + Timed Text Track API
+// http://www.w3.org/TR/html5/video.html#the-track-element
+// http://www.w3.org/TR/html5/media-elements.html#text-track-api
+//
+// While IE10 has implemented the track element, IE10 does not expose the underlying APIs to create timed text tracks by JS (really sad)
+// By Addy Osmani
+Modernizr.addTest({
+	texttrackapi: (typeof (document.createElement('video').addTextTrack) === 'function'),
+	// a more strict test for track including UI support: document.createElement('track').kind === 'subtitles'
+	track: ('kind' in document.createElement('track'))
+});
+;
