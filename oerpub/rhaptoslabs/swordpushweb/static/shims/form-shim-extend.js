@@ -1,24 +1,744 @@
-Modernizr.formvalidation||jQuery.webshims.register("form-extend",function(a,e,p,k){e.inputTypes=e.inputTypes||{};var m=e.cfg.forms,l,j=function(b){return typeof b=="number"||b&&b==b*1},n=e.inputTypes,o={radio:1,checkbox:1};e.addInputType=function(b,a){n[b]=a};var f={customError:!1,typeMismatch:!1,rangeUnderflow:!1,rangeOverflow:!1,stepMismatch:!1,tooLong:!1,patternMismatch:!1,valueMissing:!1,valid:!0},c={valueMissing:function(b,c,h){if(!b.attr("required"))return!1;var d=!1;if(!("type"in h))h.type=
-(b[0].getAttribute("type")||b[0].type||"").toLowerCase();if(h.nodeName=="select"){if(c=!c)if(!(c=b[0].selectedIndex<0))b=b[0],c=b.type=="select-one"&&b.size<2?!!a("> option:first-child",b).prop("selected"):!1;b=c}else b=o[h.type]?h.type=="checkbox"?!b.is(":checked"):!a(b[0].form&&b[0].name?b[0].form[b[0].name]:[]).filter(":checked")[0]:!c;return b},tooLong:function(b,a,c){if(a===""||c.nodeName=="select")return!1;var b=b.attr("maxlength"),c=!1,d=a.length;d&&b>=0&&a.replace&&j(b)&&(c=d>b);return c},
-typeMismatch:function(b,a,c){if(a===""||c.nodeName=="select")return!1;var d=!1;if(!("type"in c))c.type=(b[0].getAttribute("type")||b[0].type||"").toLowerCase();n[c.type]&&n[c.type].mismatch&&(d=n[c.type].mismatch(a,b));return d},patternMismatch:function(b,a,c){if(a===""||c.nodeName=="select")return!1;b=b.attr("pattern");if(!b)return!1;b=RegExp("^(?:"+b+")$");return!b?!1:!b.test(a)}};e.addValidityRule=function(b,a){c[b]=a};a.event.special.invalid={add:function(){a.event.special.invalid.setup.call(this.form||
-this)},setup:function(){var b=this.form||this;a.data(b,"invalidEventShim")||(a(b).data("invalidEventShim",!0).bind("submit",a.event.special.invalid.handler),e.moveToFirstEvent(b,"submit"))},teardown:a.noop,handler:function(b){if(!(b.type!="submit"||b.testedValidity||!b.originalEvent||!a.nodeName(b.target,"form")||a.prop(b.target,"noValidate"))){l=!0;b.testedValidity=!0;if(!a(b.target).checkValidity())return b.stopImmediatePropagation(),l=!1;l=!1}}};a(k).bind("invalid",a.noop);a.event.special.submit=
-a.event.special.submit||{setup:function(){return!1}};var d=a.event.special.submit.setup;a.extend(a.event.special.submit,{setup:function(){a.nodeName(this,"form")?a(this).bind("invalid",a.noop):a("form",this).bind("invalid",a.noop);return d.apply(this,arguments)}});e.addInputType("email",{mismatch:function(){var b=m.emailReg||/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|(\x22((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?\x22))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)*(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
-return function(a){return!b.test(a)}}()});e.addInputType("url",{mismatch:function(){var b=m.urlReg||/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
-return function(a){return!b.test(a)}}()});e.defineNodeNamesProperties(["button","fieldset","output"],{checkValidity:{value:function(){return!0}},willValidate:{value:!1},setCustomValidity:{value:a.noop},validity:{writeable:!1,get:function(){return a.extend({},f)}}},"prop");var i=function(b){var c,d=a.prop(b,"validity");if(d)a.data(b,"cachedValidity",d);else return!0;if(!d.valid){c=a.Event("invalid");var f=a(b).trigger(c);if(l&&!i.unhandledInvalids&&!c.isDefaultPrevented())e.validityAlert.showFor(f),
-i.unhandledInvalids=!0}a.removeData(b,"cachedValidity",!1);return d.valid};e.defineNodeNameProperty("form","checkValidity",{prop:{value:function(){var b=!0,c=a("input,textarea,select",this).filter(function(){var a=e.data(this,"shadowData");return!a||!a.nativeElement||a.nativeElement===this});i.unhandledInvalids=!1;for(var d=0,f=c.length;d<f;d++)i(c[d])||(b=!1);return b}}});e.defineNodeNamesProperties(["input","textarea","select"],{checkValidity:{value:function(){i.unhandledInvalids=!1;return i(a(this).getNativeElement()[0])}},
-setCustomValidity:{value:function(a){e.data(this,"customvalidationMessage",""+a)}},willValidate:{set:a.noop,get:function(){var b={button:1,reset:1,hidden:1,image:1};return function(){var c=a(this).getNativeElement()[0];return!(c.disabled||c.readOnly||b[c.type]||c.form&&a.prop(c.form,"noValidate"))}}()},validity:{set:a.noop,get:function(){var b=a(this).getNativeElement(),d=b[0],h=a.data(d,"cachedValidity");if(h)return h;h=a.extend({},f);if(!a.prop(d,"willValidate")||d.type=="submit")return h;var i=
-b.val(),g={nodeName:d.nodeName.toLowerCase()};h.customError=!!e.data(d,"customvalidationMessage");if(h.customError)h.valid=!1;a.each(c,function(a,c){if(c(b,i,g))h[a]=!0,h.valid=!1});d.setAttribute("aria-invalid",h.valid?"false":"true");d=b=null;return h}}},"prop");e.defineNodeNamesBooleanProperty(["input","textarea","select"],"required",{set:function(a){this.setAttribute("aria-required",!!a+"")},initAttr:!0});e.reflectProperties(["input"],["pattern"]);e.defineNodeNameProperty("textarea","maxlength",
-{attr:{set:function(a){this.setAttribute("maxlength",""+a)},get:function(){var a=this.getAttribute("maxlength");return a==null?void 0:a}},prop:{set:function(a){if(j(a)){if(a<0)throw"INDEX_SIZE_ERR";this.setAttribute("maxlength",parseInt(a,10))}else this.setAttribute("maxlength","0")},get:function(){var a=this.getAttribute("maxlength");return j(a)&&a>=0?parseInt(a,10):-1}}});e.defineNodeNameProperty("textarea","maxLength",{prop:{set:function(b){a.prop(this,"maxlength",b)},get:function(){return a.prop(this,
-"maxlength")}}});var q={submit:1,button:1,image:1},g={};[{name:"enctype",limitedTo:{"application/x-www-form-urlencoded":1,"multipart/form-data":1,"text/plain":1},defaultProp:"application/x-www-form-urlencoded",proptype:"enum"},{name:"method",limitedTo:{get:1,post:1},defaultProp:"get",proptype:"enum"},{name:"action",proptype:"url"},{name:"target"},{name:"novalidate",propName:"noValidate",proptype:"boolean"}].forEach(function(b){var c="form"+(b.propName||b.name).replace(/^[a-z]/,function(a){return a.toUpperCase()}),
-d="form"+b.name,f=b.name,e="click.webshimssubmittermutate"+f,i=function(){if("form"in this&&q[this.type]){var e=a.prop(this,"form");if(e){var i=a.attr(this,d);if(i!=null&&(!b.limitedTo||i.toLowerCase()===a.prop(this,c))){var g=a.attr(e,f);a.attr(e,f,i);setTimeout(function(){g!=null?a.attr(e,f,g):a(e).removeAttr(f)},9)}}}};switch(b.proptype){case "url":var j=k.createElement("form");g[c]={prop:{set:function(b){a.attr(this,d,b)},get:function(){var b=a.attr(this,d);if(b==null)return"";j.setAttribute("action",
-b);return j.action}}};break;case "boolean":g[c]={prop:{set:function(b){b?a.attr(this,"formnovalidate","formnovalidate"):a(this).removeAttr("formnovalidate")},get:function(){return a.attr(this,"formnovalidate")!=null}}};break;case "enum":g[c]={prop:{set:function(b){a.attr(this,d,b)},get:function(){var c=a.attr(this,d);return!c||(c=c.toLowerCase())&&!b.limitedTo[c]?b.defaultProp:c}}};break;default:g[c]={prop:{set:function(b){a.attr(this,d,b)},get:function(){var b=a.attr(this,d);return b!=null?b:""}}}}g[d]||
-(g[d]={});g[d].attr={set:function(b){g[d].attr._supset.call(this,b);a(this).unbind(e).bind(e,i)},get:function(){return g[d].attr._supget.call(this)}};g[d].initAttr=!0;g[d].removeAttr={value:function(){a(this).unbind(e);g[d].removeAttr._supvalue.call(this)}}});e.defineNodeNamesProperties(["input","button"],g);!a.support.getSetAttribute&&a("<form novalidate></form>").attr("novalidate")==null&&e.defineNodeNameProperty("form","novalidate",{attr:{set:function(a){this.setAttribute("novalidate",""+a)},get:function(){var a=
-this.getAttribute("novalidate");return a==null?void 0:a}}});e.defineNodeNameProperty("form","noValidate",{prop:{set:function(b){b?a.attr(this,"novalidate","novalidate"):a(this).removeAttr("novalidate")},get:function(){return a.attr(this,"novalidate")!=null}}});e.addReady(function(b,c){a("form",b).add(c.filter("form")).bind("invalid",a.noop);setTimeout(function(){try{if(k.activeElement&&"form"in k.activeElement)return}catch(c){return}var d=!0;a("input, select, textarea",b).each(function(){if(!d)return!1;
-if(this.getAttribute("autofocus")!=null){d=!1;var b=a(this).getShadowFocusElement();try{b[0].focus()}catch(c){}return!1}})},0)})});
-jQuery.webshims.ready("dom-support form-core",function(a,e,p){Modernizr.textareaPlaceholder=!!("placeholder"in a("<textarea />")[0]);if(!Modernizr.input.placeholder||!Modernizr.textareaPlaceholder){var k=e.cfg.forms.placeholderType=="over",m=["textarea"];Modernizr.input.placeholder||m.push("input");var l=function(f,c,d){if(!k&&f.type!="password")d===!1&&(d=a.prop(f,"value")),f.value=d;c.box.removeClass("placeholder-visible")},j=function(f,c,d,e,j){if(!e&&(e=a.data(f,"placeHolder"),!e))return;if(j==
-"focus"||!j&&f===document.activeElement)(f.type=="password"||k||a(f).hasClass("placeholder-visible"))&&l(f,e,"");else if(c===!1&&(c=a.prop(f,"value")),c)l(f,e,c);else if(d===!1&&(d=a.attr(f,"placeholder")||""),d&&!c){c=e;d===!1&&(d=a.attr(f,"placeholder")||"");if(!k&&f.type!="password")f.value=d;c.box.addClass("placeholder-visible")}else l(f,e,c)},n=function(e){var e=a(e),c=e.prop("id"),d=!(!e.attr("title")&&!e.attr("aria-labeledby"));!d&&c&&(d=!!a('label[for="'+c+'"]',e[0].form)[0]);return a(d?'<span class="placeholder-text"></span>':
-'<label for="'+(c||a.webshims.getID(e))+'" class="placeholder-text"></label>')},o=function(){var e={text:1,search:1,url:1,email:1,password:1,tel:1};return{create:function(c){var d=a.data(c,"placeHolder");if(d)return d;d=a.data(c,"placeHolder",{text:n(c)});a(c).bind("focus.placeholder blur.placeholder",function(a){j(this,!1,!1,d,a.type)});c.form&&a(c.form).bind("reset.placeholder",function(a){setTimeout(function(){j(c,!1,!1,d,a.type)},0)});if(c.type=="password"||k){d.box=a(c).wrap('<span class="placeholder-box placeholder-box-'+
-(c.nodeName||"").toLowerCase()+'" />').parent();d.text.insertAfter(c).bind("mousedown.placeholder",function(){j(this,!1,!1,d,"focus");try{setTimeout(function(){c.focus()},0)}catch(a){}return!1});a.each(["Left","Top"],function(e,b){var f=(parseInt(a.curCSS(c,"padding"+b),10)||0)+Math.max(parseInt(a.curCSS(c,"margin"+b),10)||0,0)+(parseInt(a.curCSS(c,"border"+b+"Width"),10)||0);d.text.css("padding"+b,f)});a.curCSS(c,"lineHeight");var e={width:a(c).width(),height:a(c).height()},f=a.curCSS(c,"float");
-a.each(["lineHeight","fontSize","fontFamily","fontWeight"],function(e,b){var f=a.curCSS(c,b);d.text.css(b)!=f&&d.text.css(b,f)});e.width&&e.height&&d.text.css(e);f!=="none"&&d.box.addClass("placeholder-box-"+f)}else{e=function(e){a(c).hasClass("placeholder-visible")&&(l(c,d,""),e&&e.type=="submit"&&setTimeout(function(){e.isDefaultPrevented()&&j(c,!1,!1,d)},9))};if(a.nodeName(d.text[0],"label"))d.text.hide()[a.browser.msie?"insertBefore":"insertAfter"](c);a(p).bind("beforeunload",e);d.box=a(c);c.form&&
-a(c.form).submit(e)}return d},update:function(c,d){if(e[a.prop(c,"type")]||a.nodeName(c,"textarea")){var i=o.create(c);i.text.text(d);j(c,!1,d,i)}}}}();a.webshims.publicMethods={pHolder:o};m.forEach(function(a){e.defineNodeNameProperty(a,"placeholder",{attr:{set:function(a){e.contentAttr(this,"placeholder",a);o.update(this,a)},get:function(){return e.contentAttr(this,"placeholder")}},reflect:!0,initAttr:!0})});m.forEach(function(f){var c={},d;["attr","prop"].forEach(function(f){c[f]={set:function(a){var c=
-e.contentAttr(this,"placeholder"),b=d[f]._supset.call(this,a);c&&"value"in this&&j(this,a,c);return b},get:function(){return a(this).hasClass("placeholder-visible")?"":d[f]._supget.call(this)}}});d=e.defineNodeNameProperty(f,"value",c)})}});
+webshims.register('form-shim-extend', function($, webshims, window, document, undefined, options){
+"use strict";
+webshims.inputTypes = webshims.inputTypes || {};
+//some helper-functions
+var cfg = webshims.cfg.forms;
+var bugs = webshims.bugs;
+var isSubmit;
+
+var isNumber = function(string){
+		return (typeof string == 'number' || (string && string == string * 1));
+	},
+	typeModels = webshims.inputTypes,
+	checkTypes = {
+		radio: 1,
+		checkbox: 1
+	},
+	getType = function(elem){
+		return (elem.getAttribute('type') || elem.type || '').toLowerCase();
+	}
+;
+
+(function(){
+	if('querySelector' in document){
+		try {
+			bugs.findRequired = !($('<form action="#" style="width: 1px; height: 1px; overflow: hidden;"><select name="b" required="" /></form>')[0].querySelector('select:required'));
+		} catch(er){
+			bugs.findRequired = false;
+		}
+		
+		if (bugs.bustedValidity || bugs.findRequired) {
+			(function(){
+				var find = $.find;
+				var matchesSelector = $.find.matchesSelector;
+				
+				var regExp = /(\:valid|\:invalid|\:optional|\:required|\:in-range|\:out-of-range)(?=[\s\[\~\.\+\>\:\#*]|$)/ig;
+				var regFn = function(sel){
+					return sel + '-element';
+				};
+				
+				$.find = (function(){
+					var slice = Array.prototype.slice;
+					var fn = function(sel){
+						var ar = arguments;
+						ar = slice.call(ar, 1, ar.length);
+						ar.unshift(sel.replace(regExp, regFn));
+						return find.apply(this, ar);
+					};
+					for (var i in find) {
+						if(find.hasOwnProperty(i)){
+							fn[i] = find[i];
+						}
+					}
+					return fn;
+				})();
+				if(!Modernizr.prefixed || Modernizr.prefixed("matchesSelector", document.documentElement)){
+					$.find.matchesSelector = function(node, expr){
+						expr = expr.replace(regExp, regFn);
+						return matchesSelector.call(this, node, expr);
+					};
+				}
+				
+			})();
+		}
+	}
+})();
+
+//API to add new input types
+webshims.addInputType = function(type, obj){
+	typeModels[type] = obj;
+};
+
+//contsrain-validation-api
+var validityPrototype = {
+	customError: false,
+
+	typeMismatch: false,
+	badInput: false,
+	rangeUnderflow: false,
+	rangeOverflow: false,
+	stepMismatch: false,
+	tooLong: false,
+	patternMismatch: false,
+	valueMissing: false,
+	
+	valid: true
+};
+
+var isPlaceholderOptionSelected = function(select){
+	if(select.type == 'select-one' && select.size < 2){
+		var option = $('> option:first-child', select);
+		return !!option.prop('selected');
+	} 
+	return false;
+};
+
+var emptyJ = $([]);
+var getGroupElements = function(elem){
+	elem = $(elem);
+	var name;
+	var form;
+	var ret = emptyJ;
+	if(elem[0].type == 'radio'){
+		form = elem.prop('form');
+		name = elem[0].name;
+		if(!name){
+			ret = elem;
+		} else if(form){
+			ret = $(form[name]);
+		} else {
+			ret = $(document.getElementsByName(name)).filter(function(){
+				return !$.prop(this, 'form');
+			});
+		}
+		ret = ret.filter('[type="radio"]');
+	}
+	return ret;
+};
+var validityRules = {
+		valueMissing: function(input, val, cache){
+			if(!input.prop('required')){return false;}
+			var ret = false;
+			if(!('type' in cache)){
+				cache.type = getType(input[0]);
+			}
+			if(cache.nodeName == 'select'){
+				ret = (!val && (input[0].selectedIndex < 0 || isPlaceholderOptionSelected(input[0]) ));
+			} else if(checkTypes[cache.type]){
+				ret = (cache.type == 'checkbox') ? !input.is(':checked') : !getGroupElements(input).filter(':checked')[0];
+			} else {
+				ret = !(val);
+			}
+			return ret;
+		},
+		tooLong: function(){
+			return false;
+		},
+		patternMismatch: function(input, val, cache) {
+			if(val === '' || cache.nodeName == 'select'){return false;}
+			var pattern = input.attr('pattern');
+			if(!pattern){return false;}
+			try {
+				pattern = new RegExp('^(?:' + pattern + ')$');
+			} catch(er){
+				webshims.error('invalid pattern value: "'+ pattern +'" | '+ er);
+				pattern = false;
+			}
+			if(!pattern){return false;}
+			return !(pattern.test(val));
+		}
+	}
+;
+
+$.each({typeMismatch: 'mismatch', badInput: 'bad'}, function(name, fn){
+	validityRules[name] = function (input, val, cache){
+		if(val === '' || cache.nodeName == 'select'){return false;}
+		var ret = false;
+		if(!('type' in cache)){
+			cache.type = getType(input[0]);
+		}
+		
+		if(typeModels[cache.type] && typeModels[cache.type][fn]){
+			ret = typeModels[cache.type][fn](val, input);
+		} else if('validity' in input[0] && ('name' in input[0].validity)){
+			ret = input[0].validity[name] || false;
+		}
+		return ret;
+	};
+});
+
+webshims.addValidityRule = function(type, fn){
+	validityRules[type] = fn;
+};
+
+$.event.special.invalid = {
+	add: function(){
+		$.event.special.invalid.setup.call(this.form || this);
+	},
+	setup: function(){
+		var form = this.form || this;
+		if( $.data(form, 'invalidEventShim') ){
+			form = null;
+			return;
+		}
+		$(form)
+			.data('invalidEventShim', true)
+			.on('submit', $.event.special.invalid.handler)
+		;
+		webshims.moveToFirstEvent(form, 'submit');
+		if(webshims.bugs.bustedValidity && $.nodeName(form, 'form')){
+			(function(){
+				var noValidate = form.getAttribute('novalidate');
+				form.setAttribute('novalidate', 'novalidate');
+				webshims.data(form, 'bustedNoValidate', (noValidate == null) ? null : noValidate);
+			})();
+		}
+		form = null;
+	},
+	teardown: $.noop,
+	handler: function(e, d){
+		
+		if( e.type != 'submit' || e.testedValidity || !e.originalEvent || !$.nodeName(e.target, 'form') || $.prop(e.target, 'noValidate') ){return;}
+		
+		isSubmit = true;
+		e.testedValidity = true;
+		var notValid = !($(e.target).checkValidity());
+		if(notValid){
+			e.stopImmediatePropagation();
+			isSubmit = false;
+			return false;
+		}
+		isSubmit = false;
+	}
+};
+
+$.event.special.submit = $.event.special.submit || {setup: function(){return false;}};
+var submitSetup = $.event.special.submit.setup;
+$.extend($.event.special.submit, {
+	setup: function(){
+		if($.nodeName(this, 'form')){
+			$(this).on('invalid', $.noop);
+		} else {
+			$('form', this).on('invalid', $.noop);
+		}
+		return submitSetup.apply(this, arguments);
+	}
+});
+webshims.ready('form-shim-extend2 WINDOWLOAD', function(){
+	$(window).on('invalid', $.noop);
+});
+
+
+webshims.addInputType('email', {
+	mismatch: (function(){
+		//taken from http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#valid-e-mail-address
+		var test = cfg.emailReg || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+		var splitReg = /\s*,\s*/g;
+		return function(val, input){
+			var ret = false;
+			val = $(input).prop('multiple') ? val.split(splitReg) : [val];
+			
+			for(var i = 0; i < val.length; i++){
+				if(!test.test(val[i])){
+					ret = true;
+					break;
+				}
+			}
+			return ret;
+		};
+	})()
+});
+
+webshims.addInputType('url', {
+	mismatch: (function(){
+		//taken from scott gonzales
+		var test = cfg.urlReg || /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
+		return function(val){
+			return !test.test(val);
+		};
+	})()
+});
+
+webshims.defineNodeNameProperty('input', 'type', {
+	prop: {
+		get: function(){
+			var elem = this;
+			var type = (elem.getAttribute('type') || '').toLowerCase();
+			return (webshims.inputTypes[type]) ? type : elem.type;
+		}
+	}
+});
+
+// IDLs for constrain validation API
+//ToDo: add object to this list
+webshims.defineNodeNamesProperties(['button', 'fieldset', 'output'], {
+	checkValidity: {
+		value: function(){return true;}
+	},
+	willValidate: {
+		value: false
+	},
+	setCustomValidity: {
+		value: $.noop
+	},
+	validity: {
+		writeable: false,
+		get: function(){
+			return $.extend({}, validityPrototype);
+		}
+	}
+}, 'prop');
+
+var baseCheckValidity = function(elem){
+	var e,
+		v = $.prop(elem, 'validity')
+	;
+	if(v){
+		$.data(elem, 'cachedValidity', v);
+	} else {
+		return true;
+	}
+	if( !v.valid ){
+		e = $.Event('invalid');
+		var jElm = $(elem).trigger(e);
+		if(isSubmit && !baseCheckValidity.unhandledInvalids && !e.isDefaultPrevented()){
+			webshims.validityAlert.showFor(jElm);
+			baseCheckValidity.unhandledInvalids = true;
+		}
+	}
+	$.removeData(elem, 'cachedValidity');
+	return v.valid;
+};
+var rsubmittable = /^(?:select|textarea|input)/i;
+webshims.defineNodeNameProperty('form', 'checkValidity', {
+	prop: {
+		value: function(){
+			
+			var ret = true,
+				elems = $($.prop(this, 'elements')).filter(function(){
+					if(!rsubmittable.test(this.nodeName)){return false;}
+					var shadowData = webshims.data(this, 'shadowData');
+					return !shadowData || !shadowData.nativeElement || shadowData.nativeElement === this;
+				})
+			;
+			
+			baseCheckValidity.unhandledInvalids = false;
+			for(var i = 0, len = elems.length; i < len; i++){
+				if( !baseCheckValidity(elems[i]) ){
+					ret = false;
+				}
+			}
+			return ret;
+		}
+	}
+});
+
+webshims.defineNodeNamesProperties(['input', 'textarea', 'select'], {
+	checkValidity: {
+		value: function(){
+			baseCheckValidity.unhandledInvalids = false;
+			return baseCheckValidity($(this).getNativeElement()[0]);
+		}
+	},
+	setCustomValidity: {
+		value: function(error){
+			$.removeData(this, 'cachedValidity');
+			webshims.data(this, 'customvalidationMessage', ''+error);
+		}
+	},
+	willValidate: {
+		writeable: false,
+		get: (function(){
+			var types = {
+					button: 1,
+					reset: 1,
+					hidden: 1,
+					image: 1
+				}
+			;
+			return function(){
+				var elem = $(this).getNativeElement()[0];
+				//elem.name && <- we don't use to make it easier for developers
+				return !!(!elem.disabled && !elem.readOnly && !types[elem.type] );
+			};
+		})()
+	},
+	validity: {
+		writeable: false,
+		get: function(){
+			var jElm = $(this).getNativeElement();
+			var elem = jElm[0];
+			var validityState = $.data(elem, 'cachedValidity');
+			if(validityState){
+				return validityState;
+			}
+			validityState 	= $.extend({}, validityPrototype);
+			
+			if( !$.prop(elem, 'willValidate') || elem.type == 'submit' ){
+				return validityState;
+			}
+			var val 	= jElm.val(),
+				cache 	= {nodeName: elem.nodeName.toLowerCase()}
+			;
+			
+			validityState.customError = !!(webshims.data(elem, 'customvalidationMessage'));
+			if( validityState.customError ){
+				validityState.valid = false;
+			}
+							
+			$.each(validityRules, function(rule, fn){
+				if (fn(jElm, val, cache)) {
+					validityState[rule] = true;
+					validityState.valid = false;
+				}
+			});
+			$(this).getShadowFocusElement().attr('aria-invalid',  validityState.valid ? 'false' : 'true');
+			jElm = null;
+			elem = null;
+			return validityState;
+		}
+	}
+}, 'prop');
+
+webshims.defineNodeNamesBooleanProperty(['input', 'textarea', 'select'], 'required', {
+	set: function(value){
+		$(this).getShadowFocusElement().attr('aria-required', !!(value)+'');
+	},
+	initAttr: Modernizr.localstorage //only if we have aria-support
+});
+webshims.defineNodeNamesBooleanProperty(['input'], 'multiple');
+
+if(webshims.bugs.bustedValidity){
+	
+	webshims.defineNodeNameProperty('form', 'novalidate', {
+		attr: {
+			set: function(val){
+				webshims.data(this, 'bustedNoValidate', ''+val);
+			},
+			get: function(){
+				var ret = webshims.data(this, 'bustedNoValidate');
+				return ret == null ? undefined : ret;
+			}
+		},
+		removeAttr: {
+			value: function(){
+				webshims.data(this, 'bustedNoValidate', null);
+			}
+		}
+	});
+	
+	$.each(['rangeUnderflow', 'rangeOverflow', 'stepMismatch'], function(i, name){
+		validityRules[name] = function(elem){
+			return (elem[0].validity || {})[name] || false;
+		};
+	});
+	
+}
+
+webshims.defineNodeNameProperty('form', 'noValidate', {
+	prop: {
+		set: function(val){
+			val = !!val;
+			if(val){
+				$.attr(this, 'novalidate', 'novalidate');
+			} else {
+				$(this).removeAttr('novalidate');
+			}
+		},
+		get: function(){
+			return $.attr(this, 'novalidate') != null;
+		}
+	}
+});
+
+if(Modernizr.inputtypes.date && /webkit/i.test(navigator.userAgent)){
+	(function(){
+		
+		var noInputTriggerEvts = {updateInput: 1, input: 1},
+			fixInputTypes = {
+				date: 1,
+				time: 1,
+				month: 1,
+				week: 1,
+				"datetime-local": 1
+			},
+			noFocusEvents = {
+				focusout: 1,
+				blur: 1
+			},
+			changeEvts = {
+				updateInput: 1,
+				change: 1
+			},
+			observe = function(input){
+				var timer,
+					focusedin = true,
+					lastInputVal = input.prop('value'),
+					lastChangeVal = lastInputVal,
+					trigger = function(e){
+						//input === null
+						if(!input){return;}
+						var newVal = input.prop('value');
+						
+						if(newVal !== lastInputVal){
+							lastInputVal = newVal;
+							if(!e || !noInputTriggerEvts[e.type]){
+								input.trigger('input');
+							}
+						}
+						if(e && changeEvts[e.type]){
+							lastChangeVal = newVal;
+						}
+						if(!focusedin && newVal !== lastChangeVal){
+							input.trigger('change');
+						}
+					},
+					extraTimer,
+					extraTest = function(){
+						clearTimeout(extraTimer);
+						extraTimer = setTimeout(trigger, 9);
+					},
+					unbind = function(e){
+						clearInterval(timer);
+						setTimeout(function(){
+							if(e && noFocusEvents[e.type]){
+								focusedin = false;
+							}
+							if(input){
+								input.unbind('focusout blur', unbind).unbind('input change updateInput', trigger);
+								trigger();
+							}
+							input = null;
+						}, 1);
+						
+					}
+				;
+				
+				clearInterval(timer);
+				timer = setInterval(trigger, 160);
+				extraTest();
+				input
+					.off({
+						'focusout blur': unbind,
+						'input change updateInput': trigger
+					})
+					.on({
+						'focusout blur': unbind,
+						'input updateInput change': trigger
+					})
+				;
+			}
+		;
+		
+		
+		$(document)
+			.on('focusin', function(e){
+				if( e.target && fixInputTypes[e.target.type] && !e.target.readOnly && !e.target.disabled ){
+					observe($(e.target));
+				}
+			})
+		;
+		
+		
+	})();
+}
+
+webshims.addReady(function(context, contextElem){
+	//start constrain-validation
+	var focusElem;
+	$('form', context)
+		.add(contextElem.filter('form'))
+		.bind('invalid', $.noop)
+	;
+	
+	try {
+		if(context == document && !('form' in (document.activeElement || {}))) {
+			focusElem = $('input[autofocus], select[autofocus], textarea[autofocus]', context).eq(0).getShadowFocusElement()[0];
+			if (focusElem && focusElem.offsetHeight && focusElem.offsetWidth) {
+				focusElem.focus();
+			}
+		}
+	} 
+	catch (er) {}
+	
+});
+
+if(!Modernizr.input.list){
+	webshims.defineNodeNameProperty('datalist', 'options', {
+		prop: {
+			writeable: false,
+			get: function(){
+				var elem = this;
+				var select = $('select', elem);
+				var options;
+				if(select[0]){
+					options = $.makeArray(select[0].options || []);
+				} else {
+					options = $('option', elem).get();
+					if(options.length){
+						webshims.warn('you should wrap your option-elements for a datalist in a select element to support IE and other old browsers.');
+					}
+				}
+				return options;
+			}
+		}
+	});
+}
+
+
+
+var submitterTypes = {submit: 1, button: 1, image: 1};
+var formSubmitterDescriptors = {};
+[
+	{
+		name: "enctype",
+		limitedTo: {
+			"application/x-www-form-urlencoded": 1,
+			"multipart/form-data": 1,
+			"text/plain": 1
+		},
+		defaultProp: "application/x-www-form-urlencoded",
+		proptype: "enum"
+	},
+	{
+		name: "method",
+		limitedTo: {
+			"get": 1,
+			"post": 1
+		},
+		defaultProp: "get",
+		proptype: "enum"
+	},
+	{
+		name: "action",
+		proptype: "url"
+	},
+	{
+		name: "target"
+	},
+	{
+		name: "novalidate",
+		propName: "noValidate",
+		proptype: "boolean"
+	}
+].forEach(function(desc){
+	var propName = 'form'+ (desc.propName || desc.name).replace(/^[a-z]/, function(f){
+		return f.toUpperCase();
+	});
+	var attrName = 'form'+ desc.name;
+	var formName = desc.name;
+	var eventName = 'click.webshimssubmittermutate'+formName;
+	
+	var changeSubmitter = function(){
+		var elem = this;
+		if( !('form' in elem) || !submitterTypes[elem.type] ){return;}
+		var form = $.prop(elem, 'form');
+		if(!form){return;}
+		var attr = $.attr(elem, attrName);
+		if(attr != null && ( !desc.limitedTo || attr.toLowerCase() === $.prop(elem, propName))){
+			
+			var oldAttr = $.attr(form, formName);
+			
+			$.attr(form, formName, attr);
+			setTimeout(function(){
+				if(oldAttr != null){
+					$.attr(form, formName, oldAttr);
+				} else {
+					try {
+						$(form).removeAttr(formName);
+					} catch(er){
+						form.removeAttribute(formName);
+					}
+				}
+			}, 9);
+		}
+	};
+	
+	
+
+switch(desc.proptype) {
+		case "url":
+			var urlForm = document.createElement('form');
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						if(value == null){return '';}
+						urlForm.setAttribute('action', value);
+						return urlForm.action;
+					}
+				}
+			};
+			break;
+		case "boolean":
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(val){
+						val = !!val;
+						if(val){
+							$.attr(this, 'formnovalidate', 'formnovalidate');
+						} else {
+							$(this).removeAttr('formnovalidate');
+						}
+					},
+					get: function(){
+						return $.attr(this, 'formnovalidate') != null;
+					}
+				}
+			};
+			break;
+		case "enum":
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						return (!value || ( (value = value.toLowerCase()) && !desc.limitedTo[value] )) ? desc.defaultProp : value;
+					}
+				}
+		};
+		break;
+		default:
+			formSubmitterDescriptors[propName] = {
+				prop: {
+					set: function(value){
+						$.attr(this, attrName, value);
+					},
+					get: function(){
+						var value = $.attr(this, attrName);
+						return (value != null) ? value : "";
+					}
+				}
+			};
+	}
+
+
+	if(!formSubmitterDescriptors[attrName]){
+		formSubmitterDescriptors[attrName] = {};
+	}
+	formSubmitterDescriptors[attrName].attr = {
+		set: function(value){
+			formSubmitterDescriptors[attrName].attr._supset.call(this, value);
+			$(this).unbind(eventName).on(eventName, changeSubmitter);
+		},
+		get: function(){
+			return formSubmitterDescriptors[attrName].attr._supget.call(this);
+		}
+	};
+	formSubmitterDescriptors[attrName].initAttr = true;
+	formSubmitterDescriptors[attrName].removeAttr = {
+		value: function(){
+			$(this).unbind(eventName);
+			formSubmitterDescriptors[attrName].removeAttr._supvalue.call(this);
+		}
+	};
+});
+
+webshims.defineNodeNamesProperties(['input', 'button'], formSubmitterDescriptors);
+
+}); //webshims.ready end

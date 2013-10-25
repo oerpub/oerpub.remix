@@ -41,14 +41,14 @@ def gdoc2html(request):
     # be anonymous
     session['login'] = AnonymousSession()
 
-    # setup work driectory: save_dir = transform_dir + user_subdir_name
+    # setup work directory: save_dir = transform_dir + user_subdir_name
     transform_dir = request.registry.settings['transform_dir']
     user_subdir_name, save_dir = create_save_dir(request)
 
     # allow cross domain access
     request.response.headers.add('Access-Control-Allow-Origin', '*')
     
-    # convert gdoc html to cnxml to textbook (aka strcutured) html or aloha-ready html
+    # convert gdoc html to cnxml to textbook (aka structured) html or aloha-ready html
     cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=copy_images)
     cnxml = clean_cnxml(cnxml)
     title = None

@@ -1,35 +1,924 @@
-document.createElement("canvas").getContext||function(){function S(){return this.context_||(this.context_=new z(this))}function T(a,b,c){var g=J.call(arguments,2);return function(){return a.apply(b,g.concat(J.call(arguments)))}}function K(a){return String(a).replace(/&/g,"&amp;").replace(/"/g,"&quot;")}function L(a){a.namespaces.g_vml_||a.namespaces.add("g_vml_","urn:schemas-microsoft-com:vml","#default#VML");a.namespaces.g_o_||a.namespaces.add("g_o_","urn:schemas-microsoft-com:office:office","#default#VML");
-if(!a.styleSheets.ex_canvas_)a=a.createStyleSheet(),a.owningElement.id="ex_canvas_",a.cssText="canvas{display:inline-block;overflow:hidden;text-align:left;width:300px;height:150px}"}function U(a){var b=a.srcElement;if(b.getContext&&"clearRect"in b.getContext())switch(a.propertyName){case "width":b.getContext().clearRect();b.style.width=b.attributes.width.nodeValue+"px";b.firstChild.style.width=b.clientWidth+"px";break;case "height":b.getContext().clearRect(),b.style.height=b.attributes.height.nodeValue+
-"px",b.firstChild.style.height=b.clientHeight+"px"}}function V(a){a=a.srcElement;if(a.firstChild)a.firstChild.style.width=a.clientWidth+"px",a.firstChild.style.height=a.clientHeight+"px"}function A(){return[[1,0,0],[0,1,0],[0,0,1]]}function q(a,b){for(var c=A(),g=0;g<3;g++)for(var e=0;e<3;e++){for(var f=0,d=0;d<3;d++)f+=a[g][d]*b[d][e];c[g][e]=f}return c}function M(a,b){b.fillStyle=a.fillStyle;b.lineCap=a.lineCap;b.lineJoin=a.lineJoin;b.lineWidth=a.lineWidth;b.miterLimit=a.miterLimit;b.shadowBlur=
-a.shadowBlur;b.shadowColor=a.shadowColor;b.shadowOffsetX=a.shadowOffsetX;b.shadowOffsetY=a.shadowOffsetY;b.strokeStyle=a.strokeStyle;b.globalAlpha=a.globalAlpha;b.font=a.font;b.textAlign=a.textAlign;b.textBaseline=a.textBaseline;b.arcScaleX_=a.arcScaleX_;b.arcScaleY_=a.arcScaleY_;b.lineScale_=a.lineScale_}function N(a){var b=a.indexOf("(",3),c=a.indexOf(")",b+1),b=a.substring(b+1,c).split(",");if(b.length!=4||a.charAt(3)!="a")b[3]=1;return b}function B(a,b,c){return Math.min(c,Math.max(b,a))}function C(a,
-b,c){c<0&&c++;c>1&&c--;return 6*c<1?a+(b-a)*6*c:2*c<1?b:3*c<2?a+(b-a)*(2/3-c)*6:a}function D(a){if(a in E)return E[a];var b,c=1,a=String(a);if(a.charAt(0)=="#")b=a;else if(/^rgb/.test(a)){c=N(a);b="#";for(var g,e=0;e<3;e++)g=c[e].indexOf("%")!=-1?Math.floor(parseFloat(c[e])/100*255):+c[e],b+=s[B(g,0,255)];c=+c[3]}else if(/^hsl/.test(a)){e=c=N(a);b=parseFloat(e[0])/360%360;b<0&&b++;g=B(parseFloat(e[1])/100,0,1);e=B(parseFloat(e[2])/100,0,1);if(g==0)g=e=b=e;else{var f=e<0.5?e*(1+g):e+g-e*g,d=2*e-f;
-g=C(d,f,b+1/3);e=C(d,f,b);b=C(d,f,b-1/3)}b="#"+s[Math.floor(g*255)]+s[Math.floor(e*255)]+s[Math.floor(b*255)];c=c[3]}else b=W[a]||a;return E[a]={color:b,alpha:c}}function z(a){this.m_=A();this.mStack_=[];this.aStack_=[];this.currentPath_=[];this.fillStyle=this.strokeStyle="#000";this.lineWidth=1;this.lineJoin="miter";this.lineCap="butt";this.miterLimit=m*1;this.globalAlpha=1;this.font="10px sans-serif";this.textAlign="left";this.textBaseline="alphabetic";this.canvas=a;var b="width:"+a.clientWidth+
-"px;height:"+a.clientHeight+"px;overflow:hidden;position:absolute",c=a.ownerDocument.createElement("div");c.style.cssText=b;a.appendChild(c);b=c.cloneNode(!1);b.style.backgroundColor="red";b.style.filter="alpha(opacity=0)";a.appendChild(b);this.element_=c;this.lineScale_=this.arcScaleY_=this.arcScaleX_=1}function O(a,b,c,g){a.currentPath_.push({type:"bezierCurveTo",cp1x:b.x,cp1y:b.y,cp2x:c.x,cp2y:c.y,x:g.x,y:g.y});a.currentX_=g.x;a.currentY_=g.y}function P(a,b){var c=D(a.strokeStyle),g=c.color,c=
-c.alpha*a.globalAlpha,e=a.lineScale_*a.lineWidth;e<1&&(c*=e);b.push("<g_vml_:stroke",' opacity="',c,'"',' joinstyle="',a.lineJoin,'"',' miterlimit="',a.miterLimit,'"',' endcap="',X[a.lineCap]||"square",'"',' weight="',e,'px"',' color="',g,'" />')}function Q(a,b,c,g){var e=a.fillStyle,f=a.arcScaleX_,d=a.arcScaleY_,h=g.x-c.x,n=g.y-c.y;if(e instanceof t){var i=0,j=g=0,r=0,k=1;if(e.type_=="gradient"){var i=e.x1_/f,c=e.y1_/d,l=p(a,e.x0_/f,e.y0_/d),i=p(a,i,c),i=Math.atan2(i.x-l.x,i.y-l.y)*180/Math.PI;i<
-0&&(i+=360);i<1.0E-6&&(i=0)}else l=p(a,e.x0_,e.y0_),g=(l.x-c.x)/h,j=(l.y-c.y)/n,h/=f*m,n/=d*m,k=u.max(h,n),r=2*e.r0_/k,k=2*e.r1_/k-r;f=e.colors_;f.sort(function(a,b){return a.offset-b.offset});for(var d=f.length,l=f[0].color,c=f[d-1].color,h=f[0].alpha*a.globalAlpha,a=f[d-1].alpha*a.globalAlpha,n=[],o=0;o<d;o++){var q=f[o];n.push(q.offset*k+r+" "+q.color)}b.push('<g_vml_:fill type="',e.type_,'"',' method="none" focus="100%"',' color="',l,'"',' color2="',c,'"',' colors="',n.join(","),'"',' opacity="',
-a,'"',' g_o_:opacity2="',h,'"',' angle="',i,'"',' focusposition="',g,",",j,'" />')}else e instanceof F?h&&n&&b.push("<g_vml_:fill",' position="',-c.x/h*f*f,",",-c.y/n*d*d,'"',' type="tile"',' src="',e.src_,'" />'):(e=D(a.fillStyle),b.push('<g_vml_:fill color="',e.color,'" opacity="',e.alpha*a.globalAlpha,'" />'))}function p(a,b,c){a=a.m_;return{x:m*(b*a[0][0]+c*a[1][0]+a[2][0])-o,y:m*(b*a[0][1]+c*a[1][1]+a[2][1])-o}}function w(a,b,c){if(isFinite(b[0][0])&&isFinite(b[0][1])&&isFinite(b[1][0])&&isFinite(b[1][1])&&
-isFinite(b[2][0])&&isFinite(b[2][1])&&(a.m_=b,c))a.lineScale_=Y(Z(b[0][0]*b[1][1]-b[0][1]*b[1][0]))}function t(a){this.type_=a;this.r1_=this.y1_=this.x1_=this.r0_=this.y0_=this.x0_=0;this.colors_=[]}function F(a,b){if(!a||a.nodeType!=1||a.tagName!="IMG")throw new x("TYPE_MISMATCH_ERR");if(a.readyState!="complete")throw new x("INVALID_STATE_ERR");switch(b){case "repeat":case null:case "":this.repetition_="repeat";break;case "repeat-x":case "repeat-y":case "no-repeat":this.repetition_=b;break;default:throw new x("SYNTAX_ERR");
-}this.src_=a.src;this.width_=a.width;this.height_=a.height}function x(a){this.code=this[a];this.message=a+": DOM Exception "+this.code}var u=Math,h=u.round,G=u.sin,H=u.cos,Z=u.abs,Y=u.sqrt,m=10,o=m/2;navigator.userAgent.match(/MSIE ([\d.]+)?/);var J=Array.prototype.slice;L(document);var R={init:function(a){var b=a||document;b.createElement("canvas");var c=this;setTimeout(function(){jQuery.webshims.ready("DOM",T(c.init_,c,b))},0)},init_:function(a){for(var a=a.getElementsByTagName("canvas"),b=0;b<
-a.length;b++)this.initElement(a[b])},initElement:function(a){if(!a.getContext){a.getContext=S;L(a.ownerDocument);a.innerHTML="";a.attachEvent("onpropertychange",U);a.attachEvent("onresize",V);var b=a.attributes;b.width&&b.width.specified?a.style.width=b.width.nodeValue+"px":a.width=a.clientWidth;b.height&&b.height.specified?a.style.height=b.height.nodeValue+"px":a.height=a.clientHeight}return a}};R.init();for(var s=[],d=0;d<16;d++)for(var y=0;y<16;y++)s[d*16+y]=d.toString(16)+y.toString(16);var W=
-{aliceblue:"#F0F8FF",antiquewhite:"#FAEBD7",aquamarine:"#7FFFD4",azure:"#F0FFFF",beige:"#F5F5DC",bisque:"#FFE4C4",black:"#000000",blanchedalmond:"#FFEBCD",blueviolet:"#8A2BE2",brown:"#A52A2A",burlywood:"#DEB887",cadetblue:"#5F9EA0",chartreuse:"#7FFF00",chocolate:"#D2691E",coral:"#FF7F50",cornflowerblue:"#6495ED",cornsilk:"#FFF8DC",crimson:"#DC143C",cyan:"#00FFFF",darkblue:"#00008B",darkcyan:"#008B8B",darkgoldenrod:"#B8860B",darkgray:"#A9A9A9",darkgreen:"#006400",darkgrey:"#A9A9A9",darkkhaki:"#BDB76B",
-darkmagenta:"#8B008B",darkolivegreen:"#556B2F",darkorange:"#FF8C00",darkorchid:"#9932CC",darkred:"#8B0000",darksalmon:"#E9967A",darkseagreen:"#8FBC8F",darkslateblue:"#483D8B",darkslategray:"#2F4F4F",darkslategrey:"#2F4F4F",darkturquoise:"#00CED1",darkviolet:"#9400D3",deeppink:"#FF1493",deepskyblue:"#00BFFF",dimgray:"#696969",dimgrey:"#696969",dodgerblue:"#1E90FF",firebrick:"#B22222",floralwhite:"#FFFAF0",forestgreen:"#228B22",gainsboro:"#DCDCDC",ghostwhite:"#F8F8FF",gold:"#FFD700",goldenrod:"#DAA520",
-grey:"#808080",greenyellow:"#ADFF2F",honeydew:"#F0FFF0",hotpink:"#FF69B4",indianred:"#CD5C5C",indigo:"#4B0082",ivory:"#FFFFF0",khaki:"#F0E68C",lavender:"#E6E6FA",lavenderblush:"#FFF0F5",lawngreen:"#7CFC00",lemonchiffon:"#FFFACD",lightblue:"#ADD8E6",lightcoral:"#F08080",lightcyan:"#E0FFFF",lightgoldenrodyellow:"#FAFAD2",lightgreen:"#90EE90",lightgrey:"#D3D3D3",lightpink:"#FFB6C1",lightsalmon:"#FFA07A",lightseagreen:"#20B2AA",lightskyblue:"#87CEFA",lightslategray:"#778899",lightslategrey:"#778899",
-lightsteelblue:"#B0C4DE",lightyellow:"#FFFFE0",limegreen:"#32CD32",linen:"#FAF0E6",magenta:"#FF00FF",mediumaquamarine:"#66CDAA",mediumblue:"#0000CD",mediumorchid:"#BA55D3",mediumpurple:"#9370DB",mediumseagreen:"#3CB371",mediumslateblue:"#7B68EE",mediumspringgreen:"#00FA9A",mediumturquoise:"#48D1CC",mediumvioletred:"#C71585",midnightblue:"#191970",mintcream:"#F5FFFA",mistyrose:"#FFE4E1",moccasin:"#FFE4B5",navajowhite:"#FFDEAD",oldlace:"#FDF5E6",olivedrab:"#6B8E23",orange:"#FFA500",orangered:"#FF4500",
-orchid:"#DA70D6",palegoldenrod:"#EEE8AA",palegreen:"#98FB98",paleturquoise:"#AFEEEE",palevioletred:"#DB7093",papayawhip:"#FFEFD5",peachpuff:"#FFDAB9",peru:"#CD853F",pink:"#FFC0CB",plum:"#DDA0DD",powderblue:"#B0E0E6",rosybrown:"#BC8F8F",royalblue:"#4169E1",saddlebrown:"#8B4513",salmon:"#FA8072",sandybrown:"#F4A460",seagreen:"#2E8B57",seashell:"#FFF5EE",sienna:"#A0522D",skyblue:"#87CEEB",slateblue:"#6A5ACD",slategray:"#708090",slategrey:"#708090",snow:"#FFFAFA",springgreen:"#00FF7F",steelblue:"#4682B4",
-tan:"#D2B48C",thistle:"#D8BFD8",tomato:"#FF6347",turquoise:"#40E0D0",violet:"#EE82EE",wheat:"#F5DEB3",whitesmoke:"#F5F5F5",yellowgreen:"#9ACD32"},E={},I={},X={butt:"flat",round:"round"},d=z.prototype;d.clearRect=function(){if(this.textMeasureEl_)this.textMeasureEl_.removeNode(!0),this.textMeasureEl_=null;this.element_.innerHTML=""};d.beginPath=function(){this.currentPath_=[]};d.moveTo=function(a,b){var c=p(this,a,b);this.currentPath_.push({type:"moveTo",x:c.x,y:c.y});this.currentX_=c.x;this.currentY_=
-c.y};d.lineTo=function(a,b){var c=p(this,a,b);this.currentPath_.push({type:"lineTo",x:c.x,y:c.y});this.currentX_=c.x;this.currentY_=c.y};d.bezierCurveTo=function(a,b,c,g,e,f){e=p(this,e,f);a=p(this,a,b);c=p(this,c,g);O(this,a,c,e)};d.quadraticCurveTo=function(a,b,c,g){a=p(this,a,b);c=p(this,c,g);g={x:this.currentX_+2/3*(a.x-this.currentX_),y:this.currentY_+2/3*(a.y-this.currentY_)};O(this,g,{x:g.x+(c.x-this.currentX_)/3,y:g.y+(c.y-this.currentY_)/3},c)};d.arc=function(a,b,c,g,e,f){c*=m;var d=f?"at":
-"wa",h=a+H(g)*c-o,n=b+G(g)*c-o,g=a+H(e)*c-o,e=b+G(e)*c-o;h==g&&!f&&(h+=0.125);a=p(this,a,b);h=p(this,h,n);g=p(this,g,e);this.currentPath_.push({type:d,x:a.x,y:a.y,radius:c,xStart:h.x,yStart:h.y,xEnd:g.x,yEnd:g.y})};d.rect=function(a,b,c,g){this.moveTo(a,b);this.lineTo(a+c,b);this.lineTo(a+c,b+g);this.lineTo(a,b+g);this.closePath()};d.strokeRect=function(a,b,c,g){var e=this.currentPath_;this.beginPath();this.moveTo(a,b);this.lineTo(a+c,b);this.lineTo(a+c,b+g);this.lineTo(a,b+g);this.closePath();this.stroke();
-this.currentPath_=e};d.fillRect=function(a,b,c,g){var e=this.currentPath_;this.beginPath();this.moveTo(a,b);this.lineTo(a+c,b);this.lineTo(a+c,b+g);this.lineTo(a,b+g);this.closePath();this.fill();this.currentPath_=e};d.createLinearGradient=function(a,b,c,g){var e=new t("gradient");e.x0_=a;e.y0_=b;e.x1_=c;e.y1_=g;return e};d.createRadialGradient=function(a,b,c,g,e,f){var d=new t("gradientradial");d.x0_=a;d.y0_=b;d.r0_=c;d.x1_=g;d.y1_=e;d.r1_=f;return d};d.drawImage=function(a,b){var c,g,e,d,o,v,n,
-i;e=a.runtimeStyle.width;d=a.runtimeStyle.height;a.runtimeStyle.width="auto";a.runtimeStyle.height="auto";var j=a.width,r=a.height;a.runtimeStyle.width=e;a.runtimeStyle.height=d;if(arguments.length==3)c=arguments[1],g=arguments[2],o=v=0,n=e=j,i=d=r;else if(arguments.length==5)c=arguments[1],g=arguments[2],e=arguments[3],d=arguments[4],o=v=0,n=j,i=r;else if(arguments.length==9)o=arguments[1],v=arguments[2],n=arguments[3],i=arguments[4],c=arguments[5],g=arguments[6],e=arguments[7],d=arguments[8];else throw Error("Invalid number of arguments");
-var k=p(this,c,g),l=[];l.push(" <g_vml_:group",' coordsize="',m*10,",",m*10,'"',' coordorigin="0,0"',' style="width:',10,"px;height:",10,"px;position:absolute;");if(this.m_[0][0]!=1||this.m_[0][1]||this.m_[1][1]!=1||this.m_[1][0]){var q=[];q.push("M11=",this.m_[0][0],",","M12=",this.m_[1][0],",","M21=",this.m_[0][1],",","M22=",this.m_[1][1],",","Dx=",h(k.x/m),",","Dy=",h(k.y/m),"");var s=p(this,c+e,g),t=p(this,c,g+d);c=p(this,c+e,g+d);k.x=u.max(k.x,s.x,t.x,c.x);k.y=u.max(k.y,s.y,t.y,c.y);l.push("padding:0 ",
-h(k.x/m),"px ",h(k.y/m),"px 0;filter:progid:DXImageTransform.Microsoft.Matrix(",q.join(""),", sizingmethod='clip');")}else l.push("top:",h(k.y/m),"px;left:",h(k.x/m),"px;");l.push(' ">','<g_vml_:image src="',a.src,'"',' style="width:',m*e,"px;"," height:",m*d,'px"',' cropleft="',o/j,'"',' croptop="',v/r,'"',' cropright="',(j-o-n)/j,'"',' cropbottom="',(r-v-i)/r,'"'," />","</g_vml_:group>");this.element_.insertAdjacentHTML("BeforeEnd",l.join(""))};d.stroke=function(a){var b=[];b.push("<g_vml_:shape",
-' filled="',!!a,'"',' style="position:absolute;width:',10,"px;height:",10,'px;"',' coordorigin="0,0"',' coordsize="',m*10,",",m*10,'"',' stroked="',!a,'"',' path="');for(var c={x:null,y:null},d={x:null,y:null},e=0;e<this.currentPath_.length;e++){var f=this.currentPath_[e];switch(f.type){case "moveTo":b.push(" m ",h(f.x),",",h(f.y));break;case "lineTo":b.push(" l ",h(f.x),",",h(f.y));break;case "close":b.push(" x ");f=null;break;case "bezierCurveTo":b.push(" c ",h(f.cp1x),",",h(f.cp1y),",",h(f.cp2x),
-",",h(f.cp2y),",",h(f.x),",",h(f.y));break;case "at":case "wa":b.push(" ",f.type," ",h(f.x-this.arcScaleX_*f.radius),",",h(f.y-this.arcScaleY_*f.radius)," ",h(f.x+this.arcScaleX_*f.radius),",",h(f.y+this.arcScaleY_*f.radius)," ",h(f.xStart),",",h(f.yStart)," ",h(f.xEnd),",",h(f.yEnd))}if(f){if(c.x==null||f.x<c.x)c.x=f.x;if(d.x==null||f.x>d.x)d.x=f.x;if(c.y==null||f.y<c.y)c.y=f.y;if(d.y==null||f.y>d.y)d.y=f.y}}b.push(' ">');a?Q(this,b,c,d):P(this,b);b.push("</g_vml_:shape>");this.element_.insertAdjacentHTML("beforeEnd",
-b.join(""))};d.fill=function(){this.stroke(!0)};d.closePath=function(){this.currentPath_.push({type:"close"})};d.save=function(){var a={};M(this,a);this.aStack_.push(a);this.mStack_.push(this.m_);this.m_=q(A(),this.m_)};d.restore=function(){if(this.aStack_.length)M(this.aStack_.pop(),this),this.m_=this.mStack_.pop()};d.translate=function(a,b){w(this,q([[1,0,0],[0,1,0],[a,b,1]],this.m_),!1)};d.rotate=function(a){var b=H(a),a=G(a);w(this,q([[b,a,0],[-a,b,0],[0,0,1]],this.m_),!1)};d.scale=function(a,
-b){this.arcScaleX_*=a;this.arcScaleY_*=b;w(this,q([[a,0,0],[0,b,0],[0,0,1]],this.m_),!0)};d.transform=function(a,b,c,d,e,f){w(this,q([[a,b,0],[c,d,0],[e,f,1]],this.m_),!0)};d.setTransform=function(a,b,c,d,e,f){w(this,[[a,b,0],[c,d,0],[e,f,1]],!0)};d.drawText_=function(a,b,c,d,e){var f=this.m_,d=0,o=1E3,q=0,n=[],i;i=this.font;if(I[i])i=I[i];else{var j=document.createElement("div").style;try{j.font=i}catch(r){}i=I[i]={style:j.fontStyle||"normal",variant:j.fontVariant||"normal",weight:j.fontWeight||
-"normal",size:j.fontSize||10,family:j.fontFamily||"sans-serif"}}var j=i,k=this.element_;i={};for(var l in j)i[l]=j[l];l=parseFloat(k.currentStyle.fontSize);k=parseFloat(j.size);i.size=typeof j.size=="number"?j.size:j.size.indexOf("px")!=-1?k:j.size.indexOf("em")!=-1?l*k:j.size.indexOf("%")!=-1?l/100*k:j.size.indexOf("pt")!=-1?k/0.75:l;i.size*=0.981;l=i.style+" "+i.variant+" "+i.weight+" "+i.size+"px "+i.family;k=this.element_.currentStyle;j=this.textAlign.toLowerCase();switch(j){case "left":case "center":case "right":break;
-case "end":j=k.direction=="ltr"?"right":"left";break;case "start":j=k.direction=="rtl"?"right":"left";break;default:j="left"}switch(this.textBaseline){case "hanging":case "top":q=i.size/1.75;break;case "middle":break;default:case null:case "alphabetic":case "ideographic":case "bottom":q=-i.size/2.25}switch(j){case "right":d=1E3;o=0.05;break;case "center":d=o=500}b=p(this,b+0,c+q);n.push('<g_vml_:line from="',-d,' 0" to="',o,' 0.05" ',' coordsize="100 100" coordorigin="0 0"',' filled="',!e,'" stroked="',
-!!e,'" style="position:absolute;width:1px;height:1px;">');e?P(this,n):Q(this,n,{x:-d,y:0},{x:o,y:i.size});e=f[0][0].toFixed(3)+","+f[1][0].toFixed(3)+","+f[0][1].toFixed(3)+","+f[1][1].toFixed(3)+",0,0";b=h(b.x/m)+","+h(b.y/m);n.push('<g_vml_:skew on="t" matrix="',e,'" ',' offset="',b,'" origin="',d,' 0" />','<g_vml_:path textpathok="true" />','<g_vml_:textpath on="true" string="',K(a),'" style="v-text-align:',j,";font:",K(l),'" /></g_vml_:line>');this.element_.insertAdjacentHTML("beforeEnd",n.join(""))};
-d.fillText=function(a,b,c,d){this.drawText_(a,b,c,d,!1)};d.strokeText=function(a,b,c,d){this.drawText_(a,b,c,d,!0)};d.measureText=function(a){if(!this.textMeasureEl_)this.element_.insertAdjacentHTML("beforeEnd",'<span style="position:absolute;top:-20000px;left:0;padding:0;margin:0;border:none;white-space:pre;"></span>'),this.textMeasureEl_=this.element_.lastChild;var b=this.element_.ownerDocument;this.textMeasureEl_.innerHTML="";this.textMeasureEl_.style.font=this.font;this.textMeasureEl_.appendChild(b.createTextNode(a));
-return{width:this.textMeasureEl_.offsetWidth}};d.clip=function(){};d.arcTo=function(){};d.createPattern=function(a,b){return new F(a,b)};t.prototype.addColorStop=function(a,b){b=D(b);this.colors_.push({offset:a,color:b.color,alpha:b.alpha})};d=x.prototype=Error();d.INDEX_SIZE_ERR=1;d.DOMSTRING_SIZE_ERR=2;d.HIERARCHY_REQUEST_ERR=3;d.WRONG_DOCUMENT_ERR=4;d.INVALID_CHARACTER_ERR=5;d.NO_DATA_ALLOWED_ERR=6;d.NO_MODIFICATION_ALLOWED_ERR=7;d.NOT_FOUND_ERR=8;d.NOT_SUPPORTED_ERR=9;d.INUSE_ATTRIBUTE_ERR=10;
-d.INVALID_STATE_ERR=11;d.SYNTAX_ERR=12;d.INVALID_MODIFICATION_ERR=13;d.NAMESPACE_ERR=14;d.INVALID_ACCESS_ERR=15;d.VALIDATION_ERR=16;d.TYPE_MISMATCH_ERR=17;G_vmlCanvasManager=R;CanvasRenderingContext2D=z;CanvasGradient=t;CanvasPattern=F;DOMException=x}();
+// Copyright 2006 Google Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+// Known Issues:
+//
+// * Patterns are not implemented.
+// * Radial gradient are not implemented. The VML version of these look very
+//   different from the canvas one.
+// * Clipping paths are not implemented.
+// * Coordsize. The width and height attribute have higher priority than the
+//   width and height style values which isn't correct.
+// * Painting mode isn't implemented.
+// * Canvas width/height should is using content-box by default. IE in
+//   Quirks mode will draw the canvas using border-box. Either change your
+//   doctype to HTML5
+//   (http://www.whatwg.org/specs/web-apps/current-work/#the-doctype)
+//   or use Box Sizing Behavior from WebFX
+//   (http://webfx.eae.net/dhtml/boxsizing/boxsizing.html)
+// * Non uniform scaling does not correctly scale strokes.
+// * Optimize. There is always room for speed improvements.
+
+// Only add this code if we do not already have a canvas implementation
+if (!document.createElement('canvas').getContext) {
+
+(function() {
+
+  // alias some functions to make (compiled) code shorter
+  var m = Math;
+  var mr = m.round;
+  var ms = m.sin;
+  var mc = m.cos;
+  var abs = m.abs;
+  var sqrt = m.sqrt;
+
+  // this is used for sub pixel precision
+  var Z = 10;
+  var Z2 = Z / 2;
+
+  /**
+   * This funtion is assigned to the <canvas> elements as element.getContext().
+   * @this {HTMLElement}
+   * @return {CanvasRenderingContext2D_}
+   */
+  function getContext() {
+    return this.context_ ||
+        (this.context_ = new CanvasRenderingContext2D_(this));
+  }
+
+  var slice = Array.prototype.slice;
+
+  /**
+   * Binds a function to an object. The returned function will always use the
+   * passed in {@code obj} as {@code this}.
+   *
+   * Example:
+   *
+   *   g = bind(f, obj, a, b)
+   *   g(c, d) // will do f.call(obj, a, b, c, d)
+   *
+   * @param {Function} f The function to bind the object to
+   * @param {Object} obj The object that should act as this when the function
+   *     is called
+   * @param {*} var_args Rest arguments that will be used as the initial
+   *     arguments when the function is called
+   * @return {Function} A new function that has bound this
+   */
+  function bind(f, obj, var_args) {
+    var a = slice.call(arguments, 2);
+    return function() {
+      return f.apply(obj, a.concat(slice.call(arguments)));
+    };
+  }
+
+  var G_vmlCanvasManager_ = {
+    init: function(opt_doc) {
+      if (/MSIE/.test(navigator.userAgent) && !window.opera) {
+        var doc = opt_doc || document;
+        // Create a dummy element so that IE will allow canvas elements to be
+        // recognized.
+        doc.createElement('canvas');
+        doc.attachEvent('onreadystatechange', bind(this.init_, this, doc));
+      }
+    },
+
+    init_: function(doc) {
+      // create xmlns
+      if (!doc.namespaces['g_vml_']) {
+        doc.namespaces.add('g_vml_', 'urn:schemas-microsoft-com:vml',
+                           '#default#VML');
+
+      }
+      if (!doc.namespaces['g_o_']) {
+        doc.namespaces.add('g_o_', 'urn:schemas-microsoft-com:office:office',
+                           '#default#VML');
+      }
+
+      // Setup default CSS.  Only add one style sheet per document
+      if (!doc.styleSheets['ex_canvas_']) {
+        var ss = doc.createStyleSheet();
+        ss.owningElement.id = 'ex_canvas_';
+        ss.cssText = 'canvas{display:inline-block;overflow:hidden;' +
+            // default size is 300x150 in Gecko and Opera
+            'text-align:left;width:300px;height:150px}' +
+            'g_vml_\\:*{behavior:url(#default#VML)}' +
+            'g_o_\\:*{behavior:url(#default#VML)}';
+
+      }
+
+      // find all canvas elements
+      var els = doc.getElementsByTagName('canvas');
+      for (var i = 0; i < els.length; i++) {
+        this.initElement(els[i]);
+      }
+    },
+
+    /**
+     * Public initializes a canvas element so that it can be used as canvas
+     * element from now on. This is called automatically before the page is
+     * loaded but if you are creating elements using createElement you need to
+     * make sure this is called on the element.
+     * @param {HTMLElement} el The canvas element to initialize.
+     * @return {HTMLElement} the element that was created.
+     */
+    initElement: function(el) {
+      if (!el.getContext) {
+
+        el.getContext = getContext;
+
+        // Remove fallback content. There is no way to hide text nodes so we
+        // just remove all childNodes. We could hide all elements and remove
+        // text nodes but who really cares about the fallback content.
+        el.innerHTML = '';
+
+        // do not use inline function because that will leak memory
+        el.attachEvent('onpropertychange', onPropertyChange);
+        el.attachEvent('onresize', onResize);
+
+        var attrs = el.attributes;
+        if (attrs.width && attrs.width.specified) {
+          // TODO: use runtimeStyle and coordsize
+          // el.getContext().setWidth_(attrs.width.nodeValue);
+          el.style.width = attrs.width.nodeValue + 'px';
+        } else {
+          el.width = el.clientWidth;
+        }
+        if (attrs.height && attrs.height.specified) {
+          // TODO: use runtimeStyle and coordsize
+          // el.getContext().setHeight_(attrs.height.nodeValue);
+          el.style.height = attrs.height.nodeValue + 'px';
+        } else {
+          el.height = el.clientHeight;
+        }
+        //el.getContext().setCoordsize_()
+      }
+      return el;
+    }
+  };
+
+  function onPropertyChange(e) {
+    var el = e.srcElement;
+
+    switch (e.propertyName) {
+      case 'width':
+        el.style.width = el.attributes.width.nodeValue + 'px';
+        el.getContext().clearRect();
+        break;
+      case 'height':
+        el.style.height = el.attributes.height.nodeValue + 'px';
+        el.getContext().clearRect();
+        break;
+    }
+  }
+
+  function onResize(e) {
+    var el = e.srcElement;
+    if (el.firstChild) {
+      el.firstChild.style.width =  el.clientWidth + 'px';
+      el.firstChild.style.height = el.clientHeight + 'px';
+    }
+  }
+
+  G_vmlCanvasManager_.init();
+
+  // precompute "00" to "FF"
+  var dec2hex = [];
+  for (var i = 0; i < 16; i++) {
+    for (var j = 0; j < 16; j++) {
+      dec2hex[i * 16 + j] = i.toString(16) + j.toString(16);
+    }
+  }
+
+  function createMatrixIdentity() {
+    return [
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1]
+    ];
+  }
+
+  function matrixMultiply(m1, m2) {
+    var result = createMatrixIdentity();
+
+    for (var x = 0; x < 3; x++) {
+      for (var y = 0; y < 3; y++) {
+        var sum = 0;
+
+        for (var z = 0; z < 3; z++) {
+          sum += m1[x][z] * m2[z][y];
+        }
+
+        result[x][y] = sum;
+      }
+    }
+    return result;
+  }
+
+  function copyState(o1, o2) {
+    o2.fillStyle     = o1.fillStyle;
+    o2.lineCap       = o1.lineCap;
+    o2.lineJoin      = o1.lineJoin;
+    o2.lineWidth     = o1.lineWidth;
+    o2.miterLimit    = o1.miterLimit;
+    o2.shadowBlur    = o1.shadowBlur;
+    o2.shadowColor   = o1.shadowColor;
+    o2.shadowOffsetX = o1.shadowOffsetX;
+    o2.shadowOffsetY = o1.shadowOffsetY;
+    o2.strokeStyle   = o1.strokeStyle;
+    o2.globalAlpha   = o1.globalAlpha;
+    o2.arcScaleX_    = o1.arcScaleX_;
+    o2.arcScaleY_    = o1.arcScaleY_;
+    o2.lineScale_    = o1.lineScale_;
+  }
+
+  function processStyle(styleString) {
+    var str, alpha = 1;
+
+    styleString = String(styleString);
+    if (styleString.substring(0, 3) == 'rgb') {
+      var start = styleString.indexOf('(', 3);
+      var end = styleString.indexOf(')', start + 1);
+      var guts = styleString.substring(start + 1, end).split(',');
+
+      str = '#';
+      for (var i = 0; i < 3; i++) {
+        str += dec2hex[Number(guts[i])];
+      }
+
+      if (guts.length == 4 && styleString.substr(3, 1) == 'a') {
+        alpha = guts[3];
+      }
+    } else {
+      str = styleString;
+    }
+
+    return {color: str, alpha: alpha};
+  }
+
+  function processLineCap(lineCap) {
+    switch (lineCap) {
+      case 'butt':
+        return 'flat';
+      case 'round':
+        return 'round';
+      case 'square':
+      default:
+        return 'square';
+    }
+  }
+
+  /**
+   * This class implements CanvasRenderingContext2D interface as described by
+   * the WHATWG.
+   * @param {HTMLElement} surfaceElement The element that the 2D context should
+   * be associated with
+   */
+  function CanvasRenderingContext2D_(surfaceElement) {
+    this.m_ = createMatrixIdentity();
+
+    this.mStack_ = [];
+    this.aStack_ = [];
+    this.currentPath_ = [];
+
+    // Canvas context properties
+    this.strokeStyle = '#000';
+    this.fillStyle = '#000';
+
+    this.lineWidth = 1;
+    this.lineJoin = 'miter';
+    this.lineCap = 'butt';
+    this.miterLimit = Z * 1;
+    this.globalAlpha = 1;
+    this.canvas = surfaceElement;
+
+    var el = surfaceElement.ownerDocument.createElement('div');
+    el.style.width =  surfaceElement.clientWidth + 'px';
+    el.style.height = surfaceElement.clientHeight + 'px';
+    el.style.overflow = 'hidden';
+    el.style.position = 'absolute';
+    surfaceElement.appendChild(el);
+
+    this.element_ = el;
+    this.arcScaleX_ = 1;
+    this.arcScaleY_ = 1;
+    this.lineScale_ = 1;
+  }
+
+  var contextPrototype = CanvasRenderingContext2D_.prototype;
+  contextPrototype.clearRect = function() {
+    this.element_.innerHTML = '';
+  };
+
+  contextPrototype.beginPath = function() {
+    // TODO: Branch current matrix so that save/restore has no effect
+    //       as per safari docs.
+    this.currentPath_ = [];
+  };
+
+  contextPrototype.moveTo = function(aX, aY) {
+    var p = this.getCoords_(aX, aY);
+    this.currentPath_.push({type: 'moveTo', x: p.x, y: p.y});
+    this.currentX_ = p.x;
+    this.currentY_ = p.y;
+  };
+
+  contextPrototype.lineTo = function(aX, aY) {
+    var p = this.getCoords_(aX, aY);
+    this.currentPath_.push({type: 'lineTo', x: p.x, y: p.y});
+
+    this.currentX_ = p.x;
+    this.currentY_ = p.y;
+  };
+
+  contextPrototype.bezierCurveTo = function(aCP1x, aCP1y,
+                                            aCP2x, aCP2y,
+                                            aX, aY) {
+    var p = this.getCoords_(aX, aY);
+    var cp1 = this.getCoords_(aCP1x, aCP1y);
+    var cp2 = this.getCoords_(aCP2x, aCP2y);
+    bezierCurveTo(this, cp1, cp2, p);
+  };
+
+  // Helper function that takes the already fixed cordinates.
+  function bezierCurveTo(self, cp1, cp2, p) {
+    self.currentPath_.push({
+      type: 'bezierCurveTo',
+      cp1x: cp1.x,
+      cp1y: cp1.y,
+      cp2x: cp2.x,
+      cp2y: cp2.y,
+      x: p.x,
+      y: p.y
+    });
+    self.currentX_ = p.x;
+    self.currentY_ = p.y;
+  }
+
+  contextPrototype.quadraticCurveTo = function(aCPx, aCPy, aX, aY) {
+    // the following is lifted almost directly from
+    // http://developer.mozilla.org/en/docs/Canvas_tutorial:Drawing_shapes
+
+    var cp = this.getCoords_(aCPx, aCPy);
+    var p = this.getCoords_(aX, aY);
+
+    var cp1 = {
+      x: this.currentX_ + 2.0 / 3.0 * (cp.x - this.currentX_),
+      y: this.currentY_ + 2.0 / 3.0 * (cp.y - this.currentY_)
+    };
+    var cp2 = {
+      x: cp1.x + (p.x - this.currentX_) / 3.0,
+      y: cp1.y + (p.y - this.currentY_) / 3.0
+    };
+
+    bezierCurveTo(this, cp1, cp2, p);
+  };
+
+  contextPrototype.arc = function(aX, aY, aRadius,
+                                  aStartAngle, aEndAngle, aClockwise) {
+    aRadius *= Z;
+    var arcType = aClockwise ? 'at' : 'wa';
+
+    var xStart = aX + mc(aStartAngle) * aRadius - Z2;
+    var yStart = aY + ms(aStartAngle) * aRadius - Z2;
+
+    var xEnd = aX + mc(aEndAngle) * aRadius - Z2;
+    var yEnd = aY + ms(aEndAngle) * aRadius - Z2;
+
+    // IE won't render arches drawn counter clockwise if xStart == xEnd.
+    if (xStart == xEnd && !aClockwise) {
+      xStart += 0.125; // Offset xStart by 1/80 of a pixel. Use something
+                       // that can be represented in binary
+    }
+
+    var p = this.getCoords_(aX, aY);
+    var pStart = this.getCoords_(xStart, yStart);
+    var pEnd = this.getCoords_(xEnd, yEnd);
+
+    this.currentPath_.push({type: arcType,
+                           x: p.x,
+                           y: p.y,
+                           radius: aRadius,
+                           xStart: pStart.x,
+                           yStart: pStart.y,
+                           xEnd: pEnd.x,
+                           yEnd: pEnd.y});
+
+  };
+
+  contextPrototype.rect = function(aX, aY, aWidth, aHeight) {
+    this.moveTo(aX, aY);
+    this.lineTo(aX + aWidth, aY);
+    this.lineTo(aX + aWidth, aY + aHeight);
+    this.lineTo(aX, aY + aHeight);
+    this.closePath();
+  };
+
+  contextPrototype.strokeRect = function(aX, aY, aWidth, aHeight) {
+    var oldPath = this.currentPath_;
+    this.beginPath();
+
+    this.moveTo(aX, aY);
+    this.lineTo(aX + aWidth, aY);
+    this.lineTo(aX + aWidth, aY + aHeight);
+    this.lineTo(aX, aY + aHeight);
+    this.closePath();
+    this.stroke();
+
+    this.currentPath_ = oldPath;
+  };
+
+  contextPrototype.fillRect = function(aX, aY, aWidth, aHeight) {
+    var oldPath = this.currentPath_;
+    this.beginPath();
+
+    this.moveTo(aX, aY);
+    this.lineTo(aX + aWidth, aY);
+    this.lineTo(aX + aWidth, aY + aHeight);
+    this.lineTo(aX, aY + aHeight);
+    this.closePath();
+    this.fill();
+
+    this.currentPath_ = oldPath;
+  };
+
+  contextPrototype.createLinearGradient = function(aX0, aY0, aX1, aY1) {
+    var gradient = new CanvasGradient_('gradient');
+    gradient.x0_ = aX0;
+    gradient.y0_ = aY0;
+    gradient.x1_ = aX1;
+    gradient.y1_ = aY1;
+    return gradient;
+  };
+
+  contextPrototype.createRadialGradient = function(aX0, aY0, aR0,
+                                                   aX1, aY1, aR1) {
+    var gradient = new CanvasGradient_('gradientradial');
+    gradient.x0_ = aX0;
+    gradient.y0_ = aY0;
+    gradient.r0_ = aR0;
+    gradient.x1_ = aX1;
+    gradient.y1_ = aY1;
+    gradient.r1_ = aR1;
+    return gradient;
+  };
+
+  contextPrototype.drawImage = function(image, var_args) {
+    var dx, dy, dw, dh, sx, sy, sw, sh;
+
+    // to find the original width we overide the width and height
+    var oldRuntimeWidth = image.runtimeStyle.width;
+    var oldRuntimeHeight = image.runtimeStyle.height;
+    image.runtimeStyle.width = 'auto';
+    image.runtimeStyle.height = 'auto';
+
+    // get the original size
+    var w = image.width;
+    var h = image.height;
+
+    // and remove overides
+    image.runtimeStyle.width = oldRuntimeWidth;
+    image.runtimeStyle.height = oldRuntimeHeight;
+
+    if (arguments.length == 3) {
+      dx = arguments[1];
+      dy = arguments[2];
+      sx = sy = 0;
+      sw = dw = w;
+      sh = dh = h;
+    } else if (arguments.length == 5) {
+      dx = arguments[1];
+      dy = arguments[2];
+      dw = arguments[3];
+      dh = arguments[4];
+      sx = sy = 0;
+      sw = w;
+      sh = h;
+    } else if (arguments.length == 9) {
+      sx = arguments[1];
+      sy = arguments[2];
+      sw = arguments[3];
+      sh = arguments[4];
+      dx = arguments[5];
+      dy = arguments[6];
+      dw = arguments[7];
+      dh = arguments[8];
+    } else {
+      throw Error('Invalid number of arguments');
+    }
+
+    var d = this.getCoords_(dx, dy);
+
+    var w2 = sw / 2;
+    var h2 = sh / 2;
+
+    var vmlStr = [];
+
+    var W = 10;
+    var H = 10;
+
+    // For some reason that I've now forgotten, using divs didn't work
+    vmlStr.push(' <g_vml_:group',
+                ' coordsize="', Z * W, ',', Z * H, '"',
+                ' coordorigin="0,0"' ,
+                ' style="width:', W, 'px;height:', H, 'px;position:absolute;');
+
+    // If filters are necessary (rotation exists), create them
+    // filters are bog-slow, so only create them if abbsolutely necessary
+    // The following check doesn't account for skews (which don't exist
+    // in the canvas spec (yet) anyway.
+
+    if (this.m_[0][0] != 1 || this.m_[0][1]) {
+      var filter = [];
+
+      // Note the 12/21 reversal
+      filter.push('M11=', this.m_[0][0], ',',
+                  'M12=', this.m_[1][0], ',',
+                  'M21=', this.m_[0][1], ',',
+                  'M22=', this.m_[1][1], ',',
+                  'Dx=', mr(d.x / Z), ',',
+                  'Dy=', mr(d.y / Z), '');
+
+      // Bounding box calculation (need to minimize displayed area so that
+      // filters don't waste time on unused pixels.
+      var max = d;
+      var c2 = this.getCoords_(dx + dw, dy);
+      var c3 = this.getCoords_(dx, dy + dh);
+      var c4 = this.getCoords_(dx + dw, dy + dh);
+
+      max.x = m.max(max.x, c2.x, c3.x, c4.x);
+      max.y = m.max(max.y, c2.y, c3.y, c4.y);
+
+      vmlStr.push('padding:0 ', mr(max.x / Z), 'px ', mr(max.y / Z),
+                  'px 0;filter:progid:DXImageTransform.Microsoft.Matrix(',
+                  filter.join(''), ", sizingmethod='clip');")
+    } else {
+      vmlStr.push('top:', mr(d.y / Z), 'px;left:', mr(d.x / Z), 'px;');
+    }
+
+    vmlStr.push(' ">' ,
+                '<g_vml_:image src="', image.src, '"',
+                ' style="width:', Z * dw, 'px;',
+                ' height:', Z * dh, 'px;"',
+                ' cropleft="', sx / w, '"',
+                ' croptop="', sy / h, '"',
+                ' cropright="', (w - sx - sw) / w, '"',
+                ' cropbottom="', (h - sy - sh) / h, '"',
+                ' />',
+                '</g_vml_:group>');
+
+    this.element_.insertAdjacentHTML('BeforeEnd',
+                                    vmlStr.join(''));
+  };
+
+  contextPrototype.stroke = function(aFill) {
+    var lineStr = [];
+    var lineOpen = false;
+    var a = processStyle(aFill ? this.fillStyle : this.strokeStyle);
+    var color = a.color;
+    var opacity = a.alpha * this.globalAlpha;
+
+    var W = 10;
+    var H = 10;
+
+    lineStr.push('<g_vml_:shape',
+                 ' filled="', !!aFill, '"',
+                 ' style="position:absolute;width:', W, 'px;height:', H, 'px;"',
+                 ' coordorigin="0 0" coordsize="', Z * W, ' ', Z * H, '"',
+                 ' stroked="', !aFill, '"',
+                 ' path="');
+
+    var newSeq = false;
+    var min = {x: null, y: null};
+    var max = {x: null, y: null};
+
+    for (var i = 0; i < this.currentPath_.length; i++) {
+      var p = this.currentPath_[i];
+      var c;
+
+      switch (p.type) {
+        case 'moveTo':
+          c = p;
+          lineStr.push(' m ', mr(p.x), ',', mr(p.y));
+          break;
+        case 'lineTo':
+          lineStr.push(' l ', mr(p.x), ',', mr(p.y));
+          break;
+        case 'close':
+          lineStr.push(' x ');
+          p = null;
+          break;
+        case 'bezierCurveTo':
+          lineStr.push(' c ',
+                       mr(p.cp1x), ',', mr(p.cp1y), ',',
+                       mr(p.cp2x), ',', mr(p.cp2y), ',',
+                       mr(p.x), ',', mr(p.y));
+          break;
+        case 'at':
+        case 'wa':
+          lineStr.push(' ', p.type, ' ',
+                       mr(p.x - this.arcScaleX_ * p.radius), ',',
+                       mr(p.y - this.arcScaleY_ * p.radius), ' ',
+                       mr(p.x + this.arcScaleX_ * p.radius), ',',
+                       mr(p.y + this.arcScaleY_ * p.radius), ' ',
+                       mr(p.xStart), ',', mr(p.yStart), ' ',
+                       mr(p.xEnd), ',', mr(p.yEnd));
+          break;
+      }
+
+
+      // TODO: Following is broken for curves due to
+      //       move to proper paths.
+
+      // Figure out dimensions so we can do gradient fills
+      // properly
+      if (p) {
+        if (min.x == null || p.x < min.x) {
+          min.x = p.x;
+        }
+        if (max.x == null || p.x > max.x) {
+          max.x = p.x;
+        }
+        if (min.y == null || p.y < min.y) {
+          min.y = p.y;
+        }
+        if (max.y == null || p.y > max.y) {
+          max.y = p.y;
+        }
+      }
+    }
+    lineStr.push(' ">');
+
+    if (!aFill) {
+      var lineWidth = this.lineScale_ * this.lineWidth;
+
+      // VML cannot correctly render a line if the width is less than 1px.
+      // In that case, we dilute the color to make the line look thinner.
+      if (lineWidth < 1) {
+        opacity *= lineWidth;
+      }
+
+      lineStr.push(
+        '<g_vml_:stroke',
+        ' opacity="', opacity, '"',
+        ' joinstyle="', this.lineJoin, '"',
+        ' miterlimit="', this.miterLimit, '"',
+        ' endcap="', processLineCap(this.lineCap), '"',
+        ' weight="', lineWidth, 'px"',
+        ' color="', color, '" />'
+      );
+    } else if (typeof this.fillStyle == 'object') {
+      var fillStyle = this.fillStyle;
+      var angle = 0;
+      var focus = {x: 0, y: 0};
+
+      // additional offset
+      var shift = 0;
+      // scale factor for offset
+      var expansion = 1;
+
+      if (fillStyle.type_ == 'gradient') {
+        var x0 = fillStyle.x0_ / this.arcScaleX_;
+        var y0 = fillStyle.y0_ / this.arcScaleY_;
+        var x1 = fillStyle.x1_ / this.arcScaleX_;
+        var y1 = fillStyle.y1_ / this.arcScaleY_;
+        var p0 = this.getCoords_(x0, y0);
+        var p1 = this.getCoords_(x1, y1);
+        var dx = p1.x - p0.x;
+        var dy = p1.y - p0.y;
+        angle = Math.atan2(dx, dy) * 180 / Math.PI;
+
+        // The angle should be a non-negative number.
+        if (angle < 0) {
+          angle += 360;
+        }
+
+        // Very small angles produce an unexpected result because they are
+        // converted to a scientific notation string.
+        if (angle < 1e-6) {
+          angle = 0;
+        }
+      } else {
+        var p0 = this.getCoords_(fillStyle.x0_, fillStyle.y0_);
+        var width  = max.x - min.x;
+        var height = max.y - min.y;
+        focus = {
+          x: (p0.x - min.x) / width,
+          y: (p0.y - min.y) / height
+        };
+
+        width  /= this.arcScaleX_ * Z;
+        height /= this.arcScaleY_ * Z;
+        var dimension = m.max(width, height);
+        shift = 2 * fillStyle.r0_ / dimension;
+        expansion = 2 * fillStyle.r1_ / dimension - shift;
+      }
+
+      // We need to sort the color stops in ascending order by offset,
+      // otherwise IE won't interpret it correctly.
+      var stops = fillStyle.colors_;
+      stops.sort(function(cs1, cs2) {
+        return cs1.offset - cs2.offset;
+      });
+
+      var length = stops.length;
+      var color1 = stops[0].color;
+      var color2 = stops[length - 1].color;
+      var opacity1 = stops[0].alpha * this.globalAlpha;
+      var opacity2 = stops[length - 1].alpha * this.globalAlpha;
+
+      var colors = [];
+      for (var i = 0; i < length; i++) {
+        var stop = stops[i];
+        colors.push(stop.offset * expansion + shift + ' ' + stop.color);
+      }
+
+      // When colors attribute is used, the meanings of opacity and o:opacity2
+      // are reversed.
+      lineStr.push('<g_vml_:fill type="', fillStyle.type_, '"',
+                   ' method="none" focus="100%"',
+                   ' color="', color1, '"',
+                   ' color2="', color2, '"',
+                   ' colors="', colors.join(','), '"',
+                   ' opacity="', opacity2, '"',
+                   ' g_o_:opacity2="', opacity1, '"',
+                   ' angle="', angle, '"',
+                   ' focusposition="', focus.x, ',', focus.y, '" />');
+    } else {
+      lineStr.push('<g_vml_:fill color="', color, '" opacity="', opacity,
+                   '" />');
+    }
+
+    lineStr.push('</g_vml_:shape>');
+
+    this.element_.insertAdjacentHTML('beforeEnd', lineStr.join(''));
+  };
+
+  contextPrototype.fill = function() {
+    this.stroke(true);
+  }
+
+  contextPrototype.closePath = function() {
+    this.currentPath_.push({type: 'close'});
+  };
+
+  /**
+   * @private
+   */
+  contextPrototype.getCoords_ = function(aX, aY) {
+    var m = this.m_;
+    return {
+      x: Z * (aX * m[0][0] + aY * m[1][0] + m[2][0]) - Z2,
+      y: Z * (aX * m[0][1] + aY * m[1][1] + m[2][1]) - Z2
+    }
+  };
+
+  contextPrototype.save = function() {
+    var o = {};
+    copyState(this, o);
+    this.aStack_.push(o);
+    this.mStack_.push(this.m_);
+    this.m_ = matrixMultiply(createMatrixIdentity(), this.m_);
+  };
+
+  contextPrototype.restore = function() {
+    copyState(this.aStack_.pop(), this);
+    this.m_ = this.mStack_.pop();
+  };
+
+  function matrixIsFinite(m) {
+    for (var j = 0; j < 3; j++) {
+      for (var k = 0; k < 2; k++) {
+        if (!isFinite(m[j][k]) || isNaN(m[j][k])) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function setM(ctx, m, updateLineScale) {
+    if (!matrixIsFinite(m)) {
+      return;
+    }
+    ctx.m_ = m;
+
+    if (updateLineScale) {
+      // Get the line scale.
+      // Determinant of this.m_ means how much the area is enlarged by the
+      // transformation. So its square root can be used as a scale factor
+      // for width.
+      var det = m[0][0] * m[1][1] - m[0][1] * m[1][0];
+      ctx.lineScale_ = sqrt(abs(det));
+    }
+  }
+
+  contextPrototype.translate = function(aX, aY) {
+    var m1 = [
+      [1,  0,  0],
+      [0,  1,  0],
+      [aX, aY, 1]
+    ];
+
+    setM(this, matrixMultiply(m1, this.m_), false);
+  };
+
+  contextPrototype.rotate = function(aRot) {
+    var c = mc(aRot);
+    var s = ms(aRot);
+
+    var m1 = [
+      [c,  s, 0],
+      [-s, c, 0],
+      [0,  0, 1]
+    ];
+
+    setM(this, matrixMultiply(m1, this.m_), false);
+  };
+
+  contextPrototype.scale = function(aX, aY) {
+    this.arcScaleX_ *= aX;
+    this.arcScaleY_ *= aY;
+    var m1 = [
+      [aX, 0,  0],
+      [0,  aY, 0],
+      [0,  0,  1]
+    ];
+
+    setM(this, matrixMultiply(m1, this.m_), true);
+  };
+
+  contextPrototype.transform = function(m11, m12, m21, m22, dx, dy) {
+    var m1 = [
+      [m11, m12, 0],
+      [m21, m22, 0],
+      [dx,  dy,  1]
+    ];
+
+    setM(this, matrixMultiply(m1, this.m_), true);
+  };
+
+  contextPrototype.setTransform = function(m11, m12, m21, m22, dx, dy) {
+    var m = [
+      [m11, m12, 0],
+      [m21, m22, 0],
+      [dx,  dy,  1]
+    ];
+
+    setM(this, m, true);
+  };
+
+  /******** STUBS ********/
+  contextPrototype.clip = function() {
+    // TODO: Implement
+  };
+
+  contextPrototype.arcTo = function() {
+    // TODO: Implement
+  };
+
+  contextPrototype.createPattern = function() {
+    return new CanvasPattern_;
+  };
+
+  // Gradient / Pattern Stubs
+  function CanvasGradient_(aType) {
+    this.type_ = aType;
+    this.x0_ = 0;
+    this.y0_ = 0;
+    this.r0_ = 0;
+    this.x1_ = 0;
+    this.y1_ = 0;
+    this.r1_ = 0;
+    this.colors_ = [];
+  }
+
+  CanvasGradient_.prototype.addColorStop = function(aOffset, aColor) {
+    aColor = processStyle(aColor);
+    this.colors_.push({offset: aOffset,
+                       color: aColor.color,
+                       alpha: aColor.alpha});
+  };
+
+  function CanvasPattern_() {}
+
+  // set up externs
+  G_vmlCanvasManager = G_vmlCanvasManager_;
+  CanvasRenderingContext2D = CanvasRenderingContext2D_;
+  CanvasGradient = CanvasGradient_;
+  CanvasPattern = CanvasPattern_;
+
+})();
+
+} // if
