@@ -1,6 +1,6 @@
 <html>
     <head>
-        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.7.2.min.js')}"></script>
+        <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/jquery-1.8.3.min.js')}"></script>
         <script src="${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/swordpush.js')}"></script>
         <script type="text/javascript">
           /* this submits the hidden login form to cnx. */
