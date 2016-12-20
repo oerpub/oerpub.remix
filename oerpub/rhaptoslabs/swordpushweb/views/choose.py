@@ -864,10 +864,7 @@ class URLProcessor(BaseFormProcessor):
                     # page if not.
                     if resp.status / 100 == 2:
                         # Get the title
-                        title = etree.fromstring(html,
-                            etree.HTMLParser()).xpath(
-                            '/html/head/title/text()')[0] or \
-                            'Untitled Google Document'
+                        title = 'Untitled Google Document'
 
                         # Process it
                         P = GoogleDocProcessor(self.request)
