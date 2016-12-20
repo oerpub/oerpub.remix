@@ -712,10 +712,10 @@ class GoogleDocProcessor(BaseFormProcessor):
         # operate, and update like BaseFormProcessor does above.
         return self.process_gdocs_resource(html, title)
 
-    def process_gdocs_resource(self, html, title, form=None):
+    def process_gdocs_resource(self, html, title, form=None, kix=None):
         try:
             filename = self._process_gdocs_resource(
-                self.save_dir, html)
+                self.save_dir, html, kix)
         except ConversionError as e:
             return render_conversionerror(self.request, e.msg)
 
@@ -734,9 +734,9 @@ class GoogleDocProcessor(BaseFormProcessor):
         return HTTPFound(location=self.request.route_url(self.nextStep()))
 
     @classmethod
-    def _process_gdocs_resource(klass, save_dir, html):
+    def _process_gdocs_resource(klass, save_dir, html, kix=None):
         # Transformation and get images
-        cnxml, objects = gdocs_to_cnxml(html, bDownloadImages=True)
+        cnxml, objects = gdocs_to_cnxml(html, kixcontent=kix, bDownloadImages=True)
         cnxml = clean_cnxml(cnxml)
         save_cnxml(save_dir, cnxml, objects.items())
         validate_cnxml(cnxml)
@@ -855,6 +855,8 @@ class URLProcessor(BaseFormProcessor):
                 try:
                     resp, html = http.request(
                         'https://docs.google.com/document/d/%s/export?format=html&confirm=no_antivirus' % gdocs_resource_id)
+                    resp2, kix = http.request(
+                        'https://docs.google.com/feeds/download/documents/export/Export?id=%s&exportFormat=kix' % gdocs_resource_id)
                 except HttpError:
                     pass
                 else:
@@ -869,7 +871,7 @@ class URLProcessor(BaseFormProcessor):
 
                         # Process it
                         P = GoogleDocProcessor(self.request)
-                        return P.process_gdocs_resource(html, title, form)
+                        return P.process_gdocs_resource(html, title, form, kix)
                 self.request.session.flash('Failed to convert google document')
                 return HTTPFound(location=self.request.route_url('choose'))
             else:
